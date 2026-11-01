@@ -77,7 +77,6 @@
           <nav class="compare-nav" aria-label="Další srovnání">
             <a class="chip" href="srovnani-ninite.html">vs Ninite</a>
             <a class="chip" href="srovnani-unigetui.html" aria-current="page">vs UniGetUI</a>
-            <a class="chip" href="srovnani-chocolatey.html">vs Chocolatey</a>
             <a class="chip" href="srovnani-winstall.html">vs Winstall.app</a>
           </nav>
           <h1>HubGet vs UniGetUI</h1>
@@ -113,8 +112,8 @@
       <div class="wrap">
         <dl class="stats reveal">
           <div><dt>Zaměření</dt><dd>Obchod vs správce balíčků</dd></div>
-          <div><dt>Správci naostro</dt><dd>1 (3 ve verzi 0.1.11) vs 11</dd></div>
-          <div><dt>Platformy</dt><dd>Windows vs Windows, macOS, Linux</dd></div>
+          <div><dt>Správci balíčků</dt><dd>11 vs 11</dd></div>
+          <div><dt>Jedna aplikace, jedna karta</dt><dd>Ano vs ne</dd></div>
           <div><dt>Cena a licence</dt><dd>Obojí zdarma, MIT</dd></div>
         </dl>
       </div>
@@ -126,7 +125,7 @@
         <div class="section__head reveal">
           <p class="eyebrow">Funkce</p>
           <h2>Srovnání funkcí</h2>
-          <p class="section__lead">HubGet ve vydané verzi 0.1.10, s poznámkou, co přinese připravovaná verze 0.1.11. Kde je dál UniGetUI, píšeme to na rovinu.</p>
+          <p class="section__lead">Co který nástroj umí. Kde je dál UniGetUI, píšeme to na rovinu.</p>
         </div>
         <div class="cmp-wrap reveal">
           <table class="cmp">
@@ -164,9 +163,24 @@
                 <td data-label="UniGetUI"><span class="mark mark--yes"><span class="sr-only">Ano: </span></span>Podrobné údaje o balíčku včetně snímků obrazovky z komunitní databáze</td>
               </tr>
               <tr>
+                <th scope="row">Hodnocení a recenze</th>
+                <td data-label="HubGet"><span class="mark mark--yes"><span class="sr-only">Ano: </span></span>Průměr hvězdiček, rozložení hodnocení a nejužitečnější recenze – vlastní přidáte po přihlášení přes GitHub</td>
+                <td data-label="UniGetUI"><span class="mark mark--no"><span class="sr-only">Ne: </span></span>Hodnocení ani recenze nenabízí</td>
+              </tr>
+              <tr>
                 <th scope="row">Instalace, aktualizace, odinstalace</th>
                 <td data-label="HubGet"><span class="mark mark--yes"><span class="sr-only">Ano: </span></span>Přímo v aplikaci, i hromadně – pro všechny podporované správce</td>
                 <td data-label="UniGetUI"><span class="mark mark--yes"><span class="sr-only">Ano: </span></span>Pro všechny podporované správce, i hromadně</td>
+              </tr>
+              <tr>
+                <th scope="row">Záložní zdroj instalace</th>
+                <td data-label="HubGet"><span class="mark mark--yes"><span class="sr-only">Ano: </span></span>Když WinGet ohlásí nefunkční odkaz na stažení, HubGet sám zkusí Chocolatey a potom Scoop</td>
+                <td data-label="UniGetUI"><span class="mark mark--no"><span class="sr-only">Ne: </span></span>Při chybě instalace jiný zdroj sám nezkusí</td>
+              </tr>
+              <tr>
+                <th scope="row">Úklid po odinstalaci</th>
+                <td data-label="HubGet"><span class="mark mark--yes"><span class="sr-only">Ano: </span></span>Najde zbytky v AppData, Program Files, nabídce Start i v registru a nabídne je smazat. Se sledováním instalace ví o všem, co instalátor vytvořil</td>
+                <td data-label="UniGetUI"><span class="mark mark--no"><span class="sr-only">Ne: </span></span>Odinstaluje přes správce balíčků, zbytky nehledá</td>
               </tr>
               <tr>
                 <th scope="row">Automatické aktualizace</th>
@@ -184,14 +198,14 @@
                 <td data-label="UniGetUI"><span class="mark mark--yes"><span class="sr-only">Ano: </span></span>Ikona u hodin s dostupnými aktualizacemi</td>
               </tr>
               <tr>
+                <th scope="row">Programy po spuštění</th>
+                <td data-label="HubGet"><span class="mark mark--yes"><span class="sr-only">Ano: </span></span>Vše, co se spouští po přihlášení do Windows, na jednom místě – zapnutí a vypnutí jedním kliknutím a vliv na rychlost startu</td>
+                <td data-label="UniGetUI"><span class="mark mark--no"><span class="sr-only">Ne: </span></span>Nenabízí</td>
+              </tr>
+              <tr>
                 <th scope="row">Záloha a přenos</th>
                 <td data-label="HubGet"><span class="mark mark--yes"><span class="sr-only">Ano: </span></span>Sady balíčků s importem a exportem (.ubundle, skript PowerShellu, export pro WinGet)</td>
                 <td data-label="UniGetUI"><span class="mark mark--yes"><span class="sr-only">Ano: </span></span>Export a import seznamů balíčků, zálohy i do GitHub Gistu</td>
-              </tr>
-              <tr>
-                <th scope="row">Platformy</th>
-                <td data-label="HubGet"><span class="mark mark--part"><span class="sr-only">Částečně: </span></span>Windows 10 a 11</td>
-                <td data-label="UniGetUI"><span class="mark mark--yes"><span class="sr-only">Ano: </span></span>Windows, macOS a Linux</td>
               </tr>
               <tr>
                 <th scope="row">Cena a licence</th>
@@ -231,7 +245,6 @@
             <p class="compare-card__title">UniGetUI se hodí, když…</p>
             <ul class="ticks ticks--muted">
               <li>chcete jeden seznam balíčků ze všech správců místo obchodu s aplikacemi</li>
-              <li>pracujete i na macOS nebo Linuxu</li>
               <li>chcete zálohovat seznam balíčků do GitHub Gistu</li>
             </ul>
           </article>
@@ -253,7 +266,7 @@
           </details>
           <details>
             <summary>V čem je UniGetUI dál?</summary>
-            <p>UniGetUI běží i na macOS a Linuxu a umí zálohovat seznam balíčků do GitHub Gistu. Správce balíčků i automatické aktualizace už oba nástroje mají stejné – od verze 0.1.13 HubGet kromě WinGetu, Chocolatey a Scoopu spravuje i npm, Bun, pip, Cargo, vcpkg, .NET Tool a PowerShell a aktualizace plánuje v daný čas, s minimálním stářím a výjimkami pro baterii.</p>
+            <p>UniGetUI umí zálohovat seznam balíčků do GitHub Gistu. Správce balíčků i automatické aktualizace už oba nástroje mají stejné – od verze 0.1.13 HubGet kromě WinGetu, Chocolatey a Scoopu spravuje i npm, Bun, pip, Cargo, vcpkg, .NET Tool a PowerShell a aktualizace plánuje v daný čas, s minimálním stářím a výjimkami pro baterii.</p>
           </details>
           <details>
             <summary>Můžu používat HubGet i UniGetUI zároveň?</summary>
@@ -267,7 +280,7 @@
 
         <div class="changelog-cta reveal">
           <h2>Vyzkoušejte HubGet</h2>
-          <p>Zdarma, open source a bez reklam. Instalátor má 4,3&nbsp;MB a nepotřebuje práva správce.</p>
+          <p>Zdarma, open source a bez reklam. Instalátor má zhruba 6&nbsp;MB a nepotřebuje práva správce.</p>
           <div class="changelog-cta__actions">
             <a class="btn btn--primary btn--lg" href="index.html#stahnout">Stáhnout HubGet</a>
             <a class="btn btn--ghost btn--lg" href="srovnani.html">Další srovnání</a>

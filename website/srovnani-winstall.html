@@ -77,7 +77,6 @@
           <nav class="compare-nav" aria-label="Další srovnání">
             <a class="chip" href="srovnani-ninite.html">vs Ninite</a>
             <a class="chip" href="srovnani-unigetui.html">vs UniGetUI</a>
-            <a class="chip" href="srovnani-chocolatey.html">vs Chocolatey</a>
             <a class="chip" href="srovnani-winstall.html" aria-current="page">vs Winstall.app</a>
           </nav>
           <h1>HubGet vs Winstall.app</h1>
@@ -128,7 +127,7 @@ winget install --id=7zip.7zip -e</pre>
         <div class="section__head reveal">
           <p class="eyebrow">Funkce</p>
           <h2>Srovnání funkcí</h2>
-          <p class="section__lead">Co který nástroj umí – HubGet ve vydané verzi 0.1.10, s poznámkou, co přinese připravovaná verze 0.1.11.</p>
+          <p class="section__lead">Co který nástroj umí.</p>
         </div>
         <div class="cmp-wrap reveal">
           <table class="cmp">
@@ -147,7 +146,7 @@ winget install --id=7zip.7zip -e</pre>
               </tr>
               <tr>
                 <th scope="row">Co je potřeba nainstalovat</th>
-                <td data-label="HubGet"><span class="mark mark--part"><span class="sr-only">Částečně: </span></span>HubGet – instalátor má 4,3&nbsp;MB a nepotřebuje práva správce</td>
+                <td data-label="HubGet"><span class="mark mark--part"><span class="sr-only">Částečně: </span></span>HubGet – instalátor má zhruba 6&nbsp;MB a nepotřebuje práva správce</td>
                 <td data-label="Winstall.app"><span class="mark mark--yes"><span class="sr-only">Ano: </span></span>Nic – stačí prohlížeč a WinGet, který je ve Windows 10 a 11</td>
               </tr>
               <tr>
@@ -166,8 +165,18 @@ winget install --id=7zip.7zip -e</pre>
                 <td data-label="Winstall.app"><span class="mark mark--no"><span class="sr-only">Ne: </span></span>Mimo jeho záběr – slouží k sestavení instalačního příkazu</td>
               </tr>
               <tr>
+                <th scope="row">Automatické aktualizace</th>
+                <td data-label="HubGet"><span class="mark mark--yes"><span class="sr-only">Ano: </span></span>Plánovaná kontrola i instalace v daný čas, oznámení, minimální stáří aktualizací a výjimky pro baterii a měřené připojení</td>
+                <td data-label="Winstall.app"><span class="mark mark--no"><span class="sr-only">Ne: </span></span>Neumí – aktualizace spouštíte příkazem v terminálu sami</td>
+              </tr>
+              <tr>
+                <th scope="row">Úklid po odinstalaci</th>
+                <td data-label="HubGet"><span class="mark mark--yes"><span class="sr-only">Ano: </span></span>Najde zbytky v AppData, Program Files, nabídce Start i v registru a nabídne je smazat. Se sledováním instalace ví o všem, co instalátor vytvořil</td>
+                <td data-label="Winstall.app"><span class="mark mark--no"><span class="sr-only">Ne: </span></span>Neodinstalovává</td>
+              </tr>
+              <tr>
                 <th scope="row">Chocolatey a Scoop přímo v aplikaci</th>
-                <td data-label="HubGet"><span class="mark mark--part"><span class="sr-only">Částečně: </span></span>V katalogu a jako záložní zdroj už teď. Instalaci, aktualizace a odinstalaci přinese verze 0.1.11</td>
+                <td data-label="HubGet"><span class="mark mark--yes"><span class="sr-only">Ano: </span></span>Instalace, aktualizace i odinstalace přímo v aplikaci – a záložní zdroj, když nefunguje WinGet</td>
                 <td data-label="Winstall.app"><span class="mark mark--no"><span class="sr-only">Ne: </span></span>Nepodporuje</td>
               </tr>
               <tr>
@@ -181,6 +190,11 @@ winget install --id=7zip.7zip -e</pre>
                 <td data-label="Winstall.app"><span class="mark mark--part"><span class="sr-only">Částečně: </span></span>Stránka aplikace s popisem, odkazy a instalačním příkazem</td>
               </tr>
               <tr>
+                <th scope="row">Hodnocení a recenze</th>
+                <td data-label="HubGet"><span class="mark mark--yes"><span class="sr-only">Ano: </span></span>Průměr hvězdiček, rozložení hodnocení a nejužitečnější recenze – vlastní přidáte po přihlášení přes GitHub</td>
+                <td data-label="Winstall.app"><span class="mark mark--no"><span class="sr-only">Ne: </span></span>Hodnocení ani recenze nenabízí</td>
+              </tr>
+              <tr>
                 <th scope="row">Kolekce a sady aplikací</th>
                 <td data-label="HubGet"><span class="mark mark--yes"><span class="sr-only">Ano: </span></span>Sady balíčků s importem a exportem (.ubundle, skript PowerShellu, export pro WinGet)</td>
                 <td data-label="Winstall.app"><span class="mark mark--yes"><span class="sr-only">Ano: </span></span>Kolekce („packs“) sdílené odkazem a export skriptu</td>
@@ -189,6 +203,11 @@ winget install --id=7zip.7zip -e</pre>
                 <th scope="row">Běh na pozadí</th>
                 <td data-label="HubGet"><span class="mark mark--yes"><span class="sr-only">Ano: </span></span>Ikona u hodin – instalace doběhnou i po zavření okna</td>
                 <td data-label="Winstall.app"><span class="mark mark--no"><span class="sr-only">Ne: </span></span>Instalace běží v terminálu, který spustíte sami</td>
+              </tr>
+              <tr>
+                <th scope="row">Programy po spuštění</th>
+                <td data-label="HubGet"><span class="mark mark--yes"><span class="sr-only">Ano: </span></span>Vše, co se spouští po přihlášení do Windows, na jednom místě – zapnutí a vypnutí jedním kliknutím a vliv na rychlost startu</td>
+                <td data-label="Winstall.app"><span class="mark mark--no"><span class="sr-only">Ne: </span></span>Nenabízí</td>
               </tr>
               <tr>
                 <th scope="row">Použití mimo Windows</th>
@@ -258,8 +277,8 @@ winget install --id=7zip.7zip -e</pre>
             <p>Ano. Oba nástroje stojí na stejném repozitáři WinGetu, takže aplikace ze svých kolekcí najdete i v katalogu HubGetu. Stačí je vyhledat a uložit do vlastní sady balíčků – tu pak nainstalujete najednou nebo exportujete jako skript PowerShellu.</p>
           </details>
           <details>
-            <summary>Umí HubGet už teď instalovat z Chocolatey a Scoopu?</summary>
-            <p>Částečně. Aplikace z Chocolatey a Scoopu jsou v katalogu i ve vyhledávání a od verze 0.1.10 slouží jako záložní zdroj, když má WinGet nefunkční odkaz na stažení. Plnou instalaci, aktualizace a odinstalaci z obou správců přímo v aplikaci přinese verze 0.1.11, která je ve vývoji.</p>
+            <summary>Umí HubGet instalovat z Chocolatey a Scoopu?</summary>
+            <p>Ano. Aplikace z Chocolatey a Scoopu HubGet nainstaluje, aktualizuje i odinstaluje přímo v aplikaci. Oba správci zároveň slouží jako záložní zdroj, když má WinGet nefunkční odkaz na stažení.</p>
           </details>
           <details>
             <summary>Jsou oba nástroje zdarma?</summary>
@@ -269,7 +288,7 @@ winget install --id=7zip.7zip -e</pre>
 
         <div class="changelog-cta reveal">
           <h2>Vyzkoušejte HubGet</h2>
-          <p>Zdarma, open source a bez reklam. Instalátor má 4,3&nbsp;MB a nepotřebuje práva správce.</p>
+          <p>Zdarma, open source a bez reklam. Instalátor má zhruba 6&nbsp;MB a nepotřebuje práva správce.</p>
           <div class="changelog-cta__actions">
             <a class="btn btn--primary btn--lg" href="index.html#stahnout">Stáhnout HubGet</a>
             <a class="btn btn--ghost btn--lg" href="srovnani.html">Další srovnání</a>

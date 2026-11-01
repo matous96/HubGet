@@ -77,7 +77,6 @@
           <nav class="compare-nav" aria-label="More comparisons">
             <a class="chip" href="compare-ninite.html" aria-current="page">vs Ninite</a>
             <a class="chip" href="compare-unigetui.html">vs UniGetUI</a>
-            <a class="chip" href="compare-chocolatey.html">vs Chocolatey</a>
             <a class="chip" href="compare-winstall.html">vs Winstall.app</a>
           </nav>
           <h1>HubGet vs Ninite</h1>
@@ -134,7 +133,7 @@
         <div class="section__head reveal">
           <p class="eyebrow">Features</p>
           <h2>Feature comparison</h2>
-          <p class="section__lead">HubGet as of the released version 0.1.10, next to the free Ninite for home use.</p>
+          <p class="section__lead">HubGet next to the free Ninite for home use.</p>
         </div>
         <div class="cmp-wrap reveal">
           <table class="cmp">
@@ -172,9 +171,19 @@
                 <td data-label="Ninite"><span class="mark mark--part"><span class="sr-only">Partly: </span></span>Run the installer again – it skips up-to-date apps. Only for apps Ninite offers</td>
               </tr>
               <tr>
+                <th scope="row">Automatic updates</th>
+                <td data-label="HubGet"><span class="mark mark--yes"><span class="sr-only">Yes: </span></span>Scheduled checks and installs at a set time, notifications, a minimum age for updates and exceptions for battery and metered connections</td>
+                <td data-label="Ninite"><span class="mark mark--no"><span class="sr-only">No: </span></span>Not in the free version, only in the paid Ninite Pro</td>
+              </tr>
+              <tr>
                 <th scope="row">Uninstall</th>
                 <td data-label="HubGet"><span class="mark mark--yes"><span class="sr-only">Yes: </span></span>Right in the app</td>
                 <td data-label="Ninite"><span class="mark mark--no"><span class="sr-only">No: </span></span>Not in the free version, only in the paid Ninite Pro</td>
+              </tr>
+              <tr>
+                <th scope="row">Leftover cleanup</th>
+                <td data-label="HubGet"><span class="mark mark--yes"><span class="sr-only">Yes: </span></span>Finds leftovers in AppData, Program Files, the Start menu and the registry and offers to delete them. With install tracking, it knows everything the installer created</td>
+                <td data-label="Ninite"><span class="mark mark--no"><span class="sr-only">No: </span></span>The free version can’t uninstall at all</td>
               </tr>
               <tr>
                 <th scope="row">Installed apps overview</th>
@@ -187,6 +196,11 @@
                 <td data-label="Ninite"><span class="mark mark--part"><span class="sr-only">Partly: </span></span>A simple list of apps sorted into categories</td>
               </tr>
               <tr>
+                <th scope="row">Ratings and reviews</th>
+                <td data-label="HubGet"><span class="mark mark--yes"><span class="sr-only">Yes: </span></span>Average star rating, rating breakdown and the most helpful reviews – add your own after signing in with GitHub</td>
+                <td data-label="Ninite"><span class="mark mark--no"><span class="sr-only">No: </span></span>No ratings or reviews</td>
+              </tr>
+              <tr>
                 <th scope="row">Install options</th>
                 <td data-label="HubGet"><span class="mark mark--yes"><span class="sr-only">Yes: </span></span>A specific version, architecture, scope, as administrator, custom arguments</td>
                 <td data-label="Ninite"><span class="mark mark--no"><span class="sr-only">No: </span></span>Installs with default settings</td>
@@ -195,6 +209,11 @@
                 <th scope="row">App bundles</th>
                 <td data-label="HubGet"><span class="mark mark--yes"><span class="sr-only">Yes: </span></span>Package bundles with import and export (.ubundle, PowerShell script, WinGet export)</td>
                 <td data-label="Ninite"><span class="mark mark--part"><span class="sr-only">Partly: </span></span>Your selection is stored in the downloaded installer, which you can run again or pass on</td>
+              </tr>
+              <tr>
+                <th scope="row">Startup programs</th>
+                <td data-label="HubGet"><span class="mark mark--yes"><span class="sr-only">Yes: </span></span>Everything that starts when you sign in to Windows, in one place – turn items on or off with one click and see their impact on startup</td>
+                <td data-label="Ninite"><span class="mark mark--no"><span class="sr-only">No: </span></span>Not available</td>
               </tr>
               <tr>
                 <th scope="row">Supported Windows</th>
@@ -269,13 +288,13 @@
           </details>
           <details>
             <summary>Why does HubGet need to be installed when Ninite is just a download?</summary>
-            <p>HubGet is a desktop app – that’s the only way it can show what’s installed on your PC, keep track of updates and let installs finish in the background. The installer is 4.3&nbsp;MB and doesn’t need admin rights.</p>
+            <p>HubGet is a desktop app – that’s the only way it can show what’s installed on your PC, keep track of updates and let installs finish in the background. The installer is about 6&nbsp;MB and doesn’t need admin rights.</p>
           </details>
         </div>
 
         <div class="changelog-cta reveal">
           <h2>Try HubGet</h2>
-          <p>Free, open source and ad-free. The installer is 4.3&nbsp;MB and doesn’t need admin rights.</p>
+          <p>Free, open source and ad-free. The installer is about 6&nbsp;MB and doesn’t need admin rights.</p>
           <div class="changelog-cta__actions">
             <a class="btn btn--primary btn--lg" href="index.html#stahnout">Download HubGet</a>
             <a class="btn btn--ghost btn--lg" href="compare.html">More comparisons</a>

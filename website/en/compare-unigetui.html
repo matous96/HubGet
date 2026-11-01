@@ -77,7 +77,6 @@
           <nav class="compare-nav" aria-label="More comparisons">
             <a class="chip" href="compare-ninite.html">vs Ninite</a>
             <a class="chip" href="compare-unigetui.html" aria-current="page">vs UniGetUI</a>
-            <a class="chip" href="compare-chocolatey.html">vs Chocolatey</a>
             <a class="chip" href="compare-winstall.html">vs Winstall.app</a>
           </nav>
           <h1>HubGet vs UniGetUI</h1>
@@ -113,8 +112,8 @@
       <div class="wrap">
         <dl class="stats reveal">
           <div><dt>Focus</dt><dd>App store vs package manager</dd></div>
-          <div><dt>Managers fully supported</dt><dd>1 (3 in 0.1.11) vs 11</dd></div>
-          <div><dt>Platforms</dt><dd>Windows vs Windows, macOS, Linux</dd></div>
+          <div><dt>Package managers</dt><dd>11 vs 11</dd></div>
+          <div><dt>One app, one card</dt><dd>Yes vs no</dd></div>
           <div><dt>Price and license</dt><dd>Both free, MIT</dd></div>
         </dl>
       </div>
@@ -126,7 +125,7 @@
         <div class="section__head reveal">
           <p class="eyebrow">Features</p>
           <h2>Feature comparison</h2>
-          <p class="section__lead">HubGet as of the released version 0.1.10, with notes on what the upcoming version 0.1.11 adds. Where UniGetUI is ahead, we say so.</p>
+          <p class="section__lead">What each tool can do. Where UniGetUI is ahead, we say so.</p>
         </div>
         <div class="cmp-wrap reveal">
           <table class="cmp">
@@ -164,9 +163,24 @@
                 <td data-label="UniGetUI"><span class="mark mark--yes"><span class="sr-only">Yes: </span></span>Detailed package information, including screenshots from a community database</td>
               </tr>
               <tr>
+                <th scope="row">Ratings and reviews</th>
+                <td data-label="HubGet"><span class="mark mark--yes"><span class="sr-only">Yes: </span></span>Average star rating, rating breakdown and the most helpful reviews – add your own after signing in with GitHub</td>
+                <td data-label="UniGetUI"><span class="mark mark--no"><span class="sr-only">No: </span></span>No ratings or reviews</td>
+              </tr>
+              <tr>
                 <th scope="row">Install, update, uninstall</th>
                 <td data-label="HubGet"><span class="mark mark--yes"><span class="sr-only">Yes: </span></span>Right in the app, in bulk too – for every supported manager</td>
                 <td data-label="UniGetUI"><span class="mark mark--yes"><span class="sr-only">Yes: </span></span>For every supported manager, in bulk too</td>
+              </tr>
+              <tr>
+                <th scope="row">Fallback install source</th>
+                <td data-label="HubGet"><span class="mark mark--yes"><span class="sr-only">Yes: </span></span>When WinGet reports a broken download link, HubGet automatically tries Chocolatey and then Scoop</td>
+                <td data-label="UniGetUI"><span class="mark mark--no"><span class="sr-only">No: </span></span>Doesn’t try another source on its own when an install fails</td>
+              </tr>
+              <tr>
+                <th scope="row">Leftover cleanup</th>
+                <td data-label="HubGet"><span class="mark mark--yes"><span class="sr-only">Yes: </span></span>Finds leftovers in AppData, Program Files, the Start menu and the registry and offers to delete them. With install tracking, it knows everything the installer created</td>
+                <td data-label="UniGetUI"><span class="mark mark--no"><span class="sr-only">No: </span></span>Uninstalls through the package manager without looking for leftovers</td>
               </tr>
               <tr>
                 <th scope="row">Automatic updates</th>
@@ -184,14 +198,14 @@
                 <td data-label="UniGetUI"><span class="mark mark--yes"><span class="sr-only">Yes: </span></span>A tray icon showing available updates</td>
               </tr>
               <tr>
+                <th scope="row">Startup programs</th>
+                <td data-label="HubGet"><span class="mark mark--yes"><span class="sr-only">Yes: </span></span>Everything that starts when you sign in to Windows, in one place – turn items on or off with one click and see their impact on startup</td>
+                <td data-label="UniGetUI"><span class="mark mark--no"><span class="sr-only">No: </span></span>Not available</td>
+              </tr>
+              <tr>
                 <th scope="row">Backup and transfer</th>
                 <td data-label="HubGet"><span class="mark mark--yes"><span class="sr-only">Yes: </span></span>Package bundles with import and export (.ubundle, PowerShell script, WinGet export)</td>
                 <td data-label="UniGetUI"><span class="mark mark--yes"><span class="sr-only">Yes: </span></span>Export and import of package lists, plus backups to a GitHub Gist</td>
-              </tr>
-              <tr>
-                <th scope="row">Platforms</th>
-                <td data-label="HubGet"><span class="mark mark--part"><span class="sr-only">Partly: </span></span>Windows 10 and 11</td>
-                <td data-label="UniGetUI"><span class="mark mark--yes"><span class="sr-only">Yes: </span></span>Windows, macOS and Linux</td>
               </tr>
               <tr>
                 <th scope="row">Price and license</th>
@@ -231,7 +245,6 @@
             <p class="compare-card__title">UniGetUI is a good fit if you…</p>
             <ul class="ticks ticks--muted">
               <li>want one list of packages from every manager instead of an app store</li>
-              <li>also work on macOS or Linux</li>
               <li>want to back up your package list to a GitHub Gist</li>
             </ul>
           </article>
@@ -253,7 +266,7 @@
           </details>
           <details>
             <summary>Where is UniGetUI ahead?</summary>
-            <p>UniGetUI runs on macOS and Linux too and can back up your package list to a GitHub Gist. Both now offer the same package managers and automatic updates – since version 0.1.13, HubGet manages npm, Bun, pip, Cargo, vcpkg, .NET Tool and PowerShell in addition to WinGet, Chocolatey and Scoop, and schedules updates at a set time, with a minimum age and battery exceptions.</p>
+            <p>UniGetUI can back up your package list to a GitHub Gist. Both now offer the same package managers and automatic updates – since version 0.1.13, HubGet manages npm, Bun, pip, Cargo, vcpkg, .NET Tool and PowerShell in addition to WinGet, Chocolatey and Scoop, and schedules updates at a set time, with a minimum age and battery exceptions.</p>
           </details>
           <details>
             <summary>Can I use HubGet and UniGetUI side by side?</summary>
@@ -267,7 +280,7 @@
 
         <div class="changelog-cta reveal">
           <h2>Try HubGet</h2>
-          <p>Free, open source and ad-free. The installer is 4.3&nbsp;MB and doesn’t need admin rights.</p>
+          <p>Free, open source and ad-free. The installer is about 6&nbsp;MB and doesn’t need admin rights.</p>
           <div class="changelog-cta__actions">
             <a class="btn btn--primary btn--lg" href="index.html#stahnout">Download HubGet</a>
             <a class="btn btn--ghost btn--lg" href="compare.html">More comparisons</a>

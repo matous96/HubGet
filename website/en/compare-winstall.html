@@ -77,7 +77,6 @@
           <nav class="compare-nav" aria-label="More comparisons">
             <a class="chip" href="compare-ninite.html">vs Ninite</a>
             <a class="chip" href="compare-unigetui.html">vs UniGetUI</a>
-            <a class="chip" href="compare-chocolatey.html">vs Chocolatey</a>
             <a class="chip" href="compare-winstall.html" aria-current="page">vs Winstall.app</a>
           </nav>
           <h1>HubGet vs Winstall.app</h1>
@@ -128,7 +127,7 @@ winget install --id=7zip.7zip -e</pre>
         <div class="section__head reveal">
           <p class="eyebrow">Features</p>
           <h2>Feature comparison</h2>
-          <p class="section__lead">What each tool can do – HubGet as of the released version 0.1.10, with notes on what the upcoming version 0.1.11 adds.</p>
+          <p class="section__lead">What each tool can do.</p>
         </div>
         <div class="cmp-wrap reveal">
           <table class="cmp">
@@ -147,7 +146,7 @@ winget install --id=7zip.7zip -e</pre>
               </tr>
               <tr>
                 <th scope="row">What you need to install</th>
-                <td data-label="HubGet"><span class="mark mark--part"><span class="sr-only">Partly: </span></span>HubGet – a 4.3&nbsp;MB installer that doesn’t need admin rights</td>
+                <td data-label="HubGet"><span class="mark mark--part"><span class="sr-only">Partly: </span></span>HubGet – an installer of about 6&nbsp;MB that doesn’t need admin rights</td>
                 <td data-label="Winstall.app"><span class="mark mark--yes"><span class="sr-only">Yes: </span></span>Nothing – just a browser and WinGet, which comes with Windows 10 and 11</td>
               </tr>
               <tr>
@@ -166,8 +165,18 @@ winget install --id=7zip.7zip -e</pre>
                 <td data-label="Winstall.app"><span class="mark mark--no"><span class="sr-only">No: </span></span>Out of scope – it’s for putting together an install command</td>
               </tr>
               <tr>
+                <th scope="row">Automatic updates</th>
+                <td data-label="HubGet"><span class="mark mark--yes"><span class="sr-only">Yes: </span></span>Scheduled checks and installs at a set time, notifications, a minimum age for updates and exceptions for battery and metered connections</td>
+                <td data-label="Winstall.app"><span class="mark mark--no"><span class="sr-only">No: </span></span>No – you run update commands in the terminal yourself</td>
+              </tr>
+              <tr>
+                <th scope="row">Leftover cleanup</th>
+                <td data-label="HubGet"><span class="mark mark--yes"><span class="sr-only">Yes: </span></span>Finds leftovers in AppData, Program Files, the Start menu and the registry and offers to delete them. With install tracking, it knows everything the installer created</td>
+                <td data-label="Winstall.app"><span class="mark mark--no"><span class="sr-only">No: </span></span>Doesn’t uninstall</td>
+              </tr>
+              <tr>
                 <th scope="row">Chocolatey and Scoop in the app</th>
-                <td data-label="HubGet"><span class="mark mark--part"><span class="sr-only">Partly: </span></span>In the catalog and as a fallback source today. Install, update and uninstall arrive in version 0.1.11</td>
+                <td data-label="HubGet"><span class="mark mark--yes"><span class="sr-only">Yes: </span></span>Install, update and uninstall right in the app – plus a fallback source when WinGet fails</td>
                 <td data-label="Winstall.app"><span class="mark mark--no"><span class="sr-only">No: </span></span>Not supported</td>
               </tr>
               <tr>
@@ -181,6 +190,11 @@ winget install --id=7zip.7zip -e</pre>
                 <td data-label="Winstall.app"><span class="mark mark--part"><span class="sr-only">Partly: </span></span>An app page with a description, links and the install command</td>
               </tr>
               <tr>
+                <th scope="row">Ratings and reviews</th>
+                <td data-label="HubGet"><span class="mark mark--yes"><span class="sr-only">Yes: </span></span>Average star rating, rating breakdown and the most helpful reviews – add your own after signing in with GitHub</td>
+                <td data-label="Winstall.app"><span class="mark mark--no"><span class="sr-only">No: </span></span>No ratings or reviews</td>
+              </tr>
+              <tr>
                 <th scope="row">Collections and bundles</th>
                 <td data-label="HubGet"><span class="mark mark--yes"><span class="sr-only">Yes: </span></span>Package bundles with import and export (.ubundle, PowerShell script, WinGet export)</td>
                 <td data-label="Winstall.app"><span class="mark mark--yes"><span class="sr-only">Yes: </span></span>Collections (“packs”) shared via a link, plus script export</td>
@@ -189,6 +203,11 @@ winget install --id=7zip.7zip -e</pre>
                 <th scope="row">Running in the background</th>
                 <td data-label="HubGet"><span class="mark mark--yes"><span class="sr-only">Yes: </span></span>A tray icon – installs finish even after you close the window</td>
                 <td data-label="Winstall.app"><span class="mark mark--no"><span class="sr-only">No: </span></span>Installs run in a terminal you start yourself</td>
+              </tr>
+              <tr>
+                <th scope="row">Startup programs</th>
+                <td data-label="HubGet"><span class="mark mark--yes"><span class="sr-only">Yes: </span></span>Everything that starts when you sign in to Windows, in one place – turn items on or off with one click and see their impact on startup</td>
+                <td data-label="Winstall.app"><span class="mark mark--no"><span class="sr-only">No: </span></span>Not available</td>
               </tr>
               <tr>
                 <th scope="row">Use outside Windows</th>
@@ -258,8 +277,8 @@ winget install --id=7zip.7zip -e</pre>
             <p>Yes. Both tools are built on the same WinGet repository, so the apps from your collections are in the HubGet catalog too. Just search for them and save them to your own package bundle – then install it all at once or export it as a PowerShell script.</p>
           </details>
           <details>
-            <summary>Can HubGet install from Chocolatey and Scoop today?</summary>
-            <p>Partly. Apps from Chocolatey and Scoop are in the catalog and in search, and since version 0.1.10 they serve as a fallback source when WinGet has a broken download link. Full install, update and uninstall from both managers right in the app arrives in version 0.1.11, which is in development.</p>
+            <summary>Can HubGet install from Chocolatey and Scoop?</summary>
+            <p>Yes. HubGet installs, updates and uninstalls apps from Chocolatey and Scoop right in the app. Both managers also serve as a fallback source when WinGet has a broken download link.</p>
           </details>
           <details>
             <summary>Are both tools free?</summary>
@@ -269,7 +288,7 @@ winget install --id=7zip.7zip -e</pre>
 
         <div class="changelog-cta reveal">
           <h2>Try HubGet</h2>
-          <p>Free, open source and ad-free. The installer is 4.3&nbsp;MB and doesn’t need admin rights.</p>
+          <p>Free, open source and ad-free. The installer is about 6&nbsp;MB and doesn’t need admin rights.</p>
           <div class="changelog-cta__actions">
             <a class="btn btn--primary btn--lg" href="index.html#stahnout">Download HubGet</a>
             <a class="btn btn--ghost btn--lg" href="compare.html">More comparisons</a>

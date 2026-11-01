@@ -231,18 +231,6 @@ kbd {
 .hero__cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 6px; }
 .hero__meta { font-size: 0.9rem; color: var(--muted); }
 
-/* Na telefonu: HubGet je pro počítač – nabídka poslat si odkaz (sdílení / kopírování, main.js) */
-.phone-note { display: none; }
-@media (max-width: 760px) and (pointer: coarse) {
-  .phone-note {
-    display: grid; gap: 12px; justify-items: start;
-    padding: 16px 18px;
-    border-radius: var(--radius);
-    background: var(--accent-soft);
-    color: var(--text); font-size: 0.95rem; text-align: left;
-  }
-}
-
 .pill {
   display: inline-flex; align-items: center; gap: 8px;
   padding: 6px 14px 6px 10px;
@@ -781,7 +769,7 @@ a.is-placeholder { cursor: not-allowed; }
 /* ---------- Srovnání s alternativami ---------- */
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
-.compare-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+.compare-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
 .compare-card { display: flex; flex-direction: column; gap: 16px; padding: 32px; }
 .compare-card > p:not(.compare-card__title) { color: var(--muted); }
 .compare-card .compare-card__link { margin-top: auto; padding-top: 4px; }
@@ -1049,6 +1037,7 @@ a.is-placeholder { cursor: not-allowed; }
   .highlights, .explore { grid-template-columns: repeat(2, 1fr); }
   .news { grid-template-columns: 1fr; gap: 28px; }
   .compare-head { grid-template-columns: 1fr; gap: 32px; }
+  .compare-grid { grid-template-columns: 1fr; }
   .free__main { gap: 48px; }
 }
 @media (max-width: 760px) {
@@ -1098,25 +1087,4 @@ a.is-placeholder { cursor: not-allowed; }
   .free__price { justify-items: start; }
   .compare-card { padding: 24px 20px; }
   .vs-visual { padding: 16px; }
-
-  /* Dlouhé řady karet jako vodorovný pás, který se přejíždí prstem – další karta
-     vykukuje u okraje. Stránka je tak na telefonu o tisíce pixelů kratší. */
-  .news__grid, .grid, .managers, .compare-grid, .roadmap, .highlights {
-    grid-template-columns: none;
-    grid-auto-flow: column;
-    grid-auto-columns: 84%;
-    gap: 12px;
-    margin-inline: -16px;
-    padding: 4px 16px 18px;
-    overflow-x: auto;
-    overscroll-behavior-x: contain;
-    scroll-snap-type: x mandatory;
-    scroll-padding-inline: 16px;
-    scrollbar-width: none;
-  }
-  .news__grid::-webkit-scrollbar, .grid::-webkit-scrollbar, .managers::-webkit-scrollbar,
-  .compare-grid::-webkit-scrollbar, .roadmap::-webkit-scrollbar, .highlights::-webkit-scrollbar { display: none; }
-  .news__grid > *, .grid > *, .managers > *, .compare-grid > *, .roadmap > *, .highlights > * { scroll-snap-align: start; }
-  /* Pás karet bez animace objevení – karty mimo obrazovku by zůstaly průhledné */
-  .news__grid > .reveal, .grid > .reveal, .compare-grid > .reveal, .highlights > .reveal { opacity: 1; transform: none; }
 }

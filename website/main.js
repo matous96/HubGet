@@ -16,11 +16,11 @@ const LINKS = {
 const TEXTS = {
   cs: {
     placeholder: "Odkaz brzy doplníme", copy: "Kopírovat", copied: "Zkopírováno ✓", copyFailed: "Nelze kopírovat",
-    menuOpen: "Otevřít menu", menuClose: "Zavřít menu", linkCopied: "Odkaz zkopírován ✓",
+    menuOpen: "Otevřít menu", menuClose: "Zavřít menu",
   },
   en: {
     placeholder: "Link coming soon", copy: "Copy", copied: "Copied ✓", copyFailed: "Can’t copy",
-    menuOpen: "Open menu", menuClose: "Close menu", linkCopied: "Link copied ✓",
+    menuOpen: "Open menu", menuClose: "Close menu",
   },
 };
 const T = TEXTS[document.documentElement.lang] || TEXTS.cs;
@@ -111,33 +111,6 @@ if (menu) {
   addEventListener("keydown", (e) => e.key === "Escape" && setOpen(false));
   document.addEventListener("click", (e) => !nav.contains(e.target) && setOpen(false));
   matchMedia("(min-width: 861px)").addEventListener("change", (e) => e.matches && setOpen(false));
-}
-
-// ---------- Telefon: poslat si odkaz do počítače ----------
-// Sdílení systému (zpráva, e-mail…), jinak zkopírování odkazu do schránky.
-for (const button of document.querySelectorAll("[data-share]")) {
-  const label = button.textContent;
-  button.addEventListener("click", async () => {
-    const url = location.href.split("#")[0];
-    try {
-      if (navigator.share) {
-        await navigator.share({ title: document.title, url });
-        return;
-      }
-      await navigator.clipboard.writeText(url);
-      button.textContent = T.linkCopied;
-    } catch (error) {
-      // Zavřené sdílení není chyba; jinak zkusit aspoň schránku
-      if (error?.name === "AbortError") return;
-      try {
-        await navigator.clipboard.writeText(url);
-        button.textContent = T.linkCopied;
-      } catch {
-        button.textContent = T.copyFailed;
-      }
-    }
-    setTimeout(() => (button.textContent = label), 2200);
-  });
 }
 
 // ---------- Ukázka příkazů CLI (jen na úvodní stránce) ----------
