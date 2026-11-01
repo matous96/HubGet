@@ -34,8 +34,8 @@
       "tooltip": "HubGet"
     },
     "security": {
-      "csp": "default-src 'self'; img-src 'self' data: https: http://icon.localhost icon:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; connect-src 'self' ipc: http://ipc.localhost https:",
-      "devCsp": "default-src 'self'; img-src 'self' data: https: http://icon.localhost icon:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; connect-src 'self' ipc: http://ipc.localhost https: ws://localhost:1420"
+      "csp": "default-src 'self'; img-src 'self' data: blob: https: http://icon.localhost icon:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; connect-src 'self' ipc: http://ipc.localhost https:",
+      "devCsp": "default-src 'self'; img-src 'self' data: blob: https: http://icon.localhost icon:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; connect-src 'self' ipc: http://ipc.localhost https: ws://localhost:1420"
     }
   },
   "bundle": {
