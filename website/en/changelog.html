@@ -76,8 +76,9 @@
         <div class="page-head__inner reveal">
           <p class="eyebrow">What’s new</p>
           <h1>What’s new in&nbsp;HubGet</h1>
-          <p class="lead">Every change since the first public version 0.1.0, newest first. Nineteen updates have shipped since its release on October&nbsp;21.</p>
+          <p class="lead">Every change since the first public version 0.1.0, newest first. Twenty updates have shipped since its release on October&nbsp;21.</p>
           <nav class="versions-nav" aria-label="Jump to version">
+            <a class="chip" href="#v0-1-20">0.1.20</a>
             <a class="chip" href="#v0-1-19">0.1.19</a>
             <a class="chip" href="#v0-1-18">0.1.18</a>
             <a class="chip" href="#v0-1-17">0.1.17</a>
@@ -101,8 +102,8 @@
           </nav>
         </div>
         <dl class="stats reveal">
-          <div><dt>Current version</dt><dd>0.1.19</dd></div>
-          <div><dt>Updates since 0.1.0</dt><dd>19</dd></div>
+          <div><dt>Current version</dt><dd>0.1.20</dd></div>
+          <div><dt>Updates since 0.1.0</dt><dd>20</dd></div>
           <div><dt>Apps in the catalog</dt><dd>25,100+</dd></div>
           <div><dt>Package managers for real</dt><dd>WinGet · Chocolatey · Scoop + 8 for developers</dd></div>
         </dl>
@@ -207,6 +208,11 @@
             <h3>A new name, HubGet, and calm updates</h3>
             <p>Unibox is now HubGet at hubget.eu. Automatic updates never get in your way – confirm anything that needs administrator rights with one dialog.</p>
           </article>
+          <article class="card highlight reveal">
+            <span class="highlight__ver">Version 0.1.20</span>
+            <h3>New categories and apps from vendor websites</h3>
+            <p>Seven new categories with far more accurate sorting, DaVinci Resolve and other apps from vendor websites, and an Open button for every app.</p>
+          </article>
         </div>
       </div>
     </section>
@@ -221,6 +227,48 @@
         </div>
 
         <div class="timeline">
+          <!-- 0.1.20 -->
+          <article class="release" id="v0-1-20">
+            <div class="release__meta">
+              <span class="release__ver">0.1.20</span>
+              <time class="release__date" datetime="2026-11-01">Nov 1, 2026</time>
+            </div>
+            <div class="card release__body">
+              <div class="release__head">
+                <h2>New categories and apps from vendor websites</h2>
+                <span class="badge badge--live">Latest</span>
+              </div>
+              <div class="changes changes--new">
+                <h3>New</h3>
+                <ul>
+                  <li><strong>New categories</strong> – AI, Music &amp; Audio, Education &amp; Science, Finance, Cloud &amp; Storage, Internet &amp; Network, and Personalization. The Other category gathers what fits nowhere else, and categories without apps are hidden.</li>
+                  <li><strong>Apps from vendor websites</strong> – DaVinci Resolve, VMware Workstation Pro, Cisco Packet Tracer, Houdini, LabVIEW, Blackmagic Desktop Video and ATEM Software Control. The vendor offers them only on its own website, so HubGet doesn’t install them: Get from website opens the official page. Once the app is installed, HubGet recognizes and opens it.</li>
+                  <li><strong>Open for every app</strong> – including programs outside package managers. If a program can’t be started, its folder opens instead.</li>
+                  <li><strong>Contact form</strong> – in Settings → Contact and under the envelope icon in the top bar. Send a question, an idea or a bug, screenshots included.</li>
+                  <li><strong>Sort by install date</strong> – Installed apps can be sorted by what you installed most recently.</li>
+                </ul>
+              </div>
+              <div class="changes changes--better">
+                <h3>Improved</h3>
+                <ul>
+                  <li>Apps are sorted into categories far more accurately – HubGet reads the descriptions and tags of every app in WinGet. Music players and editors are in Music &amp; Audio.</li>
+                  <li>HubGet recognizes, updates and uninstalls portable apps on the desktop (Tor Browser) – the folder goes to the Recycle Bin.</li>
+                  <li>Apps without an icon get a tile in their category’s color with its symbol.</li>
+                  <li>When a dark color dominates an app’s logo, the banner uses it.</li>
+                  <li>The list of installed PowerShell modules loads faster.</li>
+                  <li>The contact form replaces the forum links.</li>
+                </ul>
+              </div>
+              <div class="changes changes--fix">
+                <h3>Fixed</h3>
+                <ul>
+                  <li>Tor Browser still offered Install after it was installed.</li>
+                  <li>Music apps such as Spotify and Audacity were in the Video category.</li>
+                </ul>
+              </div>
+            </div>
+          </article>
+
           <!-- 0.1.19 -->
           <article class="release" id="v0-1-19">
             <div class="release__meta">
@@ -230,7 +278,6 @@
             <div class="card release__body">
               <div class="release__head">
                 <h2>HubGet and calm updates</h2>
-                <span class="badge badge--live">Latest</span>
               </div>
               <div class="changes changes--new">
                 <h3>New</h3>
