@@ -24,6 +24,7 @@ import {
 import { ARCH_LABEL } from "@/lib/arch";
 import { normalize } from "@/lib/utils";
 import { isVerified } from "@/lib/verified";
+import { isWebOnly } from "@/lib/webOnly";
 import { getSource, managers, sortBySourceOrder } from "@/services/managers";
 import { sourcePriority } from "@/store/settings";
 import { inLockedSource, isDevLock, useSourceScope } from "@/store/sourceLock";
@@ -109,8 +110,9 @@ export function SearchPage() {
 
   // Výsledky, které patří k aplikaci z katalogu, vynecháme (katalog je ukazuje výše).
   // Balíček se stejným názvem jako aplikace v katalogu, jehož zdroj katalog ještě
-  // nezná, se k ní připojí jako další zdroj. Zbytek se sloučí do profilů podle
-  // názvu: stejný název = jeden profil, jiný název = samostatný profil.
+  // nezná, se k ní připojí jako další zdroj – kromě aplikace jen z webu výrobce (knihovna
+  // „houdini“ z npm není SideFX Houdini). Zbytek se sloučí do profilů podle názvu:
+  // stejný název = jeden profil, jiný název = samostatný profil.
   const sourceIndex = useSourceIndex();
   const { filter: archFilter, fits } = useArchFilter();
   const { shownCatalog, repoResults, hiddenByArch } = useMemo(() => {
@@ -120,7 +122,8 @@ export function SearchPage() {
     const rest: RepoSearchResult[] = [];
     for (const r of repo) {
       if (sourceIndex.has(sourceKey(r.source, r.packageId))) continue;
-      const entry = byName.get(nameKey(r.name));
+      const named = byName.get(nameKey(r.name));
+      const entry = named && !isWebOnly(named) ? named : undefined;
       const known = entry && [...entry.sources, ...(extra.get(entry.id) ?? [])].some((s) => s.source === r.source);
       if (entry && !known) extra.set(entry.id, [...(extra.get(entry.id) ?? []), { source: r.source, packageId: r.packageId, version: r.version }]);
       else rest.push(r);

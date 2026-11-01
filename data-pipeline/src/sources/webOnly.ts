@@ -28,6 +28,8 @@ interface WebOnlyApp {
   downloadUrl: string;
   supportUrl?: string;
   license: string | null;
+  /** Fajfka ověřeného vydavatele – položku zadáváme ručně a odkazuje jen na oficiální web výrobce. */
+  verified?: boolean;
   popularity: number;
   /** Verze, když ji nejde zjistit automaticky; chybí = aplikace verzi neukazuje (zastaralá by mátla). */
   latestVersion?: string;

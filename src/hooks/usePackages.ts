@@ -9,6 +9,7 @@ import { archFamilies, matchesArch } from "@/lib/arch";
 import { eaIconSrc, steamIconSrc } from "@/lib/iconSrc";
 import { installedNameKey } from "@/lib/nameKey";
 import { isTauri } from "@/lib/tauri";
+import { isWebOnly } from "@/lib/webOnly";
 import { wingetBaseId } from "@/lib/wingetVariant";
 import { normalize } from "@/lib/utils";
 import { compareVersions } from "@/lib/version";
@@ -220,6 +221,8 @@ function useInstalledLinks(): InstalledLinks {
   }
   const linkFree = (p: InstalledPackage, entry: CatalogEntry | undefined) => {
     if (!entry || taken.has(entry.id)) return;
+    // Aplikace jen z webu výrobce je program ve Windows – ne knihovna z npm či pip se stejným názvem
+    if (isWebOnly(entry) && p.origin !== "local") return;
     links.set(p, entry);
     taken.add(entry.id);
   };

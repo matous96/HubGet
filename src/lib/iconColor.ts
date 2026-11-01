@@ -247,13 +247,17 @@ export function useIconColor(sources: string[], brand?: string | null): { color:
 
 /**
  * Barvy ikon několika aplikací (undefined = ikona bez barvy nebo nejde načíst).
- * `pending` = některá se ještě počítá.
+ * `pending` = některá se ještě počítá. Stejné zdroje (dvě aplikace se stejnou
+ * ikonou – Blackmagic Desktop Video a ATEM, aplikace bez ikony) sdílí jeden dotaz.
  */
 export function useIconColors(items: { sources: string[]; brand?: string | null }[]): { colors: (string | undefined)[]; pending: boolean } {
   const known = items.map((item) => knownColor(item.sources, item.brand));
-  const results = useQueries({ queries: items.map((item, i) => iconColorQuery(item.sources, item.brand, known[i])) });
+  const keys = items.map((item) => JSON.stringify([item.sources, item.brand ?? null]));
+  const unique = [...new Set(keys)].map((key) => keys.indexOf(key));
+  const results = useQueries({ queries: unique.map((i) => iconColorQuery(items[i].sources, items[i].brand, known[i])) });
+  const resultOf = (i: number) => results[unique.indexOf(keys.indexOf(keys[i]))];
   return {
-    colors: items.map((_, i) => known[i] ?? results[i].data ?? undefined),
-    pending: items.some((item, i) => item.sources.length > 0 && !known[i] && results[i].isPending),
+    colors: items.map((_, i) => known[i] ?? resultOf(i).data ?? undefined),
+    pending: items.some((item, i) => item.sources.length > 0 && !known[i] && resultOf(i).isPending),
   };
 }
