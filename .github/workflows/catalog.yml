@@ -23,7 +23,8 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: ["website/**", ".github/workflows/catalog.yml"]
+    # Změna pipeline (i kódu, který sdílí s aplikací) vygeneruje nový katalog hned – ne až v noci
+    paths: ["website/**", ".github/workflows/catalog.yml", "data-pipeline/**", "src/lib/verified.ts", "src/lib/wingetVariant.ts"]
 
 permissions:
   contents: read
@@ -41,6 +42,9 @@ jobs:
       PAGES_CATALOG_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/catalog.json
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Push: celá historie – krok „Katalog z GitHub Pages“ porovná změněné soubory
+          fetch-depth: ${{ github.event_name == 'push' && 0 || 1 }}
 
       - uses: pnpm/action-setup@v4
         with:
@@ -52,11 +56,21 @@ jobs:
           node-version: 24
           cache: pnpm
 
-      # Jen změna webu: zveřejněný katalog beze změny (Pages nasazuje vždy celý web i s katalogem)
+      # Jen změna webu: zveřejněný katalog beze změny (Pages nasazuje vždy celý web i s katalogem).
+      # Změnila-li se pipeline nebo tento workflow, vygeneruje se nový (vydání 0.1.20 jinak čekalo
+      # na noční běh a nové kategorie i aplikace z webu výrobce v katalogu chyběly)
       - name: Katalog z GitHub Pages
         id: published
         if: github.event_name == 'push'
+        env:
+          BEFORE: ${{ github.event.before }}
         run: |
+          changed=$(git diff --name-only "$BEFORE" "$GITHUB_SHA" -- data-pipeline src/lib/verified.ts src/lib/wingetVariant.ts .github/workflows/catalog.yml 2>/dev/null) || changed="neznámé"
+          if [ -n "$changed" ]; then
+            echo "Změna pipeline – vygeneruje se nový katalog:"
+            echo "$changed"
+            exit 0
+          fi
           mkdir -p data-pipeline/out
           if curl -fsSL --compressed --retry 3 "$PAGES_CATALOG_URL" -o data-pipeline/out/catalog.json \
             && node scripts/check-catalog.mjs data-pipeline/out/catalog.json; then

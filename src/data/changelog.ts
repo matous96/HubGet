@@ -28,6 +28,33 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
   {
+    version: "0.1.21",
+    date: "2026-11-01",
+    highlights: [
+      {
+        cs: "Opraveno: náhled snímku obrazovky v kontaktním formuláři a u Přidat snímek v detailu aplikace zůstával prázdný.",
+        en: "Fixed: the screenshot preview in the contact form and in Add screenshot on an app's page stayed empty.",
+      },
+    ],
+    // Opravná verze – na webu dál karty hlavních novinek z 0.1.20 (0.1.21 je obsahuje také)
+    featured: [
+      {
+        title: { cs: "Nové kategorie", en: "New categories" },
+        text: {
+          cs: "Umělá inteligence, Hudba a zvuk, Vzdělávání, Finance, Cloud, Internet a síť a Přizpůsobení – a přesnější zařazení aplikací.",
+          en: "AI, Music & Audio, Education, Finance, Cloud, Internet & Network, and Personalization – with far more accurate sorting.",
+        },
+      },
+      {
+        title: { cs: "Aplikace z webu výrobce", en: "Apps from the vendor's website" },
+        text: {
+          cs: "DaVinci Resolve, VMware Workstation Pro a další – stažení z oficiálního webu, po instalaci je HubGet pozná a otevře.",
+          en: "DaVinci Resolve, VMware Workstation Pro and more – download from the official website, then HubGet recognizes and opens them.",
+        },
+      },
+    ],
+  },
+  {
     version: "0.1.20",
     date: "2026-11-01",
     highlights: [
