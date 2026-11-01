@@ -28,7 +28,8 @@ import { wingetVariant } from "../../../src/lib/wingetVariant.ts";
 import { cleanName, plainText, publisherFromId, siteKey, slugId, truncate } from "../lib/text.ts";
 import type { WingetInstaller, WingetManifest } from "../sources/winget.ts";
 import { loadWingetManifest } from "../sources/winget.ts";
-import { categorize } from "./categories.ts";
+import { loadWebOnly } from "../sources/webOnly.ts";
+import { categorize, categorizeLegacy, legacyCategories } from "./categories.ts";
 import { chooseSharpIcons, type IconChoice } from "./icons.ts";
 import type { AppRecord } from "./match.ts";
 import { LINK_WEIGHT, pickRepository, repositoryKey } from "./repository.ts";
@@ -36,6 +37,11 @@ import { LINK_WEIGHT, pickRepository, repositoryKey } from "./repository.ts";
 export interface BuildOptions {
   /** Kolika nejpopulárnějším aplikacím stáhnout manifest wingetu (podrobnosti, ikony, SHA-256…). */
   details: number;
+  /**
+   * Kolika dalším aplikacím wingetu vzít z manifestu jen popis, štítky a vydavatele
+   * (zařazení do kategorií, popis na kartě) – bez poznámek k vydání a údajů o instalátoru.
+   */
+  descriptions: number;
   /** Kolika z nich zjistit velikost instalátoru (požadavek HEAD na server vydavatele). */
   sizes: number;
   /** Omezit katalog na N nejpopulárnějších aplikací (pro testování). */
@@ -189,6 +195,17 @@ export async function buildCatalog(
     tick();
   });
 
+  // 2b) Ostatní balíčky wingetu: z manifestu jen popis, štítky a vydavatel
+  const briefTargets = chosen.filter((x) => x.r.winget && !manifests.has(x.id)).slice(0, options.descriptions);
+  log.step(`Popisy z manifestů wingetu: ${briefTargets.length} dalších aplikací`);
+  const tickBrief = progress("popisy", briefTargets.length);
+  const briefs = new Map<string, Pick<WingetManifest, "ShortDescription" | "Tags" | "Publisher">>();
+  await mapLimit(briefTargets, 16, async (x) => {
+    const m = await loadWingetManifest(x.r.winget!);
+    if (m) briefs.set(x.id, { ShortDescription: m.ShortDescription, Tags: m.Tags, Publisher: m.Publisher });
+    tickBrief();
+  });
+
   // 3) Velikosti instalátorů (HEAD na server vydavatele, s mezipamětí)
   const sizeTargets = detailTargets.slice(0, options.sizes);
   log.step(`Velikosti instalátorů: ${sizeTargets.length}`);
@@ -214,11 +231,12 @@ export async function buildCatalog(
   const packages: CatalogEntry[] = chosen.map(({ r, id, popularity }) => {
     if (r.choco?.downloadCount) downloadsToday[id] = r.choco.downloadCount;
     const m = manifests.get(id) ?? null;
+    const brief = briefs.get(id);
     const c = curated[id];
     const name = displayName(r, m);
     const homepage = m?.PackageUrl ?? m?.PublisherUrl ?? r.choco?.projectUrl ?? r.scoop?.homepage ?? null;
-    const description = truncate(m?.ShortDescription ?? r.choco?.summary ?? r.scoop?.description ?? "", 200);
-    const tags = pickTags(m?.Tags, r.winget?.tags, r.choco?.tags);
+    const description = truncate(m?.ShortDescription ?? brief?.ShortDescription ?? r.choco?.summary ?? r.scoop?.description ?? "", 200);
+    const tags = pickTags(m?.Tags ?? brief?.Tags, r.winget?.tags, r.choco?.tags);
     const support = m?.PublisherSupportUrl ?? null;
     // Repozitář podle všech odkazů – zastaralé zdroje a repozitáře instalátorů prohrají.
     // Web z Chocolatey / Scoopu zavede repozitář jen tam, kde by byl i webem aplikace
@@ -255,7 +273,11 @@ export async function buildCatalog(
     const iconUrl = c?.iconUrl ?? candidates[0] ?? null;
     const shots = screenshotsOf(r, unigetKey, [iconUrl, ...candidates], uniget.screenshots);
 
-    const publisher = m?.Publisher ?? (r.winget ? publisherFromId(r.winget.id) : (r.choco?.authors ?? ""));
+    const publisher = m?.Publisher ?? brief?.Publisher ?? (r.winget ? publisherFromId(r.winget.id) : (r.choco?.authors ?? ""));
+    // Nové kategorie jen v categoriesV2 (a jen když se liší) – starší verze HubGetu znají jen původní
+    const signals = { tags, name, description, ids: [r.winget?.id, r.choco?.id, r.scoop && `${r.scoop.bucket}/${r.scoop.name}`].filter((x): x is string => !!x) };
+    const categories = c?.categories ?? categorize(signals);
+    const legacy = c?.categories ? legacyCategories(c.categories) : categorizeLegacy(signals);
     const entry: CatalogEntry = {
       id,
       name,
@@ -263,7 +285,8 @@ export async function buildCatalog(
       // Oficiální vydavatel ze seznamu (modrá fajfka) – stejné pravidlo jako v aplikaci
       verified: isOfficialPublisher(publisher) || undefined,
       description,
-      categories: c?.categories ?? categorize(tags, name, description),
+      categories: legacy,
+      categoriesV2: categories.join() === legacy.join() ? undefined : categories,
       tags,
       iconUrl,
       homepage,
@@ -290,6 +313,14 @@ export async function buildCatalog(
     };
     return stripEmpty(entry, REQUIRED_ENTRY_KEYS);
   });
+
+  // 4b) Aplikace jen z webu výrobce (web-only.json) – starší verze HubGetu je nevidí
+  const webOnly = (await loadWebOnly(now)).map((e) => {
+    if (!(e.id in firstSeen.ids)) firstSeen.ids[e.id] = firstSeen.initialized ? now : "";
+    const entry: CatalogEntry = { ...e, addedAt: firstSeen.ids[e.id], alternatives: e.alternatives?.filter((a) => catalogIds.has(a)) };
+    return stripEmpty(entry, REQUIRED_ENTRY_KEYS);
+  });
+  if (webOnly.length) log.info(`jen z webu výrobce: ${webOnly.map((e) => `${e.name} ${e.latestVersion}`).join(", ")}`);
   await saveFirstSeen(firstSeen);
   await addWeeklyDownloads(packages, downloadsToday, now.slice(0, 10));
 
@@ -309,6 +340,7 @@ export async function buildCatalog(
     generatedAt: now,
     stats: { total: records.length, bySource: counts, exclusive },
     packages,
+    webOnly: webOnly.length ? webOnly : undefined,
   };
 }
 

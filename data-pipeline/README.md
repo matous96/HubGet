@@ -177,6 +177,17 @@ barvu banneru, kategorie, alternativy a volitelné části instalátoru (PATH, z
 (např. Audacity 4: oficiální ikona z `audacity/audacity`, `share/icons/AppIcon`; Windows Terminal
 z `microsoft/terminal`; WinRAR – současná ikona v 256 px z balíčku Chocolatey).
 
+`web-only.json` – aplikace, které výrobce dává ke stažení jen na svém webu a žádný správce
+balíčků je nemá (DaVinci Resolve). Katalog je nese mimo `packages` v poli `webOnly` (HubGet
+do 0.1.19 počítá u každé aplikace se zdrojem): aplikace je ukáže s odkazem `downloadUrl`
+na oficiální stránku ke stažení a nainstalované pozná podle názvu v registru a otevře –
+neinstaluje, neaktualizuje ani neodinstaluje je. Verzi a datum vydání produktů Blackmagic
+Design (`blackmagic`: id produktu) doplní jejich veřejný seznam stažení, jinak platí ručně
+uvedená `latestVersion`; bez ní aplikace verzi neukazuje (zastaralá by mátla). Program, který se
+v registru jmenuje jinak než aplikace, spáruje `installedNames` – regulární výrazy názvů
+(„^VMware Workstation$“ u VMware Workstation Pro); názvy s verzí nebo architekturou
+(„Cisco Packet Tracer 9.0 64Bit“, „Houdini 21.0.440“) se spárují samy.
+
 ## Popularita a „Nové“
 
 Popularita 0–100 = počet stažení z Chocolatey (logaritmicky) + počet zdrojů + moniker

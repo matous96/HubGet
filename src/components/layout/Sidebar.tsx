@@ -17,7 +17,7 @@ import { Link, useLocation } from "react-router";
 import { HubGetLogo } from "@/components/ui/Logo";
 import { AppMenu } from "./AppMenu";
 import { SourcesPanel } from "./SourcesPanel";
-import { CATEGORIES } from "@/data/categories";
+import { useVisibleCategories } from "@/hooks/useCategories";
 import { useInstalledItems } from "@/hooks/useInstalledItems";
 import { useInstallableStats } from "@/hooks/usePackages";
 import { isTauri, isTestBuild } from "@/lib/tauri";
@@ -31,6 +31,7 @@ import { useSettings } from "@/store/settings";
 /** Levý navigační panel: sekce Objevovat, Knihovna a Kategorie, dole nastavení. */
 export function Sidebar() {
   const { t } = useTranslation();
+  const categories = useVisibleCategories();
   // Počet stejný jako na stránce Nainstalované (bez nespárovaných programů nalezených jen na disku)
   const { data: installed, items: installedItems } = useInstalledItems();
   const updates = installed?.filter((p) => p.availableVersion).length ?? 0;
@@ -114,7 +115,7 @@ export function Sidebar() {
         </Section>
 
         <Section title={t("nav.categories")}>
-          {CATEGORIES.map(({ id, icon }) => (
+          {categories.map(({ id, icon }) => (
             <NavItem key={id} to={`/categories/${id}`} icon={icon} label={t(`categories.${id}`)} accentIcon />
           ))}
         </Section>

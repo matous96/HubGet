@@ -54,7 +54,18 @@ export async function loadCatalog(onFresh?: (fresh: LoadedCatalog) => void): Pro
 let loadedOnce = false;
 
 function prepare(loaded: LoadedCatalog): LoadedCatalog {
-  const packages = loaded.catalog.packages.map((p) => ({ ...p, sources: sortBySourceOrder(p.sources) }));
+  // Kategorie z verze 0.1.20 (AI, cloud…) jsou jen v categoriesV2 – `categories` je pro starší verze
+  const packages = loaded.catalog.packages.map((p) => ({
+    ...p,
+    categories: p.categoriesV2 ?? p.categories,
+    sources: sortBySourceOrder(p.sources),
+  }));
+  // Aplikace jen z webu výrobce mezi ostatní podle popularity (katalog je podle ní seřazený)
+  for (const web of loaded.catalog.webOnly ?? []) {
+    if (!web.downloadUrl || packages.some((p) => p.id === web.id)) continue;
+    const at = packages.findIndex((p) => p.popularity < web.popularity);
+    packages.splice(at < 0 ? packages.length : at, 0, { ...web, sources: [] });
+  }
   return { ...loaded, catalog: { ...loaded.catalog, packages } };
 }
 

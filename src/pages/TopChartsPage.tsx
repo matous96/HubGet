@@ -7,7 +7,8 @@ import { ratingsEnabled, useRatingFormat, useRatingSummaries } from "@/component
 import { matchesSource, SourceFilter, type SourceFilterValue } from "@/components/package/SourceFilter";
 import { CardSkeletons, EmptyState, PageHeader } from "@/components/ui/States";
 import { getSource, isSourceId } from "@/services/managers";
-import { CATEGORIES } from "@/data/categories";
+import { CATEGORIES, inCategory } from "@/data/categories";
+import { useVisibleCategories } from "@/hooks/useCategories";
 import { useDismiss } from "@/hooks/useDismiss";
 import { useUrlState } from "@/hooks/useUrlState";
 import { useArchFilter, useCatalog, useModeFilter } from "@/hooks/usePackages";
@@ -39,6 +40,7 @@ const RATING_PRIOR = 5;
  */
 export function TopChartsPage() {
   const { t } = useTranslation();
+  const sortedCategories = useVisibleCategories();
   const { data, isLoading } = useCatalog();
   // Kategorie, správce a řazení v adrese – po otevření detailu a návratu zpět zůstanou
   const [category, setCategory] = useUrlState<CategoryId | "all">("category", "all", (v) => CATEGORIES.some((c) => c.id === v));
@@ -57,7 +59,7 @@ export function TopChartsPage() {
   const filtered = useMemo(() => {
     const list = (data?.catalog.packages ?? []).filter(
       (p) =>
-        (category === "all" || p.categories.includes(category)) &&
+        (category === "all" || inCategory(p, category)) &&
         matchesSource(p.sources, sourceFilter) &&
         fitsArch(p),
     );
@@ -112,7 +114,7 @@ export function TopChartsPage() {
 
       {/* Filtr kategorií */}
       <div className="no-scrollbar -mx-1 mb-6 flex gap-2 overflow-x-auto px-1 pb-1">
-        {(["all", ...CATEGORIES.map((c) => c.id)] as const).map((id) => (
+        {(["all", ...sortedCategories.map((c) => c.id)] as const).map((id) => (
           <button
             key={id}
             type="button"

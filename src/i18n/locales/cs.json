@@ -825,12 +825,20 @@
     "development": "Vývoj",
     "communication": "Komunikace",
     "games": "Hry",
-    "multimedia": "Multimédia",
+    "multimedia": "Video",
     "graphics": "Grafika",
     "productivity": "Kancelář",
     "utilities": "Nástroje",
     "security": "Bezpečnost",
     "system": "Systém",
+    "audio": "Hudba a zvuk",
+    "ai": "Umělá inteligence",
+    "education": "Vzdělávání a věda",
+    "finance": "Finance",
+    "cloud": "Cloud a úložiště",
+    "network": "Internet a síť",
+    "personalization": "Přizpůsobení",
+    "other": "Ostatní",
     "notFound": "Kategorie neexistuje.",
     "empty": "V této kategorii zatím nejsou žádné aplikace."
   },
@@ -857,12 +865,15 @@
     "uninstall": "Odinstalovat",
     "installed": "Nainstalováno",
     "open": "Otevřít",
+    "openFolder": "Otevřít složku",
+    "webDownload": "Stáhnout z webu",
     "cancel": "Zrušit",
     "back": "Zpět",
     "publisher": "Vydavatel",
     "latestVersion": "Nejnovější verze",
     "installedVersion": "Nainstalovaná verze",
     "website": "Webové stránky",
+    "downloadPage": "Ke stažení",
     "license": "Licence",
     "tags": "Štítky",
     "categories": "Kategorie",
@@ -876,7 +887,12 @@
     "openInSteam": "Otevřít ve Steamu",
     "managedByEa": "Hru spravuje EA app – aktualizace a ověřování souborů probíhá v EA app.",
     "localInstall": "Nainstalováno mimo správce balíčků – HubGet ji umí odinstalovat, ale ne aktualizovat.",
+    "webOnlyNote": "{{publisher}} dává aplikaci {{name}} ke stažení jen na svém webu, proto ji HubGet nemůže nainstalovat, aktualizovat ani odinstalovat. Nainstalovanou ji ale pozná a otevře.",
+    "webSource": "Web výrobce",
+    "webBadge": "Web",
+    "webSourceHint": "Ke stažení jen na webu výrobce – HubGet ji nespravuje",
     "diskInstall": "Nalezeno na disku ve složce {{folder}} – bez záznamu v Programech a funkcích. HubGet ji neumí odinstalovat ani aktualizovat.",
+    "portableInstall": "Rozbaleno ve složce {{folder}} – bez záznamu v Programech a funkcích. Aktualizace nainstaluje novou verzi přes WinGet, odinstalace přesune složku do Koše.",
     "availableIn": "Dostupné ve zdrojích",
     "statRank": "Žebříček",
     "statRating": "Hodnocení",
@@ -910,6 +926,7 @@
     "notInCatalog": "Tento balíček není v katalogu, proto u něj chybí popis a ikona.",
     "notFound": "Balíček nebyl nalezen.",
     "confirmUninstall": "Opravdu odinstalovat {{name}} (přes {{source}})?",
+    "confirmPortableUninstall": "Odinstalovat {{name}}? Složka {{folder}} se přesune do Koše.",
     "cliInfo": "Informace",
     "cliVersions": "Verze",
     "cliPin": "Zamknout verzi",
@@ -950,7 +967,8 @@
     "via": "Sdílet na",
     "email": "E-mail",
     "short": "{{name}} – mrkněte na tuhle aplikaci",
-    "message": "Doporučuji {{name}}: {{description}}\n\nOtevřete v HubGetu: {{link}}\nNebo nainstalujte příkazem: {{command}}"
+    "message": "Doporučuji {{name}}: {{description}}\n\nOtevřete v HubGetu: {{link}}\nNebo nainstalujte příkazem: {{command}}",
+    "messageNoCommand": "Doporučuji {{name}}: {{description}}\n\nOtevřete v HubGetu: {{link}}"
   },
   "auth": {
     "signIn": "Přihlásit se",
@@ -1558,7 +1576,8 @@
     "sortBy": "Řadit",
     "sort": {
       "popularity": "Popularita",
-      "name": "Název"
+      "name": "Název",
+      "recent": "Nově nainstalované"
     }
   },
   "settings": {

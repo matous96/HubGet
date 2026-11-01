@@ -12,6 +12,7 @@ import {
   ArrowDownToLine,
   ChevronDown,
   Download,
+  ExternalLink,
   Hand,
   Hash,
   Info,
@@ -34,6 +35,7 @@ import { useDismiss } from "@/hooks/useDismiss";
 import { useInstallActions } from "@/hooks/useInstallActions";
 import { cn } from "@/lib/utils";
 import { isTauri } from "@/lib/tauri";
+import { isWebOnly, openDownloadPage } from "@/lib/webOnly";
 import { useInstallUi } from "@/store/installUi";
 import { useSettings } from "@/store/settings";
 import type { CatalogEntry, SourceId } from "@/types";
@@ -66,6 +68,21 @@ export function InstallMenuItems({ entry, source, showDetails = true, onClose }:
     onClose();
     fn();
   };
+
+  // Aplikace jen z webu výrobce: HubGet ji nespravuje – jen odkaz ke stažení a detail
+  if (isWebOnly(entry)) {
+    return (
+      <>
+        {notInstalled && (
+          <Item icon={ExternalLink} label={t("package.webDownload")} onClick={run(() => openDownloadPage(entry))} />
+        )}
+        {notInstalled && showDetails && <Separator />}
+        {showDetails && (
+          <Item icon={Info} label={t("installMenu.details")} shortcut="Enter" onClick={run(() => navigate(detailUrl(entry.id)))} />
+        )}
+      </>
+    );
+  }
 
   return (
     <>

@@ -30,7 +30,7 @@ import { DetailLibraryButtons } from "@/components/package/QuickActions";
 import { SafeInstallNote } from "@/components/package/SafeInstallNote";
 import { ReportButton } from "@/components/package/ReportButton";
 import { ShareButton } from "@/components/package/ShareButton";
-import { OriginBadge, useOriginLabel } from "@/components/package/SourceBadge";
+import { OriginBadge, useOriginLabel, WebBadge } from "@/components/package/SourceBadge";
 import { UninstallButton } from "@/components/package/UninstallButton";
 import { AutoUpdateToggle, InstallerHostWarning, UpdatePinBar } from "@/components/package/UpdatePin";
 import { NameWithBadge, VerifiedBadge } from "@/components/package/VerifiedBadge";
@@ -54,6 +54,7 @@ import { useInstallActions } from "@/hooks/useInstallActions";
 import { overlayOpen } from "@/hooks/useOverlay";
 import { allArchitectures } from "@/lib/arch";
 import { cn, formatRelative, formatSize, formatSizeText } from "@/lib/utils";
+import { isWebOnly } from "@/lib/webOnly";
 import { useGithubStars } from "@/services/github";
 import { getSource, searchAll, sourcePackageUrl, steamAppId } from "@/services/managers";
 import { useInstallOptions } from "@/store/installOptions";
@@ -61,7 +62,7 @@ import { useInstallUi } from "@/store/installUi";
 import { useRecent } from "@/store/recent";
 import { sourcePriority, useSettings } from "@/store/settings";
 import { useSourceLock, useSourceScope } from "@/store/sourceLock";
-import type { CatalogEntry, SourceId } from "@/types";
+import type { CatalogEntry, PackageSource, SourceId } from "@/types";
 
 /** Zamčený zdroj (jen zapnutý) a jeho zrušení. */
 function useSourceLockView() {
@@ -161,7 +162,10 @@ function PackageDetailView({ entry: fullEntry, inCatalog }: { entry: CatalogEntr
   // Vypnutá kontrola součtu v Možnostech instalace – indikátor SHA-256 varuje
   const savedSkipHash = useInstallOptions((s) => !!s.byApp[entry.id]?.skipHash);
   const effective = useEffectiveSource(entry, chosen ?? savedSource);
-  const shownSource = effective ?? entry.sources[0];
+  // Aplikace jen z webu výrobce (DaVinci Resolve) žádný zdroj nemá – ani nainstalovaná
+  // (záznam v registru by nabídl starší verze, sadu balíčků a příkaz wingetu)
+  const web = isWebOnly(entry);
+  const shownSource: PackageSource | undefined = web ? undefined : (effective ?? entry.sources[0]);
   const actions = useInstallActions(entry, effective?.source);
   const openOptions = useInstallUi((s) => s.openOptions);
   const canInstall = actions.status === "available" && !job && !!effective;
@@ -262,19 +266,27 @@ function PackageDetailView({ entry: fullEntry, inCatalog }: { entry: CatalogEntr
                 <PackageAction entry={entry} source={effective?.source} size="lg" />
               </div>
               {/* Starší verze jde i spustit – Otevřít vedle Aktualizovat */}
-              {actions.status === "updatable" && !job && <LaunchButton entry={entry} installed={installed} size="lg" />}
+              {actions.status === "updatable" && !job && !web && <LaunchButton entry={entry} installed={installed} size="lg" />}
               {/* Možnosti instalace: jako správce, interaktivně, ruční instalace… */}
               {canInstall && <InstallSplitMenu entry={entry} source={effective?.source} />}
               {/* Instalace konkrétní (starší) verze ze zvoleného zdroje */}
               {/* Správce bez výběru verze (vcpkg) nabízí jen aktuální verzi */}
-              {effective && getSource(effective.source).supportsVersions && !unmanaged && !job && (
+              {effective && getSource(effective.source).supportsVersions && !unmanaged && !web && !job && (
                 <VersionPicker entry={entry} pkg={effective} installed={installed} />
               )}
               <UninstallButton entry={entry} variant="full" />
             </div>
 
+            {/* Aplikace jen z webu výrobce: proč ji HubGet nespravuje */}
+            {web && (
+              <p className="flex max-w-2xl items-start gap-2.5 rounded-xl border border-line bg-surface-2 px-4 py-3 text-sm text-muted">
+                <Info className="mt-0.5 size-4 shrink-0 text-accent" />
+                <span>{t("package.webOnlyNote", { name: entry.name, publisher: entry.publisher })}</span>
+              </p>
+            )}
+
             {/* Nenainstalovaná aplikace: výběr zdroje instalace */}
-            {!installed && (
+            {!installed && entry.sources.length > 0 && (
               <div className="flex flex-wrap items-center gap-2 text-sm">
                 <span className="mr-1 text-muted">{t("package.sourceLabel")}</span>
                 {entry.sources.map((s) => {
@@ -319,7 +331,7 @@ function PackageDetailView({ entry: fullEntry, inCatalog }: { entry: CatalogEntr
         </div>
 
         {/* Panel: odkud a jak je aplikace nainstalovaná, pravidla aktualizací a ověření instalátoru */}
-        {(installed || !unmanaged) && (
+        {(installed || (!unmanaged && !web)) && (
           <div
             className={cn(
               "col-span-2 col-start-2 row-start-3 mt-6 flex flex-wrap items-start gap-x-10 gap-y-3 self-start rounded-2xl border border-line bg-surface/60 px-5 py-4 text-sm",
@@ -334,6 +346,7 @@ function PackageDetailView({ entry: fullEntry, inCatalog }: { entry: CatalogEntr
                 <span className="flex items-center gap-2 text-muted">
                   {t("package.installedVia")}
                   <OriginBadge origin={installed.origin} />
+                  {web && <WebBadge />}
                 </span>
                 {/* Hry ze Steamu aktualizuje Steam sám; programy mimo správce HubGet jen odinstaluje */}
                 {installed.origin === "steam" && (
@@ -349,19 +362,21 @@ function PackageDetailView({ entry: fullEntry, inCatalog }: { entry: CatalogEntr
                 )}
                 {installed.origin === "ea" && <p className="text-xs text-muted">{t("package.managedByEa")}</p>}
                 {installed.diskLocation ? (
-                  <p className="text-xs break-all text-muted">{t("package.diskInstall", { folder: installed.diskLocation })}</p>
+                  <p className="text-xs break-all text-muted">
+                    {t(installed.portable ? "package.portableInstall" : "package.diskInstall", { folder: installed.diskLocation })}
+                  </p>
                 ) : (
-                  installed.origin === "local" && <p className="text-xs text-muted">{t("package.localInstall")}</p>
+                  installed.origin === "local" && !web && <p className="text-xs text-muted">{t("package.localInstall")}</p>
                 )}
                 {/* Instalátor nové verze z jiného serveru (winget) */}
                 <InstallerHostWarning installed={installed} />
                 {/* Přeskočit nabízenou verzi / zamknout verzi; automatická aktualizace této aplikace */}
-                <UpdatePinBar installed={installed} appName={entry.name} />
-                <AutoUpdateToggle installed={installed} />
+                {!web && <UpdatePinBar installed={installed} appName={entry.name} />}
+                {!web && <AutoUpdateToggle installed={installed} />}
               </div>
             )}
             {/* Ujištění o bezpečné instalaci (ne u programů mimo správce a her ze Steamu) */}
-            {!unmanaged && <SafeInstallNote pkg={shownSource} skipHash={savedSkipHash} />}
+            {!unmanaged && shownSource && <SafeInstallNote pkg={shownSource} skipHash={savedSkipHash} />}
           </div>
         )}
       </header>
@@ -405,13 +420,15 @@ function PackageDetailView({ entry: fullEntry, inCatalog }: { entry: CatalogEntr
                 ? originLabel(installed.origin)
                 : entry.releaseDate
                   ? t("package.statReleased", { when: formatRelative(entry.releaseDate, language) })
-                  : getSource(shownSource.source).label
+                  : shownSource
+                    ? getSource(shownSource.source).label
+                    : t("package.webSource")
           }
         >
-          {shownSource.version || "—"}
+          {shownSource?.version || entry.latestVersion || "—"}
         </Stat>
         {/* U her ze Steamu a lokálních programů winget jen „vidí“ instalaci – zdroj ke stažení to není */}
-        {!unmanaged && (
+        {!unmanaged && entry.sources.length > 0 && (
           <Stat label={t("package.statSources")} sub={entry.sources.map((s) => getSource(s.source).label).join(" · ")}>
             {entry.sources.length}
           </Stat>
@@ -437,7 +454,7 @@ function PackageDetailView({ entry: fullEntry, inCatalog }: { entry: CatalogEntr
           </Stat>
         )}
         {/* Velikost ke stažení ze zvoleného zdroje („182,9“ / „MB“), pod ní místo na disku */}
-        {shownSource.size ? (
+        {shownSource?.size ? (
           <Stat
             label={t("package.statSize")}
             sub={
@@ -459,7 +476,7 @@ function PackageDetailView({ entry: fullEntry, inCatalog }: { entry: CatalogEntr
 
       {/* ── Příkazy pro příkazový řádek všech správců ────────────── */}
       {/* Hry ze Steamu a programy mimo správce přes příkazy nainstalovat nejdou */}
-      {!unmanaged && (
+      {!unmanaged && shownSource && (
         <PackageCommand sources={entry.sources} active={shownSource.source} installed={installed} name={entry.name} />
       )}
 
@@ -480,7 +497,7 @@ function PackageDetailView({ entry: fullEntry, inCatalog }: { entry: CatalogEntr
       )}
 
       {/* ── Technické údaje: požadavky, SHA-256, rozsah, velikost, závislosti ── */}
-      {!unmanaged && inCatalog && <TechnicalDetails entry={entry} pkg={shownSource} />}
+      {!unmanaged && inCatalog && shownSource && <TechnicalDetails entry={entry} pkg={shownSource} />}
 
       {/* ── Ochrana soukromí ─────────────────────────────────────── */}
       {!unmanaged && <PrivacySection entry={entry} />}
@@ -505,7 +522,8 @@ function PackageDetailView({ entry: fullEntry, inCatalog }: { entry: CatalogEntr
               </div>
             </InfoItem>
           )}
-          <InfoItem label={t("package.latestVersion")}>{entry.latestVersion}</InfoItem>
+          {/* Aplikace jen z webu výrobce bez zjistitelné verze ji nemá */}
+          {entry.latestVersion && <InfoItem label={t("package.latestVersion")}>{entry.latestVersion}</InfoItem>}
           {entry.releaseDate && (
             <InfoItem label={t("package.lastUpdate")}>
               {new Date(entry.releaseDate).toLocaleDateString(language, { day: "numeric", month: "long", year: "numeric" })}
@@ -516,7 +534,7 @@ function PackageDetailView({ entry: fullEntry, inCatalog }: { entry: CatalogEntr
           )}
           {installed && <InfoItem label={t("package.installedVersion")}>{installed.installedVersion}</InfoItem>}
           {entry.license && <InfoItem label={t("package.license")}>{entry.license}</InfoItem>}
-          {shownSource.installerType && (
+          {shownSource?.installerType && (
             <InfoItem label={t("package.installerType")}>{t(`installerTypes.${shownSource.installerType}`)}</InfoItem>
           )}
           {entry.homepage && (
@@ -534,35 +552,51 @@ function PackageDetailView({ entry: fullEntry, inCatalog }: { entry: CatalogEntr
             </InfoItem>
           )}
           {/* Architektury zvoleného zdroje (jinak sjednocení všech) + kompatibilita s tímto PC */}
-          {(shownSource.architectures?.length ?? 0) > 0 || allArchitectures(entry.sources).length > 0 ? (
+          {shownSource && ((shownSource.architectures?.length ?? 0) > 0 || allArchitectures(entry.sources).length > 0) ? (
             <InfoItem label={t("arch.label", { source: getSource(shownSource.source).label })}>
               <ArchitectureInfo architectures={shownSource.architectures ?? allArchitectures(entry.sources)} />
             </InfoItem>
           ) : null}
+          {/* Aplikace jen z webu výrobce: oficiální stránka ke stažení */}
+          {entry.downloadUrl && (
+            <InfoItem label={t("package.downloadPage")}>
+              <a
+                href={entry.downloadUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1 text-accent hover:underline"
+              >
+                {new URL(entry.downloadUrl).hostname.replace(/^www\./, "")}
+                <ExternalLink className="size-3.5" />
+              </a>
+            </InfoItem>
+          )}
           {/* Id balíčku v každém zdroji s odkazem do repozitáře */}
-          <InfoItem label={t("package.availableIn")}>
-            <ul className="flex flex-col gap-1.5">
-              {entry.sources.map((s) => (
-                <li key={s.source} className="flex items-center gap-2 text-sm">
-                  <span className={cn("size-2 shrink-0 rounded-full", getSource(s.source).dot)} />
-                  <span className="w-28 shrink-0 text-muted">{getSource(s.source).label}</span>
-                  <a
-                    href={sourcePackageUrl(s.source, s.packageId)}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="truncate font-mono text-xs text-fg hover:text-accent hover:underline"
-                  >
-                    {s.packageId}
-                  </a>
-                  {s.size ? (
-                    <span className="ml-auto shrink-0 text-xs text-muted tabular-nums">
-                      {formatSizeText(s.size, language)}
-                    </span>
-                  ) : null}
-                </li>
-              ))}
-            </ul>
-          </InfoItem>
+          {entry.sources.length > 0 && (
+            <InfoItem label={t("package.availableIn")}>
+              <ul className="flex flex-col gap-1.5">
+                {entry.sources.map((s) => (
+                  <li key={s.source} className="flex items-center gap-2 text-sm">
+                    <span className={cn("size-2 shrink-0 rounded-full", getSource(s.source).dot)} />
+                    <span className="w-28 shrink-0 text-muted">{getSource(s.source).label}</span>
+                    <a
+                      href={sourcePackageUrl(s.source, s.packageId)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="truncate font-mono text-xs text-fg hover:text-accent hover:underline"
+                    >
+                      {s.packageId}
+                    </a>
+                    {s.size ? (
+                      <span className="ml-auto shrink-0 text-xs text-muted tabular-nums">
+                        {formatSizeText(s.size, language)}
+                      </span>
+                    ) : null}
+                  </li>
+                ))}
+              </ul>
+            </InfoItem>
+          )}
           {entry.tags.length > 0 && (
             <InfoItem label={t("package.tags")}>
               <div className="flex flex-wrap gap-1.5">

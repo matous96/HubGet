@@ -35,6 +35,8 @@ export const MAX_AGE = {
   githubStars: 24 * HOUR,
   /** Rozlišení ikon (ikony se mění zřídka). */
   iconSizes: 30 * 24 * HOUR,
+  /** Verze aplikací jen z webu výrobce (seznam stažení Blackmagic Design). */
+  webOnly: 12 * HOUR,
 };
 
 /** Komunitní databáze ikon a screenshotů UniGetUI (repozitář Devolutions/UniGetUI). */

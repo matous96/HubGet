@@ -5,7 +5,7 @@ import { PackageCollection } from "@/components/package/PackageCollection";
 import { Button } from "@/components/ui/Button";
 import { CollectionToolbar } from "@/components/ui/CollectionToolbar";
 import { CardSkeletons, EmptyState, ErrorState, PageHeader } from "@/components/ui/States";
-import { useInstalledItems, useUpdates } from "@/hooks/useInstalledItems";
+import { useInstallOrder, useInstalledItems, useUpdates } from "@/hooks/useInstalledItems";
 import { useSortedPackages } from "@/hooks/usePackages";
 import { useUrlState } from "@/hooks/useUrlState";
 import { cn, normalize } from "@/lib/utils";
@@ -14,11 +14,12 @@ import { AdminPendingPanel } from "@/components/package/AdminPendingPanel";
 import { OriginFilter, type OriginFilterValue } from "@/components/package/SourceFilter";
 import { useAutoUpdates } from "@/store/autoUpdates";
 import { useSelection } from "@/store/selection";
+import { useSettings } from "@/store/settings";
 import type { InstallOrigin } from "@/types";
 
 type Filter = "all" | "updates";
 
-/** Nainstalované balíčky s filtrem aktualizací a hromadnou aktualizací. */
+/** Nainstalované balíčky s filtrem aktualizací, hromadnou aktualizací a řazením i podle data instalace. */
 export function InstalledPage() {
   const { t } = useTranslation();
   const { items, isLoading, isError, refetch, isFetching } = useInstalledItems();
@@ -26,6 +27,10 @@ export function InstalledPage() {
   // Filtry jsou v adrese (?filter=updates&origin=steam&q=…): na záložku aktualizací odkazuje
   // postranní panel a po otevření detailu a návratu zpět zůstanou
   const [filter, setFilter] = useUrlState<Filter>("filter", "all", (v) => v === "updates");
+  // Řadit → Nově nainstalované: nejnovější instalace nahoře (jen tady – jinde podle popularity)
+  const byInstallTime = useInstallOrder();
+  const recentFirst = useSettings((s) => s.sortMode) === "recent";
+  const list = filter === "updates" ? updatable : items;
   const [text, setText] = useUrlState<string>("q", "");
   const [originFilter, setOriginFilter] = useUrlState<OriginFilterValue>("origin", "all", (v) => ORIGINS.some((o) => o.id === v));
 
@@ -46,9 +51,9 @@ export function InstalledPage() {
   // Počty podle původu instalace (pro filtr) v rámci zvolené záložky
   const originCounts = useMemo(() => {
     const counts: Partial<Record<InstallOrigin, number>> = {};
-    for (const i of filter === "updates" ? updatable : items) counts[i.pkg.origin] = (counts[i.pkg.origin] ?? 0) + 1;
+    for (const i of list) counts[i.pkg.origin] = (counts[i.pkg.origin] ?? 0) + 1;
     return counts;
-  }, [items, updatable, filter]);
+  }, [list]);
 
   // Zdroj, který ve zvolené záložce nic nemá (Steam v Dostupných aktualizacích), se nepoužije –
   // jeho filtr by tam nebyl vidět a seznam by byl bez vysvětlení prázdný. Na Vše zase platí.
@@ -56,12 +61,13 @@ export function InstalledPage() {
 
   const entries = useMemo(() => {
     const q = normalize(text.trim());
-    return (filter === "updates" ? updatable : items)
-      .filter((i) => origin === "all" || i.pkg.origin === origin)
+    const shown = list.filter((i) => origin === "all" || i.pkg.origin === origin);
+    return (recentFirst ? byInstallTime(shown) : shown)
       .map((i) => i.entry)
       .filter((e) => !q || normalize(e.name).includes(q) || normalize(e.id).includes(q));
-  }, [items, updatable, filter, origin, text]);
-  const sorted = useSortedPackages(entries);
+  }, [list, origin, text, recentFirst, byInstallTime]);
+  const sortedByMode = useSortedPackages(entries);
+  const sorted = recentFirst ? entries : sortedByMode;
 
   const tabs: { id: Filter; label: string; count: number }[] = [
     // Jen zobrazené položky (bez programů nalezených jen na disku) – stejně jako filtr zdrojů a postranní panel
@@ -128,7 +134,7 @@ export function InstalledPage() {
         </div>
 
         <div className="ml-auto">
-          <CollectionToolbar />
+          <CollectionToolbar recentSort />
         </div>
       </div>
 

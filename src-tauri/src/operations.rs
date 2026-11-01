@@ -149,6 +149,16 @@ pub struct OperationResult {
     detail: Option<String>,
 }
 
+impl OperationResult {
+    /// Operace bez procesu správce (odinstalace rozbaleného programu): hotovo, nebo chyba s popisem.
+    pub fn done(result: Result<(), String>) -> Self {
+        match result {
+            Ok(()) => OperationResult { outcome: Outcome::Success, code: 0, error_key: None, restart_required: false, detail: None },
+            Err(detail) => OperationResult { outcome: Outcome::Error, code: 1, error_key: None, restart_required: false, detail: Some(detail) },
+        }
+    }
+}
+
 /// Co a jak spustit; dodává konkrétní správce.
 pub struct Spec {
     pub program: String,

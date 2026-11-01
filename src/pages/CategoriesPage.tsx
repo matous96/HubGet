@@ -1,33 +1,21 @@
-import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { PageHeader } from "@/components/ui/States";
-import { CATEGORIES } from "@/data/categories";
-import { useCatalog } from "@/hooks/usePackages";
+import { useCategoryCounts, useVisibleCategories } from "@/hooks/useCategories";
 import { cn } from "@/lib/utils";
-import { inLockedSource, useSourceScope } from "@/store/sourceLock";
 
-/** Mřížka kategorií s počtem aplikací. */
+/** Mřížka kategorií s počtem aplikací (prázdné se neukazují). */
 export function CategoriesPage() {
   const { t } = useTranslation();
-  const { data } = useCatalog();
-  const { lock } = useSourceScope();
-
   // Počet balíčků v každé kategorii (při zamčeném zdroji jen z něj)
-  const counts = useMemo(() => {
-    const map = new Map<string, number>();
-    for (const p of data?.catalog.packages ?? []) {
-      if (!inLockedSource(p, lock)) continue;
-      for (const c of p.categories) map.set(c, (map.get(c) ?? 0) + 1);
-    }
-    return map;
-  }, [data, lock]);
+  const counts = useCategoryCounts() ?? new Map<string, number>();
+  const categories = useVisibleCategories();
 
   return (
     <>
       <PageHeader title={t("categories.title")} subtitle={t("categories.subtitle")} />
       <div className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-4">
-        {CATEGORIES.map(({ id, icon: Icon }) => (
+        {categories.map(({ id, icon: Icon }) => (
           // Neutrální dlaždice: ikona v rámečku, název, počet a velká obrysová ikona v rohu
           <Link
             key={id}

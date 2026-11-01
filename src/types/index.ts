@@ -31,7 +31,10 @@ export type SourceId =
 /** Architektura procesoru (názvy jako ve Windows). */
 export type Arch = "x64" | "x86" | "arm64";
 
-/** Identifikátor kategorie – klíč pro překlady a ikony. */
+/**
+ * Identifikátor kategorie – klíč pro překlady a ikony. Kategorie od „ai“ dál
+ * přibyly ve verzi 0.1.20 – katalog je nese v `categoriesV2` (starší verze je neznají).
+ */
 export type CategoryId =
   | "browsers"
   | "development"
@@ -42,7 +45,16 @@ export type CategoryId =
   | "security"
   | "productivity"
   | "graphics"
-  | "system";
+  | "system"
+  | "ai"
+  | "audio"
+  | "cloud"
+  | "education"
+  | "finance"
+  | "network"
+  | "personalization"
+  /** Ostatní – jen v UI: aplikace bez kategorie (v katalogu se nevyskytuje, viz inCategory). */
+  | "other";
 
 /** Kategorie zpracovávaných údajů (stejné členění jako štítky soukromí v App Store). */
 export type PrivacyCategory =
@@ -151,7 +163,13 @@ export interface CatalogEntry {
   publisher: string;
   /** Krátký popis. */
   description: string;
+  /** Kategorie; v aplikaci už z `categoriesV2`, je-li v katalogu (services/catalog → prepare). */
   categories: CategoryId[];
+  /**
+   * Kategorie i s těmi z verze 0.1.20 – jen kde se liší od `categories`, které pro
+   * starší verze HubGetu obsahují jen původních 10 (data-pipeline legacyCategories).
+   */
+  categoriesV2?: CategoryId[];
   tags: string[];
   /** URL ikony; null = zobrazí se generovaná zástupná ikona. */
   iconUrl: string | null;
@@ -167,7 +185,7 @@ export interface CatalogEntry {
   weeklyGrowth?: number;
   /** Datum prvního přidání do některého z repozitářů (ISO 8601). */
   addedAt: string;
-  /** Zdroje, ze kterých lze aplikaci nainstalovat (alespoň jeden). */
+  /** Zdroje, ze kterých lze aplikaci nainstalovat (alespoň jeden; žádný jen s `downloadUrl`). */
   sources: PackageSource[];
   /** Kurátorsky vybraný balíček pro sekci „Doporučené“. */
   featured?: boolean;
@@ -215,6 +233,17 @@ export interface CatalogEntry {
   docsUrl?: string | null;
   /** Volitelné části instalátoru wingetu (PATH, zástupci…). */
   installerFeatures?: InstallerFeature[];
+  /**
+   * Oficiální stránka ke stažení u aplikace, kterou výrobce dává jen na svém webu
+   * (DaVinci Resolve) – žádný správce ji nemá, `sources` je prázdné. HubGet ji
+   * nenainstaluje, neaktualizuje ani neodinstaluje; nainstalovanou pozná a otevře.
+   */
+  downloadUrl?: string;
+  /**
+   * Regulární výrazy názvů v registru, pod kterými se program aplikace jen z webu výrobce
+   * zapisuje, když se jmenuje jinak („VMware Workstation“ u VMware Workstation Pro).
+   */
+  installedNames?: string[];
 }
 
 /**
@@ -238,6 +267,12 @@ export interface Catalog {
   sample?: boolean;
   stats?: CatalogStats;
   packages: CatalogEntry[];
+  /**
+   * Aplikace jen z webu výrobce (s `downloadUrl`, bez zdrojů) – mimo `packages`, protože
+   * HubGet do verze 0.1.19 počítá s aspoň jedním zdrojem. Aplikace je přidá k ostatním
+   * (services/catalog → prepare).
+   */
+  webOnly?: CatalogEntry[];
 }
 
 /**
@@ -278,9 +313,20 @@ export interface InstalledPackage {
   /**
    * Program nalezený jen podle složky na disku (bez záznamu v registru, id
    * „DISK\<složka>“) – složka programu. Ukáže se, jen když se spáruje
-   * s katalogem; odinstalovat ani aktualizovat ho HubGet neumí.
+   * s katalogem; odinstalovat ani aktualizovat ho HubGet neumí (kromě `portable`).
    */
   diskLocation?: string;
+  /**
+   * Program rozbalený na ploše (Tor Browser), který winget nevidí: vede se pod id
+   * balíčku wingetu z katalogu (withPortablePackages), aktualizace nainstaluje
+   * novou verzi a odinstalace přesune složku do Koše (backend winget_operation).
+   */
+  portable?: boolean;
+  /**
+   * Kdy byl program nainstalován (ms od 1. 1. 1970) podle Windows – záznam v registru,
+   * u programu jen na disku vznik jeho složky. Čas nově objeveného balíčku (store/installSeen).
+   */
+  installedAt?: number;
 }
 
 /** Výsledek vyhledávání přímo v repozitáři správce. */
@@ -398,4 +444,5 @@ export type ThemeSetting = "system" | "dark" | "light";
  */
 export type UserMode = "regular" | "developer";
 export type ViewMode = "grid" | "list";
-export type SortMode = "popularity" | "name";
+/** Řazení; „recent“ (nově nainstalované) nabízí jen stránka Nainstalované, jinde platí jako popularita. */
+export type SortMode = "popularity" | "name" | "recent";

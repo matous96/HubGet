@@ -810,12 +810,20 @@
     "development": "Desarrollo",
     "communication": "Comunicación",
     "games": "Juegos",
-    "multimedia": "Multimedia",
+    "multimedia": "Vídeo",
     "graphics": "Gráficos",
     "productivity": "Productividad",
     "utilities": "Utilidades",
     "security": "Seguridad",
     "system": "Sistema",
+    "audio": "Música y audio",
+    "ai": "IA",
+    "education": "Educación y ciencia",
+    "finance": "Finanzas",
+    "cloud": "Nube y almacenamiento",
+    "network": "Internet y redes",
+    "personalization": "Personalización",
+    "other": "Otros",
     "notFound": "La categoría no existe.",
     "empty": "Todavía no hay aplicaciones en esta categoría."
   },
@@ -842,12 +850,15 @@
     "uninstall": "Desinstalar",
     "installed": "Instalada",
     "open": "Abrir",
+    "openFolder": "Abrir carpeta",
+    "webDownload": "Descargar de la web",
     "cancel": "Cancelar",
     "back": "Atrás",
     "publisher": "Editor",
     "latestVersion": "Última versión",
     "installedVersion": "Versión instalada",
     "website": "Sitio web",
+    "downloadPage": "Página de descarga",
     "license": "Licencia",
     "tags": "Etiquetas",
     "categories": "Categorías",
@@ -861,7 +872,12 @@
     "openInSteam": "Abrir en Steam",
     "managedByEa": "Este juego lo gestiona la EA app: las actualizaciones y la verificación de archivos se hacen en la EA app.",
     "localInstall": "Instalada fuera de los gestores de paquetes: HubGet puede desinstalarla, pero no actualizarla.",
+    "webOnlyNote": "{{publisher}} ofrece {{name}} solo en su propio sitio web, por lo que HubGet no puede instalarla, actualizarla ni desinstalarla. Una vez instalada, HubGet la reconoce y la puede abrir.",
+    "webSource": "Web del fabricante",
+    "webBadge": "Web",
+    "webSourceHint": "Solo disponible en la web del fabricante: HubGet no la gestiona",
     "diskInstall": "Encontrada en el disco en {{folder}}; no aparece en Aplicaciones instaladas. HubGet no puede desinstalarla ni actualizarla.",
+    "portableInstall": "Descomprimida en {{folder}}; no aparece en Aplicaciones instaladas. La actualización instala la nueva versión con WinGet y la desinstalación mueve la carpeta a la Papelera de reciclaje.",
     "availableIn": "Disponible en",
     "statRank": "Ranking",
     "statRating": "Valoraciones",
@@ -895,6 +911,7 @@
     "notInCatalog": "Este paquete no está en el catálogo, así que no tiene descripción ni icono.",
     "notFound": "Paquete no encontrado.",
     "confirmUninstall": "¿Seguro que quieres desinstalar {{name}} (mediante {{source}})?",
+    "confirmPortableUninstall": "¿Desinstalar {{name}}? La carpeta {{folder}} se moverá a la Papelera de reciclaje.",
     "cliInfo": "Información",
     "cliVersions": "Versiones",
     "cliPin": "Fijar la versión",
@@ -935,7 +952,8 @@
     "via": "Compartir en",
     "email": "Correo",
     "short": "{{name}}: echa un vistazo a esta aplicación",
-    "message": "Te recomiendo {{name}}: {{description}}\n\nÁbrela en HubGet: {{link}}\nO instálala con: {{command}}"
+    "message": "Te recomiendo {{name}}: {{description}}\n\nÁbrela en HubGet: {{link}}\nO instálala con: {{command}}",
+    "messageNoCommand": "Te recomiendo {{name}}: {{description}}\n\nÁbrela en HubGet: {{link}}"
   },
   "auth": {
     "signIn": "Iniciar sesión",
@@ -1528,7 +1546,8 @@
     "sortBy": "Ordenar",
     "sort": {
       "popularity": "Popularidad",
-      "name": "Nombre"
+      "name": "Nombre",
+      "recent": "Instaladas recientemente"
     }
   },
   "settings": {

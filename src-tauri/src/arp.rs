@@ -27,6 +27,40 @@ pub struct ArpEntry {
     /// V Programech a funkcích se neukazuje: součást jiného programu
     /// (SystemComponent, ParentKeyName) nebo aktualizace.
     hidden: bool,
+    /// Kdy byl program nainstalován (ms od 1. 1. 1970) – viz [`install_time`].
+    pub installed_at: Option<i64>,
+}
+
+/// Milisekundy od 1. 1. 1970 pro datum a čas v UTC (bez knihovny – výpočet dne podle
+/// proleptického gregoriánského kalendáře, algoritmus „days from civil“).
+pub fn unix_ms(year: i64, month: i64, day: i64, hour: i64, minute: i64, second: i64) -> Option<i64> {
+    if !(1..=12).contains(&month) || !(1..=31).contains(&day) {
+        return None;
+    }
+    let y = if month <= 2 { year - 1 } else { year };
+    let era = y.div_euclid(400);
+    let yoe = y - era * 400;
+    let doy = (153 * (month + if month > 2 { -3 } else { 9 }) + 2) / 5 + day - 1;
+    let doe = yoe * 365 + yoe / 4 - yoe / 100 + doy;
+    let days = era * 146_097 + doe - 719_468;
+    Some(((days * 24 + hour) * 60 + minute) * 60_000 + second * 1000)
+}
+
+/// Čas instalace ze záznamu: InstallDate („20261031“, jen den) a poslední zápis klíče.
+/// Zápis ze stejného dne upřesní čas; jiný den (klíč později přepsal jiný program) má
+/// přednost InstallDate. Bez InstallDate (NSIS, Squirrel) jen poslední zápis.
+fn install_time(install_date: &str, written: Option<i64>) -> Option<i64> {
+    let date = install_date.trim();
+    let parsed = (date.len() == 8 && date.bytes().all(|b| b.is_ascii_digit()))
+        .then(|| unix_ms(date[..4].parse().ok()?, date[4..6].parse().ok()?, date[6..].parse().ok()?, 0, 0, 0))
+        .flatten();
+    const DAY: i64 = 86_400_000;
+    match (parsed, written) {
+        // InstallDate je místní datum – den zápisu se porovná s tolerancí časového pásma
+        (Some(day), Some(at)) if (at - day).abs() < 2 * DAY => Some(at.max(day)),
+        (Some(day), _) => Some(day),
+        (None, at) => at,
+    }
 }
 
 /// Všechny záznamy: počítač (64bit i 32bit pohled) a aktuální uživatel.
@@ -55,6 +89,11 @@ pub fn load() -> Vec<ArpEntry> {
             let hidden = sub.get_value::<u32, _>("SystemComponent").unwrap_or(0) == 1
                 || !get("ParentKeyName").is_empty()
                 || ["update", "hotfix", "service pack"].iter().any(|kind| release.contains(kind));
+            // Poslední zápis klíče (UTC) – instalátor ho zapisuje při instalaci
+            let written = sub.query_info().ok().and_then(|info| {
+                let t = info.get_last_write_time_system();
+                unix_ms(t.wYear.into(), t.wMonth.into(), t.wDay.into(), t.wHour.into(), t.wMinute.into(), t.wSecond.into())
+            });
             entries.push(ArpEntry {
                 key,
                 user,
@@ -66,6 +105,7 @@ pub fn load() -> Vec<ArpEntry> {
                 uninstall: get("UninstallString"),
                 quiet_uninstall: get("QuietUninstallString"),
                 hidden,
+                installed_at: install_time(&get("InstallDate"), written),
             });
         }
     }
@@ -250,7 +290,12 @@ pub fn find_app_exe(dir: &Path, depth: usize) -> Option<PathBuf> {
 }
 
 /// Spustitelný soubor, který vyhovuje podmínce, ve složce a podsložkách.
-pub fn find_exe(dir: &Path, depth: usize, mut budget: usize, accept: impl Fn(&str) -> bool) -> Option<PathBuf> {
+pub fn find_exe(dir: &Path, depth: usize, budget: usize, accept: impl Fn(&str) -> bool) -> Option<PathBuf> {
+    find_file(dir, depth, budget, |path| path.file_name().is_some_and(|file| accept(&file.to_string_lossy())))
+}
+
+/// Jako [`find_exe`], jen `accept` dostane celou cestu (třeba kvůli informacím o verzi).
+pub fn find_file(dir: &Path, depth: usize, mut budget: usize, accept: impl Fn(&Path) -> bool) -> Option<PathBuf> {
     let mut level = vec![dir.to_path_buf()];
     for _ in 0..=depth {
         let mut next = Vec::new();
@@ -262,7 +307,7 @@ pub fn find_exe(dir: &Path, depth: usize, mut budget: usize, accept: impl Fn(&st
             let Ok(entries) = std::fs::read_dir(&folder) else { continue };
             for entry in entries.flatten() {
                 let Ok(kind) = entry.file_type() else { continue };
-                if kind.is_file() && accept(&entry.file_name().to_string_lossy()) {
+                if kind.is_file() && accept(&entry.path()) {
                     return Some(entry.path());
                 }
                 if kind.is_dir() {
@@ -351,6 +396,11 @@ impl ArpEntry {
         let scope = if self.user { "User" } else { "Machine" };
         let arch = if self.x86 { "X86" } else { "X64" };
         format!(r"ARP\{scope}\{arch}\{}", self.key)
+    }
+
+    /// Číslo hry ze Steamu („Steam App 1091500“ → „1091500“).
+    pub fn steam_id(&self) -> Option<String> {
+        is_steam_key(&self.key).then(|| self.key["Steam App ".len()..].to_string())
     }
 
     /// Hra z EA app (dříve Origin): EA do složky každé hry ukládá `__Installer\installerdata.xml`
@@ -488,6 +538,21 @@ pub(crate) mod tests {
         }
         std::fs::create_dir_all(&root).unwrap();
         root
+    }
+
+    #[test]
+    fn install_times() {
+        assert_eq!(unix_ms(1970, 1, 1, 0, 0, 0), Some(0));
+        assert_eq!(unix_ms(2026, 10, 31, 22, 25, 53), Some(1_793_485_553_000));
+        assert_eq!(unix_ms(2024, 2, 29, 0, 0, 0), Some(1_709_164_800_000));
+        let day = unix_ms(2026, 10, 31, 0, 0, 0);
+        let written = unix_ms(2026, 10, 31, 22, 25, 53);
+        // Zápis ze stejného dne upřesní čas, pozdější přepis klíče datum instalace nezmění
+        assert_eq!(install_time("20261031", written), written);
+        assert_eq!(install_time("20261020", written), unix_ms(2026, 10, 20, 0, 0, 0));
+        assert_eq!(install_time("", written), written);
+        assert_eq!(install_time("31.10.2026", None), None);
+        assert_eq!(install_time("20261031", None), day);
     }
 
     #[test]

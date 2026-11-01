@@ -810,12 +810,20 @@
     "development": "Développement",
     "communication": "Communication",
     "games": "Jeux",
-    "multimedia": "Multimédia",
+    "multimedia": "Vidéo",
     "graphics": "Graphisme",
     "productivity": "Productivité",
     "utilities": "Utilitaires",
     "security": "Sécurité",
     "system": "Système",
+    "audio": "Musique et audio",
+    "ai": "IA",
+    "education": "Éducation et sciences",
+    "finance": "Finances",
+    "cloud": "Cloud et stockage",
+    "network": "Internet et réseau",
+    "personalization": "Personnalisation",
+    "other": "Autres",
     "notFound": "Cette catégorie n’existe pas.",
     "empty": "Aucune application dans cette catégorie pour l’instant."
   },
@@ -842,12 +850,15 @@
     "uninstall": "Désinstaller",
     "installed": "Installée",
     "open": "Ouvrir",
+    "openFolder": "Ouvrir le dossier",
+    "webDownload": "Télécharger sur le site",
     "cancel": "Annuler",
     "back": "Retour",
     "publisher": "Éditeur",
     "latestVersion": "Dernière version",
     "installedVersion": "Version installée",
     "website": "Site web",
+    "downloadPage": "Page de téléchargement",
     "license": "Licence",
     "tags": "Étiquettes",
     "categories": "Catégories",
@@ -861,7 +872,12 @@
     "openInSteam": "Ouvrir dans Steam",
     "managedByEa": "Ce jeu est géré par l’EA app – les mises à jour et la vérification des fichiers se font dans l’EA app.",
     "localInstall": "Installée hors des gestionnaires de paquets – HubGet peut la désinstaller, mais pas la mettre à jour.",
+    "webOnlyNote": "{{publisher}} ne propose {{name}} qu'au téléchargement sur son propre site, HubGet ne peut donc pas l'installer, la mettre à jour ni la désinstaller. Une fois installée, HubGet la reconnaît et peut l'ouvrir.",
+    "webSource": "Site de l'éditeur",
+    "webBadge": "Web",
+    "webSourceHint": "Disponible uniquement sur le site de l'éditeur – HubGet ne la gère pas",
     "diskInstall": "Trouvée sur le disque dans {{folder}} – absente des Applications installées. HubGet ne peut ni la désinstaller ni la mettre à jour.",
+    "portableInstall": "Décompressée dans {{folder}} – absente des Applications installées. La mise à jour installe la nouvelle version via WinGet ; la désinstallation déplace le dossier dans la Corbeille.",
     "availableIn": "Disponible via",
     "statRank": "Classement",
     "statRating": "Notes",
@@ -895,6 +911,7 @@
     "notInCatalog": "Ce paquet n’est pas dans le catalogue, il n’a donc ni description ni icône.",
     "notFound": "Paquet introuvable.",
     "confirmUninstall": "Désinstaller vraiment {{name}} (via {{source}}) ?",
+    "confirmPortableUninstall": "Désinstaller {{name}} ? Le dossier {{folder}} sera déplacé dans la Corbeille.",
     "cliInfo": "Infos",
     "cliVersions": "Versions",
     "cliPin": "Épingler la version",
@@ -935,7 +952,8 @@
     "via": "Partager sur",
     "email": "E-mail",
     "short": "{{name}} – découvrez cette application",
-    "message": "Je vous recommande {{name}} : {{description}}\n\nOuvrir dans HubGet : {{link}}\nOu installer avec : {{command}}"
+    "message": "Je vous recommande {{name}} : {{description}}\n\nOuvrir dans HubGet : {{link}}\nOu installer avec : {{command}}",
+    "messageNoCommand": "Je recommande {{name}} : {{description}}\n\nOuvrir dans HubGet : {{link}}"
   },
   "auth": {
     "signIn": "Se connecter",
@@ -1528,7 +1546,8 @@
     "sortBy": "Trier",
     "sort": {
       "popularity": "Popularité",
-      "name": "Nom"
+      "name": "Nom",
+      "recent": "Récemment installées"
     }
   },
   "settings": {

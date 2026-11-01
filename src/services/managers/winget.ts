@@ -22,6 +22,10 @@ interface BackendInstalled {
   wingetSource: string | null;
   /** Program nalezený jen podle složky na disku (InstalledPackage.diskLocation). */
   diskLocation?: string;
+  /** Program rozbalený na ploše – verze z jeho souborů (InstalledPackage.portable). */
+  portable?: boolean;
+  /** Kdy byl program nainstalován (InstalledPackage.installedAt). */
+  installedAt?: number;
   /** Hra z EA app (backend ji pozná podle složky hry). */
   eaGame?: boolean;
 }

@@ -138,10 +138,3 @@ export function inspectIcon(img: HTMLImageElement, src: string): IconVerdict {
   verdicts.set(src, verdict);
   return verdict;
 }
-
-/** Iniciály pro náhradní avatar: „EA app“ → „EA“, „Google Drive“ → „GD“, „Mp3tag“ → „M“. */
-export function initialsOf(name: string): string {
-  const words = name.split(/[\s\-_.:/]+/).filter((word) => /[\p{L}\p{N}]/u.test(word));
-  const letters = words.slice(0, 2).map((word) => [...word].find((c) => /[\p{L}\p{N}]/u.test(c)) ?? "");
-  return (letters.join("") || "?").toUpperCase();
-}

@@ -3,6 +3,7 @@ import type { MouseEvent, ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { useEffectiveSource } from "@/hooks/usePackages";
 import { cn } from "@/lib/utils";
+import { isWebOnly } from "@/lib/webOnly";
 import { sourceCommand } from "@/services/managers";
 import { useBundle } from "@/store/bundle";
 import { useFavorites } from "@/store/favorites";
@@ -22,13 +23,14 @@ export function useFavoriteToggle(entry: CatalogEntry) {
   return { active, toggle, label: active ? t("quick.unfavorite") : t("quick.favorite") };
 }
 
-/** Přepínač „v sadě balíčků“ s oznámením; do sady se uloží zadaný zdroj. */
-export function useBundleToggle(entry: CatalogEntry, source: PackageSource) {
+/** Přepínač „v sadě balíčků“ s oznámením; do sady se uloží zadaný zdroj (bez zdroje nic nedělá). */
+export function useBundleToggle(entry: CatalogEntry, source: PackageSource | undefined) {
   const { t } = useTranslation();
   const toast = useToasts((s) => s.push);
   const active = useBundle((s) => s.items.some((i) => i.appId === entry.id));
   const toggleBundle = useBundle((s) => s.toggle);
   const toggle = () => {
+    if (!source) return;
     toggleBundle({ appId: entry.id, name: entry.name, source: source.source, packageId: source.packageId });
     toast(active ? "info" : "success", t(active ? "quick.bundleRemoved" : "quick.bundleAdded", { name: entry.name }));
   };
@@ -37,13 +39,15 @@ export function useBundleToggle(entry: CatalogEntry, source: PackageSource) {
 
 /**
  * Rychlé akce při prohlížení (bez otevření profilu aplikace):
- * kopírovat příkaz pro instalaci, přidat do oblíbených, přidat do sady balíčků.
+ * kopírovat příkaz pro instalaci, přidat do oblíbených, přidat do sady balíčků
+ * (aplikace jen z webu výrobce příkaz ani zdroj pro sadu nemá – jen oblíbené).
  * Pozici (relative / absolute) určuje volající – musí ležet nad roztaženým odkazem karty.
  */
 export function QuickActions({ entry, className }: { entry: CatalogEntry; className?: string }) {
   const { t } = useTranslation();
   const toast = useToasts((s) => s.push);
-  const source = useEffectiveSource(entry) ?? entry.sources[0];
+  const effective = useEffectiveSource(entry);
+  const source: PackageSource | undefined = isWebOnly(entry) ? undefined : (effective ?? entry.sources[0]);
   const favorite = useFavoriteToggle(entry);
   const bundle = useBundleToggle(entry, source);
 
@@ -55,6 +59,7 @@ export function QuickActions({ entry, className }: { entry: CatalogEntry; classN
   };
 
   const copy = async () => {
+    if (!source) return;
     const command = sourceCommand(source.source, "install", source.packageId);
     try {
       await navigator.clipboard.writeText(command);
@@ -66,21 +71,25 @@ export function QuickActions({ entry, className }: { entry: CatalogEntry; classN
 
   return (
     <div className={cn("z-10 flex items-center gap-0.5", className)}>
-      <ActionButton label={t("quick.copy")} onClick={handle(() => void copy())}>
-        <Terminal className="size-4" />
-      </ActionButton>
+      {source && (
+        <ActionButton label={t("quick.copy")} onClick={handle(() => void copy())}>
+          <Terminal className="size-4" />
+        </ActionButton>
+      )}
       <ActionButton label={favorite.label} active={favorite.active} activeClass="text-rose-500" onClick={handle(favorite.toggle)}>
         <Heart className={cn("size-4", favorite.active && "fill-current")} />
       </ActionButton>
-      <ActionButton label={bundle.label} active={bundle.active} activeClass="text-accent" onClick={handle(bundle.toggle)}>
-        {bundle.active ? <Check className="size-4" /> : <PackagePlus className="size-4" />}
-      </ActionButton>
+      {source && (
+        <ActionButton label={bundle.label} active={bundle.active} activeClass="text-accent" onClick={handle(bundle.toggle)}>
+          {bundle.active ? <Check className="size-4" /> : <PackagePlus className="size-4" />}
+        </ActionButton>
+      )}
     </div>
   );
 }
 
 /** Kulatá tlačítka Oblíbené a Přidat do sady v záhlaví profilu aplikace (vedle Sdílet). */
-export function DetailLibraryButtons({ entry, pkg }: { entry: CatalogEntry; pkg: PackageSource }) {
+export function DetailLibraryButtons({ entry, pkg }: { entry: CatalogEntry; pkg: PackageSource | undefined }) {
   const favorite = useFavoriteToggle(entry);
   const bundle = useBundleToggle(entry, pkg);
   const round = "flex size-11 cursor-pointer items-center justify-center rounded-full bg-surface-2 transition-colors hover:bg-surface-3";
@@ -97,16 +106,18 @@ export function DetailLibraryButtons({ entry, pkg }: { entry: CatalogEntry; pkg:
       >
         <Heart className={cn("size-5", favorite.active && "fill-current")} />
       </button>
-      <button
-        type="button"
-        aria-label={bundle.label}
-        title={bundle.label}
-        aria-pressed={bundle.active}
-        onClick={bundle.toggle}
-        className={cn(round, bundle.active ? "text-accent" : "text-fg")}
-      >
-        {bundle.active ? <Check className="size-5" /> : <PackagePlus className="size-5" />}
-      </button>
+      {pkg && (
+        <button
+          type="button"
+          aria-label={bundle.label}
+          title={bundle.label}
+          aria-pressed={bundle.active}
+          onClick={bundle.toggle}
+          className={cn(round, bundle.active ? "text-accent" : "text-fg")}
+        >
+          {bundle.active ? <Check className="size-5" /> : <PackagePlus className="size-5" />}
+        </button>
+      )}
     </>
   );
 }

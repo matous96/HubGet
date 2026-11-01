@@ -183,8 +183,14 @@ fn visible_window_pids() -> HashSet<u32> {
     HashSet::new()
 }
 
+/// Běží nějaký program ze složky `dir` (nebo jejích podsložek)?
+pub fn any_running_in(dir: &Path) -> bool {
+    let prefix = format!("{}\\", arp::folder_key(dir));
+    processes().iter().any(|p| inside(&p.path, &prefix))
+}
+
 /// Je spustitelný soubor okenní program? Subsystém z hlavičky PE (2 = GUI, 3 = konzole).
-fn is_gui_program(path: &str) -> bool {
+pub fn is_gui_program(path: &str) -> bool {
     use std::io::{Read, Seek, SeekFrom};
     let read = || -> std::io::Result<u16> {
         let mut file = std::fs::File::open(path)?;
@@ -213,6 +219,10 @@ pub async fn app_processes(package_id: String, name: String) -> Result<Vec<Runni
             .flat_map(install_dirs)
             .map(|d| format!("{}\\", d.to_string_lossy().trim_end_matches('\\').to_lowercase()))
             .collect();
+        // Program rozbalený na ploše (Tor Browser) záznam v registru nemá – jeho složka
+        if dirs.is_empty() {
+            dirs.extend(crate::disk::portable_folder(&name).map(|dir| format!("{}\\", arp::folder_key(&dir))));
+        }
         {
             let mut known = KNOWN_DIRS.lock().unwrap_or_else(|e| e.into_inner());
             let known = known.get_or_insert_with(HashMap::new);

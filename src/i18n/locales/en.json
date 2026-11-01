@@ -795,12 +795,20 @@
     "development": "Development",
     "communication": "Communication",
     "games": "Games",
-    "multimedia": "Multimedia",
+    "multimedia": "Video",
     "graphics": "Graphics",
     "productivity": "Productivity",
     "utilities": "Utilities",
     "security": "Security",
     "system": "System",
+    "audio": "Music & Audio",
+    "ai": "AI",
+    "education": "Education & Science",
+    "finance": "Finance",
+    "cloud": "Cloud & Storage",
+    "network": "Internet & Network",
+    "personalization": "Personalization",
+    "other": "Other",
     "notFound": "Category does not exist.",
     "empty": "There are no apps in this category yet."
   },
@@ -827,12 +835,15 @@
     "uninstall": "Uninstall",
     "installed": "Installed",
     "open": "Open",
+    "openFolder": "Open folder",
+    "webDownload": "Get from website",
     "cancel": "Cancel",
     "back": "Back",
     "publisher": "Publisher",
     "latestVersion": "Latest version",
     "installedVersion": "Installed version",
     "website": "Website",
+    "downloadPage": "Download page",
     "license": "License",
     "tags": "Tags",
     "categories": "Categories",
@@ -846,7 +857,12 @@
     "openInSteam": "Open in Steam",
     "managedByEa": "This game is managed by the EA app – updates and file verification happen in the EA app.",
     "localInstall": "Installed outside package managers – HubGet can uninstall it, but not update it.",
+    "webOnlyNote": "{{publisher}} offers {{name}} for download only on its own website, so HubGet can't install, update or uninstall it. Once it's installed, HubGet will still recognize it and open it.",
+    "webSource": "Vendor website",
+    "webBadge": "Web",
+    "webSourceHint": "Available only on the vendor's website – HubGet doesn't manage it",
     "diskInstall": "Found on disk in {{folder}} – not listed in Installed apps. HubGet can’t uninstall or update it.",
+    "portableInstall": "Unpacked in {{folder}} – not listed in Installed apps. Updating installs the new version through WinGet; uninstalling moves the folder to the Recycle Bin.",
     "availableIn": "Available from",
     "statRank": "Chart",
     "statRating": "Ratings",
@@ -880,6 +896,7 @@
     "notInCatalog": "This package is not in the catalog, so it has no description or icon.",
     "notFound": "Package not found.",
     "confirmUninstall": "Really uninstall {{name}} (via {{source}})?",
+    "confirmPortableUninstall": "Uninstall {{name}}? The folder {{folder}} will be moved to the Recycle Bin.",
     "cliInfo": "Info",
     "cliVersions": "Versions",
     "cliPin": "Pin version",
@@ -920,7 +937,8 @@
     "via": "Share to",
     "email": "Email",
     "short": "{{name}} – check out this app",
-    "message": "I recommend {{name}}: {{description}}\n\nOpen in HubGet: {{link}}\nOr install with: {{command}}"
+    "message": "I recommend {{name}}: {{description}}\n\nOpen in HubGet: {{link}}\nOr install with: {{command}}",
+    "messageNoCommand": "I recommend {{name}}: {{description}}\n\nOpen in HubGet: {{link}}"
   },
   "auth": {
     "signIn": "Sign in",
@@ -1498,7 +1516,8 @@
     "sortBy": "Sort",
     "sort": {
       "popularity": "Popularity",
-      "name": "Name"
+      "name": "Name",
+      "recent": "Recently installed"
     }
   },
   "settings": {

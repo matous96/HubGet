@@ -22,7 +22,7 @@ use serde_json::Value;
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use std::sync::Mutex;
-use std::time::Duration;
+use std::time::{Duration, Instant};
 use tauri::ipc::Channel;
 use tauri::{AppHandle, Manager};
 
@@ -542,28 +542,79 @@ fn parse_ps_list(json: &str) -> Vec<Installed> {
         .collect()
 }
 
-/// Skript PowerShellu: nainstalované moduly a jejich nejnovější verze v PowerShell Gallery.
+/// Úvod skriptů PowerShellu: tichý běh, výstup v UTF-8, TLS 1.2 pro PowerShell Gallery.
+const PS_PRELUDE: &str = "$ErrorActionPreference = 'SilentlyContinue'\n$ProgressPreference = 'SilentlyContinue'\n\
+    [Console]::OutputEncoding = New-Object System.Text.UTF8Encoding $false\n\
+    [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor 3072\n";
+
+/// Hledání nových verzí v PowerShell Gallery – zvlášť a s vlastním limitem: pomalá
+/// galerie nesmí shodit výpis nainstalovaných (moduly by z HubGetu zmizely).
+const PS_FIND_TIMEOUT: Duration = Duration::from_secs(45);
+
+/// Skript PowerShellu: nainstalované moduly (jen z disku – rychle).
 fn ps_list_script(dev: Dev) -> String {
-    let (list, find) = match dev {
-        Dev::Pwsh => (
-            "if (Get-Command Get-InstalledPSResource -ErrorAction SilentlyContinue) { @(Get-InstalledPSResource | Sort-Object Name, Version -Descending | Group-Object Name | ForEach-Object { $_.Group[0] }) } else { @(Get-InstalledModule) }",
-            "if (Get-Command Find-PSResource -ErrorAction SilentlyContinue) { Find-PSResource -Name $names -Repository PSGallery } else { Find-Module -Name $names -Repository PSGallery }",
-        ),
-        // PowerShellGet 1.x hledá přes poskytovatele NuGet – bez něj by se ptal, proto jen když už je
-        _ => (
-            "@(Get-InstalledModule)",
-            "if (Get-PackageProvider -ListAvailable -Name NuGet -ErrorAction SilentlyContinue) { Find-Module -Name $names -Repository PSGallery }",
-        ),
+    let list = match dev {
+        Dev::Pwsh => "if (Get-Command Get-InstalledPSResource -ErrorAction SilentlyContinue) { @(Get-InstalledPSResource | Sort-Object Name, Version -Descending | Group-Object Name | ForEach-Object { $_.Group[0] }) } else { @(Get-InstalledModule) }",
+        _ => "@(Get-InstalledModule)",
     };
     format!(
-        "$ErrorActionPreference = 'SilentlyContinue'\n$ProgressPreference = 'SilentlyContinue'\n\
-         [Console]::OutputEncoding = New-Object System.Text.UTF8Encoding $false\n\
-         [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor 3072\n\
-         $items = {list}\n$latest = @{{}}\n\
-         if ($items.Count) {{ $names = @($items | ForEach-Object {{ $_.Name }}); foreach ($f in @({find})) {{ $latest[$f.Name] = [string]$f.Version }} }}\n\
-         $out = @($items | ForEach-Object {{ [pscustomobject]@{{ name = $_.Name; version = [string]$_.Version; latest = $latest[$_.Name] }} }})\n\
+        "{PS_PRELUDE}$items = {list}\n\
+         $out = @($items | ForEach-Object {{ [pscustomobject]@{{ name = $_.Name; version = [string]$_.Version }} }})\n\
          ConvertTo-Json -InputObject $out -Compress"
     )
+}
+
+/// Skript PowerShellu: nejnovější verze modulů `names` v PowerShell Gallery.
+fn ps_find_script(dev: Dev, names: &[String]) -> String {
+    let find = match dev {
+        Dev::Pwsh => "if (Get-Command Find-PSResource -ErrorAction SilentlyContinue) { Find-PSResource -Name $names -Repository PSGallery } else { Find-Module -Name $names -Repository PSGallery }",
+        // PowerShellGet 1.x hledá přes poskytovatele NuGet – bez něj by se ptal, proto jen když už je
+        _ => "if (Get-PackageProvider -ListAvailable -Name NuGet -ErrorAction SilentlyContinue) { Find-Module -Name $names -Repository PSGallery }",
+    };
+    let names = names.iter().map(|name| format!("'{}'", name.replace('\'', "''"))).collect::<Vec<_>>().join(", ");
+    format!(
+        "{PS_PRELUDE}$names = @({names})\n\
+         $out = @(@({find}) | ForEach-Object {{ [pscustomobject]@{{ name = $_.Name; version = [string]$_.Version }} }})\n\
+         ConvertTo-Json -InputObject $out -Compress"
+    )
+}
+
+/// Jak dlouho platí nejnovější verze z PowerShell Gallery – dotaz trvá 4–7 s a nové
+/// verze modulů vycházejí zřídka; obnovení seznamu pak čeká jen na výpis z disku (~1,5 s).
+const PS_LATEST_TTL: Duration = Duration::from_secs(60 * 60);
+
+/// Poslední odpověď galerie: správce a názvy modulů → kdy a jaké nejnovější verze.
+type PsLatest = (Dev, Vec<String>, Instant, HashMap<String, String>);
+static PS_LATEST: Mutex<Option<PsLatest>> = Mutex::new(None);
+
+/// Nainstalované moduly PowerShellu a jejich nové verze (když galerie odpoví včas).
+fn ps_installed(tool: &Tool, dev: Dev) -> Result<Vec<Installed>, String> {
+    let list = parse_ps_list(&run_ps(tool, &ps_list_script(dev), LIST_TIMEOUT)?.stdout);
+    if list.is_empty() {
+        return Ok(list);
+    }
+    let mut names: Vec<String> = list.iter().map(|item| item.package_id.clone()).collect();
+    names.sort();
+    let cached = PS_LATEST
+        .lock()
+        .unwrap_or_else(|e| e.into_inner())
+        .as_ref()
+        .filter(|(d, n, at, _)| *d == dev && *n == names && at.elapsed() < PS_LATEST_TTL)
+        .map(|(.., latest)| latest.clone());
+    let latest = match cached {
+        Some(latest) => latest,
+        None => match run_ps(tool, &ps_find_script(dev, &names), PS_FIND_TIMEOUT) {
+            Ok(found) => {
+                let latest: HashMap<String, String> =
+                    parse_ps_list(&found.stdout).into_iter().map(|f| (f.package_id, f.installed_version)).collect();
+                *PS_LATEST.lock().unwrap_or_else(|e| e.into_inner()) = Some((dev, names, Instant::now(), latest.clone()));
+                latest
+            }
+            // Galerie nedostupná nebo pomalá – moduly zůstanou v seznamu, jen bez nové verze
+            Err(_) => HashMap::new(),
+        },
+    };
+    Ok(with_latest(list, &latest))
 }
 
 /// Spustí skript PowerShellu nástrojem (pwsh / powershell) a vrátí výstup.
@@ -608,7 +659,7 @@ fn list_installed(dev: Dev) -> Result<Vec<Installed>, String> {
             let names: Vec<String> = list.iter().map(|i| i.package_id.clone()).collect();
             with_latest(list, &parallel(&names, nuget_latest))
         }
-        Dev::Pwsh | Dev::Powershell => parse_ps_list(&run_ps(&tool, &ps_list_script(dev), LIST_TIMEOUT)?.stdout),
+        Dev::Pwsh | Dev::Powershell => ps_installed(&tool, dev)?,
     })
 }
 
@@ -1192,6 +1243,9 @@ mod tests {
         assert_eq!(list[1].available_version, None);
         // Jeden modul = objekt, ne pole
         assert_eq!(parse_ps_list(r#"{"name":"Pester","version":"5.6.1","latest":"5.6.1"}"#).len(), 1);
+        // Výpis nainstalovaných se na galerii neptá; hledání dostane názvy jako řetězce PowerShellu
+        assert!(!ps_list_script(Dev::Powershell).contains("Find-Module"));
+        assert!(ps_find_script(Dev::Powershell, &["Pester".into(), "It's".into()]).contains("$names = @('Pester', 'It''s')"));
     }
 
     #[test]

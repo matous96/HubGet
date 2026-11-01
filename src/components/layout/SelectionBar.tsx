@@ -8,6 +8,7 @@ import { Download, PackagePlus, RefreshCw, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useTranslation } from "react-i18next";
 import { pickSource, useInstalledIndex } from "@/hooks/usePackages";
+import { isWebOnly } from "@/lib/webOnly";
 import { useBundle } from "@/store/bundle";
 import { updateOptionsFor } from "@/store/installOptions";
 import { useBusyAppIds, useJobs } from "@/store/jobs";
@@ -29,7 +30,8 @@ export function SelectionBar() {
   const free = selected.filter((e) => !busy.has(e.id));
   // Co se s výběrem dá udělat: nainstalovat chybějící, aktualizovat zastaralé
   const toInstall = free.filter((e) => !installedIndex.has(e.id) && pickSource(e, enabled, preferred));
-  const toUpdate = free.filter((e) => installedIndex.get(e.id)?.availableVersion);
+  // Aplikaci jen z webu výrobce HubGet neaktualizuje (ani do sady nepatří – nemá zdroj)
+  const toUpdate = free.filter((e) => !isWebOnly(e) && installedIndex.get(e.id)?.availableVersion);
 
   const installAll = () => {
     for (const e of toInstall) {
@@ -53,6 +55,7 @@ export function SelectionBar() {
   const toBundle = () => {
     let added = 0;
     for (const e of selected) {
+      if (isWebOnly(e)) continue;
       const pkg = installedIndex.get(e.id);
       const source = pkg ? { source: pkg.source, packageId: pkg.packageId } : pickSource(e, enabled, preferred);
       if (!source) continue;

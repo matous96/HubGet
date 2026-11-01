@@ -17,9 +17,10 @@ import { PackageIcon } from "./PackageIcon";
 import { QuickActions } from "./QuickActions";
 import { useRatingFormat, useRatingSummaries } from "./RatingsSection";
 import { SelectCheckbox } from "./SelectCheckbox";
-import { OriginBadge, SourceBadge, SourceDots } from "./SourceBadge";
+import { OriginBadge, SourceBadge, SourceDots, WebBadge } from "./SourceBadge";
 import { VerifiedBadge } from "./VerifiedBadge";
 import { isVerified } from "@/lib/verified";
+import { isWebOnly } from "@/lib/webOnly";
 import { UninstallButton } from "./UninstallButton";
 
 interface PackageCardProps {
@@ -150,10 +151,16 @@ export const PackageCard = memo(function PackageCard({ entry, showUninstall, cla
             <>
               <div className="flex min-w-0 flex-1 items-center">
                 {installed ? (
-                  // U nainstalované aplikace je důležitější, odkud je nainstalovaná
-                  <OriginBadge origin={installed.origin} compact />
-                ) : (
+                  // U nainstalované aplikace je důležitější, odkud je nainstalovaná;
+                  // aplikace jen z webu výrobce (DaVinci Resolve) i s odznakem Web
+                  <span className="flex min-w-0 items-center gap-1.5">
+                    <OriginBadge origin={installed.origin} compact />
+                    {isWebOnly(entry) && <WebBadge className="shrink-0" />}
+                  </span>
+                ) : entry.sources[0] ? (
                   <SourceBadge source={entry.sources[0].source} />
+                ) : (
+                  <WebBadge />
                 )}
               </div>
               <div className="flex shrink-0 items-center gap-1">

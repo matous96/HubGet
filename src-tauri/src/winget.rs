@@ -139,8 +139,15 @@ pub struct Installed {
     winget_source: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     disk_location: Option<String>,
+    /// Program rozbalený na ploše (Tor Browser): verze z jeho souborů, aktualizace
+    /// instalací nové verze přes winget, odinstalace = složka do Koše.
+    #[serde(skip_serializing_if = "std::ops::Not::not")]
+    portable: bool,
     #[serde(skip_serializing_if = "std::ops::Not::not")]
     ea_game: bool,
+    /// Kdy byl program nainstalován (ms od 1. 1. 1970) – řazení Nově nainstalované.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    installed_at: Option<i64>,
 }
 
 impl Installed {
@@ -156,7 +163,9 @@ impl Installed {
             package_id: p.id,
             name: p.name,
             disk_location: None,
+            portable: false,
             ea_game: false,
+            installed_at: None,
         }
     }
 
@@ -169,7 +178,9 @@ impl Installed {
             available_version: None,
             winget_source: None,
             disk_location: None,
+            portable: false,
             ea_game: entry.is_ea_game(),
+            installed_at: entry.installed_at,
         }
     }
 
@@ -178,11 +189,19 @@ impl Installed {
         Installed {
             package_id: format!(r"DISK\{location}"),
             name: app.name,
-            installed_version: String::new(),
+            // Verzi zná jen program rozbalený na ploše (frontend podle ní nabídne aktualizaci)
+            installed_version: if app.desktop { disk::portable_version(&app.folder) } else { String::new() },
             available_version: None,
             winget_source: None,
             disk_location: Some(location),
+            portable: app.desktop,
             ea_game: false,
+            // Program bez záznamu v registru: kdy vznikla jeho složka
+            installed_at: std::fs::metadata(&app.folder)
+                .and_then(|meta| meta.created())
+                .ok()
+                .and_then(|time| time.duration_since(std::time::UNIX_EPOCH).ok())
+                .map(|age| age.as_millis() as i64),
         }
     }
 }
@@ -220,6 +239,12 @@ fn verified(p: &PsInstalled, registry: &arp::Registry) -> bool {
     entries.is_empty() || entries.iter().any(|entry| !arp::is_leftover(entry))
 }
 
+/// Kdy byl balíček nainstalován – nejnovější z jeho záznamů v registru (balíčky ze Storu záznam nemají).
+fn installed_at(p: &PsInstalled, registry: &arp::Registry) -> Option<i64> {
+    let version = if p.version.eq_ignore_ascii_case("unknown") { "" } else { &p.version };
+    registry.matching(&p.id, &p.name, version).iter().filter_map(|entry| entry.installed_at).max()
+}
+
 /// Hra z EA app? Jen programy mimo winget (id „ARP\…“), podle jejich záznamu v registru.
 fn is_ea_game(p: &PsInstalled, registry: &arp::Registry) -> bool {
     if !p.source.is_empty() {
@@ -247,7 +272,8 @@ pub async fn winget_installed() -> Result<Vec<Installed>, String> {
                 .filter(|p| verified(p, &registry))
                 .map(|p| {
                     let ea_game = is_ea_game(&p, &registry);
-                    Installed { ea_game, ..Installed::from_winget(p) }
+                    let installed_at = installed_at(&p, &registry);
+                    Installed { ea_game, installed_at, ..Installed::from_winget(p) }
                 })
                 .collect(),
             Err(error) => {
@@ -524,6 +550,20 @@ pub async fn winget_operation(
     request: OperationRequest,
     on_event: Channel<OpEvent>,
 ) -> Result<OperationResult, String> {
+    // Program rozbalený na ploše (Tor Browser) winget po instalaci nevidí: aktualizace
+    // = instalace nové verze (instalátor ji rozbalí do stejné složky), odinstalace =
+    // jeho složka do Koše (obnovitelná). Složku najde backend sám podle názvu.
+    let portable = if matches!(request.kind, Kind::Update | Kind::Uninstall) && !is_store_id(&request.package_id) {
+        let (package_id, name) = (request.package_id.clone(), request.name.clone().unwrap_or_default());
+        crate::process::background(move || Ok(is_portable(&package_id, &name))).await?
+    } else {
+        false
+    };
+    if portable && request.kind == Kind::Uninstall {
+        let name = request.name.clone().unwrap_or_default();
+        return crate::process::background(move || Ok(OperationResult::done(remove_portable(&name)))).await;
+    }
+    let request = if portable { OperationRequest { kind: Kind::Install, version: None, ..request } } else { request };
     let downloads = app.path().download_dir().map_err(|e| e.to_string())?;
     let options = request.options.as_ref();
     // Instalátory se stahují do %TEMP%\WinGet\<id>.<verze>, u stažení případně rovnou do cíle
@@ -576,6 +616,31 @@ pub async fn winget_operation(
         post_command,
     };
     operations::execute(id, spec, on_event).await
+}
+
+/// Program rozbalený na ploše, který winget nevidí: v registru k balíčku nic
+/// není, na ploše je jeho složka (disk::portable_folder) a ve výpisu wingetu
+/// chybí – aplikace ze Storu (MSIX) v registru také nejsou a stejnojmenná složka
+/// na ploše nesmí místo nich skončit v Koši.
+fn is_portable(package_id: &str, name: &str) -> bool {
+    arp::Registry::load().matching(package_id, name, "").is_empty()
+        && disk::portable_folder(name).is_some()
+        && winget_list().is_ok_and(|items| !items.iter().any(|p| p.id.eq_ignore_ascii_case(package_id)))
+}
+
+/// Odinstalace programu rozbaleného na ploše: složka do Koše. Běžící program
+/// (zamčené soubory) nejdřív zavře dialog „Aplikace je spuštěná“ ve frontendu.
+fn remove_portable(name: &str) -> Result<(), String> {
+    let folder = disk::portable_folder(name).ok_or_else(|| format!("Složka programu {name} na ploše není"))?;
+    // Běžící program by Koš přesunul jen napůl (zamčené soubory zůstanou)
+    if crate::running::any_running_in(&folder) {
+        return Err(format!("{name} je spuštěný – zavřete ho a zkuste to znovu"));
+    }
+    crate::leftovers::to_recycle_bin(&folder)?;
+    if folder.exists() {
+        return Err(format!("Složku {} se nepodařilo celou odstranit – nejspíš běží", folder.display()));
+    }
+    Ok(())
 }
 
 /// Zná registr aplikaci jen „pro počítač“ (nainstalovanou pro všechny uživatele)?

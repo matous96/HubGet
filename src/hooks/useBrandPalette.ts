@@ -6,11 +6,12 @@
  *     obsahuje (vícebarevná loga – Chrome), jinak dominantní odstín ikony;
  *     černobílá ikona = neutrální břidlicová,
  *  2. ikonu nejde načíst ani prozkoumat: barva značky,
- *  3. jinak odstín náhradního avataru s iniciálami.
+ *  3. jinak tmavší barva vygenerované dlaždice (lib/placeholderIcon.ts).
  */
 import { brandPalette, paletteFor, type Palette } from "@/lib/color";
 import { NEUTRAL_TONE, useIconColor } from "@/lib/iconColor";
 import { useIconSources } from "@/lib/icons";
+import { placeholderLook } from "@/lib/placeholderIcon";
 import type { CatalogEntry } from "@/types";
 
 export function useBrandPalette(entry: CatalogEntry): Palette {
@@ -19,5 +20,6 @@ export function useBrandPalette(entry: CatalogEntry): Palette {
   if (color) return paletteFor(color);
   // Během výpočtu neutrálně – pak plynulý přechod do barvy ikony
   if (pending) return paletteFor(NEUTRAL_TONE);
-  return brandPalette(entry);
+  if (entry.brandColor) return brandPalette(entry);
+  return { color: placeholderLook(entry.id, entry.name, entry.categories[0]).to, light: false, ink: "#ffffff" };
 }

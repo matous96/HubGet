@@ -13,9 +13,10 @@ import { PackageAction } from "./PackageAction";
 import { PackageIcon } from "./PackageIcon";
 import { QuickActions } from "./QuickActions";
 import { CategoryBadge } from "./CategoryBadge";
-import { OriginBadge, SourceDots } from "./SourceBadge";
+import { OriginBadge, SourceDots, WebBadge } from "./SourceBadge";
 import { VerifiedBadge } from "./VerifiedBadge";
 import { isVerified } from "@/lib/verified";
+import { isWebOnly } from "@/lib/webOnly";
 import { UninstallButton } from "./UninstallButton";
 
 interface PackageRowProps {
@@ -64,6 +65,8 @@ export const PackageRow = memo(function PackageRow({ entry, showUninstall, compa
           </h3>
           <span className="truncate text-xs text-muted">{entry.publisher}</span>
           {!installed && entry.sources.length > 1 && <SourceDots sources={entry.sources.map((s) => s.source)} />}
+          {/* Aplikace jen z webu výrobce; nainstalovaná ho má u verze (širší řádek) */}
+          {isWebOnly(entry) && (!installed || compact) && <WebBadge className="shrink-0" />}
           <CategoryBadge category={entry.categories[0]} className="hidden shrink-0 sm:inline-flex" />
         </div>
         <p className="truncate text-[13px] text-muted">{entry.description || entry.sources[0]?.packageId}</p>
@@ -72,7 +75,8 @@ export const PackageRow = memo(function PackageRow({ entry, showUninstall, compa
       {/* Zdroj (u nainstalovaných) a verze: nainstalovaná → dostupná */}
       {installed && !compact && (
         <div className="hidden shrink-0 items-center gap-1.5 text-xs tabular-nums text-muted md:flex">
-          <OriginBadge origin={installed.origin} className="mr-2" />
+          <OriginBadge origin={installed.origin} className={isWebOnly(entry) ? undefined : "mr-2"} />
+          {isWebOnly(entry) && <WebBadge className="mr-2" />}
           <span>{installed.installedVersion}</span>
           {installed.availableVersion && (
             <>

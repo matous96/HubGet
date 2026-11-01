@@ -118,6 +118,24 @@ export function bannerTone(rgb: Rgb): string {
   return rgbToHex(hslToRgb([h, s, Math.min(0.58, Math.max(0.3, l))]));
 }
 
+/** Pod touto sytostí je barva šedá – její „odstín“ nic neznamená. */
+const NEUTRAL_SATURATION = 0.15;
+
+/**
+ * Tmavá šedá z loga pro banner (DaVinci Resolve, Windows Terminal – v ikoně převládá):
+ * jas 16–30 %, nejvýš lehký nádech barvy.
+ */
+export function darkTone(rgb: Rgb): string {
+  const [h, s, l] = rgbToHsl(rgb);
+  return rgbToHex(hslToRgb([h, Math.min(s, 0.1), Math.min(0.3, Math.max(0.16, l))]));
+}
+
+/** Šedá barva (tmavá šedá z loga) – bez odstínu, se kterým by se dala seskupit. */
+export function isNeutralColor(hex: string): boolean {
+  const rgb = hexToRgb(hex);
+  return !!rgb && rgbToHsl(rgb)[1] < NEUTRAL_SATURATION;
+}
+
 /** Plynulá změna barvy karty nebo banneru (barva pozadí s vrstvou BRAND_SHADE). */
 export const COLOR_TRANSITION = "background-color 450ms ease, color 450ms ease";
 
@@ -144,7 +162,7 @@ export function prevailingColor(colors: (string | undefined)[], neutral: string)
     const rgb = color ? hexToRgb(color) : null;
     if (!color || !rgb) return [];
     const [hue, saturation] = rgbToHsl(rgb);
-    return [{ color, hue: color === neutral ? null : hue, saturation, weight: i < 3 ? 1.5 : 1 }];
+    return [{ color, hue: color === neutral || saturation < NEUTRAL_SATURATION ? null : hue, saturation, weight: i < 3 ? 1.5 : 1 }];
   });
   const total = items.reduce((sum, item) => sum + item.weight, 0);
   const hueDistance = (a: number, b: number) => Math.min(Math.abs(a - b), 360 - Math.abs(a - b));

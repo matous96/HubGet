@@ -795,12 +795,20 @@
     "development": "Entwicklung",
     "communication": "Kommunikation",
     "games": "Spiele",
-    "multimedia": "Multimedia",
+    "multimedia": "Video",
     "graphics": "Grafik",
     "productivity": "Produktivität",
     "utilities": "Werkzeuge",
     "security": "Sicherheit",
     "system": "System",
+    "audio": "Musik & Audio",
+    "ai": "KI",
+    "education": "Bildung & Wissenschaft",
+    "finance": "Finanzen",
+    "cloud": "Cloud & Speicher",
+    "network": "Internet & Netzwerk",
+    "personalization": "Personalisierung",
+    "other": "Sonstiges",
     "notFound": "Die Kategorie existiert nicht.",
     "empty": "In dieser Kategorie gibt es noch keine Apps."
   },
@@ -827,12 +835,15 @@
     "uninstall": "Deinstallieren",
     "installed": "Installiert",
     "open": "Öffnen",
+    "openFolder": "Ordner öffnen",
+    "webDownload": "Von Website laden",
     "cancel": "Abbrechen",
     "back": "Zurück",
     "publisher": "Herausgeber",
     "latestVersion": "Neueste Version",
     "installedVersion": "Installierte Version",
     "website": "Website",
+    "downloadPage": "Download-Seite",
     "license": "Lizenz",
     "tags": "Tags",
     "categories": "Kategorien",
@@ -846,7 +857,12 @@
     "openInSteam": "In Steam öffnen",
     "managedByEa": "Dieses Spiel wird von der EA app verwaltet – Updates und Dateiprüfung erfolgen in der EA app.",
     "localInstall": "Außerhalb der Paketmanager installiert – HubGet kann es deinstallieren, aber nicht aktualisieren.",
+    "webOnlyNote": "{{publisher}} bietet {{name}} nur auf der eigenen Website zum Download an, daher kann HubGet die App nicht installieren, aktualisieren oder deinstallieren. Ist sie installiert, erkennt und öffnet HubGet sie trotzdem.",
+    "webSource": "Herstellerseite",
+    "webBadge": "Web",
+    "webSourceHint": "Nur auf der Website des Herstellers erhältlich – HubGet verwaltet sie nicht",
     "diskInstall": "Auf dem Datenträger in {{folder}} gefunden – nicht unter „Installierte Apps“ aufgeführt. HubGet kann es weder deinstallieren noch aktualisieren.",
+    "portableInstall": "Entpackt in {{folder}} – nicht unter „Installierte Apps“ aufgeführt. Ein Update installiert die neue Version über WinGet, die Deinstallation verschiebt den Ordner in den Papierkorb.",
     "availableIn": "Verfügbar über",
     "statRank": "Charts",
     "statRating": "Bewertungen",
@@ -880,6 +896,7 @@
     "notInCatalog": "Dieses Paket ist nicht im Katalog, daher hat es keine Beschreibung und kein Symbol.",
     "notFound": "Paket nicht gefunden.",
     "confirmUninstall": "{{name}} wirklich deinstallieren (über {{source}})?",
+    "confirmPortableUninstall": "{{name}} deinstallieren? Der Ordner {{folder}} wird in den Papierkorb verschoben.",
     "cliInfo": "Infos",
     "cliVersions": "Versionen",
     "cliPin": "Version fixieren",
@@ -920,7 +937,8 @@
     "via": "Teilen über",
     "email": "E-Mail",
     "short": "{{name}} – schau dir diese App an",
-    "message": "Ich empfehle {{name}}: {{description}}\n\nIn HubGet öffnen: {{link}}\nOder installieren mit: {{command}}"
+    "message": "Ich empfehle {{name}}: {{description}}\n\nIn HubGet öffnen: {{link}}\nOder installieren mit: {{command}}",
+    "messageNoCommand": "Ich empfehle {{name}}: {{description}}\n\nIn HubGet öffnen: {{link}}"
   },
   "auth": {
     "signIn": "Anmelden",
@@ -1498,7 +1516,8 @@
     "sortBy": "Sortieren",
     "sort": {
       "popularity": "Beliebtheit",
-      "name": "Name"
+      "name": "Name",
+      "recent": "Neu installiert"
     }
   },
   "settings": {

@@ -6,6 +6,7 @@ import { installedNameKey } from "@/lib/nameKey";
 import { isTauri } from "@/lib/tauri";
 import i18n from "@/i18n";
 import { useInstalledVia, viaKey } from "@/store/installedVia";
+import { useInstallSeen } from "@/store/installSeen";
 import { useToasts } from "@/store/toasts";
 import type { InstalledPackage, RepoSearchResult, SourceId } from "@/types";
 import { chocoManager } from "./choco";
@@ -65,6 +66,8 @@ export async function getAllInstalled(enabled: SourceId[]): Promise<InstalledPac
   });
   const via = new Set(useInstalledVia.getState().keys);
   const merged = mergeChocolatey(results.flatMap((r) => (r.status === "fulfilled" ? r.value : [])), via);
+  // Kdy se který balíček objevil – řazení Nově nainstalované
+  useInstallSeen.getState().observe(merged);
   return [...merged.filter((p) => !p.diskLocation), ...merged.filter((p) => p.diskLocation)];
 }
 

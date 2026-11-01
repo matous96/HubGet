@@ -48,7 +48,7 @@ const settingsKind: SyncKind = {
     if (oneOf(map.language, LANGUAGES.map((l) => l.code)) && map.language !== s.language) s.setLanguage(map.language);
     if (oneOf<UserMode>(map.userMode, ["regular", "developer"])) s.setUserMode(map.userMode);
     if (oneOf<ViewMode>(map.viewMode, ["grid", "list"])) s.setViewMode(map.viewMode);
-    if (oneOf<SortMode>(map.sortMode, ["popularity", "name"])) s.setSortMode(map.sortMode);
+    if (oneOf<SortMode>(map.sortMode, ["popularity", "name", "recent"])) s.setSortMode(map.sortMode);
     if (map.accentColor === null || isString(map.accentColor)) s.setAccentColor(map.accentColor);
     const enabled = sources(map.enabledSources);
     // Aspoň jeden správce musí zůstat zapnutý

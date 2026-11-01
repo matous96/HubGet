@@ -35,6 +35,9 @@ const num = (name: string, fallback: number) => {
 
 const options = {
   details: num("details", 2500),
+  // Popis, štítky a vydavatel z manifestu i u ostatních balíčků wingetu – bez nich se
+  // většina nezařadí do kategorie (manifesty se ukládají natrvalo, stahují se jen nové verze)
+  descriptions: num("descriptions", Number.POSITIVE_INFINITY),
   sizes: num("sizes", 300),
   limit: arg("limit") ? num("limit", 0) : undefined,
 };

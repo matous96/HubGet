@@ -3,6 +3,8 @@
  * a „Aktualizovat vše“. Sdílí je přehled na domovské stránce i stránka Nainstalované.
  */
 import { useMemo } from "react";
+import { useHistory } from "@/store/history";
+import { seenKey, useInstallSeen } from "@/store/installSeen";
 import { updateOptionsFor } from "@/store/installOptions";
 import { useBusyAppIds, useJobs } from "@/store/jobs";
 import { useUpdateHolds, versionKey } from "@/store/updateHolds";
@@ -12,6 +14,29 @@ import { fallbackEntry, isListedInstalled, useInstalled, useInstalledEntries } f
 export interface InstalledItem {
   pkg: InstalledPackage;
   entry: CatalogEntry;
+}
+
+/**
+ * Řazení Nově nainstalované: nejnovější instalace nahoře. Nejdřív aplikace nainstalované
+ * přes HubGet (historie operací – přesný čas) a ty, které se ve výpisu objevily nově
+ * (store/installSeen), pak ostatní podle data ve Windows (záznam v registru – aplikace,
+ * které se aktualizují samy, ho přepisují, proto až po skutečně nových), nakonec popularita.
+ */
+export function useInstallOrder(): (items: InstalledItem[]) => InstalledItem[] {
+  const history = useHistory((s) => s.items);
+  const seen = useInstallSeen((s) => s.seen);
+  return useMemo(() => {
+    const installs = new Map<string, number>();
+    for (const h of history) {
+      if (h.outcome === "success" && h.kind === "install") installs.set(h.appId, Math.max(installs.get(h.appId) ?? 0, Date.parse(h.finishedAt)));
+    }
+    const fresh = (i: InstalledItem) => Math.max(installs.get(i.entry.id) ?? 0, seen[seenKey(i.pkg)] ?? 0);
+    return (items) =>
+      items
+        .map((item) => ({ item, fresh: fresh(item), system: item.pkg.installedAt ?? 0 }))
+        .sort((a, b) => b.fresh - a.fresh || b.system - a.system || b.item.entry.popularity - a.item.entry.popularity)
+        .map(({ item }) => item);
+  }, [history, seen]);
 }
 
 /** Původ, u kterého aplikaci HubGet nespravuje (hry ze Steamu, programy mimo správce). */

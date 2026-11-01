@@ -1,9 +1,10 @@
 import type { MouseEvent } from "react";
-import { Check, Download, Play, RefreshCw } from "lucide-react";
+import { Check, Download, ExternalLink, FolderOpen, Play, RefreshCw } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/Button";
 import { useInstallActions } from "@/hooks/useInstallActions";
 import { launchApp, useLaunchTarget } from "@/lib/launch";
+import { isWebOnly, openDownloadPage } from "@/lib/webOnly";
 import { useToasts } from "@/store/toasts";
 import type { CatalogEntry, InstalledPackage, SourceId } from "@/types";
 import { JobProgress } from "./JobProgress";
@@ -19,9 +20,11 @@ interface PackageActionProps {
 /**
  * Hlavní akce aplikace jedním kliknutím:
  *  - běží úloha → živý průběh se zrušením,
- *  - nenainstalováno → Instalovat (ze zvoleného / preferovaného zdroje),
+ *  - nenainstalováno → Instalovat (ze zvoleného / preferovaného zdroje), aplikace jen z webu
+ *    výrobce → Stáhnout z webu (oficiální stránka v prohlížeči; aktualizace se jí nenabízí),
  *  - existuje novější verze → Aktualizovat (přes zdroj, ze kterého je nainstalovaná),
- *  - nainstalováno a v nabídce Start → Otevřít (spustí aplikaci),
+ *  - nainstalováno a jde spustit → Otevřít (nabídka Start, EXE, Steam – lib/launch.ts),
+ *    jde otevřít jen složka programu → Otevřít složku,
  *  - jinak → informace „Nainstalováno“.
  */
 export function PackageAction({ entry, source, size = "sm", className }: PackageActionProps) {
@@ -45,6 +48,7 @@ export function PackageAction({ entry, source, size = "sm", className }: Package
   const iconSize = size === "sm" ? "size-3.5" : "size-4";
 
   if (status === "available") {
+    if (isWebOnly(entry)) return <WebDownloadButton entry={entry} size={size} className={className} />;
     return (
       <Button size={size} onClick={run("install")} disabled={!effective} className={className}>
         <Download className={iconSize} />
@@ -53,7 +57,7 @@ export function PackageAction({ entry, source, size = "sm", className }: Package
     );
   }
 
-  if (status === "updatable") {
+  if (status === "updatable" && !isWebOnly(entry)) {
     return (
       <Button size={size} onClick={run("update")} className={className}>
         <RefreshCw className={iconSize} />
@@ -78,9 +82,26 @@ export function PackageAction({ entry, source, size = "sm", className }: Package
   );
 }
 
+/** Stáhnout z webu – aplikace jen z webu výrobce: otevře oficiální stránku ke stažení. */
+function WebDownloadButton({ entry, size, className }: { entry: CatalogEntry; size: "sm" | "md" | "lg"; className?: string }) {
+  const { t } = useTranslation();
+  const open = (e: MouseEvent) => {
+    // Klik uvnitř karty nesmí zároveň otevřít detail
+    e.preventDefault();
+    e.stopPropagation();
+    openDownloadPage(entry);
+  };
+  return (
+    <Button size={size} onClick={open} title={t("package.webOnlyNote", { name: entry.name, publisher: entry.publisher })} className={className}>
+      <ExternalLink className={size === "sm" ? "size-3.5" : "size-4"} />
+      {t("package.webDownload")}
+    </Button>
+  );
+}
+
 /**
- * Otevřít – spustí nainstalovanou aplikaci přes její položku v nabídce Start.
- * Nic nevykreslí, pokud aplikaci spustit nejde (není v nabídce Start, webová verze).
+ * Otevřít – spustí nainstalovanou aplikaci (položka nabídky Start, EXE, Steam), nebo otevře její složku.
+ * Nic nevykreslí, pokud aplikaci otevřít nejde (knihovna bez složky, webová verze).
  */
 export function LaunchButton({
   entry,
@@ -110,9 +131,19 @@ export function LaunchButton({
     );
   };
 
+  const iconSize = size === "sm" ? "size-3.5" : "size-4";
+  // Program, který spustit nejde (jen jeho složka) – otevře se složka v Průzkumníkovi
+  if (target.kind === "folder") {
+    return (
+      <Button size={size} variant="secondary" onClick={open} className={className}>
+        <FolderOpen className={iconSize} />
+        {t("package.openFolder")}
+      </Button>
+    );
+  }
   return (
-    <Button size={size} variant={variant} onClick={open} title={target.name} className={className}>
-      <Play className={size === "sm" ? "size-3.5" : "size-4"} />
+    <Button size={size} variant={variant} onClick={open} title={target.kind === "start" ? target.app.name : undefined} className={className}>
+      <Play className={iconSize} />
       {t("package.open")}
     </Button>
   );

@@ -795,12 +795,20 @@
     "development": "开发",
     "communication": "通讯",
     "games": "游戏",
-    "multimedia": "多媒体",
+    "multimedia": "视频",
     "graphics": "图形",
     "productivity": "效率",
     "utilities": "实用工具",
     "security": "安全",
     "system": "系统",
+    "audio": "音乐与音频",
+    "ai": "人工智能",
+    "education": "教育与科学",
+    "finance": "财务",
+    "cloud": "云与存储",
+    "network": "网络与互联网",
+    "personalization": "个性化",
+    "other": "其他",
     "notFound": "该分类不存在。",
     "empty": "此分类中还没有应用。"
   },
@@ -827,12 +835,15 @@
     "uninstall": "卸载",
     "installed": "已安装",
     "open": "打开",
+    "openFolder": "打开文件夹",
+    "webDownload": "从官网下载",
     "cancel": "取消",
     "back": "返回",
     "publisher": "发布者",
     "latestVersion": "最新版本",
     "installedVersion": "已安装版本",
     "website": "网站",
+    "downloadPage": "下载页面",
     "license": "许可证",
     "tags": "标签",
     "categories": "分类",
@@ -846,7 +857,12 @@
     "openInSteam": "在 Steam 中打开",
     "managedByEa": "此游戏由 EA app 管理——更新和文件验证在 EA app 中进行。",
     "localInstall": "在包管理器之外安装——HubGet 可以卸载它，但无法更新。",
+    "webOnlyNote": "{{publisher}} 仅在其官网提供 {{name}} 下载，因此 HubGet 无法安装、更新或卸载它。安装后，HubGet 仍能识别并打开它。",
+    "webSource": "官网",
+    "webBadge": "官网",
+    "webSourceHint": "仅可从官网下载——HubGet 不管理此应用",
     "diskInstall": "在磁盘上的 {{folder}} 中找到——未列在“已安装的应用”中。HubGet 无法卸载或更新它。",
+    "portableInstall": "已解压到 {{folder}}——未列在“已安装的应用”中。更新会通过 WinGet 安装新版本，卸载会将文件夹移到回收站。",
     "availableIn": "可通过以下方式获取",
     "statRank": "排行",
     "statRating": "评分",
@@ -880,6 +896,7 @@
     "notInCatalog": "此软件包不在目录中，因此没有描述和图标。",
     "notFound": "未找到软件包。",
     "confirmUninstall": "确定要卸载 {{name}}（通过 {{source}}）吗？",
+    "confirmPortableUninstall": "卸载 {{name}}？文件夹 {{folder}} 将被移到回收站。",
     "cliInfo": "信息",
     "cliVersions": "版本",
     "cliPin": "固定版本",
@@ -920,7 +937,8 @@
     "via": "分享到",
     "email": "电子邮件",
     "short": "{{name}}——来看看这个应用",
-    "message": "推荐你试试 {{name}}：{{description}}\n\n在 HubGet 中打开：{{link}}\n或用此命令安装：{{command}}"
+    "message": "推荐你试试 {{name}}：{{description}}\n\n在 HubGet 中打开：{{link}}\n或用此命令安装：{{command}}",
+    "messageNoCommand": "推荐 {{name}}：{{description}}\n\n在 HubGet 中打开：{{link}}"
   },
   "auth": {
     "signIn": "登录",
@@ -1498,7 +1516,8 @@
     "sortBy": "排序",
     "sort": {
       "popularity": "人气",
-      "name": "名称"
+      "name": "名称",
+      "recent": "最近安装"
     }
   },
   "settings": {

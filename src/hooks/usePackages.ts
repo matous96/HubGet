@@ -11,6 +11,7 @@ import { installedNameKey } from "@/lib/nameKey";
 import { isTauri } from "@/lib/tauri";
 import { wingetBaseId } from "@/lib/wingetVariant";
 import { normalize } from "@/lib/utils";
+import { compareVersions } from "@/lib/version";
 import { loadCatalog, type LoadedCatalog } from "@/services/catalog";
 import { getAllInstalled, getSource, isEaGame, isSourceId, sortBySourceOrder, steamAppId } from "@/services/managers";
 import { useJobs } from "@/store/jobs";
@@ -123,9 +124,7 @@ export { wingetBaseId };
 const nameIndexes = new WeakMap<LoadedCatalog, Map<string, CatalogEntry>>();
 
 /** Mapa „klíč názvu“ → nejpopulárnější profil s tímto názvem (katalog je seřazený podle popularity). */
-function useCatalogNameIndex() {
-  const { data } = useCatalog();
-  if (!data) return NO_ENTRIES;
+function catalogNameIndex(data: LoadedCatalog) {
   return cached(nameIndexes, data, () => {
     const map = new Map<string, CatalogEntry>();
     for (const entry of data.catalog.packages) {
@@ -134,6 +133,38 @@ function useCatalogNameIndex() {
     }
     return map;
   });
+}
+
+function useCatalogNameIndex() {
+  const { data } = useCatalog();
+  return data ? catalogNameIndex(data) : NO_ENTRIES;
+}
+
+type InstalledAlias = [pattern: RegExp, entry: CatalogEntry];
+const aliasIndexes = new WeakMap<LoadedCatalog, InstalledAlias[]>();
+const NO_ALIASES: InstalledAlias[] = [];
+
+/**
+ * Jiné názvy v registru u aplikací jen z webu výrobce (`installedNames` – regulární
+ * výrazy): „VMware Workstation“ → VMware Workstation Pro, „NI LabVIEW 2025 Q3“ → LabVIEW.
+ */
+function installedAliases(data: LoadedCatalog) {
+  return cached(aliasIndexes, data, () =>
+    data.catalog.packages.flatMap((entry) =>
+      (entry.installedNames ?? []).flatMap((pattern): InstalledAlias[] => {
+        try {
+          return [[new RegExp(pattern, "i"), entry]];
+        } catch {
+          return []; // neplatný výraz v katalogu – aplikace se jen nespáruje
+        }
+      }),
+    ),
+  );
+}
+
+function useInstalledAliases() {
+  const { data } = useCatalog();
+  return data ? installedAliases(data) : NO_ALIASES;
 }
 
 const wingetTailIndexes = new WeakMap<Map<string, CatalogEntry>, Map<string, CatalogEntry>>();
@@ -152,7 +183,10 @@ function wingetTailIndex(sourceIndex: Map<string, CatalogEntry>) {
 }
 
 type InstalledLinks = Map<InstalledPackage, CatalogEntry | undefined>;
-const installedLinks = new WeakMap<InstalledPackage[], { sourceIndex: unknown; nameIndex: unknown; links: InstalledLinks }>();
+const installedLinks = new WeakMap<
+  InstalledPackage[],
+  { sourceIndex: unknown; nameIndex: unknown; aliases: unknown; links: InstalledLinks }
+>();
 const NO_LINKS: InstalledLinks = new Map();
 
 /**
@@ -163,7 +197,8 @@ const NO_LINKS: InstalledLinks = new Map();
  *  3. jinak podle názvu – winget vidí řadu programů jen jako záznam v registru
  *     („ARP\User\X64\Discord“), bez vazby na balíček Discord.Discord; složka
  *     programu nalezeného jen na disku i bez hlavní verze („Audacity 4“)
- *     a podle poslední části id wingetu („EA Desktop“ → ElectronicArts.EADesktop).
+ *     a podle poslední části id wingetu („EA Desktop“ → ElectronicArts.EADesktop),
+ *  4. aplikace jen z webu výrobce i podle jiného názvu v registru (installedAliases).
  * Jeden profil patří nejvýš jednomu balíčku; shoda podle id má přednost
  * a programy nalezené jen na disku jsou na řadě poslední (getAllInstalled je řadí na konec).
  */
@@ -171,9 +206,10 @@ function useInstalledLinks(): InstalledLinks {
   const { data } = useInstalled();
   const sourceIndex = useSourceIndex();
   const nameIndex = useCatalogNameIndex();
+  const aliases = useInstalledAliases();
   if (!data) return NO_LINKS;
   const known = installedLinks.get(data);
-  if (known && known.sourceIndex === sourceIndex && known.nameIndex === nameIndex) return known.links;
+  if (known && known.sourceIndex === sourceIndex && known.nameIndex === nameIndex && known.aliases === aliases) return known.links;
 
   const links: InstalledLinks = new Map();
   const taken = new Set<string>();
@@ -195,12 +231,15 @@ function useInstalledLinks(): InstalledLinks {
     if (!links.get(p)) linkFree(p, nameIndex.get(installedNameKey(p.name)));
   }
   for (const p of data) {
+    if (!links.get(p) && !p.diskLocation) linkFree(p, aliases.find(([pattern]) => pattern.test(p.name))?.[1]);
+  }
+  for (const p of data) {
     if (links.get(p) || !p.diskLocation) continue;
     const bare = p.name.replace(/\s+\d+$/, "");
     if (bare !== p.name) linkFree(p, nameIndex.get(installedNameKey(bare)));
     if (!links.get(p)) linkFree(p, wingetTailIndex(sourceIndex).get(installedNameKey(p.name)));
   }
-  installedLinks.set(data, { sourceIndex, nameIndex, links });
+  installedLinks.set(data, { sourceIndex, nameIndex, aliases, links });
   return links;
 }
 
@@ -222,18 +261,39 @@ export function useInstalledEntries() {
  * všechny komponenty tak dostanou jeden seznam a sdílené indexy (WeakMap výše)
  * se nepočítají znovu.
  */
-let ruleSelector: { rules: UpdateRules; select: (data: InstalledPackage[]) => InstalledPackage[] } | null = null;
+let ruleSelector: {
+  rules: UpdateRules;
+  catalog: LoadedCatalog | undefined;
+  select: (data: InstalledPackage[]) => InstalledPackage[];
+} | null = null;
 
-function selectWithRules(rules: UpdateRules) {
-  if (ruleSelector?.rules !== rules) {
+function selectWithRules(rules: UpdateRules, catalog: LoadedCatalog | undefined) {
+  if (ruleSelector?.rules !== rules || ruleSelector.catalog !== catalog) {
     let last: { data: InstalledPackage[]; result: InstalledPackage[] } | null = null;
     const select = (data: InstalledPackage[]) => {
-      if (last?.data !== data) last = { data, result: applyUpdateRules(data, rules) };
+      if (last?.data !== data) last = { data, result: applyUpdateRules(withPortablePackages(data, catalog), rules) };
       return last.result;
     };
-    ruleSelector = { rules, select };
+    ruleSelector = { rules, catalog, select };
   }
   return ruleSelector.select;
+}
+
+/**
+ * Program rozbalený na ploše (Tor Browser) winget po instalaci nevidí. S profilem
+ * v katalogu, který má balíček wingetu, se vede pod jeho id – aktualizace,
+ * odinstalace i spuštění pak jdou přes winget a backend program pozná sám
+ * (winget_operation, launch_info) – a novější verzi v katalogu nabídne jako aktualizaci.
+ */
+function withPortablePackages(data: InstalledPackage[], catalog: LoadedCatalog | undefined): InstalledPackage[] {
+  if (!catalog || !data.some((p) => p.portable)) return data;
+  const names = catalogNameIndex(catalog);
+  return data.map((p) => {
+    const winget = p.portable ? names.get(installedNameKey(p.name))?.sources.find((s) => s.source === "winget") : undefined;
+    if (!winget) return p;
+    const newer = !!p.installedVersion && compareVersions(winget.version, p.installedVersion) > 0;
+    return { ...p, packageId: winget.packageId, origin: "winget", availableVersion: newer ? winget.version : null };
+  });
 }
 
 /**
@@ -249,7 +309,7 @@ export function useInstalled() {
   return useQuery({
     queryKey: [...queryKeys.installed, enabled],
     queryFn: () => getAllInstalled(enabled),
-    select: selectWithRules(rules),
+    select: selectWithRules(rules, catalog),
     // Bez strukturálního sdílení – jinak by každá komponenta dostala vlastní kopii pole
     structuralSharing: false,
   });
@@ -501,6 +561,7 @@ export function useArchFilter() {
 export function sortPackages(packages: CatalogEntry[], mode: SortMode, locale: string) {
   const sorted = [...packages];
   if (mode === "name") sorted.sort((a, b) => a.name.localeCompare(b.name, locale));
+  // „recent“ (nově nainstalované) řadí jen Nainstalované (useInstallOrder) – jinde popularita
   else sorted.sort((a, b) => b.popularity - a.popularity);
   return sorted;
 }

@@ -10,13 +10,17 @@
 //! Spustit jde jen aplikaci z aktuálního seznamu – frontend nemůže předat libovolný příkaz.
 
 use serde::{Deserialize, Serialize};
+use std::ffi::OsStr;
+use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::sync::Mutex;
 use std::time::{Duration, Instant};
 
 use crate::arp;
+use crate::disk;
 use crate::powershell;
 use crate::process::background;
+use crate::running;
 
 /// Spustitelná aplikace; `target` = její spouštěcí soubor (cesta malými písmeny),
 /// pokud ho jde určit – frontend podle něj najde zástupce programu nalezeného na disku.
@@ -159,6 +163,17 @@ pub async fn start_apps() -> Result<Vec<StartApp>, String> {
     background(load).await
 }
 
+/// Otevře `target` jako z Průzkumníka (aplikace z nabídky Start, EXE, složka, odkaz steam://)
+/// – spuštěný program s HubGetem nesouvisí a dialog UAC si případně vyžádá sám.
+fn explorer(target: impl AsRef<OsStr>) -> Result<(), String> {
+    let root = std::env::var("SystemRoot").unwrap_or_else(|_| r"C:\Windows".into());
+    Command::new(Path::new(&root).join("explorer.exe"))
+        .arg(target)
+        .spawn()
+        .map(|_| ())
+        .map_err(|e| format!("Aplikaci se nepodařilo spustit: {e}"))
+}
+
 /// Spustí aplikaci z nabídky Start.
 #[tauri::command]
 pub async fn launch_app(app_id: String) -> Result<(), String> {
@@ -167,12 +182,140 @@ pub async fn launch_app(app_id: String) -> Result<(), String> {
         if !is_known_app(&app_id)? {
             return Err("Aplikace v nabídce Start není".into());
         }
-        let root = std::env::var("SystemRoot").unwrap_or_else(|_| r"C:\Windows".into());
-        Command::new(std::path::Path::new(&root).join("explorer.exe"))
-            .arg(format!("shell:AppsFolder\\{app_id}"))
-            .spawn()
-            .map_err(|e| format!("Aplikaci se nepodařilo spustit: {e}"))?;
-        Ok(())
+        explorer(format!("shell:AppsFolder\\{app_id}"))
+    })
+    .await
+}
+
+// ── Programy bez vlastní položky v nabídce Start ─────────────────────────
+//
+// Git má v nabídce Start „Git Bash“, Acrobat Reader „Adobe Acrobat“, Tor Browser
+// rozbalený na ploše nic, hry ze Steamu jen odkazy steam://. Backend k balíčku
+// najde složky programu (záznam v registru, složka na disku), jeho EXE s okny
+// a hru ze Steamu; frontend v těch složkách hledá zástupce z nabídky Start,
+// jinak program spustí přímo, a když nejde nic, otevře aspoň jeho složku.
+// Cesty frontend nedostane ani nepředává – spustit jde jen to, co backend
+// k nainstalovanému balíčku sám dohledá.
+
+/// Nainstalovaný balíček, jak ho zná frontend (id wingetu, „ARP\…“ nebo „DISK\<složka>“).
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct InstalledRef {
+    package_id: String,
+    name: String,
+    #[serde(default)]
+    version: String,
+}
+
+/// Jak jinak program otevřít.
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct LaunchInfo {
+    package_id: String,
+    /// Složky programu (malými písmeny, bez lomítka na konci) – frontend v nich hledá zástupce z nabídky Start.
+    folders: Vec<String>,
+    /// Program jde spustit přímo (EXE s okny).
+    exe: bool,
+    /// Hra ze Steamu – spustí ji Steam.
+    steam: bool,
+}
+
+/// Co backend o programu zjistil (cesty zůstanou v backendu).
+struct Resolved {
+    folders: Vec<PathBuf>,
+    exe: Option<PathBuf>,
+    steam: Option<String>,
+}
+
+/// EXE s okny (konzolový nástroj by se jen mihl), které není instalátorem – ikonou
+/// v registru bývá i instalátor (Visual C++ `Package Cache\…\VC_redist.x64.exe`,
+/// InstallShield `Setup.exe`, OpenAL `oalinst.exe`) a ten by se spustil znovu.
+fn gui_exe(path: &Path) -> bool {
+    !is_installer(path)
+        && path.file_name().is_some_and(|file| arp::is_app_exe(&file.to_string_lossy()))
+        && running::is_gui_program(&path.to_string_lossy())
+}
+
+/// Instalátor nebo služba podle cesty a názvu (ArmouryCrate.Service.exe okno nemá).
+fn is_installer(path: &Path) -> bool {
+    let lower = arp::folder_key(path);
+    let stem = path.file_stem().map(|s| s.to_string_lossy().to_lowercase()).unwrap_or_default();
+    ["\\package cache\\", "\\installshield installation information\\", "\\installer\\"].iter().any(|dir| lower.contains(dir))
+        || ["setup", "install", "redist"].iter().any(|word| stem.contains(word))
+        || stem.ends_with("inst")
+        || stem.ends_with(".service")
+}
+
+fn resolve(registry: &arp::Registry, package: &InstalledRef) -> Resolved {
+    if let Some(folder) = package.package_id.strip_prefix(r"DISK\") {
+        let folder = PathBuf::from(folder);
+        // Jen složka, kterou by našlo hledání na disku – ne libovolná cesta od frontendu
+        let exe = disk::program_exe_of(&folder);
+        let folders = if exe.is_some() { vec![folder] } else { Vec::new() };
+        return Resolved { folders, exe: exe.filter(|exe| gui_exe(exe)), steam: None };
+    }
+    let entries = registry.matching(&package.package_id, &package.name, &package.version);
+    // Program rozbalený na ploše pod id wingetu (Tor Browser – winget ho nevidí, registr nezná)
+    if entries.is_empty() {
+        if let Some(folder) = disk::portable_folder(&package.name) {
+            let exe = disk::program_exe_of(&folder).filter(|exe| gui_exe(exe));
+            return Resolved { folders: vec![folder], exe, steam: None };
+        }
+    }
+    let steam = entries.iter().find_map(|entry| entry.steam_id());
+    // Složky instalátorů (Package Cache, InstallShield) programem nejsou
+    let mut folders: Vec<PathBuf> = Vec::new();
+    for dir in entries.iter().flat_map(|entry| entry.folders()) {
+        if dir.is_dir() && !is_installer(&dir.join("x")) && !folders.iter().any(|known| arp::folder_key(known) == arp::folder_key(&dir)) {
+            folders.push(dir);
+        }
+    }
+    if steam.is_some() {
+        return Resolved { folders, exe: None, steam };
+    }
+    // EXE z ikony v registru, jinak ve složce programu pojmenované jako program
+    let key = arp::name_key(&package.name);
+    let exe = entries
+        .iter()
+        .filter_map(|entry| entry.icon_file())
+        .find(|path| gui_exe(path))
+        .or_else(|| folders.iter().find_map(|dir| disk::named_exe(dir, &key).filter(|exe| gui_exe(exe))));
+    Resolved { folders, exe, steam: None }
+}
+
+/// Složky, EXE a hry ze Steamu k nainstalovaným balíčkům (jen to, co frontend potřebuje vědět).
+#[tauri::command]
+pub async fn launch_info(packages: Vec<InstalledRef>) -> Result<Vec<LaunchInfo>, String> {
+    background(move || {
+        let registry = arp::Registry::load();
+        Ok(packages
+            .iter()
+            .map(|package| {
+                let resolved = resolve(&registry, package);
+                LaunchInfo {
+                    package_id: package.package_id.clone(),
+                    folders: resolved.folders.iter().map(|dir| arp::folder_key(dir)).collect(),
+                    exe: resolved.exe.is_some(),
+                    steam: resolved.steam.is_some(),
+                }
+            })
+            .collect())
+    })
+    .await
+}
+
+/// Otevře program bez položky v nabídce Start: `mode` „exe“ (spustí jeho EXE),
+/// „steam“ (hru přes Steam), nebo „folder“ (jeho složku v Průzkumníkovi).
+#[tauri::command]
+pub async fn launch_installed(package: InstalledRef, mode: String) -> Result<(), String> {
+    background(move || {
+        let resolved = resolve(&arp::Registry::load(), &package);
+        match mode.as_str() {
+            "exe" => explorer(resolved.exe.ok_or("Program nemá spustitelný soubor s okny")?),
+            "steam" => explorer(format!("steam://rungameid/{}", resolved.steam.ok_or("Není to hra ze Steamu")?)),
+            "folder" => explorer(resolved.folders.into_iter().next().ok_or("Složka programu neexistuje")?),
+            _ => Err("Neznámý způsob otevření".into()),
+        }
     })
     .await
 }
@@ -180,6 +323,21 @@ pub async fn launch_app(app_id: String) -> Result<(), String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn installers_are_not_programs() {
+        for path in [
+            r"C:\ProgramData\Package Cache\{0e3bb569}\VC_redist.x64.exe",
+            r"C:\Program Files (x86)\InstallShield Installation Information\{2dfe216d}\Setup.exe",
+            r"C:\Program Files (x86)\OpenAL\oalinst.exe",
+            r"C:\Program Files\ASUS\Armoury Crate Service\ArmouryCrate.Service.exe",
+        ] {
+            assert!(is_installer(Path::new(path)), "{path}");
+        }
+        for path in [r"C:\Users\x\Desktop\Tor Browser\Browser\firefox.exe", r"D:\Games\FIFA 11\Game\fifa.exe", r"C:\Program Files\Git\git-bash.exe"] {
+            assert!(!is_installer(Path::new(path)), "{path}");
+        }
+    }
 
     #[test]
     fn filters_non_apps() {

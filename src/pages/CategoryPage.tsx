@@ -6,7 +6,7 @@ import { PackageCollection } from "@/components/package/PackageCollection";
 import { matchesSource, SourceFilter, type SourceFilterValue } from "@/components/package/SourceFilter";
 import { CollectionToolbar } from "@/components/ui/CollectionToolbar";
 import { CardSkeletons, EmptyState, PageHeader } from "@/components/ui/States";
-import { getCategory } from "@/data/categories";
+import { getCategory, inCategory } from "@/data/categories";
 import { useArchFilter, useCatalog, useModeFilter, useSortedPackages } from "@/hooks/usePackages";
 import { ARCH_LABEL } from "@/lib/arch";
 import { getSource } from "@/services/managers";
@@ -36,7 +36,7 @@ export function CategoryPage() {
   const { packages, hiddenByArch } = useMemo(() => {
     if (!category) return { packages: [], hiddenByArch: 0 };
     const list = (data?.catalog.packages ?? []).filter(
-      (p) => p.categories.includes(category.id) && matchesSource(p.sources, sourceFilter),
+      (p) => inCategory(p, category.id) && matchesSource(p.sources, sourceFilter),
     );
     // Běžný uživatel nevidí balíčky jen pro vývojáře – ledaže si vývojářského správce vybral ve filtru
     const visible = sourceFilter !== "all" && getSource(sourceFilter).group === "dev" ? list : modeFilter(list);

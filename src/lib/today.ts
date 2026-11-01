@@ -18,7 +18,7 @@
  * aplikace dne je jedna na celý den a nelistuje se.
  */
 import { APP_STORIES, COLLECTIONS, dayIndex, type AppStory, type CollectionStory } from "@/data/editorial";
-import { CATEGORIES } from "@/data/categories";
+import { CATEGORIES, categoryColor } from "@/data/categories";
 import i18n from "@/i18n";
 import { isVerified } from "@/lib/verified";
 import { getSource } from "@/services/managers";
@@ -31,22 +31,6 @@ const CHUNK = 6;
 const CATEGORY_TOP = 30;
 /** Každý kolikátý den je velký příběh ručně psaný. */
 const HANDWRITTEN_EVERY = 4;
-
-/** Barva karty výběru z kategorie (hex – karta z ní skládá přechod). */
-const CATEGORY_COLORS: Record<CategoryId, string> = {
-  browsers: "#1d4ed8",
-  development: "#4338ca",
-  // Komunikace a bezpečnost se ukazují stejný den – jiný odstín než zelená bezpečnost
-  communication: "#6d28d9",
-  games: "#be123c",
-  multimedia: "#c2410c",
-  graphics: "#a21caf",
-  productivity: "#b45309",
-  utilities: "#334155",
-  // Zelená jako štít „Bezpečné“ – červená by působila jako varování
-  security: "#047857",
-  system: "#0e7490",
-};
 
 export interface TodayPicks {
   story: AppStory;
@@ -163,7 +147,7 @@ function categoryCollection(category: CategoryId, top: CatalogEntry[], round: nu
       subtitle: { cs: i18n.t("home.categoryCollection.subtitle", { names: entries.slice(0, 3).map((e) => e.name).join(", ") }) },
       description: { cs: i18n.t("home.categoryCollection.description", { category: name }) },
       appIds: entries.map((e) => e.id),
-      color: CATEGORY_COLORS[category],
+      color: categoryColor(category),
     },
     entries,
   };
@@ -194,8 +178,17 @@ export function todayPicks(
   const handwritten = APP_STORIES.filter((s) => index.has(s.appId));
   // Malé ikony pryč ještě před pořadím – přeskočená by jinak posunula výběr na stejného souseda
   const sharp = known.filter((e) => !blurry(e));
-  const categories = CATEGORIES.map((c) => c.id).filter((id) => developer || id !== "development");
-  const sources = [...COLLECTIONS.map((c) => ({ kind: "fixed" as const, story: c })), ...categories.map((id) => ({ kind: "category" as const, id }))];
+  // Ostatní (aplikace bez kategorie) jako téma dne nedává smysl. Kategorie s málo známými aplikacemi
+  // (malé nové – Finance, Přizpůsobení – nebo katalog, který je ještě nezná) by dala prázdnou kartu,
+  // která se skryje – do střídání patří jen ty, ze kterých jde poskládat celý výběr (bez ohledu na
+  // ikony, ať se pořadí nemění, jak se měří)
+  const categories = CATEGORIES.map((c) => c.id).filter(
+    (id) => id !== "other" && (developer || id !== "development") && usable.filter((e) => e.categories.includes(id)).length > CHUNK,
+  );
+  const sources = [
+    ...COLLECTIONS.filter((c) => resolve(c.appIds).length > 0).map((c) => ({ kind: "fixed" as const, story: c })),
+    ...categories.map((id) => ({ kind: "category" as const, id })),
+  ];
 
   /** Příběh a dvě kolekce pro daný posun (listování šipkami – každá karta ukáže výběr jiného dne). */
   const cards = (s: TodayShift) => {
@@ -208,6 +201,8 @@ export function todayPicks(
 
     // Kolekce: ručně psané + výběry z kategorií (běžný uživatel bez vývojářských)
     const pick = (position: number) => {
+      // Katalog se ještě načítá (prázdný seznam) – žádná kolekce, karta se neukáže
+      if (!sources.length) return { story: COLLECTIONS[0], entries: [] as CatalogEntry[] };
       const source = sources[mod(position, sources.length)];
       if (source.kind === "fixed") return { story: source.story, entries: resolve(source.story.appIds) };
       const top = usable.filter((e) => e.categories.includes(source.id) && e.id !== story.appId && !blurry(e)).slice(0, CATEGORY_TOP);

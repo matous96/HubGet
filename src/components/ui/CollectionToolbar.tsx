@@ -4,16 +4,20 @@ import { cn } from "@/lib/utils";
 import { useSettings } from "@/store/settings";
 import type { SortMode, ViewMode } from "@/types";
 
-/** Přepínač zobrazení (mřížka / seznam) a řazení (popularita / název). */
-export function CollectionToolbar({ count, hideSort }: { count?: number; hideSort?: boolean }) {
+/**
+ * Přepínač zobrazení (mřížka / seznam) a řazení (popularita / název, s `recentSort`
+ * i nově nainstalované – jen u nainstalovaných; jinde se takové řazení ukáže jako popularita).
+ */
+export function CollectionToolbar({ count, hideSort, recentSort }: { count?: number; hideSort?: boolean; recentSort?: boolean }) {
   const { t } = useTranslation();
-  const { viewMode, setViewMode, sortMode, setSortMode } = useSettings();
+  const { viewMode, setViewMode, sortMode: chosen, setSortMode } = useSettings();
+  const sortMode: SortMode = chosen === "recent" && !recentSort ? "popularity" : chosen;
 
   const views: { id: ViewMode; icon: typeof List }[] = [
     { id: "grid", icon: LayoutGrid },
     { id: "list", icon: List },
   ];
-  const sorts: SortMode[] = ["popularity", "name"];
+  const sorts: SortMode[] = recentSort ? ["popularity", "name", "recent"] : ["popularity", "name"];
 
   return (
     <div className="flex flex-wrap items-center gap-3">

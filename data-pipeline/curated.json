@@ -272,7 +272,7 @@
   "spotify-spotify": {
     "brandColor": "#1db954",
     "categories": [
-      "multimedia"
+      "audio"
     ]
   },
   "obsproject-obsstudio": {
@@ -284,7 +284,7 @@
   "audacity-audacity": {
     "iconUrl": "https://raw.githubusercontent.com/audacity/audacity/master/share/icons/AppIcon/AU4_AppIcon_512x512.png",
     "categories": [
-      "multimedia"
+      "audio"
     ]
   },
   "handbrake-handbrake": {
@@ -413,7 +413,7 @@
     "brandColor": "#88171a",
     "categories": [
       "security",
-      "system"
+      "network"
     ]
   },
   "cpuid-cpu-z": {
@@ -448,7 +448,7 @@
       "microsoft-typescript"
     ]
   },
-  "yt-dlp": {
+  "yt-dlp-yt-dlp": {
     "brandColor": "#cc0000",
     "categories": [
       "multimedia",
@@ -484,6 +484,63 @@
     ],
     "alternatives": [
       "cpuid-cpu-z"
+    ]
+  },
+  "clsid2-mpc-hc": {
+    "categories": [
+      "multimedia"
+    ]
+  },
+  "plex-plex": {
+    "categories": [
+      "multimedia"
+    ]
+  },
+  "genymobile-scrcpy": {
+    "categories": [
+      "utilities",
+      "development"
+    ]
+  },
+  "logitech-optionsplus": {
+    "categories": [
+      "system",
+      "utilities"
+    ]
+  },
+  "scoop-extras-artcraft-launcher": {
+    "categories": [
+      "graphics"
+    ]
+  },
+  "open-shell-open-shell-menu": {
+    "categories": [
+      "personalization"
+    ]
+  },
+  "ivosoft-classicshell": {
+    "categories": [
+      "personalization"
+    ]
+  },
+  "valinet-explorerpatcher": {
+    "categories": [
+      "personalization"
+    ]
+  },
+  "valinet-explorerpatcher-prerelease": {
+    "categories": [
+      "personalization"
+    ]
+  },
+  "scoop-nonportable-open-shell-np": {
+    "categories": [
+      "personalization"
+    ]
+  },
+  "naver-whale": {
+    "categories": [
+      "browsers"
     ]
   }
 }

@@ -119,6 +119,8 @@ pub fn run() {
             system::system_info,
             apps::start_apps,
             apps::launch_app,
+            apps::launch_info,
+            apps::launch_installed,
             tray::set_close_to_tray,
             tray::set_tray_labels,
             tray::set_tray_status,

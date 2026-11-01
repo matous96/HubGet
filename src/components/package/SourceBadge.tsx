@@ -1,3 +1,4 @@
+import { Globe } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { getOrigin, getSource } from "@/services/managers";
 import { cn } from "@/lib/utils";
@@ -45,6 +46,23 @@ export function SourceBadge({ source, className }: { source: SourceId; className
     >
       <span className={cn("size-1.5 shrink-0 rounded-full", meta.dot)} />
       <span className="truncate">{meta.label}</span>
+    </span>
+  );
+}
+
+/** Odznak aplikace jen z webu výrobce (místo správce balíčků, ze kterého by se instalovala); vysvětlení v bublině. */
+export function WebBadge({ className }: { className?: string }) {
+  const { t } = useTranslation();
+  return (
+    <span
+      className={cn(
+        "inline-flex max-w-full min-w-0 items-center gap-1.5 rounded-full bg-surface-2 px-2 py-0.5 text-[11px] font-medium text-muted",
+        className,
+      )}
+      title={t("package.webSourceHint")}
+    >
+      <Globe className="size-3 shrink-0" />
+      <span className="truncate">{t("package.webBadge")}</span>
     </span>
   );
 }

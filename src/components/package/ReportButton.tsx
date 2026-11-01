@@ -45,8 +45,8 @@ function sourceReportUrl(source: SourceId, packageId: string): string {
 
 interface ReportButtonProps {
   entry: CatalogEntry;
-  /** Zdroj, kterého se hlášení týká (zvolený / nainstalovaný). */
-  pkg: PackageSource;
+  /** Zdroj, kterého se hlášení týká (zvolený / nainstalovaný); aplikace jen z webu výrobce žádný nemá. */
+  pkg: PackageSource | undefined;
   installedVersion?: string;
 }
 
@@ -64,13 +64,15 @@ export function ReportButton({ entry, pkg, installedVersion }: ReportButtonProps
   const [type, setType] = useState<ProblemType>("install");
   const [details, setDetails] = useState("");
 
-  const sourceLabel = getSource(pkg.source).label;
+  const sourceLabel = pkg ? getSource(pkg.source).label : "";
   const typeLabel = t(`report.types.${type}`);
 
   // Automaticky přiložené údaje (zobrazí se i uživateli, nic se neposílá skrytě)
   const diagnostics = [
     `${t("report.diagApp")}: ${entry.name} (${entry.id})`,
-    `${t("report.diagSource")}: ${sourceLabel} – ${pkg.packageId} ${pkg.version}`,
+    pkg
+      ? `${t("report.diagSource")}: ${sourceLabel} – ${pkg.packageId} ${pkg.version}`
+      : `${t("report.diagSource")}: ${entry.downloadUrl ?? "—"}`,
     installedVersion ? `${t("report.diagInstalled")}: ${installedVersion}` : null,
     `HubGet ${pkgJson.version}`,
   ].filter(Boolean) as string[];
@@ -173,7 +175,7 @@ export function ReportButton({ entry, pkg, installedVersion }: ReportButtonProps
         </div>
 
         {/* U podezřelého balíčku odkaz na nahlášení přímo správci zdroje */}
-        {type === "malicious" && (
+        {type === "malicious" && pkg && (
           <a
             href={sourceReportUrl(pkg.source, pkg.packageId)}
             target="_blank"

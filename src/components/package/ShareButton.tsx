@@ -13,8 +13,8 @@ import { PackageIcon } from "./PackageIcon";
 
 interface ShareButtonProps {
   entry: CatalogEntry;
-  /** Zdroj pro příkaz k instalaci (zvolený / nainstalovaný). */
-  pkg: PackageSource;
+  /** Zdroj pro příkaz k instalaci (zvolený / nainstalovaný); aplikace jen z webu výrobce žádný nemá. */
+  pkg: PackageSource | undefined;
 }
 
 /**
@@ -39,12 +39,15 @@ export function ShareButton({ entry, pkg }: ShareButtonProps) {
   const link = appWebLink(entry.id) ?? appDeepLink(entry.id);
   // Na sociální sítě je potřeba webová adresa – bez webu projektu přiložíme web aplikace
   const publicUrl = appWebLink(entry.id) ?? entry.homepage ?? link;
-  const command = sourceCommand(pkg.source, "install", pkg.packageId);
-  const message = t("share.message", { name: entry.name, description: entry.description || entry.publisher, link, command });
+  const command = pkg ? sourceCommand(pkg.source, "install", pkg.packageId) : null;
+  const description = entry.description || entry.publisher;
+  const message = command
+    ? t("share.message", { name: entry.name, description, link, command })
+    : t("share.messageNoCommand", { name: entry.name, description, link });
 
   const copy = async (kind: "link" | "command") => {
     try {
-      await navigator.clipboard.writeText(kind === "link" ? link : command);
+      await navigator.clipboard.writeText(kind === "link" ? link : (command ?? ""));
       setCopied(kind);
     } catch {
       toast("error", t("common.error"));
@@ -111,13 +114,15 @@ export function ShareButton({ entry, pkg }: ShareButtonProps) {
                 hint={t("share.copyLinkHint")}
                 onClick={() => void copy("link")}
               />
-              <MenuItem
-                icon={copied === "command" ? Check : Terminal}
-                done={copied === "command"}
-                title={copied === "command" ? t("share.copied") : t("share.copyCommand")}
-                hint={<span className="font-mono">{command}</span>}
-                onClick={() => void copy("command")}
-              />
+              {command && (
+                <MenuItem
+                  icon={copied === "command" ? Check : Terminal}
+                  done={copied === "command"}
+                  title={copied === "command" ? t("share.copied") : t("share.copyCommand")}
+                  hint={<span className="font-mono">{command}</span>}
+                  onClick={() => void copy("command")}
+                />
+              )}
               {canNativeShare && (
                 <MenuItem icon={Share} title={t("share.native")} hint={t("share.nativeHint")} onClick={() => void nativeShare()} />
               )}
