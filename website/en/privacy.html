@@ -35,9 +35,11 @@
         <a href="compare.html">Compare</a>
         <a href="roadmap.html">Roadmap</a>
         <a href="faq.html">FAQ</a>
+        <a class="nav__menu-only" href="contact.html">Contact</a>
       </nav>
       <div class="nav__actions">
         <a class="lang-switch" href="../soukromi.html" hreflang="cs" lang="cs" data-lang-switch title="Česky" aria-label="Přepnout do češtiny">CZ</a>
+        <a class="icon-btn nav__mail" href="contact.html" aria-label="Write to us" title="Contact"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="4.5" width="19" height="15" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m3 7 9 6 9-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
         <a class="btn btn--primary btn--sm" href="index.html#stahnout">Download</a>
       </div>
     </div>
@@ -64,6 +66,7 @@
         <li><strong>Package managers</strong> (WinGet, Chocolatey, Scoop, npm, pip, Cargo, vcpkg, .NET, PowerShell Gallery) search, install and update through their own servers under their own policies. HubGet only passes on what you search for or install.</li>
         <li><strong>GitHub stars</strong> in app details: a request to api.github.com with the app's repository name.</li>
         <li><strong>HubGet updates</strong>: a check of latest.json on GitHub Releases. Turn off automatic checks in Settings → General.</li>
+        <li><strong>The contact form</strong> in the app and on the website sends the topic, name, email and message through the <a href="https://web3forms.com" rel="noopener">Web3Forms</a> service, which delivers them by email to the author of HubGet. In the app, technical details (HubGet and Windows version, language) are attached too unless you turn them off in the form. We only use your email to reply.</li>
         <li><strong>Links</strong> (app website, support, GitHub) open in your browser.</li>
       </ul>
 
@@ -73,6 +76,7 @@
         <li><strong>Star ratings</strong> are shown only as a summary (average and count), without names.</li>
         <li><strong>Reviews</strong> are public under your account name – HubGet shows this while you write. You can edit or delete your review at any time.</li>
         <li><strong>Screenshots</strong> you add to an app are downscaled by HubGet before upload and saved as WebP without metadata (EXIF, location). Others see them under your account name once a moderator approves them; until then only you see them. You can delete a screenshot at any time.</li>
+        <li><strong>Screenshots in the contact form</strong> are stored in private storage and the email contains a link to them that is valid for 90 days.</li>
         <li><strong>Sync</strong> stores your favorites, package bundle, appearance and language preferences and notification preferences in your account. Turn off individual areas or sync entirely in Settings → General → Sync, where you can also delete the data from your account. Custom install commands, permissions and the automatic update schedule never go to the account.</li>
         <li>Account data is stored in a <a href="https://supabase.com/privacy" rel="noopener">Supabase</a> database and only its owner can see it. Deleting your account deletes your ratings, reviews, screenshots and synced data too. Encrypted database backups are kept for at most 90 days, so deleted data disappears from them within 90 days at the latest.</li>
       </ul>
@@ -84,7 +88,7 @@
       <p>Settings, the catalog and icon cache, operation history and logs live only on your computer (the app folder in %LOCALAPPDATA% and the window storage). HubGet doesn't send them anywhere – you send a log for a bug report yourself.</p>
 
       <h2>Contact</h2>
-      <p>Send privacy questions to the <a data-link="email" href="#">project email</a> or on <a data-link="github" href="#">GitHub</a>. See also the <a href="code-signing.html">Code signing policy</a>.</p>
+      <p>Send privacy questions through the <a href="contact.html">contact form</a> or on <a data-link="github" href="#">GitHub</a>. See also the <a href="code-signing.html">Code signing policy</a>.</p>
     </article>
   </main>
 

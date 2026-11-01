@@ -1,14 +1,19 @@
 <!--
-  Tmavá varianta ikony pro oznamovací oblast (světlý hlavní panel Windows) –
-  stejná grafika jako tray-icon.svg, jen v barvě systémových ikon světlého režimu.
+  Ikona HubGetu pro oznamovací oblast (u hodin) – tmavá varianta pro světlý hlavní panel Windows:
+  jednobarevná verze loga na průhledném pozadí, jako systémové ikony Windows – otevřená krabice
+  se třemi aplikacemi; krabice je plná a je v ní vyříznutý nápis „hubget“ (testovací verze má
+  „test“, viz tray-icon-test-dark.svg). Mřížka 32 × 32 využitá skoro celá. Tečku stavu
+  kreslí tray.rs vpravo nahoře. Barva systémových ikon světlého režimu.
   PNG:  pnpm tauri icon assets/tray-icon-dark.svg -o <složka> -p 64  → 64x64.png do src-tauri/icons/tray-dark.png
 -->
 <svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 32 32">
+  <defs><mask id="m"><rect width="32" height="32" fill="#fff"/>
+    <text x="16" y="26.8" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="8.6" font-weight="700" letter-spacing="-0.5" fill="#000">hubget</text></mask></defs>
   <g fill="none" stroke="#1c1c1c" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
-    <rect x="5.5" y="17" width="21" height="12" rx="2.5"/>
     <path d="M5.5 17 L2 12 H13.5 L16 17"/>
     <path d="M26.5 17 L30 12 H18.5 L16 17"/>
   </g>
+  <rect x="2.5" y="15.5" width="27" height="15" rx="3.5" fill="#1c1c1c" mask="url(#m)"/>
   <g fill="#1c1c1c">
     <rect x="5.75" y="3.25" width="5.5" height="5.5" rx="1.5" transform="rotate(-15 8.5 6)"/>
     <rect x="13.25" y="1" width="5.5" height="5.5" rx="1.5"/>
