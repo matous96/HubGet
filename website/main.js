@@ -22,6 +22,7 @@ const TEXTS = {
     contactOffline: "Zprávu se nepodařilo odeslat. Zkontrolujte připojení k internetu.",
     contactRateLimit: "Teď nejde odeslat další zprávu. Zkuste to prosím za chvíli.",
     contactFailed: "Zprávu se nepodařilo odeslat. Zkuste to prosím znovu, nebo problém nahlaste na GitHubu.",
+    contactReason: "Důvod",
   },
   en: {
     placeholder: "Link coming soon", copy: "Copy", copied: "Copied ✓", copyFailed: "Can’t copy",
@@ -29,6 +30,7 @@ const TEXTS = {
     contactOffline: "The message couldn’t be sent. Check your internet connection.",
     contactRateLimit: "Another message can’t be sent right now. Please try again in a moment.",
     contactFailed: "The message couldn’t be sent. Please try again, or report the problem on GitHub.",
+    contactReason: "Reason",
   },
 };
 const T = TEXTS[document.documentElement.lang] || TEXTS.cs;
@@ -188,7 +190,9 @@ if (contactForm && contactDone) {
     }
     if (response.status === 429) return T.contactRateLimit;
     const result = await response.json().catch(() => null);
-    return response.ok && result?.success ? null : T.contactFailed;
+    if (response.ok && result?.success) return null;
+    // Důvod odmítnutí od služby (např. podezření na spam) – anglicky, ale řekne víc než obecná chyba
+    return result?.message ? `${T.contactFailed} ${T.contactReason}: ${result.message}` : T.contactFailed;
   };
 
   contactForm.addEventListener("submit", async (e) => {

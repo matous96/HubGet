@@ -14,7 +14,7 @@ instalátorů po webu, bez reklam a přibalených doplňků.
 
 [![Licence MIT](https://img.shields.io/badge/licence-MIT-5b6cf9)](LICENSE) [![Windows 10 a 11](https://img.shields.io/badge/Windows-10%20%7C%2011-0078d4)](#stažení) [![Tauri 2](https://img.shields.io/badge/Tauri-2-24c8db?logo=tauri&logoColor=white)](https://tauri.app) [![React 19](https://img.shields.io/badge/React-19-61dafb?logo=react&logoColor=black)](https://react.dev) [![Zdarma a open source](https://img.shields.io/badge/zdarma-open%20source-2ea44f)](#zdarma-a-open-source)
 
-**[⬇️ Stáhnout pro Windows](https://github.com/matous96/unibox/releases/latest)** &nbsp;·&nbsp; [Prohlídka](#prohlídka) &nbsp;·&nbsp; [Správci balíčků](#správci-balíčků) &nbsp;·&nbsp; [Pro vývojáře](#dokumentace-pro-vývojáře)
+**[⬇️ Stáhnout pro Windows](https://github.com/matous96/unibox/releases/latest)** &nbsp;·&nbsp; [🌐 hubget.eu](https://hubget.eu/) &nbsp;·&nbsp; [Prohlídka](#prohlídka) &nbsp;·&nbsp; [Správci balíčků](#správci-balíčků) &nbsp;·&nbsp; [Pro vývojáře](#dokumentace-pro-vývojáře)
 
 <br>
 
