@@ -7,8 +7,8 @@ const LINKS = {
   github: "https://github.com/matous96/unibox",
   releases: "https://github.com/matous96/unibox/releases",
   // Instalátory z vydání na GitHubu – verzi přepisuje `pnpm website:release` (scripts/website-release.mjs)
-  downloadExe: "https://github.com/matous96/unibox/releases/download/v0.1.20/HubGet_0.1.20_x64-setup.exe",
-  downloadMsi: "https://github.com/matous96/unibox/releases/download/v0.1.20/HubGet_0.1.20_x64_en-US.msi",
+  downloadExe: "https://github.com/matous96/unibox/releases/download/v0.1.21/HubGet_0.1.21_x64-setup.exe",
+  downloadMsi: "https://github.com/matous96/unibox/releases/download/v0.1.21/HubGet_0.1.21_x64_en-US.msi",
   email: "",        // např. "mailto:ahoj@unibox.app"
 };
 
