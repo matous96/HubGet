@@ -28,6 +28,52 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
   {
+    version: "0.1.20",
+    date: "2026-11-01",
+    highlights: [
+      {
+        cs: "Nové kategorie Umělá inteligence, Hudba a zvuk, Vzdělávání a věda, Finance, Cloud a úložiště, Internet a síť a Přizpůsobení. Aplikace jsou zařazené mnohem přesněji – hudební přehrávače a editory najdete v Hudbě a v Ostatních zůstalo jen to, co jinam opravdu nepatří.",
+        en: "New categories: AI, Music & Audio, Education & Science, Finance, Cloud & Storage, Internet & Network, and Personalization. Apps are sorted much more accurately – music players and editors are in Music, and Other holds only what truly fits nowhere else.",
+      },
+      {
+        cs: "Aplikace, které výrobce dává jen na svém webu: DaVinci Resolve, VMware Workstation Pro, Cisco Packet Tracer, Houdini a další. Tlačítko Stáhnout z webu otevře oficiální stránku a nainstalovanou aplikaci HubGet pozná a otevře.",
+        en: "Apps the vendor offers only on its own website: DaVinci Resolve, VMware Workstation Pro, Cisco Packet Tracer, Houdini and more. Get from website opens the official page, and HubGet recognizes and opens the app once it's installed.",
+      },
+      {
+        cs: "Tlačítko Otevřít u všech nainstalovaných aplikací – i u programů mimo správce balíčků. Když program spustit nejde, otevře se aspoň jeho složka.",
+        en: "An Open button for every installed app – including programs outside package managers. If a program can't be started, its folder opens instead.",
+      },
+      {
+        cs: "Kontaktní formulář v Nastavení → Kontakt (a pod ikonou obálky v horní liště): napište nám dotaz, nápad nebo chybu, i se snímky obrazovky.",
+        en: "A contact form in Settings → Contact (and under the envelope icon in the top bar): send us a question, an idea or a bug, screenshots included.",
+      },
+      {
+        cs: "Nainstalované jde seřadit podle toho, co jste nainstalovali naposledy.",
+        en: "Installed apps can be sorted by what you installed most recently.",
+      },
+      {
+        cs: "Přenosné aplikace na ploše (Tor Browser) HubGet pozná, aktualizuje i odinstaluje. Aplikace bez ikony mají dlaždici se symbolem kategorie a banner tmavého loga má jeho barvu.",
+        en: "HubGet recognizes, updates and uninstalls portable apps on the desktop (Tor Browser). Apps without an icon get a tile with their category's symbol, and a dark logo gets a banner in its own color.",
+      },
+    ],
+    featured: [
+      {
+        title: { cs: "Nové kategorie", en: "New categories" },
+        text: {
+          cs: "Umělá inteligence, Hudba a zvuk, Vzdělávání, Finance, Cloud, Internet a síť a Přizpůsobení – a přesnější zařazení aplikací.",
+          en: "AI, Music & Audio, Education, Finance, Cloud, Internet & Network, and Personalization – with far more accurate sorting.",
+        },
+      },
+      {
+        title: { cs: "Aplikace z webu výrobce", en: "Apps from the vendor's website" },
+        text: {
+          cs: "DaVinci Resolve, VMware Workstation Pro a další – stažení z oficiálního webu, po instalaci je HubGet pozná a otevře.",
+          en: "DaVinci Resolve, VMware Workstation Pro and more – download from the official website, then HubGet recognizes and opens them.",
+        },
+      },
+    ],
+  },
+  {
     version: "0.1.19",
     date: "2026-10-30",
     highlights: [
