@@ -12,6 +12,7 @@ import {
 } from "@/lib/icons";
 import { placeholderLook } from "@/lib/placeholderIcon";
 import { cn } from "@/lib/utils";
+import type { CategoryId } from "@/types";
 import { iconPixels, recordIconSize, VECTOR_ICON } from "@/store/iconQuality";
 
 /**
@@ -19,6 +20,12 @@ import { iconPixels, recordIconSize, VECTOR_ICON } from "@/store/iconQuality";
  * sdílí i barva banneru: failedIconSources v lib/icons.ts).
  */
 const lightIcons = new Set<string>();
+
+/**
+ * Ikony, které se už jednou načetly a prošly kontrolou – další karta se stejnou ikonou
+ * ji ukáže hned, bez dlaždice kategorie a prolnutí.
+ */
+const shownIcons = new Set<string>();
 
 interface PackageIconProps {
   id: string;
@@ -35,6 +42,8 @@ interface PackageIconProps {
  * vygenerovaná dlaždice se symbolem kategorie (lib/placeholderIcon.ts).
  * Zdroj, který se nenačte, je prázdný nebo (z internetu) malý a rozmazaný,
  * se přeskočí; téměř bílá ikona dostane tmavou dlaždici, aby na bílé nezmizela.
+ * Než se ikona stáhne, je místo prázdné bílé dlaždice vidět dlaždice kategorie –
+ * skutečná ikona se přes ni prolne.
  */
 export function PackageIcon({ id, name, iconUrl, size = 48, className }: PackageIconProps) {
   const sources = useIconSources(id, name, iconUrl);
@@ -45,19 +54,27 @@ export function PackageIcon({ id, name, iconUrl, size = 48, className }: Package
 
   if (src) {
     const inspectable = canInspect(src);
+    const ready = shownIcons.has(src);
     const fail = () => {
       failedIcons.add(src);
       rerender();
     };
+    const show = () => {
+      if (shownIcons.has(src)) return;
+      shownIcons.add(src);
+      rerender();
+    };
     return (
-      <div
-        className={cn(
-          "flex shrink-0 items-center justify-center ring-1 ring-black/5",
-          lightIcons.has(src) ? "bg-zinc-800" : "bg-white/95",
-          className,
-        )}
-        style={{ width: size, height: size, borderRadius: radius, padding: size * 0.16 }}
-      >
+      <div className={cn("relative shrink-0", className)} style={{ width: size, height: size, borderRadius: radius }}>
+        {!ready && <CategoryTile id={id} name={name} category={category} size={size} radius={radius} className="icon-placeholder absolute inset-0" />}
+        <div
+          className={cn(
+            "absolute inset-0 flex items-center justify-center ring-1 ring-black/5 transition-opacity duration-200",
+            lightIcons.has(src) ? "bg-zinc-800" : "bg-white/95",
+            ready ? "opacity-100" : "opacity-0",
+          )}
+          style={{ borderRadius: radius, padding: size * 0.16 }}
+        >
         <img
           key={src}
           src={src}
@@ -78,29 +95,49 @@ export function PackageIcon({ id, name, iconUrl, size = 48, className }: Package
               img.style.maxWidth = `${(img.naturalWidth * MAX_UPSCALE) / devicePixelRatio}px`;
               img.style.maxHeight = `${(img.naturalHeight * MAX_UPSCALE) / devicePixelRatio}px`;
             }
-            if (!inspectable) return;
+            if (!inspectable) return show();
             const verdict = inspectIcon(img, src);
-            if (verdict === "blank") fail();
-            else if (verdict === "light" && !lightIcons.has(src)) {
-              lightIcons.add(src);
-              rerender();
-            }
+            if (verdict === "blank") return fail();
+            if (verdict === "light") lightIcons.add(src);
+            show();
           }}
           onError={fail}
           className="size-full object-contain"
         />
+        </div>
       </div>
     );
   }
 
-  // Žádný zdroj nefunguje – dlaždice s přechodem a symbolem kategorie, kruhy podle názvu
-  // a první písmeno v rohu (v malé velikosti jen symbol)
+  // Žádný zdroj nefunguje – dlaždice kategorie natrvalo
+  return <CategoryTile id={id} name={name} category={category} size={size} radius={radius} className={cn("shrink-0", className)} />;
+}
+
+/**
+ * Dlaždice s přechodem a symbolem kategorie, kruhy podle názvu a první písmeno
+ * v rohu (v malé velikosti jen symbol) – místo ikony, která chybí nebo se stahuje.
+ */
+function CategoryTile({
+  id,
+  name,
+  category,
+  size,
+  radius,
+  className,
+}: {
+  id: string;
+  name: string;
+  category: CategoryId | undefined;
+  size: number;
+  radius: number;
+  className?: string;
+}) {
   const look = placeholderLook(id, name, category);
   const Icon = look.icon;
   return (
     <div
       aria-hidden
-      className={cn("relative flex shrink-0 items-center justify-center overflow-hidden text-white shadow-inner", className)}
+      className={cn("relative flex items-center justify-center overflow-hidden text-white shadow-inner", className)}
       style={{ width: size, height: size, borderRadius: radius, background: `linear-gradient(135deg, ${look.from}, ${look.to})` }}
     >
       {size >= 24 &&

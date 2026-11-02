@@ -113,6 +113,18 @@ body,
   display: none;
 }
 
+/* Dlaždice kategorie místo ikony, která se teprve stahuje (PackageIcon) – ukáže se až
+   po chvíli, ať při načtení ikony z mezipaměti neproblikne. */
+@keyframes icon-placeholder-in {
+  to {
+    opacity: 1;
+  }
+}
+.icon-placeholder {
+  opacity: 0;
+  animation: icon-placeholder-in 200ms ease 150ms forwards;
+}
+
 /* Animovaný pruh pro neurčitý průběh (fáze instalace). */
 @keyframes indeterminate {
   0% {
