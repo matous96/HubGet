@@ -78,8 +78,9 @@
         <div class="page-head__inner reveal">
           <p class="eyebrow">Novinky</p>
           <h1>Co je nového v&nbsp;HubGetu</h1>
-          <p class="lead">Všechny změny od první veřejné verze 0.1.0, nejnovější nahoře. Od jejího vydání 21.&nbsp;10. vyšlo dvacet jedna aktualizací.</p>
+          <p class="lead">Všechny změny od první veřejné verze 0.1.0, nejnovější nahoře. Od jejího vydání 21.&nbsp;10. vyšlo dvaadvacet aktualizací.</p>
           <nav class="versions-nav" aria-label="Přejít na verzi">
+            <a class="chip" href="#v0-1-22">0.1.22</a>
             <a class="chip" href="#v0-1-21">0.1.21</a>
             <a class="chip" href="#v0-1-20">0.1.20</a>
             <a class="chip" href="#v0-1-19">0.1.19</a>
@@ -105,8 +106,8 @@
           </nav>
         </div>
         <dl class="stats reveal">
-          <div><dt>Aktuální verze</dt><dd>0.1.21</dd></div>
-          <div><dt>Aktualizací od verze 0.1.0</dt><dd>21</dd></div>
+          <div><dt>Aktuální verze</dt><dd>0.1.22</dd></div>
+          <div><dt>Aktualizací od verze 0.1.0</dt><dd>22</dd></div>
           <div><dt>Aplikací v katalogu</dt><dd>25&nbsp;100+</dd></div>
           <div><dt>Správci naostro</dt><dd>WinGet · Chocolatey · Scoop + 8 pro vývojáře</dd></div>
         </dl>
@@ -230,6 +231,37 @@
         </div>
 
         <div class="timeline">
+          <!-- 0.1.22 -->
+          <article class="release" id="v0-1-22">
+            <div class="release__meta">
+              <span class="release__ver">0.1.22</span>
+              <time class="release__date" datetime="2026-11-02">2. 11. 2026</time>
+            </div>
+            <div class="card release__body">
+              <div class="release__head">
+                <h2>Okamžitý start a&nbsp;plynulý motiv</h2>
+                <span class="badge badge--live">Nejnovější</span>
+              </div>
+              <div class="changes changes--better">
+                <h3>Vylepšeno</h3>
+                <ul>
+                  <li><strong>Rychlejší první spuštění</strong> – na novém počítači se sekce Dnes ukáže hned i&nbsp;s&nbsp;ikonami. Ikony vybraných aplikací jsou přímo v&nbsp;instalátoru a&nbsp;katalog se napoprvé vezme z&nbsp;kopie v&nbsp;aplikaci, čerstvý se stáhne na pozadí.</li>
+                  <li>Karty v&nbsp;sekci Dnes v&nbsp;prvních sekundách po spuštění nepřeskakují.</li>
+                  <li>Ikony aplikací se stahují rychleji – až 12 najednou.</li>
+                  <li>Světlý a&nbsp;tmavý motiv se přepnou jedním plynulým prolnutím celého okna.</li>
+                  <li>Bez internetu detail aplikace řekne, že hodnocení a&nbsp;snímky teď nejde načíst – místo „zatím bez hodnocení“ a&nbsp;„žádné snímky“.</li>
+                  <li>Když některý správce balíčků nevrátí seznam nainstalovaných, stránka Nainstalované na to upozorní a&nbsp;nabídne Zkusit znovu.</li>
+                </ul>
+              </div>
+              <div class="changes changes--fix">
+                <h3>Opraveno</h3>
+                <ul>
+                  <li>Ikona, která se při výpadku sítě nenačetla, se vyřazovala natrvalo.</li>
+                </ul>
+              </div>
+            </div>
+          </article>
+
           <!-- 0.1.21 -->
           <article class="release" id="v0-1-21">
             <div class="release__meta">
@@ -239,7 +271,6 @@
             <div class="card release__body">
               <div class="release__head">
                 <h2>Oprava náhledu snímků</h2>
-                <span class="badge badge--live">Nejnovější</span>
               </div>
               <div class="changes changes--fix">
                 <h3>Opraveno</h3>

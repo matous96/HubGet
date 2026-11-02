@@ -78,8 +78,9 @@
         <div class="page-head__inner reveal">
           <p class="eyebrow">What’s new</p>
           <h1>What’s new in&nbsp;HubGet</h1>
-          <p class="lead">Every change since the first public version 0.1.0, newest first. Twenty-one updates have shipped since its release on October&nbsp;21.</p>
+          <p class="lead">Every change since the first public version 0.1.0, newest first. Twenty-two updates have shipped since its release on October&nbsp;21.</p>
           <nav class="versions-nav" aria-label="Jump to version">
+            <a class="chip" href="#v0-1-22">0.1.22</a>
             <a class="chip" href="#v0-1-21">0.1.21</a>
             <a class="chip" href="#v0-1-20">0.1.20</a>
             <a class="chip" href="#v0-1-19">0.1.19</a>
@@ -105,8 +106,8 @@
           </nav>
         </div>
         <dl class="stats reveal">
-          <div><dt>Current version</dt><dd>0.1.21</dd></div>
-          <div><dt>Updates since 0.1.0</dt><dd>21</dd></div>
+          <div><dt>Current version</dt><dd>0.1.22</dd></div>
+          <div><dt>Updates since 0.1.0</dt><dd>22</dd></div>
           <div><dt>Apps in the catalog</dt><dd>25,100+</dd></div>
           <div><dt>Package managers for real</dt><dd>WinGet · Chocolatey · Scoop + 8 for developers</dd></div>
         </dl>
@@ -230,6 +231,37 @@
         </div>
 
         <div class="timeline">
+          <!-- 0.1.22 -->
+          <article class="release" id="v0-1-22">
+            <div class="release__meta">
+              <span class="release__ver">0.1.22</span>
+              <time class="release__date" datetime="2026-11-02">Nov 2, 2026</time>
+            </div>
+            <div class="card release__body">
+              <div class="release__head">
+                <h2>Instant first launch and a smooth theme switch</h2>
+                <span class="badge badge--live">Latest</span>
+              </div>
+              <div class="changes changes--better">
+                <h3>Improved</h3>
+                <ul>
+                  <li><strong>Faster first launch</strong> – on a new PC, the Today section appears right away with its icons. Icons of the featured apps ship inside the installer, and the first launch uses the catalog bundled with the app while a fresh one downloads in the background.</li>
+                  <li>Cards in the Today section no longer jump around in the first seconds after launch.</li>
+                  <li>App icons download faster – up to 12 at once.</li>
+                  <li>Light and dark themes switch with one smooth cross-fade of the whole window.</li>
+                  <li>Offline, an app’s page now says ratings and screenshots can’t be loaded right now – instead of “no ratings yet” and “no screenshots”.</li>
+                  <li>When a package manager doesn’t return its list of installed apps, the Installed page says so and offers Try again.</li>
+                </ul>
+              </div>
+              <div class="changes changes--fix">
+                <h3>Fixed</h3>
+                <ul>
+                  <li>An icon that failed to load during a network outage was left out for good.</li>
+                </ul>
+              </div>
+            </div>
+          </article>
+
           <!-- 0.1.21 -->
           <article class="release" id="v0-1-21">
             <div class="release__meta">
@@ -239,7 +271,6 @@
             <div class="card release__body">
               <div class="release__head">
                 <h2>Screenshot preview fix</h2>
-                <span class="badge badge--live">Latest</span>
               </div>
               <div class="changes changes--fix">
                 <h3>Fixed</h3>
