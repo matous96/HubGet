@@ -8,6 +8,9 @@
  *   75  shoda s celým id wingetu („googlechrome“ = „Google.Chrome“),
  *   70  stejný název bez přívěsků („Signal Desktop“ = „Signal“, „Zoom Client“ = „Zoom“),
  *   60  shoda s poslední částí id („git“ = „Git.Git“).
+ * Web balíčku (Chocolatey projectUrl, Scoop homepage) rozhodne mezi stejně
+ * pojmenovanými aplikacemi: patří-li jasně jinému vlastníkovi než balíček wingetu,
+ * spojení se zamítne, patří-li stejnému, dostane přednost (+30, i před monikerem).
  * Chocolatey a Scoop bez wingetu se párují podle id, názvu a webu aplikace.
  * Přiřazuje se hladově od nejsilnějších shod; každý balíček wingetu může mít
  * nejvýš jeden protějšek z každého správce. Co se nespáruje, je samostatná karta.
@@ -123,30 +126,167 @@ export function dedupeScoop(packages: ScoopPackage[]): ScoopPackage[] {
 const chocoBase = (id: string) => id.toLowerCase().replace(/\.(install|portable)$/, "");
 const idTail = (id: string) => id.split(".").pop() ?? id;
 
+/** Klíče názvu pro párování – „+“ se počítá: „Notepad++“ ≠ „Notepad--“ (nameKey by z obou udělal „notepad“). */
+const plus = (text: string) => text.replace(/\+/g, " plus ");
+const matchKey = (text: string) => nameKey(plus(text));
+const matchTrimmed = (text: string) => trimmedNameKey(plus(text));
+
+const flat = (text: string) => normalize(text).replace(/[^a-z0-9]/g, "");
+const CODE_HOSTS = new Set(["github.com", "gitlab.com", "codeberg.org", "bitbucket.org", "gitee.com"]);
+/** Hostingy, kde projekt nebo autora určuje subdoména (gnuwin32.sourceforge.net, sabrogden.github.io, fixounet.free.fr). */
+const SUBDOMAIN_HOSTS =
+  /\.(github\.io|gitlab\.io|sourceforge\.net|sourceforge\.io|readthedocs\.io|netlify\.app|vercel\.app|pages\.dev|codeplex\.com|itch\.io|free\.fr|xs4all\.nl|blogspot\.com|wordpress\.com|tuxfamily\.org)$/;
+/** Weby, které o vlastníkovi nic neřeknou (sociální sítě, obchody, registry balíčků, katalogy software). */
+const NO_OWNER_HOSTS =
+  /(^|\.)(discord\.gg|discord\.com|t\.me|twitter\.com|x\.com|youtube\.com|youtu\.be|reddit\.com|facebook\.com|linkedin\.com|patreon\.com|ko-fi\.com|buymeacoffee\.com|play\.google\.com|apps\.apple\.com|apps\.microsoft\.com|npmjs\.com|pypi\.org|crates\.io|lib\.rs|docs\.rs|nuget\.org|chocolatey\.org|wikipedia\.org|softpedia\.com|filehippo\.com|majorgeeks\.com|informer\.com|uptodown\.com|bit\.ly|goo\.gl)$/;
+/** Dokumentace balíčků Go: adresa obsahuje repozitář (godoc.org/github.com/gokcehan/lf). */
+const GO_DOCS = new Set(["godoc.org", "pkg.go.dev"]);
+/** Části adres a názvů, které nic neprozradí. */
+const WEAK = new Set([
+  "www", "web", "app", "apps", "download", "downloads", "docs", "home", "blog", "get", "en", "us", "github", "archive", "sourceforge",
+  "codeplex", "sites", "projects", "products", "product", "software", "tools", "cli", "client", "desktop", "studio", "launcher", "server",
+  "tool", "editor", "browser", "player", "manager", "core", "lite", "pro", "sync", "connect", "tunnel", "portable",
+]);
+const LEGAL_FORMS = /\b(inc|corp|corporation|ltd|llc|gmbh|co|limited|software|technologies|the)\b\.?/g;
+
+/**
+ * Stopy webu nebo balíčku: vlastník (účet, doména, autor), produkt (repozitář, stránka
+ * produktu) a subdomény, které se počítají jen při přesné shodě s produktem
+ * (klogg.filimonov.dev = klogg, ale spark.apache.org ≠ Spark Desktop).
+ */
+interface Identity {
+  owners: string[];
+  products: string[];
+  exact?: string[];
+}
+
+/** Stopy bez prázdných a nic neříkajících; dvě písmena stačí (k6.io), u částí cesty až tři. */
+const clean = (values: (string | null | undefined)[], min = 2) =>
+  [...new Set(values.map((v) => flat(v ?? "")))].filter((v) => v.length >= min && !WEAK.has(v));
+
+/**
+ * Stopy webu: účet a repozitář na hostingu kódu (github.com/sharkdp/pastel), projekt na
+ * SourceForge, subdoména hostingu (gnuwin32.sourceforge.net), jinak název domény a první
+ * části cesty (uvviewsoft.com/cudatext). Archivovaná adresa (web.archive.org) podle původní.
+ */
+export function siteIdentity(url: string | null | undefined): Identity {
+  const none: Identity = { owners: [], products: [] };
+  if (!url) return none;
+  try {
+    const u = new URL(url.trim());
+    const host = u.hostname.toLowerCase().replace(/^www\./, "");
+    const path = u.pathname.split("/").filter(Boolean);
+    if (host === "web.archive.org") {
+      const original = u.pathname.replace(/^\/web\/[^/]*\//, "");
+      return original === u.pathname ? none : siteIdentity(/^https?:/.test(original) ? original : `https://${original}`);
+    }
+    if (GO_DOCS.has(host) && CODE_HOSTS.has(path[0] ?? "")) return siteIdentity(`https://${path.join("/")}`);
+    if (NO_OWNER_HOSTS.test(host)) return none;
+    if (host === "aka.ms") return { owners: ["microsoft"], products: [] };
+    if (CODE_HOSTS.has(host)) return { owners: clean([path[0]]), products: clean([path[1]?.replace(/\.git$/, "")]) };
+    if (host === "sourceforge.net") return { owners: [], products: clean([path[0] === "projects" || path[0] === "p" ? path[1] : undefined]) };
+    // Stránky na Google Sites (sites.google.com/site/qaacpage) – vlastníka určuje cesta
+    if (host === "sites.google.com") return { owners: [], products: clean(path.slice(0, 3), 3) };
+    const pages = clean(path.slice(0, 2), 3);
+    if (SUBDOMAIN_HOSTS.test(host)) {
+      const sub = host.split(".")[0];
+      return /sourceforge/.test(host) ? { owners: [], products: clean([sub, ...pages]) } : { owners: clean([sub]), products: pages };
+    }
+    const labels = host.split(".");
+    // example.co.uk, wilfred.me.uk – název domény je třetí od konce. Subdomény jen při přesné
+    // shodě: spark.apache.org i ant.apache.org patří Apache, ne Sparku od Readdle a Antu od Anthropicu
+    const take = labels.length >= 3 && /^(co|com|org|net|ac|gov|edu|me|ne|or|gr|go|ltd|plc|nom)$/.test(labels.at(-2)!) ? 3 : 2;
+    if (labels.length < take) return none;
+    return { owners: clean([labels.at(-take)]), products: pages, exact: clean(labels.slice(0, -take), 3) };
+  } catch {
+    return none;
+  }
+}
+
+/** Přívěsky, které ke krátkému názvu patří („k9s“ + cli = k9scli.io), na rozdíl od „zap“ + roxy (zaproxy.org). */
+const AFFIXES = new Set([...WEAK, "hq", "dev", "io", "js", "rs", "py", "go", "lang", "team", "labs", "official", "site", "org", "installer", "setup"]);
+
+/** Souvisí stopy? Shoda, delší obsahuje kratší („ffmpegessentialsbuild“ × „ffmpeg“), u krátkých jen s přívěskem („k9scli“ × „k9s“). */
+const overlaps = (a: string[], b: string[]) =>
+  a.some((x) =>
+    b.some((y) => {
+      if (x === y) return true;
+      const [short, long] = x.length <= y.length ? [x, y] : [y, x];
+      if (short.length >= 4) return long.includes(short);
+      return short.length >= 2 && long.startsWith(short) && AFFIXES.has(long.slice(short.length));
+    }),
+  );
+
+/**
+ * Stopy balíčku wingetu: vlastník (vydavatel z id a z indexu, weby z manifestu) a produkt
+ * (název i bez úvodního vydavatele: „Mozilla Firefox“ → firefox; repozitář z webu).
+ * `known` = balíček má web – bez něj se spojení nezamítá.
+ */
+function wingetIdentity(w: WingetIndexEntry, sites: string[]): Identity & { known: boolean } {
+  const publisher = flat(w.id.split(".")[0]);
+  const product = matchKey(cleanName(w.name));
+  // I bez závorky: „mpv (shinchiro build)“ → mpv
+  const bare = matchKey(w.name.replace(/\([^)]*\)/g, " "));
+  const fromSites = sites.map(siteIdentity);
+  return {
+    owners: clean([publisher, w.publisherNorm, ...fromSites.flatMap((s) => s.owners)]),
+    products: clean([product, bare, product.startsWith(publisher) ? product.slice(publisher.length) : undefined, ...fromSites.flatMap((s) => s.products)]),
+    known: fromSites.some((s) => s.owners.length + s.products.length > 0),
+  };
+}
+
+/** Autoři balíčku Chocolatey jako stopy vlastníka („Epic Games, Inc.“ → epicgames). */
+const authorOwners = (authors: string) => clean(authors.toLowerCase().replace(LEGAL_FORMS, "").split(/,|&|;|\/|\band\b/));
+
 export function pairSources(
   winget: WingetIndexEntry[],
   chocoAll: ChocoPackage[],
   scoopAll: ScoopPackage[],
   variants: Map<string, WingetIndexEntry[]> = new Map(),
+  /** Weby balíčků wingetu z manifestu (PackageUrl, PublisherUrl) podle id malými písmeny. */
+  wingetSites: Map<string, string[]> = new Map(),
 ): AppRecord[] {
   const choco = dedupeChoco(chocoAll);
   const scoop = dedupeScoop(scoopAll);
 
   // Indexy wingetu podle jednotlivých signálů
   const byMoniker = indexBy(winget, (w) => [w.moniker?.toLowerCase()]);
-  const byName = indexBy(winget, (w) => [nameKey(cleanName(w.name))]);
-  const byId = indexBy(winget, (w) => [nameKey(w.id)]);
-  const byTrimmed = indexBy(winget, (w) => [trimmedNameKey(w.name)]);
-  const byTail = indexBy(winget, (w) => [nameKey(idTail(w.id))]);
+  const byName = indexBy(winget, (w) => [matchKey(cleanName(w.name))]);
+  // Id i s „+“ vynechaným – Chocolatey ho v id nemívá („paragon-hfs“ = „Paragon.HFS+“)
+  const byId = indexBy(winget, (w) => [matchKey(w.id), nameKey(w.id)]);
+  const byTrimmed = indexBy(winget, (w) => [matchTrimmed(w.name)]);
+  const byTail = indexBy(winget, (w) => [matchKey(idTail(w.id)), nameKey(idTail(w.id))]);
+  const identities = winget.map((w) => wingetIdentity(w, wingetSites.get(w.id.toLowerCase()) ?? []));
 
-  /** Kandidáti z wingetu pro daný klíč a jejich skóre. */
-  const candidates = (keys: { key: string | null; map: Map<string, number[]>; score: number }[], publisherHint?: string) => {
+  /**
+   * Kandidáti z wingetu pro daný klíč a jejich skóre. Shodný název ani moniker
+   * neznamenají stejnou aplikaci („mc“ = MinIO Client i Midnight Commander,
+   * „Pastel“ od Japplis i od sharkdp): když web ani autoři balíčku nesouvisí s balíčkem
+   * wingetu, spojení se zamítne; když sedí vlastník (účet, doména, autor), má přednost.
+   */
+  const candidates = (
+    keys: { key: string | null; map: Map<string, number[]>; score: number }[],
+    publisherHint: string,
+    site: Identity,
+    /** Autoři (Chocolatey) – shoda přidá přednost, sami spojení nezamítnou (bývají to jména lidí). */
+    authors: string[] = [],
+  ) => {
     const best = new Map<number, number>();
+    const described = site.owners.length + site.products.length > 0;
     for (const { key, map, score } of keys) {
       if (!key) continue;
       for (const i of map.get(key) ?? []) {
+        let bonus = 0;
+        const w = identities[i];
+        const all = [...w.owners, ...w.products];
+        const sameOwner = overlaps([...site.owners, ...authors], all);
+        const sameProduct = overlaps(site.products, all) || !!site.exact?.some((name) => w.products.includes(name));
+        if (described && !sameOwner && w.known && !sameProduct) continue;
+        // Jen konec id (Logitech.Sync = „sync“ od Sysinternals) u balíčku bez webu – nic to nedokazuje
+        if (described && !sameOwner && !w.known && score <= 60) continue;
+        if (sameOwner) bonus += 30;
         // Drobný bonus, když sedí i vydavatel (rozhodne mezi stejně pojmenovanými balíčky)
-        const bonus = publisherHint && winget[i].publisherNorm && publisherHint.includes(winget[i].publisherNorm!) ? 5 : 0;
+        if (publisherHint && winget[i].publisherNorm && publisherHint.includes(winget[i].publisherNorm!)) bonus += 5;
         // Kratší id = spíš hlavní balíček („Git.Git“ před „Git.Git.PreRelease“)
         const s = score + bonus - winget[i].id.length / 100;
         if ((best.get(i) ?? 0) < s) best.set(i, s);
@@ -162,12 +302,14 @@ export function pairSources(
     const found = candidates(
       [
         { key: base, map: byMoniker, score: 100 },
-        { key: nameKey(c.title), map: byName, score: 85 },
-        { key: nameKey(base), map: byId, score: 75 },
-        { key: trimmedNameKey(c.title), map: byTrimmed, score: 70 },
-        { key: nameKey(base), map: byTail, score: 60 },
+        { key: matchKey(c.title), map: byName, score: 85 },
+        { key: matchKey(base), map: byId, score: 75 },
+        { key: matchTrimmed(c.title), map: byTrimmed, score: 70 },
+        { key: matchKey(base), map: byTail, score: 60 },
       ],
       normalize(c.authors),
+      siteIdentity(c.projectUrl),
+      authorOwners(c.authors),
     );
     for (const [to, score] of found) chocoEdges.push({ from, to, score });
   });
@@ -177,13 +319,17 @@ export function pairSources(
   const scoopEdges: Edge[] = [];
   scoop.forEach((s, from) => {
     const name = s.name.toLowerCase();
-    const found = candidates([
-      { key: name, map: byMoniker, score: 100 },
-      { key: nameKey(name), map: byName, score: 85 },
-      { key: nameKey(name), map: byId, score: 75 },
-      { key: trimmedNameKey(name), map: byTrimmed, score: 70 },
-      { key: nameKey(name), map: byTail, score: 60 },
-    ]);
+    const found = candidates(
+      [
+        { key: name, map: byMoniker, score: 100 },
+        { key: matchKey(name), map: byName, score: 85 },
+        { key: matchKey(name), map: byId, score: 75 },
+        { key: matchTrimmed(name), map: byTrimmed, score: 70 },
+        { key: matchKey(name), map: byTail, score: 60 },
+      ],
+      "",
+      siteIdentity(s.homepage),
+    );
     for (const [to, score] of found) scoopEdges.push({ from, to, score });
   });
   const scoopToWinget = assign(scoopEdges);

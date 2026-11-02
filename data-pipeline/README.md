@@ -72,6 +72,15 @@ s různou váhou (`src/build/match.ts`):
 | stejný název bez přívěsků | 70 | „Signal Desktop“ = „Signal“, „Zoom Client“ = „Zoom“ |
 | shoda s poslední částí id | 60 | `git` = `Git.Git` |
 
+Název (ani moniker) nestačí – „mc“ je MinIO Client i Midnight Commander, „Pastel“ od
+Japplis i od sharkdp. Proto se porovná **vlastník**: z webu balíčku Chocolatey / Scoopu
+(účet a repozitář na GitHubu, doména, autoři) a z balíčku wingetu (vydavatel v id
+a v indexu, název produktu, weby z manifestu). Jasně jiný vlastník spojení zamítne,
+stejný mu dá přednost i před monikerem (`zap` z Chocolatey = OWASP `ZAP.ZAP`, ne
+`Zaptronics.Zap`). Weby, které o vlastníkovi nic neřeknou (Discord, PyPI, Softpedia…),
+se nepočítají a bez webu na straně wingetu se nezamítá. „+“ se v názvech počítá
+(„Notepad++“ ≠ „Notepad--“).
+
 Přiřazuje se od nejsilnějších shod; každý balíček wingetu má nejvýš jeden protějšek
 z každého správce. Chocolatey a Scoop bez wingetu se párují podle id, názvu (i bez
 přívěsků) a webu aplikace – u GitHubu včetně repozitáře (`github.com/sharkdp/bat`).

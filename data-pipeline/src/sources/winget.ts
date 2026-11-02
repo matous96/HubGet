@@ -11,8 +11,8 @@ import { join } from "node:path";
 import { parse as parseYaml } from "yaml";
 import { CACHE_DIR, MAX_AGE, WINGET_CDN, WINGET_INDEX_URL } from "../config.ts";
 import { readZip } from "../lib/archive.ts";
-import { cachedFetch, Limiter } from "../lib/http.ts";
-import { log } from "../lib/log.ts";
+import { cachedFetch, Limiter, mapLimit } from "../lib/http.ts";
+import { log, progress } from "../lib/log.ts";
 import { compareVersions } from "../lib/text.ts";
 
 /** Balíček z indexu (nejnovější verze). */
@@ -153,4 +153,21 @@ export async function loadWingetManifest(entry: WingetIndexEntry): Promise<Winge
     log.warn(`manifest ${entry.id}: ${(error as Error).message}`);
     return null;
   }
+}
+
+/**
+ * Weby balíčků z manifestů (PackageUrl, PublisherUrl) podle id malými písmeny – při
+ * párování s Chocolatey a Scoopem rozhodnou mezi stejně pojmenovanými aplikacemi
+ * (build/match.ts). Manifesty se stejně čtou kvůli popisům, jsou v mezipaměti.
+ */
+export async function loadWingetSites(entries: WingetIndexEntry[]): Promise<Map<string, string[]>> {
+  const sites = new Map<string, string[]>();
+  const tick = progress("weby z manifestů", entries.length);
+  await mapLimit(entries, 16, async (entry) => {
+    const m = await loadWingetManifest(entry);
+    const urls = [m?.PackageUrl, m?.PublisherUrl].filter((url): url is string => !!url);
+    if (urls.length) sites.set(entry.id.toLowerCase(), urls);
+    tick();
+  });
+  return sites;
 }

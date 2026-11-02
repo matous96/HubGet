@@ -18,7 +18,7 @@ import { loadGithubStars } from "./sources/github.ts";
 import { loadRegistryCounts } from "./sources/registries.ts";
 import { loadScoopBuckets } from "./sources/scoop.ts";
 import { loadUnigetData } from "./sources/unigetui.ts";
-import { loadWingetIndex } from "./sources/winget.ts";
+import { loadWingetIndex, loadWingetSites } from "./sources/winget.ts";
 
 /** Parametry příkazové řádky („--details 500“, „--local“). */
 function arg(name: string): string | undefined {
@@ -62,7 +62,9 @@ log.step("Ikony a screenshoty – databáze UniGetUI");
 const uniget = await loadUnigetData();
 
 log.step("Párování balíčků do karet aplikací");
-const records = pairSources(winget, choco.packages, scoop.packages, wingetVariants);
+// Weby z manifestů wingetu rozhodnou mezi stejně pojmenovanými aplikacemi různých vlastníků
+const wingetSites = await loadWingetSites(winget);
+const records = pairSources(winget, choco.packages, scoop.packages, wingetVariants, wingetSites);
 const paired = {
   all3: records.filter((r) => r.winget && r.choco && r.scoop).length,
   wingetChoco: records.filter((r) => r.winget && r.choco).length,
