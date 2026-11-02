@@ -6,9 +6,10 @@
 //!   stahování z výstupu a výsledek z návratového kódu (HRESULT).
 
 use serde::{Deserialize, Serialize};
-use std::collections::HashSet;
+use std::collections::{BTreeSet, HashSet};
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU64, Ordering};
+use std::sync::Mutex;
 use std::time::Duration;
 use tauri::ipc::Channel;
 use tauri::{AppHandle, Manager};
@@ -223,7 +224,132 @@ fn winget_list() -> Result<Vec<PsInstalled>, String> {
     if items.is_empty() {
         return Err("Get-WinGetPackage nevrátil žádné balíčky".into());
     }
-    Ok(items)
+    Ok(refresh_changed(items))
+}
+
+/// Balíčky, které od spuštění HubGetu změnila jeho operace (nebo se po chybě „není
+/// co aktualizovat“ ukázaly jako aktuální). Modul čte přes server wingetu
+/// (WindowsPackageManagerServer), který běží s HubGetem a u aplikací MSIX drží
+/// nainstalovanou verzi z doby svého spuštění: Affinity aktualizovaná na 3.3.3
+/// v něm zůstala na 3.3.1 s nabízenou aktualizací a další pokus winget odmítl
+/// (0x8A15002B). Stav těchto balíčků se proto ověřuje přes winget CLI.
+static CHANGED: Mutex<BTreeSet<String>> = Mutex::new(BTreeSet::new());
+
+fn mark_changed(package_id: &str) {
+    CHANGED.lock().unwrap_or_else(|e| e.into_inner()).insert(package_id.to_string());
+}
+
+/// Balíček podle winget CLI: název, nainstalovaná a nabízená verze, zdroj.
+#[derive(Debug, PartialEq)]
+struct Listed {
+    name: String,
+    version: String,
+    available: Option<String>,
+    source: Option<String>,
+}
+
+/// winget 0x8A150014 – žádný nainstalovaný balíček neodpovídá (APPINSTALLER_CLI_ERROR_NO_APPLICATIONS_FOUND).
+const NO_APPLICATIONS_FOUND: u32 = 0x8A15_0014;
+
+/// Stav balíčku podle `winget list --id … --exact` – CLI čte nainstalované aplikace
+/// pokaždé znovu (~1 s). Some(None) = není nainstalovaný, None = nepodařilo se zjistit.
+fn cli_listed(package_id: &str) -> Option<Option<Listed>> {
+    if !safe_show_arg(package_id) {
+        return None;
+    }
+    let mut command = hidden_command(&winget_exe());
+    command.args(["list", "--id", package_id, "--exact", "--accept-source-agreements", "--disable-interactivity"]);
+    let output = process::run(command, Duration::from_secs(60)).ok()?;
+    match output.code as u32 {
+        0 => parse_list(&output.stdout, package_id).map(Some),
+        NO_APPLICATIONS_FOUND => Some(None),
+        _ => None,
+    }
+}
+
+/// Řádek balíčku z tabulky `winget list`: „Název  Id  Verze  [Dostupná]  [Zdroj]“.
+/// Záhlaví je v jazyce wingetu, řádky s daty ne. Zkrácené id nebo verzi („…“)
+/// ani rozsah verzí („< 2.0“) za nainstalovanou verzi brát nejde.
+fn parse_list(stdout: &str, package_id: &str) -> Option<Listed> {
+    // Před tabulkou bývá animace průběhu oddělená \r
+    stdout.lines().filter_map(|line| line.rsplit('\r').next()).find_map(|line| {
+        let tokens: Vec<&str> = line.split_whitespace().collect();
+        let at = tokens.iter().position(|token| token.eq_ignore_ascii_case(package_id))?;
+        let version = *tokens.get(at + 1)?;
+        if version.starts_with(['<', '>']) || version.ends_with('…') {
+            return None;
+        }
+        let (available, source) = match &tokens[at + 2..] {
+            [available, source] => (Some(*available), Some(*source)),
+            [single] if single.starts_with(|c: char| c.is_ascii_digit()) => (Some(*single), None),
+            [source] => (None, Some(*source)),
+            _ => (None, None),
+        };
+        Some(Listed {
+            name: tokens[..at].join(" "),
+            version: version.to_string(),
+            available: available.map(str::to_string),
+            source: source.map(str::to_string),
+        })
+    })
+}
+
+/// Výpis ze serveru wingetu opraví podle winget CLI u balíčků z CHANGED (ověření
+/// běží souběžně). Balíček, u kterého se výpis s CLI shoduje, se dál neověřuje –
+/// server změnu zachytil (programy z registru) nebo se mezitím spustil znovu.
+fn refresh_changed(items: Vec<PsInstalled>) -> Vec<PsInstalled> {
+    let ids: Vec<String> = CHANGED.lock().unwrap_or_else(|e| e.into_inner()).iter().cloned().collect();
+    if ids.is_empty() {
+        return items;
+    }
+    let fresh: Vec<(String, Option<Option<Listed>>)> = std::thread::scope(|scope| {
+        let checks: Vec<_> = ids.iter().map(|id| (id, scope.spawn(move || cli_listed(id)))).collect();
+        checks.into_iter().map(|(id, check)| (id.clone(), check.join().ok().flatten())).collect()
+    });
+    let (items, settled) = apply_fresh(items, fresh);
+    let mut changed = CHANGED.lock().unwrap_or_else(|e| e.into_inner());
+    for id in &settled {
+        changed.remove(id);
+    }
+    items
+}
+
+/// Opraví výpis podle čerstvého stavu z CLI; vrátí i balíčky, u kterých se výpis s CLI shoduje.
+fn apply_fresh(mut items: Vec<PsInstalled>, fresh: Vec<(String, Option<Option<Listed>>)>) -> (Vec<PsInstalled>, Vec<String>) {
+    let mut settled = Vec::new();
+    for (id, state) in fresh {
+        // Nezjištěno – výpis zůstane, jak je
+        let Some(state) = state else { continue };
+        let at = items.iter().position(|p| p.id.eq_ignore_ascii_case(&id));
+        match (at, state) {
+            (None, None) => settled.push(id),
+            // Odinstalovaná aplikace MSIX, kterou server pořád vypisuje
+            (Some(i), None) => {
+                items.remove(i);
+            }
+            (Some(i), Some(listed)) => {
+                let item = &mut items[i];
+                let update = listed.available.unwrap_or_default();
+                if item.version == listed.version && item.update == update {
+                    settled.push(id);
+                } else {
+                    item.version = listed.version;
+                    item.update = update;
+                }
+            }
+            // Server ji vypisuje pod jiným id (aplikace ze Storu bez spárování) – nepřidávat podruhé
+            (None, Some(listed)) if items.iter().any(|p| p.name.eq_ignore_ascii_case(&listed.name)) => settled.push(id),
+            // Nově nainstalovaná aplikace MSIX, kterou server ještě nevidí
+            (None, Some(listed)) => items.push(PsInstalled {
+                name: if listed.name.is_empty() || listed.name.ends_with('…') { id.clone() } else { listed.name },
+                id,
+                version: listed.version,
+                source: listed.source.unwrap_or_default(),
+                update: listed.available.unwrap_or_default(),
+            }),
+        }
+    }
+    (items, settled)
 }
 
 /// Je balíček z wingetu v systému opravdu? Aplikace ze Storu (MSIX v Programech
@@ -615,7 +741,24 @@ pub async fn winget_operation(
         pre_command,
         post_command,
     };
-    operations::execute(id, spec, on_event).await
+    let mut result = operations::execute(id, spec, on_event).await?;
+    if request.kind == Kind::Download {
+        return Ok(result);
+    }
+    // „Není co aktualizovat“ (0x8A15002B): buď aplikace už nejnovější verzi má (nabídka vznikla
+    // ze zastaralého stavu serveru wingetu, viz CHANGED), nebo nová verze potřebuje jiný typ
+    // instalátoru – rozhodne čerstvý stav z CLI
+    if request.kind == Kind::Update && result.error_key() == Some("noUpdate") {
+        let package_id = request.package_id.clone();
+        let current = background(move || Ok(cli_listed(&package_id))).await?;
+        if matches!(current, Some(Some(Listed { available: None, .. }))) {
+            result = result.into_success();
+        }
+    }
+    if result.is_success() {
+        mark_changed(&request.package_id);
+    }
+    Ok(result)
 }
 
 /// Program rozbalený na ploše, který winget nevidí: v registru k balíčku nic
@@ -781,6 +924,77 @@ mod tests {
         assert_eq!(parse_progress("███████▒▒▒  70%"), Some(70.0));
         assert_eq!(parse_progress("Found VLC media player [VideoLAN.VLC] Version 3.0.21"), None);
         assert_eq!(parse_progress("Downloading https://get.videolan.org/vlc/3.0.21/win64/vlc.exe"), None);
+    }
+
+    #[test]
+    fn list_row_from_cli() {
+        let listed = |name: &str, version: &str, available: Option<&str>, source: Option<&str>| Listed {
+            name: name.into(),
+            version: version.into(),
+            available: available.map(Into::into),
+            source: source.map(Into::into),
+        };
+        // Aktuální aplikace (animace průběhu před tabulkou)
+        let current = "\r-\r\\\r \rName     Id             Version    Source\n------------------------------------------\nAffinity Canva.Affinity 3.3.3.5004 winget\n";
+        assert_eq!(parse_list(current, "Canva.Affinity"), Some(listed("Affinity", "3.3.3.5004", None, Some("winget"))));
+        assert_eq!(parse_list(current, "canva.affinity").map(|l| l.version), Some("3.3.3.5004".into()));
+        // S nabízenou aktualizací, název z více slov
+        let outdated = "Name                  Id            Version Available Source\n------\nOllama version 0.40.2 Ollama.Ollama 0.40.2  0.40.13   winget\n";
+        assert_eq!(parse_list(outdated, "Ollama.Ollama"), Some(listed("Ollama version 0.40.2", "0.40.2", Some("0.40.13"), Some("winget"))));
+        // Program mimo zdroje wingetu (bez sloupce Zdroj)
+        assert_eq!(parse_list("Tool  ARP\\Machine\\X64\\Tool  1.0\n", "ARP\\Machine\\X64\\Tool"), Some(listed("Tool", "1.0", None, None)));
+        // Rozsah verzí, zkrácená verze a jiný balíček se za stav nepočítají
+        assert_eq!(parse_list("App  Vendor.App  < 2.0  winget\n", "Vendor.App"), None);
+        assert_eq!(parse_list("App  Vendor.App  1.2.3.45…  winget\n", "Vendor.App"), None);
+        assert_eq!(parse_list(current, "Canva.Affinity.Beta"), None);
+    }
+
+    #[test]
+    fn stale_list_fixed_from_cli() {
+        let ps = |id: &str, name: &str, version: &str, update: &str| PsInstalled {
+            id: id.into(),
+            name: name.into(),
+            version: version.into(),
+            source: "winget".into(),
+            update: update.into(),
+        };
+        let cli = |name: &str, version: &str, available: Option<&str>| {
+            Some(Some(Listed { name: name.into(), version: version.into(), available: available.map(Into::into), source: Some("winget".into()) }))
+        };
+        let items = vec![
+            // Server wingetu po aktualizaci MSIX pořád hlásí starou verzi s aktualizací
+            ps("Canva.Affinity", "Affinity", "3.3.1.4940", "3.3.3.5004"),
+            // Program z registru – server změnu zachytil, výpis souhlasí
+            ps("Git.Git", "Git", "2.51.0", ""),
+            // Odinstalovaná aplikace MSIX, kterou server ještě vypisuje
+            ps("Vendor.Gone", "Gone", "1.0", ""),
+            ps("Mozilla.Firefox", "Firefox", "144.0", ""),
+            ps("Store.Named", "Store App", "2.0", ""),
+        ];
+        let fresh = vec![
+            ("Canva.Affinity".to_string(), cli("Affinity", "3.3.3.5004", None)),
+            ("git.git".to_string(), cli("Git", "2.51.0", None)),
+            ("Vendor.Gone".to_string(), Some(None)),
+            // Nezjištěno – položka zůstane, jak je
+            ("Mozilla.Firefox".to_string(), None),
+            // Nová aplikace MSIX, kterou server nevidí
+            ("Vendor.New".to_string(), cli("New App", "5.0", None)),
+            // Server ji vypisuje pod jiným id – nepřidávat podruhé
+            ("9NSTOREAPP01".to_string(), cli("Store App", "2.0", None)),
+            // Odinstalovaná a server ji už nevypisuje
+            ("Vendor.Old".to_string(), Some(None)),
+        ];
+        let (items, settled) = apply_fresh(items, fresh);
+        let row = |id: &str| items.iter().find(|p| p.id == id).map(|p| (p.version.as_str(), p.update.as_str()));
+        assert_eq!(row("Canva.Affinity"), Some(("3.3.3.5004", "")));
+        assert_eq!(row("Git.Git"), Some(("2.51.0", "")));
+        assert_eq!(row("Vendor.Gone"), None);
+        assert_eq!(row("Mozilla.Firefox"), Some(("144.0", "")));
+        assert_eq!(row("Vendor.New"), Some(("5.0", "")));
+        assert_eq!(row("9NSTOREAPP01"), None);
+        assert_eq!(items.len(), 5);
+        // Dál se ověřuje jen to, co se s výpisem neshoduje (nebo nešlo zjistit)
+        assert_eq!(settled, ["git.git", "9NSTOREAPP01", "Vendor.Old"]);
     }
 
     #[test]

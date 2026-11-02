@@ -157,6 +157,20 @@ impl OperationResult {
             Err(detail) => OperationResult { outcome: Outcome::Error, code: 1, error_key: None, restart_required: false, detail: Some(detail) },
         }
     }
+
+    pub fn is_success(&self) -> bool {
+        self.outcome == Outcome::Success
+    }
+
+    pub fn error_key(&self) -> Option<&'static str> {
+        self.error_key
+    }
+
+    /// Chyba, po které se ukázalo, že cíl operace už je splněný (winget: „není co
+    /// aktualizovat“ u aplikace, která už nejnovější verzi má).
+    pub fn into_success(self) -> Self {
+        OperationResult { outcome: Outcome::Success, error_key: None, ..self }
+    }
 }
 
 /// Co a jak spustit; dodává konkrétní správce.
