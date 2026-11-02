@@ -15,8 +15,6 @@ import { PackageCollection } from "@/components/package/PackageCollection";
 import { CollectionToolbar } from "@/components/ui/CollectionToolbar";
 import { CardSkeletons, ErrorState } from "@/components/ui/States";
 import { isDevOnly, useCatalog, useCatalogIndex, useModeFilter } from "@/hooks/usePackages";
-import { useIconColors } from "@/lib/iconColor";
-import { useIconSourcesOf } from "@/lib/icons";
 import { todayPicks, type TodayShift } from "@/lib/today";
 import { trendingScore } from "@/lib/trending";
 import { cn, topN } from "@/lib/utils";
@@ -28,8 +26,8 @@ import type { CatalogEntry } from "@/types";
 type Tab = "trending" | "popular" | "new" | "updated";
 const TABS: Tab[] = ["trending", "popular", "new", "updated"];
 const TAB_SIZE = 12;
-/** Nejdéle tak dlouho (ms od načtení katalogu) čekají karty sekce Dnes na ikony a barvy. */
-const HOLD_MAX = 5000;
+/** Nejdéle tak dlouho (ms od načtení katalogu) čekají karty sekce Dnes na změření ikon. */
+const HOLD_MAX = 3000;
 
 /**
  * Domovská obrazovka: pruh se třemi sliby (bezpečné, jednoduché, vše pod
@@ -77,27 +75,10 @@ export function HomePage() {
   }, [all, catalogIndex, developer, language, iconSizes, shift]);
   const paging = (slot: TodaySlot) => ({ onPrev: () => move(slot, -1), onNext: () => move(slot, 1) });
 
-  // Ikony dnes vybraných aplikací (i dalších kandidátů) změřit předem
-  const unmeasured = today.unmeasured.map((e) => e.iconUrl ?? "").join("\n");
-  const upcoming = neighbours.flatMap((n) => n.unmeasured.map((e) => e.iconUrl ?? "")).join("\n");
-  useEffect(() => {
-    for (const url of upcoming.split("\n").filter(Boolean)) void measureIcon(url);
-  }, [upcoming]);
-  useEffect(() => {
-    for (const url of unmeasured.split("\n").filter(Boolean)) void measureIcon(url);
-  }, [unmeasured]);
-
-  // Barvy karet (banner, kolekce, aplikace dne) podle ikon – na prvním spuštění se teprve počítají
-  const shownEntries = useMemo(
-    () => [today.storyEntry, today.appOfDay, ...today.collections.flatMap((c) => c.entries)].filter((e): e is CatalogEntry => !!e),
-    [today],
-  );
-  const shownSources = useIconSourcesOf(shownEntries);
-  const { pending: colorsPending } = useIconColors(shownSources.map((sources, i) => ({ sources, brand: shownEntries[i].brandColor })));
-
-  // Místo karet kostry, dokud nejsou změřené ikony zobrazovaných aplikací a spočítané barvy karet
-  // (na novém počítači se jinak karty v prvních sekundách několikrát vymění a přebarví) – nejvýš
-  // HOLD_MAX od načtení katalogu, pak se ukáže, co je známé. Pak se výběr zamrazí (frozenSizes).
+  // Místo karet kostry, dokud nejsou změřené ikony zobrazovaných aplikací (na novém počítači se
+  // jinak karty v prvních sekundách několikrát vymění) – nejvýš HOLD_MAX od načtení katalogu, pak
+  // se ukáže, co je známé. Pak se výběr zamrazí (frozenSizes). Barvy karet se dopočítají až
+  // z ikon v mezipaměti a do barvy ikony přejdou plynule.
   const catalogReady = !!data;
   const [waited, setWaited] = useState(false);
   useEffect(() => {
@@ -105,11 +86,25 @@ export function HomePage() {
     const timer = setTimeout(() => setWaited(true), HOLD_MAX);
     return () => clearTimeout(timer);
   }, [catalogReady]);
-  const settled = today.unsettled.length === 0 && !colorsPending;
+  const settled = today.unsettled.length === 0;
   const holdToday = !frozenSizes && !settled && !waited;
   useEffect(() => {
     if (catalogReady && !frozenSizes && (settled || waited)) setFrozenSizes(useIconQuality.getState().sizes);
   }, [catalogReady, frozenSizes, settled, waited]);
+
+  // Měření ikon: ikony se stahují nejvýš po několika (icons.rs), proto nejdřív jen zobrazované
+  // aplikace – kandidáti navíc a výběry pro šipky (desítky ikon) by první zobrazení zdržely
+  // o několik sekund. Ostatní až po zobrazení karet.
+  const unsettled = today.unsettled.map((e) => e.iconUrl ?? "").join("\n");
+  const later = frozenSizes
+    ? [...today.unmeasured, ...neighbours.flatMap((n) => n.unmeasured)].map((e) => e.iconUrl ?? "").join("\n")
+    : "";
+  useEffect(() => {
+    for (const url of unsettled.split("\n").filter(Boolean)) void measureIcon(url);
+  }, [unsettled]);
+  useEffect(() => {
+    for (const url of later.split("\n").filter(Boolean)) void measureIcon(url);
+  }, [later]);
 
   // Obsah záložek (běžný uživatel bez balíčků jen pro vývojáře)
   // Jen prvních 12 v jednom průchodu – řazení celého katalogu by u Trendů trvalo desítky ms
@@ -179,68 +174,74 @@ export function HomePage() {
         )}
       </div>
 
-      {/* Stav počítače: aktualizace, co spravuje HubGet, export / import, vyčištění */}
-      <SystemStatus />
+      {/* Zbytek stránky až po kartách Dnes – jeho ikony a barvy (desítky stažení) by jinak
+          na prvním spuštění zdržely ikony karet, na které se čeká */}
+      {!holdToday && (
+        <>
+          {/* Stav počítače: aktualizace, co spravuje HubGet, export / import, vyčištění */}
+          <SystemStatus />
 
-      {/* Režim Vývojář: nástroje pro vývojáře hned pod přehledem */}
-      {devTools.length > 0 && (
-        <div className="mb-8">
-          <Shelf title={t("home.devTools")} icon={<Code className="size-5 text-accent" />}>
-            {devTools.map((p) => (
-              <ShelfItem key={p.id}>
-                <PackageCard entry={p} />
-              </ShelfItem>
-            ))}
-          </Shelf>
-        </div>
+          {/* Režim Vývojář: nástroje pro vývojáře hned pod přehledem */}
+          {devTools.length > 0 && (
+            <div className="mb-8">
+              <Shelf title={t("home.devTools")} icon={<Code className="size-5 text-accent" />}>
+                {devTools.map((p) => (
+                  <ShelfItem key={p.id}>
+                    <PackageCard entry={p} />
+                  </ShelfItem>
+                ))}
+              </Shelf>
+            </div>
+          )}
+
+          {/* Kolekce podle zaměření + vlastní sada sdílená odkazem */}
+          <ProfileCollections />
+
+          {/* Celoobrazovkový detail kolekce – otevírají ho karty kolekcí výše */}
+          <CollectionModal />
+
+          {/* ── Trendy / Populární / Nové / Aktualizované ────────────── */}
+          <section className="mb-10">
+            <div className="mb-5 grid grid-cols-4 rounded-full border border-line bg-surface-2 p-1" role="tablist">
+              {TABS.map((id) => (
+                <button
+                  key={id}
+                  type="button"
+                  role="tab"
+                  aria-selected={tab === id}
+                  onClick={() => setTab(id)}
+                  className={cn(
+                    "relative h-11 cursor-pointer rounded-full text-sm font-semibold transition-colors",
+                    tab === id ? "text-fg" : "text-muted hover:text-fg",
+                  )}
+                >
+                  {/* Posuvný ukazatel aktivní záložky */}
+                  {tab === id && (
+                    <motion.span
+                      layoutId="home-tab-indicator"
+                      className="absolute inset-0 rounded-full bg-surface shadow-sm"
+                      transition={{ type: "spring", stiffness: 420, damping: 34 }}
+                    />
+                  )}
+                  <span className="relative">{t(`home.tabs.${id}`)}</span>
+                </button>
+              ))}
+            </div>
+
+            <div className="mb-4 flex items-center justify-end gap-4">
+              <Link to="/top" className="mr-auto text-sm font-medium text-accent hover:underline">
+                {t("home.seeAll")}
+              </Link>
+              {/* Pořadí určuje záložka – nabízíme jen přepnutí mřížka / seznam */}
+              <CollectionToolbar hideSort />
+            </div>
+
+            {/* Bez nového připojení při přepnutí záložky – seznam jen dostane jiné aplikace
+                a drží výšku, takže stránka neposkočí nahoru */}
+            <PackageCollection packages={tabItems} />
+          </section>
+        </>
       )}
-
-      {/* Kolekce podle zaměření + vlastní sada sdílená odkazem */}
-      <ProfileCollections />
-
-      {/* Celoobrazovkový detail kolekce – otevírají ho karty kolekcí výše */}
-      <CollectionModal />
-
-      {/* ── Trendy / Populární / Nové / Aktualizované ────────────── */}
-      <section className="mb-10">
-        <div className="mb-5 grid grid-cols-4 rounded-full border border-line bg-surface-2 p-1" role="tablist">
-          {TABS.map((id) => (
-            <button
-              key={id}
-              type="button"
-              role="tab"
-              aria-selected={tab === id}
-              onClick={() => setTab(id)}
-              className={cn(
-                "relative h-11 cursor-pointer rounded-full text-sm font-semibold transition-colors",
-                tab === id ? "text-fg" : "text-muted hover:text-fg",
-              )}
-            >
-              {/* Posuvný ukazatel aktivní záložky */}
-              {tab === id && (
-                <motion.span
-                  layoutId="home-tab-indicator"
-                  className="absolute inset-0 rounded-full bg-surface shadow-sm"
-                  transition={{ type: "spring", stiffness: 420, damping: 34 }}
-                />
-              )}
-              <span className="relative">{t(`home.tabs.${id}`)}</span>
-            </button>
-          ))}
-        </div>
-
-        <div className="mb-4 flex items-center justify-end gap-4">
-          <Link to="/top" className="mr-auto text-sm font-medium text-accent hover:underline">
-            {t("home.seeAll")}
-          </Link>
-          {/* Pořadí určuje záložka – nabízíme jen přepnutí mřížka / seznam */}
-          <CollectionToolbar hideSort />
-        </div>
-
-        {/* Bez nového připojení při přepnutí záložky – seznam jen dostane jiné aplikace
-            a drží výšku, takže stránka neposkočí nahoru */}
-        <PackageCollection packages={tabItems} />
-      </section>
     </>
   );
 }

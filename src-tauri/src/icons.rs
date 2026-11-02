@@ -15,7 +15,7 @@
 //! a frontend rychle přejde na další zdroj (404): zdroj bez ikony (HTTP 404,
 //! 403…) den; chyba sítě a přetížený server (HTTP 429, 5xx) jen 15 minut,
 //! ikona z disku (nabídka Start, Po spuštění) po opakovaném pokusu také 15 minut.
-//! Stahuje se nejvýš 6 ikon najednou. Odpovědi mají
+//! Stahuje se nejvýš 12 ikon najednou. Odpovědi mají
 //! `Access-Control-Allow-Origin: *`, aby frontend mohl ikonu prozkoumat
 //! v canvasu (barva banneru, rozpoznání bílé / prázdné ikony).
 
@@ -40,7 +40,9 @@ const FAILURE_TTL: Duration = Duration::from_secs(24 * 3600);
 const TRANSIENT_FAILURE_TTL: Duration = Duration::from_secs(15 * 60);
 /// Nejvíc souběžných stahování – stovky karet najednou by jinak spustily
 /// stovky curl.exe a stahování by se navzájem zdržovala až do časového limitu.
-const MAX_DOWNLOADS: usize = 6;
+/// Stahování brzdí hlavně navázání spojení (každé je nové), ne přenos – na prvním
+/// spuštění, kdy není nic v mezipaměti, pomůže víc souběžných.
+const MAX_DOWNLOADS: usize = 12;
 /// Ikony nainstalovaných aplikací se po týdnu obnoví (aktualizace může ikonu změnit).
 const APP_ICON_TTL: Duration = Duration::from_secs(7 * 24 * 3600);
 /// Velikost ikony z nabídky Start.

@@ -75,8 +75,8 @@ function dailyOrder<T>(pool: T[], day: number, skip: (item: T) => boolean = () =
   return Array.from({ length: n }, (_, i) => pool[(start + i) % n]).filter((item) => !skip(item));
 }
 
-/** Kolik dalších kandidátů změřit zároveň s vybraným (kdyby měl malou ikonu). */
-const LOOKAHEAD = 6;
+/** Kolik dalších kandidátů změřit předem (kdyby vybraný měl malou ikonu) – každý je jedno stažení. */
+const LOOKAHEAD = 2;
 
 /**
  * Známá aplikace: popularita v katalogu (0–100) aspoň tolik, nebo tolik hvězd
