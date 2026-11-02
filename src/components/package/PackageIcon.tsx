@@ -33,6 +33,11 @@ interface PackageIconProps {
   iconUrl: string | null;
   /** Velikost v pixelech. */
   size?: number;
+  /**
+   * Dlaždici kategorie (ikona chybí nebo se stahuje) ukázat v bílém čtverci jako skutečnou
+   * ikonu – v banneru detailu má pozadí stejnou barvu a dlaždice by v něm zanikla.
+   */
+  framed?: boolean;
   className?: string;
 }
 
@@ -45,12 +50,26 @@ interface PackageIconProps {
  * Než se ikona stáhne, je místo prázdné bílé dlaždice vidět dlaždice kategorie –
  * skutečná ikona se přes ni prolne.
  */
-export function PackageIcon({ id, name, iconUrl, size = 48, className }: PackageIconProps) {
+export function PackageIcon({ id, name, iconUrl, size = 48, framed, className }: PackageIconProps) {
   const sources = useIconSources(id, name, iconUrl);
   const category = useCatalogIndex().get(id)?.categories[0];
   const [, rerender] = useReducer((n: number) => n + 1, 0);
   const radius = Math.round(size * 0.24); // „squircle“ zaoblení úměrné velikosti
   const src = sources.find((source) => !failedIcons.has(source));
+
+  /** Dlaždice kategorie – s `framed` menší uvnitř bílého čtverce se stejným okrajem jako skutečná ikona. */
+  const tile = (tileClassName?: string) => {
+    if (!framed) return <CategoryTile id={id} name={name} category={category} size={size} radius={radius} className={tileClassName} />;
+    const inner = Math.round(size * 0.68);
+    return (
+      <div
+        className={cn("flex items-center justify-center bg-white/95 ring-1 ring-black/5", tileClassName)}
+        style={{ width: size, height: size, borderRadius: radius }}
+      >
+        <CategoryTile id={id} name={name} category={category} size={inner} radius={Math.round(inner * 0.24)} />
+      </div>
+    );
+  };
 
   if (src) {
     const inspectable = canInspect(src);
@@ -66,7 +85,7 @@ export function PackageIcon({ id, name, iconUrl, size = 48, className }: Package
     };
     return (
       <div className={cn("relative shrink-0", className)} style={{ width: size, height: size, borderRadius: radius }}>
-        {!ready && <CategoryTile id={id} name={name} category={category} size={size} radius={radius} className="icon-placeholder absolute inset-0" />}
+        {!ready && tile("icon-placeholder absolute inset-0")}
         <div
           className={cn(
             "absolute inset-0 flex items-center justify-center ring-1 ring-black/5 transition-opacity duration-200",
@@ -110,7 +129,7 @@ export function PackageIcon({ id, name, iconUrl, size = 48, className }: Package
   }
 
   // Žádný zdroj nefunguje – dlaždice kategorie natrvalo
-  return <CategoryTile id={id} name={name} category={category} size={size} radius={radius} className={cn("shrink-0", className)} />;
+  return tile(cn("shrink-0", className));
 }
 
 /**

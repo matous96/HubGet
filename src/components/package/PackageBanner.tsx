@@ -59,6 +59,7 @@ export function PackageBanner({ entry }: { entry: CatalogEntry }) {
           name={entry.name}
           iconUrl={entry.iconUrl}
           size={96}
+          framed
           className="shadow-2xl shadow-black/30"
         />
         <span
