@@ -7,6 +7,7 @@ import { isTauri } from "@/lib/tauri";
 import i18n from "@/i18n";
 import { useInstalledVia, viaKey } from "@/store/installedVia";
 import { useInstallSeen } from "@/store/installSeen";
+import { useListFailures } from "@/store/listFailures";
 import { useToasts } from "@/store/toasts";
 import type { InstalledPackage, RepoSearchResult, SourceId } from "@/types";
 import { chocoManager } from "./choco";
@@ -64,6 +65,7 @@ export async function getAllInstalled(enabled: SourceId[]): Promise<InstalledPac
   results.forEach((result, i) => {
     if (result.status === "rejected") reportListFailure(enabled[i], result.reason);
   });
+  useListFailures.setState({ sources: enabled.filter((_, i) => results[i].status === "rejected") });
   const via = new Set(useInstalledVia.getState().keys);
   const merged = mergeChocolatey(results.flatMap((r) => (r.status === "fulfilled" ? r.value : [])), via);
   // Kdy se který balíček objevil – řazení Nově nainstalované

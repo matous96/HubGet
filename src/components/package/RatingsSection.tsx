@@ -77,7 +77,7 @@ export function RatingsSection({ entry }: { entry: CatalogEntry }) {
   const [reading, setReading] = useState<Review | null>(null);
   const withText = reviews.supportsText;
 
-  const { data: summary } = useRatingSummary(entry);
+  const { data: summary, isError: summaryFailed, refetch: retrySummary, isFetching: retrying } = useRatingSummary(entry);
   const { data: list } = useQuery({
     queryKey: queryKeys.reviews(entry.id),
     queryFn: () => reviews.getReviews(entry.id),
@@ -134,7 +134,15 @@ export function RatingsSection({ entry }: { entry: CatalogEntry }) {
 
       {/* Průměr a histogram */}
       <div className="mt-3 mb-8 flex flex-wrap items-end justify-between gap-8">
-        {!summary ? (
+        {!summary && summaryFailed ? (
+          // Bez internetu nebo výpadek služby – ne věčné načítání ani „zatím bez hodnocení“
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+            <span className="text-muted">{t("reviews.loadFailed")}</span>
+            <Button variant="secondary" size="sm" disabled={retrying} onClick={() => void retrySummary()}>
+              {t("reviews.retry")}
+            </Button>
+          </div>
+        ) : !summary ? (
           // Načítání – místo velkého čísla jen obrys, ať se sekce neposkočí
           <span className="h-[75px] w-40 animate-pulse rounded-2xl bg-surface-2" />
         ) : summary.count > 0 ? (

@@ -11,6 +11,7 @@ import { useUrlState } from "@/hooks/useUrlState";
 import { cn, normalize } from "@/lib/utils";
 import { ORIGINS } from "@/services/managers";
 import { AdminPendingPanel } from "@/components/package/AdminPendingPanel";
+import { ListFailurePanel } from "@/components/package/ListFailurePanel";
 import { OriginFilter, type OriginFilterValue } from "@/components/package/SourceFilter";
 import { useAutoUpdates } from "@/store/autoUpdates";
 import { useSelection } from "@/store/selection";
@@ -142,6 +143,9 @@ export function InstalledPage() {
       <div className="mb-5">
         <OriginFilter value={origin} onChange={setOriginFilter} counts={originCounts} />
       </div>
+
+      {/* Správce nevrátil seznam – jeho aplikace chybí, i když nainstalované jsou */}
+      {!isLoading && <ListFailurePanel onRetry={() => void refetch()} retrying={isFetching} />}
 
       {/* Aktualizace odložené kvůli právům správce – jedním potvrzením UAC */}
       {filter === "updates" && <AdminPendingPanel />}

@@ -1193,6 +1193,8 @@
     "thanks": "感谢你的评分！",
     "titleRatings": "评分",
     "noRatings": "还没有评分——来做第一个吧！",
+    "loadFailed": "暂时无法加载评分。请检查网络连接。",
+    "retry": "重试",
     "yourRating": "你的评分：",
     "failed": "无法保存你的评分，请重试。",
     "cardTitle": "平均评分 {{average}}/5（{{formatted}} 个评分）",
@@ -1247,6 +1249,7 @@
     "reportThanks": "谢谢，该截图已被举报。被举报三次后会隐藏。",
     "reportFailed": "无法举报该截图，请重试。",
     "empty": "还没有截图。添加一张应用的最新截图来帮助他人吧。",
+    "loadFailed": "暂时无法加载截图。请检查网络连接。",
     "sample": "示例——截图不会保存到任何地方"
   },
   "github": {
@@ -1508,7 +1511,10 @@
     "refresh": "刷新",
     "empty": "没有已安装的软件包。",
     "noUpdates": "一切都是最新的。🎉",
-    "filterPlaceholder": "筛选…"
+    "filterPlaceholder": "筛选…",
+    "incompleteTitle": "列表不完整",
+    "incompleteText": "无法加载以下来源的列表：{{names}}。其应用虽已安装，但此处未显示。",
+    "incompleteRetry": "重试"
   },
   "view": {
     "grid": "网格",

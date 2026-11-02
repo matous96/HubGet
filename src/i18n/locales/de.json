@@ -1193,6 +1193,8 @@
     "thanks": "Danke für Ihre Bewertung!",
     "titleRatings": "Bewertungen",
     "noRatings": "Noch keine Bewertungen – seien Sie die erste Person!",
+    "loadFailed": "Bewertungen konnten gerade nicht geladen werden. Prüfen Sie Ihre Internetverbindung.",
+    "retry": "Erneut versuchen",
     "yourRating": "Ihre Bewertung:",
     "failed": "Ihre Bewertung konnte nicht gespeichert werden. Bitte versuchen Sie es erneut.",
     "cardTitle": "Durchschnittliche Bewertung {{average}} von 5 ({{formatted}} Bewertungen)",
@@ -1247,6 +1249,7 @@
     "reportThanks": "Danke, der Screenshot wurde gemeldet. Nach drei Meldungen wird er ausgeblendet.",
     "reportFailed": "Der Screenshot konnte nicht gemeldet werden. Bitte versuchen Sie es erneut.",
     "empty": "Noch keine Screenshots. Helfen Sie anderen mit einem aktuellen Screenshot der App.",
+    "loadFailed": "Screenshots konnten gerade nicht geladen werden. Prüfen Sie Ihre Internetverbindung.",
     "sample": "Beispiel – Screenshots werden nirgends gespeichert"
   },
   "github": {
@@ -1508,7 +1511,10 @@
     "refresh": "Neu laden",
     "empty": "Keine installierten Pakete.",
     "noUpdates": "Alles ist aktuell. 🎉",
-    "filterPlaceholder": "Filtern…"
+    "filterPlaceholder": "Filtern…",
+    "incompleteTitle": "Die Liste ist unvollständig",
+    "incompleteText": "Die Liste konnte nicht geladen werden von: {{names}}. Deren Apps fehlen hier, obwohl sie installiert sind.",
+    "incompleteRetry": "Erneut versuchen"
   },
   "view": {
     "grid": "Raster",

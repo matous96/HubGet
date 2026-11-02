@@ -25,20 +25,44 @@ function trimmed(sizes: Record<string, number>): Record<string, number> {
 const TIMEOUT = 10_000;
 
 interface IconQualityState {
-  /** Adresa ikony z katalogu → kratší strana v px (0 = nejde načíst). */
+  /** Adresa ikony z katalogu → kratší strana v px (ukládá se natrvalo). */
   sizes: Record<string, number>;
+  /**
+   * Ikony, které se v tomto spuštění nenačetly – jen do zavření aplikace. Bez internetu
+   * nebo při výpadku serveru by trvale zapsaná nula ikonu vyřadila (sekce Dnes) i potom,
+   * co se síť vrátí.
+   */
+  failed: Record<string, true>;
   put: (url: string, size: number) => void;
+  fail: (url: string) => void;
 }
 
 export const useIconQuality = create<IconQualityState>()(
   persist(
     (set, get) => ({
       sizes: {},
+      failed: {},
       put: (url, size) => set({ sizes: trimmed({ ...get().sizes, [url]: size }) }),
+      fail: (url) => set({ failed: { ...get().failed, [url]: true } }),
     }),
-    { name: "unibox-icon-quality" },
+    {
+      name: "unibox-icon-quality",
+      partialize: (state) => ({ sizes: state.sizes }),
+      // Verze 1: neúspěchy se neukládají – dřívější nuly (i z výpadku sítě) dostanou novou šanci
+      version: 1,
+      migrate: (stored) => {
+        const sizes = (stored as { sizes?: Record<string, number> } | undefined)?.sizes ?? {};
+        return { sizes: Object.fromEntries(Object.entries(sizes).filter(([, size]) => size > 0)) } as IconQualityState;
+      },
+    },
   ),
 );
+
+/** Rozlišení ikon pro výběr: změřená + v tomto spuštění nenačtené jako 0 (malá ikona). */
+export function knownIconSizes(state: Pick<IconQualityState, "sizes" | "failed"> = useIconQuality.getState()): Record<string, number> {
+  const failed = Object.keys(state.failed);
+  return failed.length ? { ...Object.fromEntries(failed.map((url) => [url, 0])), ...state.sizes } : state.sizes;
+}
 
 const isSvg = (url: string) => /\.svgz?($|[?#])/i.test(url);
 const pending = new Map<string, Promise<number | undefined>>();
@@ -69,12 +93,13 @@ export function recordIconSize(url: string, img: HTMLImageElement) {
 }
 
 /**
- * Změří ikonu (výsledek uloží). Vrací kratší stranu v px, 0 = nenačetla se,
- * undefined = nestihla se načíst (zkusí se příště).
+ * Změří ikonu (výsledek uloží). Vrací kratší stranu v px, 0 = nenačetla se
+ * (pamatuje se jen do zavření aplikace), undefined = nestihla se načíst.
  */
 export function measureIcon(url: string): Promise<number | undefined> {
   const known = useIconQuality.getState().sizes[url];
   if (known !== undefined) return Promise.resolve(known);
+  if (useIconQuality.getState().failed[url]) return Promise.resolve(0);
   if (isSvg(url)) {
     useIconQuality.getState().put(url, VECTOR_ICON);
     return Promise.resolve(VECTOR_ICON);
@@ -95,7 +120,8 @@ export function measureIcon(url: string): Promise<number | undefined> {
       img.src = remoteIconSrc(url);
     }).then((size) => {
       pending.delete(url);
-      if (size !== undefined) useIconQuality.getState().put(url, size);
+      if (size === 0) useIconQuality.getState().fail(url);
+      else if (size !== undefined) useIconQuality.getState().put(url, size);
       return size;
     });
     pending.set(url, request);

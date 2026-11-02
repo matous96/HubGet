@@ -1211,6 +1211,8 @@
     "thanks": "Merci pour votre note !",
     "titleRatings": "Notes",
     "noRatings": "Aucune note pour l’instant – soyez le premier !",
+    "loadFailed": "Impossible de charger les évaluations pour le moment. Vérifiez votre connexion Internet.",
+    "retry": "Réessayer",
     "yourRating": "Votre note :",
     "failed": "Impossible d’enregistrer votre note. Veuillez réessayer.",
     "cardTitle": "Note moyenne {{average}} sur 5 ({{formatted}} notes)",
@@ -1266,6 +1268,7 @@
     "reportThanks": "Merci, la capture a été signalée. Elle est masquée après trois signalements.",
     "reportFailed": "Impossible de signaler la capture. Veuillez réessayer.",
     "empty": "Aucune capture pour l’instant. Aidez les autres en ajoutant une capture récente de l’application.",
+    "loadFailed": "Impossible de charger les captures d’écran pour le moment. Vérifiez votre connexion Internet.",
     "sample": "Exemple – les captures ne sont enregistrées nulle part"
   },
   "github": {
@@ -1538,7 +1541,10 @@
     "refresh": "Actualiser",
     "empty": "Aucun paquet installé.",
     "noUpdates": "Tout est à jour. 🎉",
-    "filterPlaceholder": "Filtrer…"
+    "filterPlaceholder": "Filtrer…",
+    "incompleteTitle": "La liste est incomplète",
+    "incompleteText": "Impossible de charger la liste de : {{names}}. Leurs applications manquent ici alors qu’elles sont installées.",
+    "incompleteRetry": "Réessayer"
   },
   "view": {
     "grid": "Grille",

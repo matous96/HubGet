@@ -118,6 +118,7 @@ export function AppScreenshots({ entry }: { entry: CatalogEntry }) {
           )
         }
         empty={<p className="rounded-2xl border border-dashed border-line px-5 py-8 text-center text-sm text-muted">{t("appScreenshots.empty")}</p>}
+        unavailable={<p className="rounded-2xl border border-dashed border-line px-5 py-8 text-center text-sm text-muted">{t("appScreenshots.loadFailed")}</p>}
       />
       {enabled && (
         <AddScreenshotsDialog

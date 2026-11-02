@@ -1211,6 +1211,8 @@
     "thanks": "Obrigado pela sua nota!",
     "titleRatings": "Notas",
     "noRatings": "Ainda não há notas – dê a primeira!",
+    "loadFailed": "Não foi possível carregar as avaliações agora. Verifique sua conexão com a internet.",
+    "retry": "Tentar novamente",
     "yourRating": "Sua nota:",
     "failed": "Não foi possível salvar sua nota. Tente novamente.",
     "cardTitle": "Nota média {{average}} de 5 ({{formatted}} notas)",
@@ -1266,6 +1268,7 @@
     "reportThanks": "Obrigado, a captura foi denunciada. Ela fica oculta após três denúncias.",
     "reportFailed": "Não foi possível denunciar a captura. Tente novamente.",
     "empty": "Ainda não há capturas. Ajude os outros adicionando uma captura atual do aplicativo.",
+    "loadFailed": "Não foi possível carregar as capturas de tela agora. Verifique sua conexão com a internet.",
     "sample": "Exemplo – as capturas não são salvas em lugar nenhum"
   },
   "github": {
@@ -1538,7 +1541,10 @@
     "refresh": "Recarregar",
     "empty": "Nenhum pacote instalado.",
     "noUpdates": "Tudo está atualizado. 🎉",
-    "filterPlaceholder": "Filtrar…"
+    "filterPlaceholder": "Filtrar…",
+    "incompleteTitle": "A lista está incompleta",
+    "incompleteText": "Não foi possível carregar a lista de: {{names}}. Os apps deles não aparecem aqui, embora estejam instalados.",
+    "incompleteRetry": "Tentar novamente"
   },
   "view": {
     "grid": "Grade",

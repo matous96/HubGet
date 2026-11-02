@@ -1193,6 +1193,8 @@
     "thanks": "Thanks for your rating!",
     "titleRatings": "Ratings",
     "noRatings": "No ratings yet – be the first!",
+    "loadFailed": "Ratings couldn’t be loaded right now. Check your internet connection.",
+    "retry": "Try again",
     "yourRating": "Your rating:",
     "failed": "Couldn't save your rating. Please try again.",
     "cardTitle": "Average rating {{average}} out of 5 ({{formatted}} ratings)",
@@ -1247,6 +1249,7 @@
     "reportThanks": "Thanks, the screenshot has been reported. It's hidden after three reports.",
     "reportFailed": "Couldn't report the screenshot. Please try again.",
     "empty": "No screenshots yet. Help others by adding a current screenshot of the app.",
+    "loadFailed": "Screenshots couldn’t be loaded right now. Check your internet connection.",
     "sample": "Sample – screenshots aren't saved anywhere"
   },
   "github": {
@@ -1508,7 +1511,10 @@
     "refresh": "Refresh",
     "empty": "No installed packages.",
     "noUpdates": "Everything is up to date. 🎉",
-    "filterPlaceholder": "Filter…"
+    "filterPlaceholder": "Filter…",
+    "incompleteTitle": "The list is incomplete",
+    "incompleteText": "Couldn’t load the list from: {{names}}. Their apps are missing here even though they’re installed.",
+    "incompleteRetry": "Try again"
   },
   "view": {
     "grid": "Grid",

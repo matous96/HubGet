@@ -18,7 +18,7 @@ import { isDevOnly, useCatalog, useCatalogIndex, useModeFilter } from "@/hooks/u
 import { NO_SHIFT, todayPicks, type TodayShift } from "@/lib/today";
 import { trendingScore } from "@/lib/trending";
 import { cn, topN } from "@/lib/utils";
-import { measureIcon, useIconQuality } from "@/store/iconQuality";
+import { knownIconSizes, measureIcon, useIconQuality } from "@/store/iconQuality";
 import { useSettings } from "@/store/settings";
 import { isFirstDay, useTodayPager, useTodayShift, type TodaySlot } from "@/store/todayPager";
 import type { CatalogEntry } from "@/types";
@@ -47,7 +47,9 @@ export function HomePage() {
 
   // Dnešní výběr: ručně psané příběhy a kolekce i známé aplikace z celého katalogu (lib/today.ts),
   // automaticky vybrané jen s ikonou ve vysokém rozlišení (store/iconQuality.ts)
-  const liveSizes = useIconQuality((s) => s.sizes);
+  const measured = useIconQuality((s) => s.sizes);
+  const failedIcons = useIconQuality((s) => s.failed);
+  const liveSizes = useMemo(() => knownIconSizes({ sizes: measured, failed: failedIcons }), [measured, failedIcons]);
   // Po zobrazení karet se výběr řídí rozlišeními známými v tu chvíli – pozdější měření
   // (karty se zobrazenými ikonami, na novém počítači desítky za sekundu) zobrazené karty nevymění
   const [frozenSizes, setFrozenSizes] = useState<Record<string, number> | null>(null);
@@ -59,7 +61,7 @@ export function HomePage() {
   const [shownShift, setShownShift] = useState(shift);
   if (shownShift !== shift) {
     setShownShift(shift);
-    if (frozenSizes) setFrozenSizes(useIconQuality.getState().sizes);
+    if (frozenSizes) setFrozenSizes(knownIconSizes());
   }
   // První den po instalaci: ručně psaný obsah s přibalenými ikonami – ukáže se hned (lib/today.ts)
   const [firstRun] = useState(isFirstDay);
@@ -93,7 +95,7 @@ export function HomePage() {
   const settled = today.unsettled.length === 0;
   const holdToday = !frozenSizes && !settled && !waited;
   useEffect(() => {
-    if (catalogReady && !frozenSizes && (settled || waited)) setFrozenSizes(useIconQuality.getState().sizes);
+    if (catalogReady && !frozenSizes && (settled || waited)) setFrozenSizes(knownIconSizes());
   }, [catalogReady, frozenSizes, settled, waited]);
 
   // Měření ikon: ikony se stahují nejvýš po několika (icons.rs), proto nejdřív jen zobrazované

@@ -1229,6 +1229,8 @@
     "thanks": "Děkujeme za hodnocení!",
     "titleRatings": "Hodnocení",
     "noRatings": "Zatím bez hodnocení – buďte první!",
+    "loadFailed": "Hodnocení se teď nepodařilo načíst. Zkontrolujte připojení k internetu.",
+    "retry": "Zkusit znovu",
     "yourRating": "Vaše hodnocení:",
     "failed": "Hodnocení se nepodařilo uložit. Zkuste to znovu.",
     "cardTitle": "Průměrné hodnocení {{average}} z 5 ({{formatted}} hodnocení)",
@@ -1285,6 +1287,7 @@
     "reportThanks": "Díky, snímek je nahlášený. Po třech nahlášeních se skryje.",
     "reportFailed": "Snímek se nepodařilo nahlásit. Zkuste to znovu.",
     "empty": "Zatím tu nejsou žádné snímky. Pomozte ostatním a přidejte aktuální snímek aplikace.",
+    "loadFailed": "Snímky se teď nepodařilo načíst. Zkontrolujte připojení k internetu.",
     "sample": "Ukázka – snímky se nikam neukládají"
   },
   "github": {
@@ -1568,7 +1571,10 @@
     "refresh": "Obnovit",
     "empty": "Žádné nainstalované balíčky.",
     "noUpdates": "Vše je aktuální. 🎉",
-    "filterPlaceholder": "Filtrovat…"
+    "filterPlaceholder": "Filtrovat…",
+    "incompleteTitle": "Seznam není úplný",
+    "incompleteText": "Nepodařilo se načíst seznam od: {{names}}. Jejich aplikace tu chybí, i když v počítači jsou.",
+    "incompleteRetry": "Zkusit znovu"
   },
   "view": {
     "grid": "Mřížka",

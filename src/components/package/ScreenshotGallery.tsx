@@ -30,6 +30,8 @@ interface ScreenshotGalleryProps {
   action?: ReactNode;
   /** Obsah místo galerie, když snímky nejsou (zobrazí se jen s `action`). */
   empty?: ReactNode;
+  /** Obsah místo galerie, když snímky jsou, ale žádný se nenačetl (bez internetu) – ne „žádné snímky“. */
+  unavailable?: ReactNode;
 }
 
 /** Popisky zdrojů snímků (vlastní názvy, nepřekládají se). */
@@ -42,7 +44,7 @@ const SOURCE_LABEL: Record<ScreenshotSource, string> = { unigetui: "UniGetUI", c
  * v jednotném rámu, za nimi rozmazaná kopie. Obrázky, které se nepodaří
  * načíst, se z galerie tiše vyřadí.
  */
-export function ScreenshotGallery({ items, name, sources, action, empty }: ScreenshotGalleryProps) {
+export function ScreenshotGallery({ items, name, sources, action, empty, unavailable }: ScreenshotGalleryProps) {
   const { t } = useTranslation();
   const [failed, setFailed] = useState<Set<string>>(new Set());
   const [loaded, setLoaded] = useState<Set<string>>(new Set());
@@ -128,7 +130,7 @@ export function ScreenshotGallery({ items, name, sources, action, empty }: Scree
       </div>
 
       {count === 0 ? (
-        empty
+        items.length > 0 ? (unavailable ?? empty) : empty
       ) : (
         <>
           <div className="group/gallery relative">

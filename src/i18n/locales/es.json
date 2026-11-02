@@ -1211,6 +1211,8 @@
     "thanks": "¡Gracias por tu valoración!",
     "titleRatings": "Valoraciones",
     "noRatings": "Aún no hay valoraciones. ¡Anímate a valorar!",
+    "loadFailed": "No se pudieron cargar las valoraciones. Comprueba tu conexión a internet.",
+    "retry": "Reintentar",
     "yourRating": "Tu valoración:",
     "failed": "No se pudo guardar tu valoración. Inténtalo de nuevo.",
     "cardTitle": "Valoración media de {{average}} sobre 5 ({{formatted}} valoraciones)",
@@ -1266,6 +1268,7 @@
     "reportThanks": "Gracias, la captura se ha denunciado. Se oculta tras tres denuncias.",
     "reportFailed": "No se pudo denunciar la captura. Inténtalo de nuevo.",
     "empty": "Aún no hay capturas. Ayuda a los demás añadiendo una captura actual de la aplicación.",
+    "loadFailed": "No se pudieron cargar las capturas de pantalla. Comprueba tu conexión a internet.",
     "sample": "Ejemplo: las capturas no se guardan en ningún sitio"
   },
   "github": {
@@ -1538,7 +1541,10 @@
     "refresh": "Recargar",
     "empty": "No hay paquetes instalados.",
     "noUpdates": "Todo está al día. 🎉",
-    "filterPlaceholder": "Filtrar…"
+    "filterPlaceholder": "Filtrar…",
+    "incompleteTitle": "La lista está incompleta",
+    "incompleteText": "No se pudo cargar la lista de: {{names}}. Sus aplicaciones faltan aquí aunque estén instaladas.",
+    "incompleteRetry": "Reintentar"
   },
   "view": {
     "grid": "Cuadrícula",
