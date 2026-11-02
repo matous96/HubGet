@@ -15,6 +15,8 @@ import { PackageCollection } from "@/components/package/PackageCollection";
 import { CollectionToolbar } from "@/components/ui/CollectionToolbar";
 import { CardSkeletons, ErrorState } from "@/components/ui/States";
 import { isDevOnly, useCatalog, useCatalogIndex, useModeFilter } from "@/hooks/usePackages";
+import { useIconColors } from "@/lib/iconColor";
+import { useIconSourcesOf } from "@/lib/icons";
 import { todayPicks, type TodayShift } from "@/lib/today";
 import { trendingScore } from "@/lib/trending";
 import { cn, topN } from "@/lib/utils";
@@ -26,6 +28,8 @@ import type { CatalogEntry } from "@/types";
 type Tab = "trending" | "popular" | "new" | "updated";
 const TABS: Tab[] = ["trending", "popular", "new", "updated"];
 const TAB_SIZE = 12;
+/** Nejdéle tak dlouho (ms od načtení katalogu) čekají karty sekce Dnes na ikony a barvy. */
+const HOLD_MAX = 5000;
 
 /**
  * Domovská obrazovka: pruh se třemi sliby (bezpečné, jednoduché, vše pod
@@ -45,10 +49,20 @@ export function HomePage() {
 
   // Dnešní výběr: ručně psané příběhy a kolekce i známé aplikace z celého katalogu (lib/today.ts),
   // automaticky vybrané jen s ikonou ve vysokém rozlišení (store/iconQuality.ts)
-  const iconSizes = useIconQuality((s) => s.sizes);
+  const liveSizes = useIconQuality((s) => s.sizes);
+  // Po zobrazení karet se výběr řídí rozlišeními známými v tu chvíli – pozdější měření
+  // (karty se zobrazenými ikonami, na novém počítači desítky za sekundu) zobrazené karty nevymění
+  const [frozenSizes, setFrozenSizes] = useState<Record<string, number> | null>(null);
+  const iconSizes = frozenSizes ?? liveSizes;
   // Listování šipkami na kartách (store/todayPager.ts)
   const shift = useTodayShift();
   const move = useTodayPager((s) => s.move);
+  // Šipka ukáže výběr jiného dne – ten už počítá se vším, co se mezitím změřilo
+  const [shownShift, setShownShift] = useState(shift);
+  if (shownShift !== shift) {
+    setShownShift(shift);
+    if (frozenSizes) setFrozenSizes(useIconQuality.getState().sizes);
+  }
   const { today, neighbours } = useMemo(() => {
     const size = (e: CatalogEntry) => (e.iconUrl ? iconSizes[e.iconUrl] : 0);
     const at = (by: number): TodayShift => ({
@@ -63,8 +77,7 @@ export function HomePage() {
   }, [all, catalogIndex, developer, language, iconSizes, shift]);
   const paging = (slot: TodaySlot) => ({ onPrev: () => move(slot, -1), onNext: () => move(slot, 1) });
 
-  // Ikony dnes vybraných aplikací změřit; do té doby (nejvýš 2 s) místo karet kostry,
-  // ať se neukáže aplikace s rozmazanou ikonou, kterou výběr vzápětí vymění
+  // Ikony dnes vybraných aplikací (i dalších kandidátů) změřit předem
   const unmeasured = today.unmeasured.map((e) => e.iconUrl ?? "").join("\n");
   const upcoming = neighbours.flatMap((n) => n.unmeasured.map((e) => e.iconUrl ?? "")).join("\n");
   useEffect(() => {
@@ -73,12 +86,30 @@ export function HomePage() {
   useEffect(() => {
     for (const url of unmeasured.split("\n").filter(Boolean)) void measureIcon(url);
   }, [unmeasured]);
+
+  // Barvy karet (banner, kolekce, aplikace dne) podle ikon – na prvním spuštění se teprve počítají
+  const shownEntries = useMemo(
+    () => [today.storyEntry, today.appOfDay, ...today.collections.flatMap((c) => c.entries)].filter((e): e is CatalogEntry => !!e),
+    [today],
+  );
+  const shownSources = useIconSourcesOf(shownEntries);
+  const { pending: colorsPending } = useIconColors(shownSources.map((sources, i) => ({ sources, brand: shownEntries[i].brandColor })));
+
+  // Místo karet kostry, dokud nejsou změřené ikony zobrazovaných aplikací a spočítané barvy karet
+  // (na novém počítači se jinak karty v prvních sekundách několikrát vymění a přebarví) – nejvýš
+  // HOLD_MAX od načtení katalogu, pak se ukáže, co je známé. Pak se výběr zamrazí (frozenSizes).
+  const catalogReady = !!data;
   const [waited, setWaited] = useState(false);
   useEffect(() => {
-    const timer = setTimeout(() => setWaited(true), 2000);
+    if (!catalogReady) return;
+    const timer = setTimeout(() => setWaited(true), HOLD_MAX);
     return () => clearTimeout(timer);
-  }, []);
-  const holdToday = !!unmeasured && !waited;
+  }, [catalogReady]);
+  const settled = today.unsettled.length === 0 && !colorsPending;
+  const holdToday = !frozenSizes && !settled && !waited;
+  useEffect(() => {
+    if (catalogReady && !frozenSizes && (settled || waited)) setFrozenSizes(useIconQuality.getState().sizes);
+  }, [catalogReady, frozenSizes, settled, waited]);
 
   // Obsah záložek (běžný uživatel bez balíčků jen pro vývojáře)
   // Jen prvních 12 v jednom průchodu – řazení celého katalogu by u Trendů trvalo desítky ms

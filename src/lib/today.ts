@@ -14,6 +14,9 @@
  *    256 px nebo vektor) – v sekci Dnes jsou ikony velké.
  * Pro daný den je výběr vždy stejný (číslo dne); sousední dny jsou od sebe
  * v seznamu daleko a nic se nezopakuje, dokud se neprojde celý seznam.
+ * Pořadí nezávisí na tom, které ikony už jsou změřené – malá ikona se jen
+ * přeskočí. Jinak by každé nové měření (na novém počítači desítky za sekundu)
+ * přepočítalo celé pořadí a karty by přeskakovaly na úplně jiné aplikace.
  * Šipky na kartách listují výběry dalších / předchozích dní – každá karta zvlášť;
  * aplikace dne je jedna na celý den a nelistuje se.
  */
@@ -37,8 +40,10 @@ export interface TodayPicks {
   storyEntry: CatalogEntry | undefined;
   collections: { story: CollectionStory; entries: CatalogEntry[] }[];
   appOfDay: CatalogEntry | undefined;
-  /** Vybrané aplikace, u kterých ještě není změřené rozlišení ikony. */
+  /** Vybrané aplikace a další kandidáti, u kterých ještě není změřené rozlišení ikony. */
   unmeasured: CatalogEntry[];
+  /** Zobrazované automaticky vybrané aplikace s ještě nezměřenou ikonou – výběr se může posunout. */
+  unsettled: CatalogEntry[];
 }
 
 /** Nejmenší rozlišení ikony (px) pro sekci Dnes – ikony se tu ukazují velké. */
@@ -132,11 +137,21 @@ function spotlight(entry: CatalogEntry, day: number): AppStory {
   };
 }
 
-/** Výběr z kategorie: `round` = kolikrát už kolekce přišla na řadu – pokaždé jiná šestice. */
-function categoryCollection(category: CategoryId, top: CatalogEntry[], round: number): { story: CollectionStory; entries: CatalogEntry[] } {
+/**
+ * Výběr z kategorie: `round` = kolikrát už kolekce přišla na řadu – pokaždé jiná šestice.
+ * Šestice se určí z celého seznamu `top` (nezávisle na měření ikon); aplikace s malou
+ * ikonou nahradí další z kategorie, ostatní zůstanou na místě.
+ */
+function categoryCollection(
+  category: CategoryId,
+  top: CatalogEntry[],
+  round: number,
+  blurry: (e: CatalogEntry) => boolean,
+): { story: CollectionStory; entries: CatalogEntry[] } {
   const chunks = Math.max(1, Math.floor(top.length / CHUNK));
   const start = (round % chunks) * CHUNK;
-  const entries = top.slice(start, start + CHUNK);
+  const rotated = [...top.slice(start), ...top.slice(0, start)];
+  const entries = rotated.filter((e) => !blurry(e)).slice(0, CHUNK);
   const name = i18n.t(`categories.${category}`);
   return {
     story: {
@@ -176,8 +191,6 @@ export function todayPicks(
   const usable = all.filter((e) => showcase(e, developer)).sort(byPopularity);
   const known = usable.slice(0, KNOWN);
   const handwritten = APP_STORIES.filter((s) => index.has(s.appId));
-  // Malé ikony pryč ještě před pořadím – přeskočená by jinak posunula výběr na stejného souseda
-  const sharp = known.filter((e) => !blurry(e));
   // Ostatní (aplikace bez kategorie) jako téma dne nedává smysl. Kategorie s málo známými aplikacemi
   // (malé nové – Finance, Přizpůsobení – nebo katalog, který je ještě nezná) by dala prázdnou kartu,
   // která se skryje – do střídání patří jen ty, ze kterých jde poskládat celý výběr (bez ohledu na
@@ -194,7 +207,7 @@ export function todayPicks(
   const cards = (s: TodayShift) => {
     // Velký příběh: ručně psaný, nebo tip na známou aplikaci
     const storyDay = day + s.story;
-    const spotlightOrder = mod(storyDay, HANDWRITTEN_EVERY) !== 0 ? dailyOrder(sharp, storyDay) : [];
+    const spotlightOrder = mod(storyDay, HANDWRITTEN_EVERY) !== 0 ? dailyOrder(known, storyDay, blurry) : [];
     const story = spotlightOrder[0]
       ? spotlight(spotlightOrder[0], storyDay)
       : (handwritten[mod(Math.floor(storyDay / HANDWRITTEN_EVERY), Math.max(1, handwritten.length))] ?? APP_STORIES[0]);
@@ -205,8 +218,8 @@ export function todayPicks(
       if (!sources.length) return { story: COLLECTIONS[0], entries: [] as CatalogEntry[] };
       const source = sources[mod(position, sources.length)];
       if (source.kind === "fixed") return { story: source.story, entries: resolve(source.story.appIds) };
-      const top = usable.filter((e) => e.categories.includes(source.id) && e.id !== story.appId && !blurry(e)).slice(0, CATEGORY_TOP);
-      return { ...categoryCollection(source.id, top, Math.floor(position / sources.length)), generated: true };
+      const top = usable.filter((e) => e.categories.includes(source.id) && e.id !== story.appId).slice(0, CATEGORY_TOP);
+      return { ...categoryCollection(source.id, top, Math.floor(position / sources.length), blurry), generated: true };
     };
     // Druhá kolekce o půl seznamu dál; když ji listování dovede na stejnou jako první, vezme další
     const first = day + s.collections[0];
@@ -222,26 +235,25 @@ export function todayPicks(
   const unshifted = shift === NO_SHIFT ? { story, collections } : cards(NO_SHIFT);
   const used = new Set([unshifted.story.appId, ...unshifted.collections.flatMap((c) => c.entries.map((e) => e.id))]);
   const appOfDayOrder = dailyOrder(
-    sharp.filter((e) => isVerified(e)),
+    known.filter((e) => isVerified(e)),
     day + 7,
-    (e) => used.has(e.id),
+    (e) => used.has(e.id) || blurry(e),
   );
   const appOfDay = appOfDayOrder[0];
 
-  // Ikony vybrané automaticky, jejichž rozlišení ještě není známé (ručně psané se neměří) – i s dalšími
-  // kandidáty, ať se výběr po jednom měření ustálí
-  const chosen = [
-    ...spotlightOrder.slice(0, LOOKAHEAD),
-    ...appOfDayOrder.slice(0, LOOKAHEAD),
-    ...collections.flatMap((c) => ("generated" in c ? c.entries : [])),
-  ];
-  const unmeasured = [...new Set(chosen.filter((e) => iconSize(e) === undefined))];
+  // Automaticky vybrané aplikace na kartách (ručně psané se neměří)
+  const generated = collections.flatMap((c) => ("generated" in c ? c.entries : []));
+  const shown = [spotlightOrder[0], appOfDay, ...generated].filter((e): e is CatalogEntry => !!e);
+  const notMeasured = (e: CatalogEntry) => iconSize(e) === undefined;
+  // Ke změření i další kandidáti, ať se výběr po jednom měření ustálí
+  const candidates = [...spotlightOrder.slice(0, LOOKAHEAD), ...appOfDayOrder.slice(0, LOOKAHEAD), ...generated];
 
   return {
     story,
     storyEntry: index.get(story.appId),
     collections: collections.map(({ story, entries }) => ({ story, entries })),
     appOfDay,
-    unmeasured,
+    unmeasured: [...new Set(candidates.filter(notMeasured))],
+    unsettled: [...new Set(shown.filter(notMeasured))],
   };
 }
