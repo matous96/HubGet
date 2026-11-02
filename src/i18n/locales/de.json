@@ -1195,6 +1195,28 @@
   "community": {
     "openSource": "Open Source",
     "openSourceTitle": "HubGet ist Open Source – den Code finden Sie auf GitHub",
+    "openSourceInfo": {
+      "lead": "HubGet entsteht offen: Der Quellcode ist öffentlich – jeder kann prüfen, was die App tut, oder bei der Entwicklung helfen.",
+      "github": "Quellcode auf GitHub",
+      "points": {
+        "code": {
+          "title": "Öffentlicher Quellcode",
+          "text": "Der gesamte Code von HubGet liegt auf GitHub. Sie können nachlesen, was die App auf Ihrem PC tut und womit sie sich verbindet."
+        },
+        "free": {
+          "title": "Kostenlos, ohne Werbung",
+          "text": "HubGet kostet nichts – kein Abo, keine Bezahlversion und keine Werbung."
+        },
+        "license": {
+          "title": "MIT-Lizenz",
+          "text": "Sie dürfen den Code frei nutzen, ändern und weitergeben – nur der Hinweis auf die Autoren muss erhalten bleiben."
+        },
+        "contribute": {
+          "title": "Machen Sie mit",
+          "text": "Melden Sie Fehler, schlagen Sie Verbesserungen vor oder helfen Sie bei Übersetzungen – alles auf GitHub."
+        }
+      }
+    },
     "contact": "Schreiben Sie uns",
     "language": "Sprache: {{language}}",
     "translate": "Helfen Sie bei der Übersetzung in weitere Sprachen",

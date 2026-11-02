@@ -16,6 +16,7 @@ import { WhatsNewDialog } from "@/components/layout/WhatsNewDialog";
 import { PackageContextMenuHost } from "@/components/package/InstallMenu";
 import { InstallOptionsDialog } from "@/components/package/InstallOptionsDialog";
 import { ErrorBoundary, PageCrash } from "@/components/ui/ErrorBoundary";
+import { Tooltips } from "@/components/ui/Tooltip";
 import { AppInUseDialog, AppRunningDialog } from "@/components/package/AppInUseDialog";
 import { FallbackOfferDialog } from "@/components/package/FallbackOfferDialog";
 import { LeftoversDialog } from "@/components/package/LeftoversDialog";
@@ -178,13 +179,14 @@ export function Layout() {
 
 /**
  * Dialogy a lišty nad oknem (každý si stav drží ve vlastním store):
- * oznámení v rohu, hromadné akce (useSelection), přihlášení (useAuth), možnosti
+ * oznámení v rohu, bubliny s popisky (title), hromadné akce (useSelection), přihlášení (useAuth), možnosti
  * a ruční instalace s kontextovou nabídkou (useInstallUi), zbytky po odinstalaci
  * (useLeftovers), import profilu, chybějící správce, běžící aplikace, nabídka
  * jiného zdroje, nová verze HubGetu, novinky a úvodní průvodce.
  */
 const OVERLAYS: [string, ComponentType][] = [
   ["Toasts", Toasts],
+  ["Tooltips", Tooltips],
   ["SelectionBar", SelectionBar],
   ["LoginDialog", LoginDialog],
   ["InstallOptionsDialog", InstallOptionsDialog],

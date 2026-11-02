@@ -1,4 +1,4 @@
-import { Heart, Mail } from "lucide-react";
+import { Mail } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link, NavLink, useLocation, useSearchParams } from "react-router";
 import { AccountButton } from "@/components/auth/AccountButton";
@@ -7,6 +7,7 @@ import { CONTACT_PATH, GITHUB_URL } from "@/config";
 import { cn } from "@/lib/utils";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { NotificationCenter } from "./NotificationCenter";
+import { OpenSourceBadge } from "./OpenSourceBadge";
 import { ThemeToggle } from "./ThemeToggle";
 
 /**
@@ -38,17 +39,8 @@ export function CommunityBar() {
         </NavLink>
       </nav>
 
-      {/* Open source */}
-      <a
-        href={GITHUB_URL}
-        target="_blank"
-        rel="noreferrer"
-        title={t("community.openSourceTitle")}
-        className="hidden items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-xs font-semibold text-emerald-600 transition-colors hover:bg-emerald-500/15 lg:inline-flex dark:text-emerald-400"
-      >
-        <Heart className="size-3 fill-current" />
-        {t("community.openSource")}
-      </a>
+      {/* Open source – bublina a okno s podrobnostmi */}
+      <OpenSourceBadge />
 
       <a href={GITHUB_URL} target="_blank" rel="noreferrer" title="GitHub" aria-label="GitHub" className={iconLink}>
         <GitHubIcon className="size-[18px]" />

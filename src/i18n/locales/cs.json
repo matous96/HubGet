@@ -1229,6 +1229,28 @@
   "community": {
     "openSource": "Open source",
     "openSourceTitle": "HubGet je open source – zdrojový kód najdete na GitHubu",
+    "openSourceInfo": {
+      "lead": "HubGet vzniká otevřeně: zdrojový kód je veřejný, takže si kdokoli může ověřit, co aplikace dělá, nebo pomoct s jejím vývojem.",
+      "github": "Zdrojový kód na GitHubu",
+      "points": {
+        "code": {
+          "title": "Veřejný zdrojový kód",
+          "text": "Celý kód HubGetu je na GitHubu. Můžete si přečíst, co aplikace v počítači dělá a kam se připojuje."
+        },
+        "free": {
+          "title": "Zdarma a bez reklam",
+          "text": "HubGet nic nestojí – nemá předplatné, placenou verzi ani reklamy."
+        },
+        "license": {
+          "title": "Licence MIT",
+          "text": "Kód můžete volně používat, upravovat i šířit dál – stačí zachovat informaci o autorech."
+        },
+        "contribute": {
+          "title": "Zapojte se",
+          "text": "Nahlaste chybu, navrhněte vylepšení nebo pomozte s překladem – vše na GitHubu."
+        }
+      }
+    },
     "contact": "Napište nám",
     "language": "Jazyk: {{language}}",
     "translate": "Pomozte s překladem do dalších jazyků",

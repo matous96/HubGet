@@ -1195,6 +1195,28 @@
   "community": {
     "openSource": "开源",
     "openSourceTitle": "HubGet 是开源的——代码在 GitHub 上",
+    "openSourceInfo": {
+      "lead": "HubGet 公开开发：源代码完全公开，任何人都可以查看应用在做什么，或参与开发。",
+      "github": "在 GitHub 上查看源代码",
+      "points": {
+        "code": {
+          "title": "公开的源代码",
+          "text": "HubGet 的全部代码都在 GitHub 上。你可以查看应用在电脑上做了什么、连接了哪些地址。"
+        },
+        "free": {
+          "title": "免费、无广告",
+          "text": "HubGet 完全免费——没有订阅、没有付费版，也没有广告。"
+        },
+        "license": {
+          "title": "MIT 许可证",
+          "text": "你可以自由使用、修改和分发代码，只需保留作者声明。"
+        },
+        "contribute": {
+          "title": "参与进来",
+          "text": "在 GitHub 上报告问题、提出改进建议或帮助翻译。"
+        }
+      }
+    },
     "contact": "联系我们",
     "language": "语言：{{language}}",
     "translate": "帮助翻译成更多语言",

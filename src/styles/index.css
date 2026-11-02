@@ -125,6 +125,25 @@ body,
   animation: icon-placeholder-in 200ms ease 150ms forwards;
 }
 
+/* Bublina s popiskem (components/ui/Tooltip.tsx) – prolne se a přisune k prvku jako HoverHint. */
+@keyframes tooltip-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--tooltip-from, 4px));
+  }
+}
+.tooltip-in {
+  animation: tooltip-in 150ms ease;
+}
+.tooltip-in[data-side="top"] {
+  --tooltip-from: -4px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tooltip-in {
+    animation: none;
+  }
+}
+
 /* Animovaný pruh pro neurčitý průběh (fáze instalace). */
 @keyframes indeterminate {
   0% {

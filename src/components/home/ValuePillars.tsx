@@ -17,6 +17,7 @@ import {
 import { useId, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/Button";
+import { HoverHint } from "@/components/ui/Tooltip";
 import { HubGetLogo } from "@/components/ui/Logo";
 import { Modal } from "@/components/ui/Modal";
 import { cn } from "@/lib/utils";
@@ -115,15 +116,9 @@ export function ValuePillars({ className }: { className?: string }) {
               <Icon className={cn("size-4", tone)} />
               {t(TITLE[id])}
             </button>
-            {/* Bublina po najetí myší (i při přechodu klávesnicí) – s malým zpožděním, ať při přejíždění neproblikává */}
-            <span
-              id={`${tooltipBase}-${id}`}
-              role="tooltip"
-              className="pointer-events-none absolute top-full left-1/2 z-30 mt-2 w-72 -translate-x-1/2 translate-y-1 rounded-xl border border-line bg-surface px-3.5 py-2.5 text-xs leading-relaxed text-muted opacity-0 shadow-card transition duration-150 peer-hover:translate-y-0 peer-hover:opacity-100 peer-hover:delay-300 peer-focus-visible:translate-y-0 peer-focus-visible:opacity-100"
-            >
-              <span className="block text-fg/90">{t(SHORT[id])}</span>
-              <span className="mt-1.5 block text-accent">{t("pillars.hint")}</span>
-            </span>
+            <HoverHint id={`${tooltipBase}-${id}`} hint={t("pillars.hint")}>
+              {t(SHORT[id])}
+            </HoverHint>
           </li>
         ))}
       </ul>

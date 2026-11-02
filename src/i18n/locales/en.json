@@ -1195,6 +1195,28 @@
   "community": {
     "openSource": "Open source",
     "openSourceTitle": "HubGet is open source – find the code on GitHub",
+    "openSourceInfo": {
+      "lead": "HubGet is built in the open: the source code is public, so anyone can check what the app does or help develop it.",
+      "github": "Source code on GitHub",
+      "points": {
+        "code": {
+          "title": "Public source code",
+          "text": "All of HubGet's code is on GitHub. You can read what the app does on your PC and what it connects to."
+        },
+        "free": {
+          "title": "Free, no ads",
+          "text": "HubGet costs nothing – no subscription, no paid edition and no ads."
+        },
+        "license": {
+          "title": "MIT license",
+          "text": "You're free to use, modify and share the code – just keep the authors' notice."
+        },
+        "contribute": {
+          "title": "Get involved",
+          "text": "Report a bug, suggest an improvement or help with translations – all on GitHub."
+        }
+      }
+    },
     "contact": "Write to us",
     "language": "Language: {{language}}",
     "translate": "Help translate into more languages",
