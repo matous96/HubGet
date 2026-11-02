@@ -1,6 +1,6 @@
 [package]
 name = "unibox"
-version = "0.1.21"
+version = "0.1.22"
 description = "HubGet – obchod s aplikacemi pro Windows nad správci balíčků"
 authors = ["HubGet"]
 license = "MIT"

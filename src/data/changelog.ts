@@ -28,6 +28,52 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
   {
+    version: "0.1.22",
+    date: "2026-11-02",
+    highlights: [
+      {
+        cs: "Rychlejší první spuštění: na novém počítači se sekce Dnes ukáže hned i s ikonami a karty v prvních sekundách nepřeskakují.",
+        en: "Faster first launch: on a new PC, the Today section appears right away with its icons, and the cards no longer jump around in the first seconds.",
+      },
+      {
+        cs: "Ikony aplikací se stahují rychleji – až 12 najednou.",
+        en: "App icons download faster – up to 12 at once.",
+      },
+      {
+        cs: "Přepnutí světlého a tmavého motivu jedním plynulým prolnutím celého okna.",
+        en: "Switching between light and dark theme is one smooth cross-fade of the whole window.",
+      },
+      {
+        cs: "Bez internetu detail aplikace řekne, že hodnocení a snímky teď nejde načíst – místo „zatím bez hodnocení“ a „žádné snímky“.",
+        en: "Offline, an app's page now says ratings and screenshots can't be loaded right now – instead of “no ratings yet” and “no screenshots”.",
+      },
+      {
+        cs: "Když některý správce balíčků nevrátí seznam nainstalovaných, stránka Nainstalované na to upozorní a nabídne Zkusit znovu.",
+        en: "When a package manager doesn't return its list of installed apps, the Installed page says so and offers Try again.",
+      },
+      {
+        cs: "Opraveno: ikona, která se při výpadku sítě nenačetla, se už nevyřazuje natrvalo.",
+        en: "Fixed: an icon that failed to load during a network outage is no longer left out for good.",
+      },
+    ],
+    featured: [
+      {
+        title: { cs: "Okamžitý start", en: "Instant first launch" },
+        text: {
+          cs: "Na novém počítači se sekce Dnes ukáže hned i s ikonami – bez čekání na internet.",
+          en: "On a new PC, the Today section appears instantly, icons included – no waiting for the internet.",
+        },
+      },
+      {
+        title: { cs: "Plynulý motiv", en: "Smooth theme switch" },
+        text: {
+          cs: "Světlý a tmavý motiv se přepnou jedním plynulým prolnutím celého okna.",
+          en: "Light and dark themes switch with one smooth cross-fade of the whole window.",
+        },
+      },
+    ],
+  },
+  {
     version: "0.1.21",
     date: "2026-11-01",
     highlights: [
