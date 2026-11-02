@@ -160,6 +160,9 @@
       "system"
     ]
   },
+  "microsoft-teams": {
+    "iconUrl": "https://res-1.cdn.office.net/files/fabric-cdn-prod_20230815.002/assets/brand-icons/product/svg/teams_48x1.svg"
+  },
   "microsoft-windowsterminal": {
     "iconUrl": "https://raw.githubusercontent.com/microsoft/terminal/main/res/terminal/images/Square44x44Logo.targetsize-256.png",
     "categories": [

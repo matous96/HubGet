@@ -331,6 +331,31 @@ const hostOf = (url: string | null | undefined) => {
   }
 };
 
+/**
+ * Ikonu z CDN wingetu (z manifestu, vytaženou z instalátoru) sdílí tolik aplikací
+ * různých vydavatelů → je to výchozí ikona instalátoru, ne aplikace: Microsoft Teams,
+ * Screenpresso, LanguageTool a JASP měly stejnou složku s obláčkem. Sdílené logo
+ * z jiných zdrojů (Node.js, FFmpeg) je v pořádku.
+ */
+const SHARED_WINGET_ICON = 3;
+const WINGET_ICONS = "https://cdn.winget.microsoft.com/icons/";
+
+/** Vydavatel podle id balíčku ve wingetu („Microsoft.Teams“ → microsoft) – názvy vydavatelů se píšou různě. */
+const wingetPublisher = (entry: Pick<CatalogEntry, "publisher" | "sources">) =>
+  (entry.sources.find((s) => s.source === "winget")?.packageId.split(".")[0] ?? entry.publisher).trim().toLowerCase();
+
+/** Ikony z CDN wingetu, které mezi kandidáty mají aplikace aspoň SHARED_WINGET_ICON různých vydavatelů. */
+export function genericWingetIcons(packages: Pick<CatalogEntry, "id" | "publisher" | "sources">[], choices: Map<string, IconChoice>): Set<string> {
+  const publishers = new Map<string, Set<string>>();
+  for (const entry of packages) {
+    for (const url of choices.get(entry.id)?.candidates ?? []) {
+      if (!url.startsWith(WINGET_ICONS)) continue;
+      publishers.set(url, (publishers.get(url) ?? new Set()).add(wingetPublisher(entry)));
+    }
+  }
+  return new Set([...publishers].filter(([, set]) => set.size >= SHARED_WINGET_ICON).map(([url]) => url));
+}
+
 export interface IconChoice {
   /** Kandidáti ze zdrojů (manifest wingetu, UniGetUI, Chocolatey). */
   candidates: string[];
@@ -344,6 +369,11 @@ export interface IconChoice {
  * prázdné a aplikace ukáže avatar s iniciálami (nebo ikonu nainstalovaného programu).
  */
 export async function chooseSharpIcons(packages: CatalogEntry[], choices: Map<string, IconChoice>) {
+  const generic = genericWingetIcons(packages, choices);
+  if (generic.size) {
+    for (const choice of choices.values()) choice.candidates = choice.candidates.filter((url) => !generic.has(url));
+    log.info(`ikony: ${generic.size} výchozích ikon instalátoru z CDN wingetu (sdílí je ≥ ${SHARED_WINGET_ICON} vydavatelé) vyřazeno`);
+  }
   const sizes = await measureIcons([...choices.values()].flatMap((c) => c.candidates));
   const sharpFromSources = (c: IconChoice) => c.candidates.some((url) => iconPixels(sizes.get(url)) >= SHARP_ICON);
 
