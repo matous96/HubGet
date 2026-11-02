@@ -1,0 +1,30 @@
+{
+  "version": "0.1.0",
+  "date": "2026-10-21",
+  "cs": {
+    "title": "První veřejná preview",
+    "lead": "Jeden obchod pro všechny aplikace ve Windows.",
+    "new": [
+      "Katalog s více než 25 000 aplikacemi z WinGetu, Chocolatey a Scoopu. Aplikace dostupná ve více zdrojích má jednu kartu.",
+      "Domovská stránka Dnes s Aplikací dne, kategorie s filtrem správců balíčků, žebříček nejstahovanějších, kolekce podle zaměření a naposledy zobrazené aplikace.",
+      "Detail aplikace s bannerem, technickými údaji, architekturami a staršími verzemi. U každé aplikace hotové příkazy pro příkazový řádek ke zkopírování.",
+      "WinGet naostro: hledání, instalace, aktualizace, odinstalace a stažení instalátoru. Fronta operací a při nedostatku oprávnění automatické opakování s právy správce.",
+      "Přehled nainstalovaných aplikací včetně programů mimo WinGet, aplikací z Microsoft Storu a her ze Steamu. Tlačítko Aktualizovat vše.",
+      "Sady balíčků (soubor .ubundle a skript PowerShellu), oblíbené, rychlé akce na kartách, historie operací a protokoly.",
+      "Režimy Běžný uživatel a Vývojář, čeština a angličtina, světlý a tmavý motiv."
+    ]
+  },
+  "en": {
+    "title": "First public preview",
+    "lead": "One store for every app on Windows.",
+    "new": [
+      "A catalog of more than 25,000 apps from WinGet, Chocolatey and Scoop. An app available from several sources has a single card.",
+      "A Today home page with App of the Day, categories with a package manager filter, a chart of the most downloaded apps, collections by focus and recently viewed apps.",
+      "App pages with a banner, technical details, architectures and older versions. Every app comes with copy-ready command-line commands.",
+      "WinGet for real: search, install, update, uninstall and installer download. An operation queue and, when permissions are missing, an automatic retry as administrator.",
+      "An overview of installed apps, including programs outside WinGet, Microsoft Store apps and Steam games. An Update all button.",
+      "Package bundles (.ubundle file and PowerShell script), favorites, quick actions on cards, operation history and logs.",
+      "Regular user and Developer modes, Czech and English, light and dark theme."
+    ]
+  }
+}

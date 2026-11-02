@@ -1,0 +1,18 @@
+{
+  "version": "0.1.6",
+  "date": "2026-10-22",
+  "cs": {
+    "title": "Bannery v barvách ikon",
+    "improved": [
+      "Barva banneru v detailu aplikace vychází z ikony, kterou aplikace opravdu zobrazuje. Barva značky se použije jen tehdy, když ji ikona obsahuje.",
+      "Popisky v banneru jsou bílé všude, kde jsou dobře čitelné – tmavé jen na světlých barvách."
+    ]
+  },
+  "en": {
+    "title": "Banners in icon colors",
+    "improved": [
+      "The banner color on the app page is based on the icon the app actually shows. The brand color is used only when the icon contains it.",
+      "Banner labels are white wherever they’re easy to read – dark only on light colors."
+    ]
+  }
+}

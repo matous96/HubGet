@@ -1,0 +1,34 @@
+{
+  "version": "0.1.10",
+  "date": "2026-10-23",
+  "cs": {
+    "title": "Záložní zdroj instalace",
+    "new": [
+      "Když WinGet ohlásí nefunkční odkaz na stažení (chyba 404), HubGet sám zkusí nainstalovat aplikaci přes Chocolatey a potom přes Scoop. Pokud selžou všechny zdroje, srozumitelně vysvětlí, co dělat dál."
+    ],
+    "fixed": [
+      "Velké karty na domovské stránce jsou klikatelné celé, ne jen jejich spodní pruh."
+    ],
+    "highlights": [
+      {
+        "title": "Záložní zdroj instalace",
+        "text": "Když má WinGet nefunkční odkaz na stažení, HubGet sám zkusí Chocolatey nebo Scoop."
+      }
+    ]
+  },
+  "en": {
+    "title": "Fallback install source",
+    "new": [
+      "When WinGet reports a broken download link (error 404), HubGet automatically tries to install the app via Chocolatey and then via Scoop. If every source fails, it clearly explains what to do next."
+    ],
+    "fixed": [
+      "Large cards on the home page are clickable as a whole, not just their bottom strip."
+    ],
+    "highlights": [
+      {
+        "title": "Fallback install source",
+        "text": "When WinGet has a broken download link, HubGet automatically tries Chocolatey or Scoop."
+      }
+    ]
+  }
+}

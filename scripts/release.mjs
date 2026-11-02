@@ -5,7 +5,8 @@
 //     a – je-li v prostředí certifikát – s digitálním podpisem kódu
 //     (Authenticode, scripts/sign.mjs: unibox.exe, instalátor NSIS i MSI),
 //  3. aktualizuje domovskou stránku webu – verzi, velikost instalátorů a sekci
-//     „To nejlepší z verze“ z src/data/changelog.ts (scripts/website-release.mjs),
+//     „To nejlepší z verze“ z src/data/changelog.ts (scripts/website-release.mjs) –
+//     a Novinky s Co chystáme z website/content/ (scripts/website-content.mjs),
 //  4. vytvoří latest.json – soubor, podle kterého nainstalované HubGet
 //     poznají novou verzi. Nahrajte ho spolu s instalátorem do GitHub Release
 //     se značkou v<verze> (viz README.cs.md → Aktualizace HubGetu).
@@ -21,6 +22,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describeIdentity, signingIdentity } from "./sign.mjs";
 import { writeUpdaterManifest } from "./updater-manifest.mjs";
+import { updateContent } from "./website-content.mjs";
 import { updateWebsite } from "./website-release.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -72,6 +74,10 @@ run(
 const websiteWarnings = await updateWebsite(root, current);
 console.log(`\nWeb: domovská stránka aktualizována na verzi ${current} (website/index.html, website/en/index.html).`);
 for (const warning of websiteWarnings) console.warn(`! ${warning}`);
+const content = updateContent(root);
+console.log(`Web: Novinky (${content.versions.length} verzí) a Co chystáme vygenerované z website/content/.`);
+for (const { file, message } of content.warnings) console.warn(`! ${file}: ${message}`);
+if (!content.versions.includes(current)) console.warn(`! V Novinkách chybí verze ${current} – přidejte ji v Pages CMS (website/content/novinky/).`);
 if (!updater) process.exit(0);
 
 // 4. latest.json pro GitHub Releases

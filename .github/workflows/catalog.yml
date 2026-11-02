@@ -5,6 +5,7 @@
 # Katalog denně vygeneruje data pipeline. Odtud si ho stahují nainstalované HubGet
 # (výchozí VITE_CATALOG_URL v sestavené aplikaci) a přibalí ho workflow Vydání.
 # Změna webu v main se zveřejní hned – s posledním zveřejněným katalogem, bez pipeline.
+# Patří k ní i úpravy Novinek a Co chystáme v Pages CMS (website/content/, .pages.yml).
 #
 # Pages posílá katalog komprimovaný (16 MB → ~3,5 MB) s ETagem, takže opakované
 # stažení beze změny je jen krátká odpověď 304. Mezipaměť pipeline (stažené zdroje,
@@ -27,7 +28,7 @@ on:
   push:
     branches: [main]
     # Změna pipeline (i kódu, který sdílí s aplikací) vygeneruje nový katalog hned – ne až v noci
-    paths: ["website/**", ".github/workflows/catalog.yml", "data-pipeline/**", "src/lib/verified.ts", "src/lib/wingetVariant.ts"]
+    paths: ["website/**", "scripts/website-content.mjs", ".github/workflows/catalog.yml", "data-pipeline/**", "src/lib/verified.ts", "src/lib/wingetVariant.ts"]
 
 permissions:
   contents: read
@@ -136,12 +137,14 @@ jobs:
       - name: Kontrola katalogu
         run: node scripts/check-catalog.mjs data-pipeline/out/catalog.json
 
-      # Web je čisté HTML/CSS/JS s relativními odkazy – zveřejní se tak, jak je v repozitáři
+      # Web je čisté HTML/CSS/JS s relativními odkazy. Novinky a Co chystáme se nejdřív vygenerují
+      # z website/content/ (úpravy z Pages CMS) – vadný záznam se přeskočí s upozorněním u běhu.
       - name: Obsah webu
         run: |
+          node scripts/website-content.mjs
           mkdir -p _site
           cp -R website/. _site/
-          rm -f _site/vite.config.mjs
+          rm -rf _site/vite.config.mjs _site/content
           cp data-pipeline/out/catalog.json _site/catalog.json
           # Zvětšené malé ikony, na které katalog odkazuje (hubget.eu/icons/…)
           if [ -d data-pipeline/out/icons ]; then mkdir -p _site/icons && cp -R data-pipeline/out/icons/. _site/icons/; fi

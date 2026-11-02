@@ -1,0 +1,16 @@
+{
+  "version": "0.1.5",
+  "date": "2026-10-22",
+  "cs": {
+    "title": "Přehlednější detail aplikace",
+    "improved": [
+      "Volby instalace v detailu aplikace jsou schované pod odkazem „Volby instalace“. Změněné volby jsou vidět ve stručném souhrnu."
+    ]
+  },
+  "en": {
+    "title": "A cleaner app page",
+    "improved": [
+      "Install options on the app page are tucked behind an “Install options” link. Changed options appear in a short summary."
+    ]
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "version": "0.1.13",
+  "date": "2026-10-27",
+  "cs": {
+    "title": "Správci pro vývojáře naostro a aktualizace pod kontrolou",
+    "new": [
+      "**npm, Bun, pip, Cargo, vcpkg, .NET Tool, PowerShell 7 i 5.1** – hledání přímo v jejich registrech, instalace, aktualizace i odinstalace knihoven a nástrojů v režimu Vývojář. Dostupné aktualizace globálních balíčků najdete mezi ostatními aktualizacemi.",
+      "**Nástroje jedním kliknutím** – chybí Node.js, Python, Rust, .NET SDK nebo PowerShell 7? HubGet je nainstaluje přes WinGet. U vcpkg ukáže stručný návod.",
+      "**Filtr i pro vývojáře** – klik na npm, pip, Cargo… v levém panelu ukáže přehled správce: nainstalované balíčky, hledání jen v jeho registru a oblíbené nástroje.",
+      "**Plánované aktualizace** – kontrola v intervalu od 30 minut po týden, nebo každý den či ve vybrané dny v zadaný čas. Automatická instalace může mít vlastní plán a zmeškaný termín se dožene se zpožděním, hned po spuštění, nebo se přeskočí.",
+      "**Minimální stáří aktualizací** – nová verze se nabídne až po zadaném počtu dní od vydání, celkově i zvlášť pro jednotlivé správce.",
+      "**Uložené volby i pro aktualizace** – jako správce, interaktivně, architektura, složka, parametry a příkazy platí i při aktualizaci. Nově i odinstalace předchozí verze a vlastní parametry jen pro aktualizace."
+    ],
+    "improved": [
+      "Automatická instalace aktualizací počká i při zapnuté úspoře baterie. Odložené aktualizace HubGet oznámí a zkusí je nainstalovat znovu za čtvrt hodiny.",
+      "Aktualizace, která se po několika pokusech neprojeví (správce ji nabízí dál), se přestane nabízet. V detailu aplikace ji jde nabídnout znovu.",
+      "**Úvodní průvodce** – při prvním spuštění vás HubGet v pěti krocích provede katalogem, filtrem zdrojů, pokročilou odinstalací, správou Po spuštění a zálohami. Přeskočit jde kdykoli, znovu ho spustíte v Nastavení → Obecné.",
+      "**Dostupné aktualizace i u Chocolatey** – v přehledu aktualizací, v počtech i v hromadné a automatické aktualizaci. Dotaz na repozitář běží na pozadí a seznam aplikací nezdržuje.",
+      "**Varování při změně serveru instalátoru** – když se instalátor nové verze z WinGetu stahuje odjinud než u nainstalované verze, aktualizace se označí oranžově, detail ukáže obě adresy a automatická aktualizace ji vynechá.",
+      "V Nastavení → Předvolby oznámení vypnete oznámení o aktualizacích od vybraných správců.",
+      "Seznam aktualizací může mít všechny aktualizace předem zaškrtnuté.",
+      "Sekce Dnes vybírá ze stovek známých aplikací celého katalogu – tipy dne, výběry z kategorií a aplikace dne se už neopakují po pár dnech. Aplikace dne je vždy ověřená a zůstává celý den stejná, ukazují se jen aplikace s ostrou ikonou. Šipkami na ostatních kartách listujete dalšími výběry.",
+      "Stabilnější a plynulejší: chyba na jedné stránce už neshodí celé okno (stačí „Zkusit znovu“), selhání správce balíčků HubGet oznámí místo tichého vynechání a scrollování seznamů běží bez zasekávání.",
+      "Balíčky správců pro vývojáře se zjišťují jen v režimu Vývojář – v režimu Běžný uživatel zůstává přehled rychlý a bez knihoven.",
+      "V Nastavení → Správci balíčků přepnete na režim Vývojář jedním tlačítkem.",
+      "Hledání z odkazu (třeba štítek v detailu aplikace) vyplní i pole vyhledávání nahoře."
+    ],
+    "highlights": [
+      {
+        "title": "Správci pro vývojáře naostro",
+        "text": "npm, Bun, pip, Cargo, vcpkg, .NET Tool a PowerShell – hledání, instalace, aktualizace i odinstalace. Chybějící Node.js, Python nebo Rust doinstaluje jedním kliknutím."
+      },
+      {
+        "title": "Aktualizace pod kontrolou",
+        "text": "Kontrola i instalace v daný čas a dny, minimální stáří aktualizací, výjimky pro baterii a měřené připojení a uložené volby i pro aktualizace."
+      }
+    ]
+  },
+  "en": {
+    "title": "Developer package managers for real and updates under control",
+    "new": [
+      "**npm, Bun, pip, Cargo, vcpkg, .NET Tool, PowerShell 7 and 5.1** – search their registries directly, and install, update and uninstall libraries and tools in Developer mode. Available updates for global packages show up with all your other updates.",
+      "**Tools in one click** – missing Node.js, Python, Rust, the .NET SDK or PowerShell 7? HubGet installs them via WinGet. For vcpkg it shows short instructions.",
+      "**A filter for developers too** – click npm, pip, Cargo… in the sidebar to see the manager’s overview: installed packages, search in its registry only and popular tools.",
+      "**Scheduled updates** – checks at an interval from 30 minutes to a week, or every day or on selected days at a set time. Automatic installs can have their own schedule, and a missed time is caught up with a delay, right after start, or skipped.",
+      "**Minimum age for updates** – a new version is offered only after the set number of days since its release, globally or per package manager.",
+      "**Saved options for updates too** – as administrator, interactive, architecture, folder, arguments and commands apply when updating. New: uninstall the previous version and custom arguments just for updates."
+    ],
+    "improved": [
+      "Automatic update installs also wait while battery saver is on. HubGet reports postponed updates and tries to install them again in 15 minutes.",
+      "An update that doesn’t apply after several attempts (the manager keeps offering it) stops being offered. You can offer it again on the app page.",
+      "**Welcome tour** – on the first launch, HubGet walks you through the catalog, the source filter, advanced uninstall, startup apps and backups in five steps. Skip it any time and replay it in Settings → General.",
+      "**Available updates for Chocolatey too** – in the update list, the counts, and bulk and automatic updates. The repository check runs in the background and doesn’t slow down the app list.",
+      "**A warning when the installer host changes** – when the new version’s installer from WinGet is downloaded from a different place than the installed version’s, the update is marked orange, the app page shows both addresses and automatic updates skip it.",
+      "In Settings → Notification preferences, turn off update notifications from selected package managers.",
+      "The update list can have all updates checked by default.",
+      "The Today section picks from hundreds of well-known apps across the catalog – daily tips, category picks and the app of the day no longer repeat after a few days. The app of the day is always verified and stays the same all day, and only apps with a sharp icon are shown. Browse more picks with the arrows on the other cards.",
+      "More stable and smoother: an error on one page no longer takes down the whole window (just “Try again”), HubGet reports when a package manager fails instead of silently leaving it out, and lists scroll without stutter.",
+      "Developer packages are checked only in Developer mode – Regular user mode stays fast and free of libraries.",
+      "Switch to Developer mode with one button in Settings → Package managers.",
+      "Searching from a link (such as a tag on an app page) fills in the search box at the top too."
+    ],
+    "highlights": [
+      {
+        "title": "Developer package managers for real",
+        "text": "npm, Bun, pip, Cargo, vcpkg, .NET Tool and PowerShell – search, install, update and uninstall. Installs a missing Node.js, Python or Rust in one click."
+      },
+      {
+        "title": "Updates under control",
+        "text": "Checks and installs at a set time and days, a minimum age for updates, battery and metered-connection exceptions, and saved options for updates too."
+      }
+    ]
+  }
+}

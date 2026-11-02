@@ -1,0 +1,60 @@
+{
+  "version": "0.1.20",
+  "date": "2026-11-01",
+  "cs": {
+    "title": "Nové kategorie a aplikace z webu výrobce",
+    "new": [
+      "**Nové kategorie** – Umělá inteligence, Hudba a zvuk, Vzdělávání a věda, Finance, Cloud a úložiště, Internet a síť a Přizpůsobení. Kategorie Ostatní sdruží, co jinam nepatří, a kategorie bez aplikací se neukazují.",
+      "**Aplikace z webu výrobce** – DaVinci Resolve, VMware Workstation Pro, Cisco Packet Tracer, Houdini, LabVIEW, Blackmagic Desktop Video a ATEM Software Control. Výrobce je dává jen na svém webu, takže je HubGet neinstaluje: tlačítko Stáhnout z webu otevře oficiální stránku. Nainstalovanou aplikaci HubGet pozná a otevře.",
+      "**Otevřít u všech aplikací** – i u programů mimo správce balíčků. Když program spustit nejde, otevře se aspoň jeho složka.",
+      "**Kontaktní formulář** – v Nastavení → Kontakt a pod ikonou obálky v horní liště. Pošlete dotaz, nápad nebo chybu i se snímky obrazovky.",
+      "**Řazení podle instalace** – Nainstalované jde seřadit podle toho, co jste nainstalovali naposledy."
+    ],
+    "improved": [
+      "Aplikace jsou v kategoriích zařazené mnohem přesněji – HubGet čte popisy a štítky všech aplikací z WinGetu. Hudební přehrávače a editory najdete v Hudbě a zvuku.",
+      "Přenosné aplikace na ploše (Tor Browser) HubGet pozná, aktualizuje i odinstaluje – složka putuje do Koše.",
+      "Aplikace bez ikony mají dlaždici v barvě kategorie s jejím symbolem.",
+      "Když v logu aplikace převládá tmavá barva, banner ji převezme.",
+      "Seznam nainstalovaných modulů PowerShellu se načte rychleji.",
+      "Odkazy na fórum nahradil kontaktní formulář."
+    ],
+    "fixed": [
+      "Tor Browser po instalaci dál nabízel Instalovat.",
+      "Hudební aplikace jako Spotify a Audacity byly v kategorii Video."
+    ],
+    "highlights": [
+      {
+        "title": "Nové kategorie a aplikace z webu výrobce",
+        "text": "Sedm nových kategorií s přesnějším zařazením, DaVinci Resolve a další aplikace z webu výrobce a tlačítko Otevřít u všech aplikací."
+      }
+    ]
+  },
+  "en": {
+    "title": "New categories and apps from vendor websites",
+    "new": [
+      "**New categories** – AI, Music & Audio, Education & Science, Finance, Cloud & Storage, Internet & Network, and Personalization. The Other category gathers what fits nowhere else, and categories without apps are hidden.",
+      "**Apps from vendor websites** – DaVinci Resolve, VMware Workstation Pro, Cisco Packet Tracer, Houdini, LabVIEW, Blackmagic Desktop Video and ATEM Software Control. The vendor offers them only on its own website, so HubGet doesn’t install them: Get from website opens the official page. Once the app is installed, HubGet recognizes and opens it.",
+      "**Open for every app** – including programs outside package managers. If a program can’t be started, its folder opens instead.",
+      "**Contact form** – in Settings → Contact and under the envelope icon in the top bar. Send a question, an idea or a bug, screenshots included.",
+      "**Sort by install date** – Installed apps can be sorted by what you installed most recently."
+    ],
+    "improved": [
+      "Apps are sorted into categories far more accurately – HubGet reads the descriptions and tags of every app in WinGet. Music players and editors are in Music & Audio.",
+      "HubGet recognizes, updates and uninstalls portable apps on the desktop (Tor Browser) – the folder goes to the Recycle Bin.",
+      "Apps without an icon get a tile in their category’s color with its symbol.",
+      "When a dark color dominates an app’s logo, the banner uses it.",
+      "The list of installed PowerShell modules loads faster.",
+      "The contact form replaces the forum links."
+    ],
+    "fixed": [
+      "Tor Browser still offered Install after it was installed.",
+      "Music apps such as Spotify and Audacity were in the Video category."
+    ],
+    "highlights": [
+      {
+        "title": "New categories and apps from vendor websites",
+        "text": "Seven new categories with far more accurate sorting, DaVinci Resolve and other apps from vendor websites, and an Open button for every app."
+      }
+    ]
+  }
+}

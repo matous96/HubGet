@@ -1,0 +1,150 @@
+# Pages CMS (https://pagescms.org, open source, zdarma) – Novinky a Co chystáme na webu
+# upravené v prohlížeči. Uložení je commit do main; workflow Katalog z dat ve website/content/
+# vygeneruje stránky (scripts/website-content.mjs) a web zveřejní. Viz README.cs.md → Web.
+#
+# Texty jsou prosté s malým Markdownem: **tučně** a [odkaz](adresa) – adresa „@github“
+# nebo „@releases“ je odkaz na repozitář / všechna vydání. Nezlomitelné mezery za
+# jednopísmennými předložkami a spojkami doplní generátor sám.
+
+settings:
+  commit:
+    templates:
+      create: "Web: přidáno {path} (Pages CMS)"
+      update: "Web: upraveno {path} (Pages CMS)"
+      delete: "Web: smazáno {path} (Pages CMS)"
+      rename: "Web: přejmenováno {oldPath} → {newPath} (Pages CMS)"
+
+components:
+  # Text vydání v jednom jazyce
+  release-text:
+    type: object
+    fields:
+      - name: title
+        label: Nadpis
+        type: string
+        required: true
+      - name: lead
+        label: Úvodní věta
+        type: text
+        description: Nepovinné – krátká věta pod nadpisem.
+      - name: new
+        label: Nové
+        type: text
+        list: true
+        description: "Jeden bod seznamu na položku. **tučně**, [odkaz](adresa)."
+      - name: improved
+        label: Vylepšeno
+        type: text
+        list: true
+      - name: fixed
+        label: Opraveno
+        type: text
+        list: true
+      - name: highlights
+        label: V kostce
+        description: Největší novinky verze jako karty v přehledu „V kostce“ – většina verzí žádnou nemá.
+        type: object
+        list:
+          collapsible:
+            collapsed: true
+            summary: "{title}"
+        fields:
+          - name: title
+            label: Nadpis
+            type: string
+          - name: text
+            label: Text
+            type: text
+
+  # Plán v jednom jazyce
+  plan-text:
+    type: object
+    fields:
+      - name: title
+        label: Nadpis
+        type: string
+        required: true
+      - name: text
+        label: Popis
+        type: text
+      - name: label
+        label: Štítek stavu
+        type: string
+        description: Například „Funguje od verze 0.1.14“ nebo „Čeká na certifikát“.
+
+content:
+  - name: novinky
+    label: Novinky
+    type: collection
+    path: website/content/novinky
+    format: json
+    filename:
+      template: "{version}.json"
+      field: create
+    view:
+      primary: version
+      fields: [version, date, cs.title]
+      sort: [date, version]
+      default:
+        sort: date
+        order: desc
+    fields:
+      - name: version
+        label: Verze
+        type: string
+        required: true
+        pattern:
+          regex: "^\\d+\\.\\d+\\.\\d+$"
+          message: Číslo verze ve tvaru 0.1.23
+      - name: date
+        label: Datum vydání
+        type: date
+        required: true
+        options:
+          format: yyyy-MM-dd
+      - name: cs
+        label: Česky
+        component: release-text
+      - name: en
+        label: English
+        component: release-text
+
+  - name: co-chystame
+    label: Co chystáme
+    type: file
+    path: website/content/co-chystame.json
+    format: json
+    fields:
+      - name: lead
+        label: Úvod stránky
+        type: object
+        fields:
+          - name: cs
+            label: Česky
+            type: text
+          - name: en
+            label: English
+            type: text
+      - name: items
+        label: Plány
+        type: object
+        list:
+          collapsible:
+            collapsed: true
+            summary: "{fields.cs.title}"
+        fields:
+          - name: status
+            label: Stav
+            type: select
+            options:
+              values:
+                - name: ready
+                  label: Hotovo (zelený štítek)
+                - name: wait
+                  label: Připravujeme / čeká
+          - name: cs
+            label: Česky
+            component: plan-text
+          - name: en
+            label: English
+            component: plan-text

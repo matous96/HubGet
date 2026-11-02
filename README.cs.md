@@ -452,9 +452,39 @@ bere z `featured` nejnovějšího vydání v `src/data/changelog.ts` (nadpis, te
 volitelně odkaz), bez nich z prvních dvou bodů `highlights`. Přepisují se jen oblasti
 mezi značkami `<!--release:klíč-->` … `<!--/release:klíč-->` na domovské stránce
 (`website/index.html`, `website/en/index.html`) a na stránce Správci balíčků
-(`spravci.html`, `en/package-managers.html`); podrobné Novinky (`novinky.html`,
-`en/changelog.html`) se píšou ručně. Před vydáním tedy stačí přidat vydání do
-`changelog.ts`.
+(`spravci.html`, `en/package-managers.html`). Podrobné Novinky a Co chystáme se
+generují z dat ve `website/content/` (viz [Úpravy webu v prohlížeči](#úpravy-webu-v-prohlížeči-pages-cms)).
+Před vydáním tedy stačí přidat vydání do `changelog.ts` (poznámky v aplikaci
+a domovská stránka) a do Novinek v Pages CMS – `pnpm release` upozorní, když
+v Novinkách nová verze chybí.
+
+### Úpravy webu v prohlížeči (Pages CMS)
+
+Novinky (`novinky.html`, `en/changelog.html`) a Co chystáme (`co-chystame.html`,
+`en/roadmap.html`) se upravují ve formuláři v prohlížeči přes
+[Pages CMS](https://pagescms.org) (open source, zdarma) – bez psaní HTML:
+
+1. Na [app.pagescms.org](https://app.pagescms.org) se přihlaste přes GitHub.
+2. Nainstalujte aplikaci Pages CMS na GitHubu jen pro repozitář `matous96/unibox`
+   (Only select repositories).
+3. Otevřete repozitář – v menu jsou **Novinky** (jedna položka na verzi, česky
+   i anglicky) a **Co chystáme**.
+4. Uložení je commit do `main`. Workflow Katalog (běh „Web – aktualizace“) z dat
+   vygeneruje stránky a do pár minut je zveřejní.
+
+Texty jsou prosté s malým Markdownem: `**tučně**` a `[odkaz](adresa)` – adresa
+`@github` nebo `@releases` vede na repozitář / všechna vydání (`LINKS` ve
+`website/main.js`). Nezlomitelné mezery za jednopísmennými předložkami a spojkami
+doplní generátor sám. Karty „V kostce“ jsou u vydání (pole V kostce), čipy verzí,
+aktuální verze a počet aktualizací (číslem i slovy) se spočítají. Chybí-li anglický
+text, anglická stránka ukáže český; vadný záznam se přeskočí s upozorněním u běhu.
+
+Data jsou ve `website/content/` (`novinky/<verze>.json`, `co-chystame.json`),
+formulář popisuje `.pages.yml`. Stránky z nich přepíše `scripts/website-content.mjs`
+(ručně `pnpm website:content`, spouští ho i `pnpm release` a workflow) – jen oblasti
+mezi značkami `<!--obsah:klíč-->` … `<!--/obsah:klíč-->`, zbytek stránek se upravuje
+v HTML. Po úpravě v Pages CMS stáhněte změny (`git pull`), než budete pokračovat
+v práci lokálně.
 
 Web je rozdělený do podstránek podle horní navigace – domovská stránka nese jen úvod,
 novinky, pilíře, rozcestník, „Zdarma“ a stažení:

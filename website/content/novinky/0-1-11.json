@@ -1,0 +1,126 @@
+{
+  "version": "0.1.11",
+  "date": "2026-10-26",
+  "cs": {
+    "title": "Chocolatey a Scoop naostro, režim jednoho zdroje a aktualizace na pozadí",
+    "new": [
+      "**Chocolatey a Scoop naostro** – hledání, instalace, aktualizace i odinstalace přímo v HubGetu. Chybějící správce balíčků nainstaluje jedním kliknutím jeho oficiální instalační skript.",
+      "**Režim jednoho zdroje** – klik na WinGet, Chocolatey nebo Scoop v levém panelu ukáže v celém katalogu jen aplikace z tohoto zdroje a instaluje jen odtud. Lišta nahoře režim ukazuje a jedním klikem ho zruší.",
+      "**Chytrý záložní zdroj** – když instalace selže (nefunkční odkaz, běžící jiná instalace, balíček ve zdroji chybí…), HubGet nabídne stejnou aplikaci z Chocolatey nebo Scoopu. Chybějícího správce nejdřív nabídne nainstalovat.",
+      "**Odkazy unibox://** – kolekce a aplikace z webu se otevřou rovnou v HubGetu s předvyplněným seznamem k instalaci. Instalaci vždy potvrzujete vy.",
+      "U nainstalované aplikace je místo výběru zdroje štítek **Nainstalováno přes** s barvou správce (WinGet, Chocolatey, Scoop). Platí i po restartu.",
+      "**Automatická kontrola aktualizací na pozadí** – každou hodinu, denně nebo týdně, s tlačítkem „Spustit tuto úlohu nyní“. Volitelně i automatická instalace všech nebo jen vybraných aplikací, s ohledem na baterii a měřené připojení.",
+      "**Centrum oznámení** – zvoneček v horní liště s historií událostí a chyb, počtem nových chyb, kopírováním chybových hlášek a vymazáním historie.",
+      "**Předvolby oznámení** – hlavní vypínač, souhrn po dokončení dávky operací, dostupné aktualizace, průběh operací, selhání a úspěch. Když je HubGet na pozadí, dorazí oznámení Windows.",
+      "Sekce **Oprávnění správce a další nebezpečná nastavení** – práva správce pro každou operaci nebo jen jednou, zákaz povýšení, vlastní argumenty příkazového řádku, příkazy před a po instalaci, vlastní cesty ke správcům balíčků a jejich import ze sad. Vše je ve výchozím stavu vypnuté.",
+      "Aktualizace běžící aplikace: HubGet najde její otevřená okna a procesy, nabídne je zavřít a aktualizaci zopakuje.",
+      "Výběr varianty balíčku z WinGetu – jazyka nebo typu instalátoru (například Firefox ve více než 100 jazycích).",
+      "Modrá **fajfka u ověřených aplikací** od známých vydavatelů – v detailu i na kartách.",
+      "**Vlastní barva zvýraznění** – hotové palety nebo libovolný HEX kód.",
+      "**Běžící aplikace už instalaci nezablokuje** – proces na pozadí (třeba OBS u hodin nebo proces visící v paměti) HubGet před instalací, aktualizací či odinstalací sám ukončí. Otevřenou aplikaci nabídne zavřít jedním kliknutím, po odinstalaci ukončí procesy, které z její složky dál běží.",
+      "**Pokročilá odinstalace** (Nastavení, výchozí vypnuto) – po odinstalaci najde zbytky v Program Files, ProgramData, zástupcích v nabídce Start a na ploše i v registru Windows a nabídne je smazat, nebo je smaže automaticky. Soubory jdou do Koše, klíče registru se před smazáním zálohují.",
+      "Okno **Co je nového v HubGetu** – po aktualizaci se jednou ukáže s novinkami všech vydání, která jste přeskočili. Celou historii najdete v nabídce ⋯ → Poznámky k vydání.",
+      "Nová sekce **Po spuštění** – programy, které se spouštějí po přihlášení do Windows, z registru, složky Po spuštění i plánovače úloh na jednom místě. Zapnete je, vypnete (stejně jako ve Správci úloh – položka zůstane v seznamu) nebo trvale odstraníte se zálohou. Vliv na rychlost startu (vysoký, střední, nízký) HubGet přečte z měření Windows, programy, které na disku chybí, označí.",
+      "**Sledování instalace** (Nastavení, nebo pravé tlačítko → Nainstalovat se sledováním) – před instalací a po ní HubGet pořídí snímek disku a registru a zapamatuje si, co instalátor vytvořil. Po odinstalaci to nabídne smazat celé, i bez pokročilé odinstalace.",
+      "**Ignorovat aktualizace** u kterékoli aplikace, nebo je **odložit** o den, týden či měsíc – pak se samy znovu nabídnou. Ignorované a odložené aplikace vynechá i hromadná a automatická aktualizace, přehled se zrušením najdete v Nastavení.",
+      "**Export profilu do HTML** – kromě JSON i přehledná stránka se seznamem aplikací a příkazy pro ruční instalaci, kterou jde zároveň importovat. Profil nese i nastavení aktualizací a po importu chybějící aplikace nainstalujete jedním kliknutím."
+    ],
+    "improved": [
+      "Katalog obsahuje **všech 15 776 balíčků WinGetu** včetně jazykových verzí a typů instalátoru – celkem přes 25 100 aplikací. Počítadlo v horní liště ukazuje přesný počet.",
+      "Přesnější párování stejných aplikací mezi WinGetem, Chocolatey a Scoopem.",
+      "Počet hvězdiček z GitHubu na kartách u více než 4 100 open-source aplikací a správný repozitář i u přesunutých projektů (například OBS Studio).",
+      "Rozhraní využije celou šířku okna – na velkém monitoru přibudou sloupce karet.",
+      "Výraznější ikona u hodin s barevnou tečkou stavu: modrá při práci, červená při chybě, zelená po dokončení.",
+      "Svižnější přepínání stránek – jen krátké prolnutí místo posunu.",
+      "**Rychlejší odezva** – hledání ve WinGetu trvá desetinu sekundy místo desítek sekund a průběh instalace už nezpomaluje okno.",
+      "Název aplikace v detailu jde označit a zkopírovat."
+    ],
+    "fixed": [
+      "**Spolehlivější rozpoznání nainstalovaných aplikací** i na jiných počítačích. HubGet ověří, že spouštěcí soubor aplikace na disku opravdu je – zbytky v registru po odinstalaci (například Ollama) už nesvítí jako „Nainstalováno“. Najde i aplikace v profilu uživatele (Discord v %LocalAppData%) a bez modulu WinGetu čte přímo registr Windows. Tlačítko Otevřít se ukáže jen u aplikace, jejíž spouštěcí soubor existuje.",
+      "Dlouhá licence ani verze v detailu aplikace už nepřetékají do vedlejšího sloupce a fajfka ověření sedí u jména vydavatele.",
+      "Scoop si před přidáním bucketu (například extras) sám doplní Git a jeho chyby jsou čitelné.",
+      "Dlouhá chybová hláška v upozornění už nepřeroste okno.",
+      "Tlačítko „Instalovat vše“ v kartách kolekcí se vejde i do úzkého okna.",
+      "Logo v levém panelu je zarovnané s horní lištou a fajfka u Aplikace dne stojí hned za názvem."
+    ],
+    "highlights": [
+      {
+        "title": "Chocolatey a Scoop naostro",
+        "text": "Instalace, aktualizace i odinstalace přímo v HubGetu, režim jednoho zdroje a odkazy unibox:// z webu."
+      },
+      {
+        "title": "Po spuštění",
+        "text": "Programy spouštěné po přihlášení z registru, složky Po spuštění i plánovače úloh – zapnout, vypnout, odstranit a vliv na rychlost startu."
+      },
+      {
+        "title": "Čistá odinstalace",
+        "text": "Pokročilá odinstalace najde zbytky na disku i v registru. Se sledováním instalace smaže vše, co instalátor vytvořil."
+      },
+      {
+        "title": "Aktualizace a profil po svém",
+        "text": "Ignorované a odložené aktualizace, export profilu i s nastavením do JSON nebo přehledné stránky HTML."
+      }
+    ]
+  },
+  "en": {
+    "title": "Chocolatey and Scoop for real, single-source mode and background updates",
+    "new": [
+      "**Chocolatey and Scoop for real** – search, install, update and uninstall right in HubGet. A missing package manager is installed in one click using its official install script.",
+      "**Single-source mode** – click WinGet, Chocolatey or Scoop in the sidebar and the whole catalog shows only apps from that source and installs only from it. A bar at the top shows the mode and clears it in one click.",
+      "**Smart fallback source** – when an install fails (broken link, another install running, the package is missing from the source…), HubGet offers the same app from Chocolatey or Scoop. If that package manager is missing, it offers to install it first.",
+      "**unibox:// links** – collections and apps from the web open right in HubGet with a pre-filled list to install. You always confirm the installation.",
+      "Installed apps show an **Installed via** label in the package manager’s color (WinGet, Chocolatey, Scoop) instead of the source picker. It persists across restarts.",
+      "**Automatic background update checks** – hourly, daily or weekly, with a “Run this task now” button. Optionally installs all updates or only selected apps automatically, mindful of battery and metered connections.",
+      "**Notification center** – a bell in the top bar with a history of events and errors, a count of new errors, copying error messages and clearing the history.",
+      "**Notification preferences** – a master switch, a summary after a batch of operations, available updates, operation progress, failures and successes. When HubGet runs in the background, you get Windows notifications.",
+      "A section for **Administrator rights and other dangerous settings** – admin rights for every operation or just once, no elevation, custom command-line arguments, pre- and post-install commands, custom package manager paths and importing them from bundles. All off by default.",
+      "Updating a running app: HubGet finds its open windows and processes, offers to close them and retries the update.",
+      "Choose a WinGet package variant – language or installer type (for example Firefox in more than 100 languages).",
+      "A blue **verified checkmark** for apps from well-known publishers – on app pages and on cards.",
+      "**Custom accent color** – ready-made palettes or any HEX code.",
+      "**A running app no longer blocks an install** – HubGet ends a background process (such as OBS in the tray or a process stuck in memory) before an install, update or uninstall. It offers to close an open app in one click, and after an uninstall it ends processes still running from the app’s folder.",
+      "**Advanced uninstall** (Settings, off by default) – after an uninstall it finds leftovers in Program Files, ProgramData, Start menu and desktop shortcuts and the Windows registry and offers to delete them, or deletes them automatically. Files go to the Recycle Bin; registry keys are backed up before they’re deleted.",
+      "A **What’s new in HubGet** window – after an update it appears once with the news from every release you skipped. The full history is in the ⋯ menu → Release notes.",
+      "A new **Startup apps** section – programs that start when you sign in to Windows, from the registry, the Startup folder and Task Scheduler, in one place. Enable or disable them (just like in Task Manager – the entry stays in the list) or remove them for good with a backup. HubGet reads the startup impact (high, medium, low) from Windows’ own measurement and flags programs that are missing from disk.",
+      "**Install monitoring** (Settings, or right-click → Install with monitoring) – HubGet takes a disk and registry snapshot before and after an install and remembers what the installer created. After an uninstall it offers to remove all of it, even without advanced uninstall.",
+      "**Ignore updates** for any app, or **postpone** them for a day, a week or a month – then they’re offered again. Ignored and postponed apps are left out of bulk and automatic updates too; review and undo them in Settings.",
+      "**Profile export to HTML** – besides JSON, a readable page with the list of apps and commands for a manual install, which can be imported as well. The profile carries your update settings, and after an import you install the missing apps in one click."
+    ],
+    "improved": [
+      "The catalog contains **all 15,776 WinGet packages**, including language versions and installer types – more than 25,100 apps in total. The counter in the top bar shows the exact number.",
+      "More accurate matching of the same app across WinGet, Chocolatey and Scoop.",
+      "GitHub star counts on the cards of more than 4,100 open-source apps, and the correct repository even for moved projects (such as OBS Studio).",
+      "The interface uses the full width of the window – a large monitor gets more columns of cards.",
+      "A more prominent tray icon with a colored status dot: blue while working, red on error, green when done.",
+      "Snappier page switching – a short cross-fade instead of a slide.",
+      "**Faster response** – WinGet search takes a tenth of a second instead of tens of seconds, and install progress no longer slows the window down.",
+      "The app name on the app page can be selected and copied."
+    ],
+    "fixed": [
+      "**More reliable detection of installed apps**, on any PC. HubGet checks that the app’s executable really exists on disk – registry leftovers after an uninstall (such as Ollama) no longer show as “Installed”. It also finds apps in the user profile (Discord in %LocalAppData%) and reads the Windows registry directly when the WinGet module is missing. The Open button appears only when the app’s executable exists.",
+      "A long license or version on the app page no longer spills into the next column, and the verified checkmark sits right by the publisher’s name.",
+      "Scoop installs Git by itself before adding a bucket (such as extras), and its errors are readable.",
+      "A long error message in a notification no longer outgrows the window.",
+      "The “Install all” button on collection cards fits even in a narrow window.",
+      "The logo in the side panel lines up with the top bar, and the checkmark next to App of the Day sits right after the name."
+    ],
+    "highlights": [
+      {
+        "title": "Chocolatey and Scoop for real",
+        "text": "Install, update and uninstall right in HubGet, single-source mode and unibox:// links from the web."
+      },
+      {
+        "title": "Startup apps",
+        "text": "Programs that start at sign-in from the registry, the Startup folder and Task Scheduler – enable, disable, remove and see their startup impact."
+      },
+      {
+        "title": "Clean uninstall",
+        "text": "Advanced uninstall finds leftovers on disk and in the registry. With install monitoring it removes everything the installer created."
+      },
+      {
+        "title": "Updates and profiles your way",
+        "text": "Ignored and postponed updates, and a profile export with settings as JSON or a readable HTML page."
+      }
+    ]
+  }
+}

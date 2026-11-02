@@ -1,0 +1,55 @@
+{
+  "version": "0.1.16",
+  "date": "2026-10-28",
+  "cs": {
+    "title": "Aplikace ze Storu a Skokani týdne",
+    "new": [
+      "**Aplikace ze Storu v sekci Po spuštění** – Teams, WhatsApp, Terminál, iCloud a další aplikace ze Storu s názvem, vydavatelem a ikonou. Vypnete je jedním kliknutím jako ve Správci úloh, bez práv správce, a aplikace si spouštění sama znovu nezapne. Odstranit ho jde jen odinstalací aplikace – je součástí jejího balíčku.",
+      "**Nejstahovanější po svém** – řazení podle popularity, podle hodnocení od uživatelů nebo Skokani týdne: aplikace, kterým nejrychleji roste počet stažení. U každé aplikace je vidět údaj, podle kterého se řadí.",
+      "**Aplikace, které se aktualizují samy** – když se aplikace (třeba Discord) po aktualizaci vrátí na verzi ze svého serveru, HubGet ji označí „aktualizuje se sama“ a přestane aktualizaci nabízet dokola. V detailu ji jde nabídnout znovu."
+    ],
+    "improved": [
+      "Detail aplikace na širokém okně využívá i místo vpravo – informace nejsou tak nahuštěné a na celou obrazovku nezůstává zbytečně prázdné místo.",
+      "Když instalátor spadne (třeba GeForce NOW), HubGet to řekne srozumitelně a nabídne jiný zdroj – instalaci zbytečně neopakuje jako správce.",
+      "Dialog aktualizace HubGetu ukáže, proč se aktualizace nepodařila, a stahování má delší časový limit."
+    ],
+    "fixed": [
+      "Aplikace nainstalovaná dvěma správci (třeba Git přes WinGet i Scoop) má na Nainstalovaných dvě vlastní karty – dřív obě ukazovaly první instalaci.",
+      "Ikona programu z disku se po přechodné chybě načte znovu – dřív zůstala celý den prázdná.",
+      "Přepínání Trendy / Populární na Domů neskočí na začátek stránky.",
+      "Esc v dialogu zavře jen horní okno a klávesy (Enter, Ctrl+Enter, Ctrl+K) nepůsobí na stránku pod dialogem.",
+      "Automatické aktualizace odložené kvůli baterii nebo měřenému připojení: hláška „Nalezeny 3 aktualizace“ místo názvu textu."
+    ],
+    "highlights": [
+      {
+        "title": "Aplikace ze Storu po spuštění",
+        "text": "Teams, WhatsApp, iCloud a další aplikace ze Storu vypnete po spuštění jedním kliknutím – a samy si spouštění znovu nezapnou."
+      }
+    ]
+  },
+  "en": {
+    "title": "Store apps and this week’s movers",
+    "new": [
+      "**Store apps in Startup apps** – Teams, WhatsApp, Terminal, iCloud and other Store apps with their name, publisher and icon. Turn them off with one click like in Task Manager, no admin rights needed, and the app can’t turn startup back on by itself. Only uninstalling the app removes it – it’s part of the app’s package.",
+      "**Top charts your way** – sort by popularity, by user ratings or by This week’s movers: the apps whose downloads are growing fastest. Each app shows the figure it’s sorted by.",
+      "**Apps that update themselves** – when an app (Discord, for example) reverts to its own server’s version after an update, HubGet marks it as “updates itself” and stops offering the update over and over. You can offer it again from the app detail."
+    ],
+    "improved": [
+      "On a wide window, the app detail uses the space on the right too – the information isn’t so cramped and full screen doesn’t leave empty space.",
+      "When an installer crashes (GeForce NOW, for example), HubGet says so clearly and offers another source – no pointless retry as administrator.",
+      "The HubGet update dialog shows why an update failed, and the download has a longer time limit."
+    ],
+    "fixed": [
+      "An app installed by two package managers (Git via WinGet and Scoop, for example) gets its own card for each under Installed – both used to show the first installation.",
+      "A program icon from disk loads again after a temporary error – it used to stay blank for a whole day.",
+      "Switching Trending / Popular on Home no longer jumps to the top of the page.",
+      "Esc in a dialog closes only the topmost window, and keys (Enter, Ctrl+Enter, Ctrl+K) no longer act on the page under a dialog."
+    ],
+    "highlights": [
+      {
+        "title": "Store apps at startup",
+        "text": "Turn off Teams, WhatsApp, iCloud and other Store apps at startup with one click – and they won’t turn it back on by themselves."
+      }
+    ]
+  }
+}

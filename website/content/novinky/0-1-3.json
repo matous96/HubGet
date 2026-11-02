@@ -1,0 +1,38 @@
+{
+  "version": "0.1.3",
+  "date": "2026-10-22",
+  "cs": {
+    "title": "Hromadná instalace, export a úklid po odinstalaci",
+    "new": [
+      "**Hromadná instalace** – zaškrtněte více aplikací a nainstalujte je najednou.",
+      "**Export a import** seznamu aplikací – snadný přenos na nový počítač.",
+      "Přeskočení nabízené verze a zamknutí verze aplikace – HubGet pak danou aktualizaci nenabízí.",
+      "**Úklid po odinstalaci** – HubGet najde složky, které po aplikaci zůstaly, a nabídne jejich přesun do Koše.",
+      "Počet hvězdiček z GitHubu v detailu open-source aplikací.",
+      "Připravili jsme hodnocení aplikací (1–5 hvězdiček) s přihlášením přes GitHub a Google a automatické aktualizace samotného HubGetu. Zapneme je, jakmile spustíme server pro hodnocení a kanál aktualizací."
+    ],
+    "highlights": [
+      {
+        "title": "Hromadná instalace, export a import",
+        "text": "Více aplikací najednou, přenos seznamu aplikací na nový počítač, zamykání verzí a úklid po odinstalaci."
+      }
+    ]
+  },
+  "en": {
+    "title": "Bulk install, export and cleanup after uninstall",
+    "new": [
+      "**Bulk install** – check several apps and install them all at once.",
+      "**Export and import** of your app list – easy to move to a new PC.",
+      "Skip an offered version or pin an app’s version – HubGet then stops offering that update.",
+      "**Cleanup after uninstall** – HubGet finds folders an app left behind and offers to move them to the Recycle Bin.",
+      "GitHub star counts on the pages of open-source apps.",
+      "We’ve prepared app ratings (1–5 stars) with GitHub and Google sign-in, and automatic updates of HubGet itself. We’ll turn them on once the ratings server and update channel are live."
+    ],
+    "highlights": [
+      {
+        "title": "Bulk install, export and import",
+        "text": "Several apps at once, moving your app list to a new PC, version pinning and cleanup after uninstall."
+      }
+    ]
+  }
+}

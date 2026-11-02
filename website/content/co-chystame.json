@@ -1,0 +1,60 @@
+{
+  "lead": {
+    "cs": "Hodnocení, recenze, synchronizace i publikování fungují od verze 0.1.14. Zbývá digitální podpis instalátoru – také zdarma a open source.",
+    "en": "Ratings, reviews, sync and publishing work as of version 0.1.14. What’s left is a digitally signed installer – free and open source too."
+  },
+  "items": [
+    {
+      "status": "wait",
+      "cs": {
+        "title": "Digitálně podepsaný instalátor",
+        "text": "Bez varování SmartScreenu při prvním spuštění. Sestavení s bezplatným podpisem přes SignPath Foundation i [zásady podepisování](podpis-kodu.html) jsou hotové.",
+        "label": "Čeká na certifikát"
+      },
+      "en": {
+        "title": "Digitally signed installer",
+        "text": "No SmartScreen warning on first launch. The build with free signing by SignPath Foundation and the [code signing policy](code-signing.html) are ready.",
+        "label": "Waiting for the certificate"
+      }
+    },
+    {
+      "status": "ready",
+      "cs": {
+        "title": "Hodnocení, recenze a snímky",
+        "text": "Hvězdičky, textové recenze a aktuální snímky obrazovky od uživatelů – recenzi jde upravit, smazat i nahlásit.",
+        "label": "Funguje od verze 0.1.14"
+      },
+      "en": {
+        "title": "Ratings, reviews and screenshots",
+        "text": "Star ratings, written reviews and current screenshots from users – reviews can be edited, deleted and reported.",
+        "label": "Live since version 0.1.14"
+      }
+    },
+    {
+      "status": "ready",
+      "cs": {
+        "title": "Publikování aplikací vývojáři",
+        "text": "Průvodce z adresy instalátoru připraví manifest WinGetu, ověří ho a pomůže ho odeslat. Po schválení se aplikace objeví v HubGetu.",
+        "label": "Funguje od verze 0.1.14"
+      },
+      "en": {
+        "title": "Publishing by developers",
+        "text": "A wizard turns an installer URL into a WinGet manifest, validates it and helps submit it. Once approved, the app shows up in HubGet.",
+        "label": "Live since version 0.1.14"
+      }
+    },
+    {
+      "status": "ready",
+      "cs": {
+        "title": "Přihlášení a synchronizace",
+        "text": "Přihlášení přes GitHub. Oblíbené, sada balíčků a předvolby napříč počítači – každou oblast jde vypnout a data z účtu kdykoli smazat.",
+        "label": "Funguje od verze 0.1.14"
+      },
+      "en": {
+        "title": "Sign-in and sync",
+        "text": "Sign in with GitHub. Favorites, your package bundle and preferences across your PCs – each area can be turned off and account data deleted at any time.",
+        "label": "Live since version 0.1.14"
+      }
+    }
+  ]
+}

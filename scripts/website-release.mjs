@@ -7,7 +7,8 @@
 //   news                sekce „To nejlepší z verze“ – karty z `featured` nejnovějšího
 //                       vydání v src/data/changelog.ts, jinak z prvních dvou bodů `highlights`.
 // Ve website/main.js přepíše odkazy ke stažení (LINKS.downloadExe, downloadMsi) na instalátory
-// vydání v<verze> na GitHubu. Novinky (novinky.html, en/changelog.html) se píšou ručně – jsou podrobnější.
+// vydání v<verze> na GitHubu. Podrobné Novinky (novinky.html, en/changelog.html) generuje
+// scripts/website-content.mjs z website/content/ (upravují se v Pages CMS).
 import { existsSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";

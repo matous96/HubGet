@@ -1,0 +1,38 @@
+{
+  "version": "0.1.17",
+  "date": "2026-10-28",
+  "cs": {
+    "title": "Rychlejší start a soukromí v recenzích",
+    "improved": [
+      "**Rychlejší start** – HubGet ukáže katalog hned z uložené kopie a čerstvý stáhne na pozadí. Dřív při každém spuštění čekal na stažení celého katalogu – na pomalém připojení až 15 sekund.",
+      "**Jen křestní jméno u recenzí** – u recenzí a snímků od uživatelů se ukazuje jen křestní jméno, a když ho účet nemá, přezdívka z GitHubu. Celé jméno se veřejně neukazuje ani neukládá.",
+      "Úvodní průvodce představí i hodnocení a recenze – kde je najdete a jak přidat vlastní."
+    ],
+    "fixed": [
+      "Aplikace bez hodnocení ukáže prázdné hvězdičky a jednu výzvu – dřív místo průměru stála velká pomlčka, která vypadala jako bílý obdélník."
+    ],
+    "highlights": [
+      {
+        "title": "Rychlejší start",
+        "text": "Katalog se ukáže hned z uložené kopie a čerstvý se stáhne na pozadí – start nečeká na internet."
+      }
+    ]
+  },
+  "en": {
+    "title": "Faster startup and privacy in reviews",
+    "improved": [
+      "**Faster startup** – HubGet shows the catalog right away from its saved copy and downloads the fresh one in the background. It used to wait for the whole catalog to download on every launch – up to 15 seconds on a slow connection.",
+      "**First names only in reviews** – reviews and user screenshots show only the first name, or the GitHub username if the account has none. The full name is never shown publicly or stored.",
+      "The welcome tour now introduces ratings and reviews – where to find them and how to add your own."
+    ],
+    "fixed": [
+      "An app without ratings shows empty stars and a single prompt – a large dash used to stand in for the average and looked like a white rectangle."
+    ],
+    "highlights": [
+      {
+        "title": "Faster startup",
+        "text": "The catalog appears right away from the saved copy and the fresh one downloads in the background – startup doesn’t wait for the internet."
+      }
+    ]
+  }
+}

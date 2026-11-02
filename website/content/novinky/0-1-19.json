@@ -1,0 +1,64 @@
+{
+  "version": "0.1.19",
+  "date": "2026-10-30",
+  "cs": {
+    "title": "HubGet a klidné aktualizace",
+    "new": [
+      "**Nový název HubGet** – Unibox se teď jmenuje HubGet a web najdete na hubget.eu. Aktualizace převede instalaci sama: nastavení, oblíbené, sady, přihlášení i historie zůstanou, stejně jako zástupci a připnutí na hlavním panelu.",
+      "**Čeká na potvrzení** – aktualizace, které potřebují práva správce, automatika na pozadí nespouští, takže nevyskočí nečekaný dialog UAC. Najdete je v Dostupných aktualizacích a potvrdíte je všechny jedním dialogem Windows.",
+      "**Filtr platformy** – v hledání, kategoriích a Nejstahovanějších vyberete x64, ARM64 nebo x86. Verze pro jiné procesory (třeba Discord pro ARM64 a x86) pak výsledky nezahltí.",
+      "**Procenta u instalace** – průběh instalace i aktualizace ukazuje odhad v procentech podle toho, jak dlouho jednotlivé fáze trvaly dřív.",
+      "**Tečka u hodin** – oranžová tečka na ikoně v oznamovací oblasti, když jsou k dispozici aktualizace. Vypnete ji v Nastavení → Obecné."
+    ],
+    "improved": [
+      "**Klidné automatické aktualizace** – běžící aplikace počkají, až je zavřete. Nepovedená aktualizace se zkusí příště a po třetím neúspěchu ji HubGet nechá na vás – bez vyskakovacích chyb.",
+      "Aplikace a moduly PowerShellu nainstalované pro všechny uživatele se aktualizují rovnou jako správce, bez neúspěšného prvního pokusu.",
+      "Scoop si před kontrolou aktualizací obnoví buckety, takže vidí nové verze.",
+      "Nová volba v Nastavení → Obecné: běžící aplikaci před aktualizací nebo odinstalací ukončit natvrdo bez dotazu.",
+      "Úvodní průvodce má nový krok o oznámeních a aktualizacích.",
+      "Ikona na hlavním panelu a u hodin s nápisem."
+    ],
+    "fixed": [
+      "Aktualizace aplikací MSI nainstalovaných pro všechny uživatele končily chybou 0x8A150049.",
+      "Aktualizace modulu PowerShellu v Program Files (např. Microsoft.WinGet.Client) končila chybou „Administrator rights are required“.",
+      "Některé hry ze Steamu neměly ikonu.",
+      "Počet „Vše“ v Nainstalovaných nesouhlasil s počtem zobrazených aplikací."
+    ],
+    "highlights": [
+      {
+        "title": "Nový název HubGet a klidné aktualizace",
+        "text": "Unibox je teď HubGet na hubget.eu. Automatické aktualizace nikoho neruší – co potřebuje práva správce, potvrdíte jedním dialogem."
+      }
+    ]
+  },
+  "en": {
+    "title": "HubGet and calm updates",
+    "new": [
+      "**A new name: HubGet** – Unibox is now called HubGet, and its website lives at hubget.eu. The update moves your installation over by itself: settings, favorites, collections, sign-in and history stay, as do your shortcuts and taskbar pin.",
+      "**Waiting for your confirmation** – automatic updates don’t run updates that need administrator rights in the background, so no unexpected UAC dialog pops up. You’ll find them in Updates available and confirm them all with a single Windows dialog.",
+      "**Platform filter** – pick x64, ARM64 or x86 in search, categories and Top charts. Versions for other processors (such as Discord for ARM64 and x86) no longer flood the results.",
+      "**Install percentages** – installs and updates show an estimated percentage based on how long each phase took before.",
+      "**A dot by the clock** – an orange dot on the notification area icon when updates are available. Turn it off in Settings → General."
+    ],
+    "improved": [
+      "**Calm automatic updates** – running apps wait until you close them. A failed update is retried next time, and after the third failure HubGet leaves it to you – no error pop-ups.",
+      "Apps and PowerShell modules installed for all users update as administrator right away, without a failed first attempt.",
+      "Scoop refreshes its buckets before checking for updates, so it sees new versions.",
+      "A new option in Settings → General: force-close a running app before updating or uninstalling it, without asking.",
+      "The welcome tour has a new step about notifications and updates.",
+      "A lettered icon on the taskbar and by the clock."
+    ],
+    "fixed": [
+      "Updating MSI apps installed for all users failed with error 0x8A150049.",
+      "Updating a PowerShell module in Program Files (such as Microsoft.WinGet.Client) failed with “Administrator rights are required”.",
+      "Some Steam games had no icon.",
+      "The “All” count on Installed didn’t match the number of apps shown."
+    ],
+    "highlights": [
+      {
+        "title": "A new name, HubGet, and calm updates",
+        "text": "Unibox is now HubGet at hubget.eu. Automatic updates never get in your way – confirm anything that needs administrator rights with one dialog."
+      }
+    ]
+  }
+}
