@@ -2,7 +2,7 @@
 //! (ve WebView2 `http://icon.localhost/…`).
 //!
 //! - `/remote?u=<adresa>` – ikona z internetu (katalog, favicony). Stáhne se
-//!   jednou (curl.exe), uloží do mezipaměti a příště se načte hned. ICO se
+//!   jednou (sdílená spojení, reqwest), uloží do mezipaměti a příště se načte hned. ICO se
 //!   převede na PNG (prohlížeč některé ICO vykreslí prázdné – např. více
 //!   položek 256 × 256), prázdné obrázky se odmítnou. Ikony redakčních
 //!   aplikací (sekce Dnes) jsou přibalené k instalaci (`first-run-icons`,
@@ -23,13 +23,12 @@
 
 use sha2::{Digest, Sha256};
 use std::borrow::Cow;
+use std::io::Read;
 use std::path::{Path, PathBuf};
-use std::sync::{Condvar, Mutex};
+use std::sync::{Condvar, LazyLock, Mutex};
 use std::time::{Duration, SystemTime};
 use tauri::http::{header, Request, Response, StatusCode};
 use tauri::{AppHandle, Manager, Runtime, UriSchemeContext, UriSchemeResponder};
-
-use crate::process::{self, hidden_command, system_tool};
 
 /// Název protokolu (`http://icon.localhost/…` ve WebView2).
 pub const SCHEME: &str = "icon";
@@ -40,10 +39,9 @@ const FAILURE_TTL: Duration = Duration::from_secs(24 * 3600);
 /// Jak dlouho se nezkouší zdroj po chybě sítě (bez připojení, časový limit) –
 /// krátce, ať výpadek při spuštění nenechá aplikaci bez ikon celý den.
 const TRANSIENT_FAILURE_TTL: Duration = Duration::from_secs(15 * 60);
-/// Nejvíc souběžných stahování – stovky karet najednou by jinak spustily
-/// stovky curl.exe a stahování by se navzájem zdržovala až do časového limitu.
-/// Stahování brzdí hlavně navázání spojení (každé je nové), ne přenos – na prvním
-/// spuštění, kdy není nic v mezipaměti, pomůže víc souběžných.
+/// Nejvíc souběžných stahování – stovky karet najednou by se jinak navzájem
+/// zdržovaly až do časového limitu. Spojení k jednomu serveru se znovu používají
+/// (klient HTTP níže), takže brzdí hlavně první spojení k novému serveru.
 const MAX_DOWNLOADS: usize = 12;
 /// Ikony nainstalovaných aplikací se po týdnu obnoví (aktualizace může ikonu změnit).
 const APP_ICON_TTL: Duration = Duration::from_secs(7 * 24 * 3600);
@@ -189,7 +187,9 @@ fn remote_icon(dir: &Path, bundled: Option<&Path>, url: &str) -> Result<(Vec<u8>
         let _slot = DownloadSlot::acquire();
         // Mezitím ji mohl stáhnout souběžný požadavek (ikona + barva banneru)
         if !path.exists() {
-            let raw = match download(url) {
+            let raw = match download(url, BROWSER_AGENT) {
+                // Místo obrázku stránka (ověření prohlížeče) – ještě jednou jako obyčejný klient
+                Ok(raw) if sniff(&raw).is_none() => download(url, PLAIN_AGENT).ok().filter(|again| sniff(again).is_some()).unwrap_or(raw),
                 Ok(raw) => raw,
                 Err(e) if e.permanent => return remember_failure(&fail, e.message),
                 Err(e) => {
@@ -208,32 +208,50 @@ fn remote_icon(dir: &Path, bundled: Option<&Path>, url: &str) -> Result<(Vec<u8>
     Ok((bytes, mime))
 }
 
-fn download(url: &str) -> Result<Vec<u8>, DownloadError> {
-    let mut command = hidden_command(&system_tool("curl.exe").to_string_lossy());
-    command
-        .args(["--location", "--fail", "--silent", "--connect-timeout", "5", "--max-time", "15", "--max-filesize"])
-        .arg(MAX_BYTES.to_string())
-        // Některé servery bez User-Agentu prohlížeče obrázek nevydají
-        .args(["--user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) HubGet"])
-        // Stavový kód HTTP na stderr (data jdou na stdout)
-        .args(["--write-out", "%{stderr}%{response_code}"])
-        .args(["--output", "-"])
-        .arg(url);
-    let output = process::run_bytes(command, Duration::from_secs(20))
-        .map_err(|message| DownloadError { permanent: false, message })?;
-    let status: u16 = String::from_utf8_lossy(&output.stderr).trim().parse().unwrap_or(0);
-    let failure = |permanent: bool, reason: &str| DownloadError {
-        permanent,
-        message: format!("{reason} (curl {}, HTTP {status})", output.code),
-    };
-    match output.code {
-        0 if !output.stdout.is_empty() => Ok(output.stdout),
-        // Přetížený server (HTTP 429 – omezení počtu požadavků, 5xx) to zkusí znovu za chvíli
-        22 if is_transient_status(status) => Err(failure(false, "server je přetížený")),
-        // 0 bez dat, 3 neplatná adresa, 22 HTTP 4xx (ikona neexistuje), 63 příliš velký soubor
-        0 | 3 | 22 | 63 => Err(failure(true, "zdroj ikonu nemá")),
-        // DNS, připojení, časový limit, TLS… – chyba sítě
-        _ => Err(failure(false, "chyba sítě")),
+/// Některé servery bez User-Agentu prohlížeče obrázek nevydají, jiné naopak prohlížeči
+/// pošlou stránku s ověřením (wiki.scribus.net) – pak se stahuje ještě jednou jako obyčejný klient.
+const BROWSER_AGENT: &str = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) HubGet";
+const PLAIN_AGENT: &str = "HubGet";
+
+/// Sdílený klient: spojení k serveru (CDN wingetu, imgur, jsDelivr…) se naváže jednou
+/// a další ikony z něj jdou hned – dřív každou stahoval nový curl.exe s novým spojením
+/// a to stálo víc než samotný přenos (studená mezipaměť: ~1 s na ikonu).
+static HTTP: LazyLock<Option<reqwest::blocking::Client>> = LazyLock::new(|| {
+    // reqwest bez vlastní kryptografie – stejná (ring) jako u pluginu aktualizací
+    let _ = rustls::crypto::ring::default_provider().install_default();
+    reqwest::blocking::Client::builder()
+        .connect_timeout(Duration::from_secs(5))
+        .timeout(Duration::from_secs(15))
+        .pool_max_idle_per_host(MAX_DOWNLOADS)
+        .build()
+        .ok()
+});
+
+fn download(url: &str, user_agent: &str) -> Result<Vec<u8>, DownloadError> {
+    // DNS, připojení, časový limit, TLS… – chyba sítě
+    let network = |error: String| DownloadError { permanent: false, message: format!("chyba sítě ({error})") };
+    let client = HTTP.as_ref().ok_or_else(|| network("HTTP klient se nespustil".into()))?;
+    let mut response = client
+        .get(url)
+        .header(reqwest::header::USER_AGENT, user_agent)
+        .send()
+        .map_err(|e| network(e.to_string()))?;
+    let status = response.status().as_u16();
+    let failure = |permanent: bool, reason: &str| DownloadError { permanent, message: format!("{reason} (HTTP {status})") };
+    if !response.status().is_success() {
+        // Přetížený server (HTTP 429 – omezení počtu požadavků, 5xx) to zkusí znovu za chvíli,
+        // ostatní (404, 403…) ikonu nemá
+        return Err(if is_transient_status(status) { failure(false, "server je přetížený") } else { failure(true, "zdroj ikonu nemá") });
+    }
+    if response.content_length().is_some_and(|length| length > MAX_BYTES) {
+        return Err(failure(true, "příliš velký soubor"));
+    }
+    let mut body = Vec::new();
+    response.by_ref().take(MAX_BYTES + 1).read_to_end(&mut body).map_err(|e| network(e.to_string()))?;
+    match body.len() as u64 {
+        0 => Err(failure(true, "zdroj ikonu nemá")),
+        length if length > MAX_BYTES => Err(failure(true, "příliš velký soubor")),
+        _ => Ok(body),
     }
 }
 

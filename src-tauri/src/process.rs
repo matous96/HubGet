@@ -60,7 +60,6 @@ pub struct Captured {
 pub struct CapturedBytes {
     pub code: i32,
     pub stdout: Vec<u8>,
-    pub stderr: Vec<u8>,
 }
 
 /// Spustí příkaz, počká na konec (nejdéle `timeout`) a vrátí jeho výstup jako text.
@@ -85,11 +84,8 @@ pub fn run_bytes(mut command: Command, timeout: Duration) -> Result<CapturedByte
         }
         thread::sleep(Duration::from_millis(25));
     };
-    Ok(CapturedBytes {
-        code: status.code().unwrap_or(-1),
-        stdout: stdout.join().unwrap_or_default(),
-        stderr: stderr.join().unwrap_or_default(),
-    })
+    let _ = stderr.join();
+    Ok(CapturedBytes { code: status.code().unwrap_or(-1), stdout: stdout.join().unwrap_or_default() })
 }
 
 fn read_to_end<R: Read + Send + 'static>(stream: Option<R>) -> thread::JoinHandle<Vec<u8>> {

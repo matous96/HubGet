@@ -31,6 +31,10 @@ base64 = "0.22"
 sha2 = "0.10"
 # Ikony: převod ICO → PNG, rozpoznání prázdných obrázků (icons.rs)
 image = { version = "0.25", default-features = false, features = ["ico", "png"] }
+# Stahování ikon (icons.rs) se sdílenými spojeními místo nového curl.exe pro každou ikonu.
+# reqwest i rustls s ring už přibaluje plugin aktualizací – žádná nová knihovna
+reqwest = { version = "0.13", default-features = false, features = ["blocking", "rustls-no-provider", "system-proxy"] }
+rustls = { version = "0.23", default-features = false, features = ["ring"] }
 # Systémový dialog „Uložit jako“ (export seznamu aplikací, sady balíčků, protokolů)
 tauri-plugin-dialog = "2"
 # Aktualizace samotného HubGetu (podepsané vydání z GitHub Releases) a restart po ní
