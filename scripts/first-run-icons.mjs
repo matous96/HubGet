@@ -38,15 +38,27 @@ for (const id of ids) {
 
 let total = 0;
 const failed = [];
-await Promise.all(
-  [...wanted].map(async ([name, { id, url }]) => {
+/** Stažení s dalšími dvěma pokusy – jedno selhání sítě by ikonu z instalace vynechalo. */
+async function download(url) {
+  for (let attempt = 1; ; attempt++) {
     try {
       const response = await fetch(url, {
         headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) HubGet" },
         signal: AbortSignal.timeout(20_000),
       });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      const bytes = Buffer.from(await response.arrayBuffer());
+      return Buffer.from(await response.arrayBuffer());
+    } catch (error) {
+      if (attempt >= 3) throw error;
+      await new Promise((r) => setTimeout(r, 1500 * attempt));
+    }
+  }
+}
+
+await Promise.all(
+  [...wanted].map(async ([name, { id, url }]) => {
+    try {
+      const bytes = await download(url);
       if (!bytes.length || bytes.length > MAX_BYTES) throw new Error(`velikost ${bytes.length} B`);
       if (/^\s*<(!doctype html|html)/i.test(bytes.subarray(0, 64).toString("utf8"))) throw new Error("HTML místo obrázku");
       writeFileSync(join(out, name), bytes);
