@@ -1,5 +1,5 @@
 import { useReducer } from "react";
-import { useCatalogIndex } from "@/hooks/usePackages";
+import { usePackageIndex } from "@/store/packageIndex";
 import {
   canInspect,
   failedIconSources as failedIcons,
@@ -52,7 +52,7 @@ interface PackageIconProps {
  */
 export function PackageIcon({ id, name, iconUrl, size = 48, framed, className }: PackageIconProps) {
   const sources = useIconSources(id, name, iconUrl);
-  const category = useCatalogIndex().get(id)?.categories[0];
+  const category = usePackageIndex((s) => s.catalog.get(id)?.categories[0]);
   const [, rerender] = useReducer((n: number) => n + 1, 0);
   const radius = Math.round(size * 0.24); // „squircle“ zaoblení úměrné velikosti
   const src = sources.find((source) => !failedIcons.has(source));

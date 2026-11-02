@@ -16,6 +16,7 @@ import { compareVersions } from "@/lib/version";
 import { loadCatalog, type LoadedCatalog } from "@/services/catalog";
 import { getAllInstalled, getSource, isEaGame, isSourceId, sortBySourceOrder, steamAppId } from "@/services/managers";
 import { useJobs } from "@/store/jobs";
+import { usePackageIndex } from "@/store/packageIndex";
 import { activeSources, sourcePriority, useSettings } from "@/store/settings";
 import { inLockedSource, useSourceScope } from "@/store/sourceLock";
 import { applyUpdateRules, useUpdateRules, type UpdateRules } from "@/store/updateRules";
@@ -323,8 +324,11 @@ export function useInstalled() {
  * na kanonické id, ostatní dostanou id ve tvaru "zdroj:id balíčku" – stejně
  * jako další instalace téže aplikace jiným správcem (Git přes winget i jako
  * závislost Scoopu), ať ji karta, detail i fronta úloh rozliší.
+ *
+ * Počítá ji jen PackageIndexSync (desítky odběrů dotazů a stavu); ostatní čtou
+ * hotovou přes useInstalledIndex / useInstalledEntry (store/packageIndex.ts).
  */
-export function useInstalledIndex() {
+export function useComputedInstalledIndex() {
   const { data } = useInstalled();
   const links = useInstalledLinks();
   if (!data) return NO_INSTALLED;
@@ -344,6 +348,12 @@ export function useInstalledIndex() {
   return cachedIndex.index;
 }
 
+/** Mapa id aplikace → nainstalovaný balíček (hotová, jeden odběr – viz useComputedInstalledIndex). */
+export const useInstalledIndex = () => usePackageIndex((s) => s.installed);
+
+/** Nainstalovaný balíček jedné aplikace – karta se překreslí jen při změně svého záznamu. */
+export const useInstalledEntry = (appId: string) => usePackageIndex((s) => s.installed.get(appId));
+
 /** Výsledný stav aplikace pro tlačítko akce. */
 export type PackageStatus = "available" | "installed" | "updatable";
 
@@ -355,7 +365,7 @@ export interface PackageState {
 
 /** Spojí nainstalovaný stav a případnou běžící úlohu pro jednu aplikaci. */
 export function usePackageState(appId: string): PackageState {
-  const installed = useInstalledIndex().get(appId);
+  const installed = useInstalledEntry(appId);
   const job = useJobs((s) => s.jobs[appId]);
   const status: PackageStatus = !installed ? "available" : installed.availableVersion ? "updatable" : "installed";
   return { status, installed, job };
@@ -368,7 +378,7 @@ export function usePackageState(appId: string): PackageState {
  * v zamčeném – režim jednoho zdroje v levém panelu).
  */
 export function useEffectiveSource(entry: CatalogEntry, chosen?: SourceId): PackageSource | undefined {
-  const installed = useInstalledIndex().get(entry.id);
+  const installed = useInstalledEntry(entry.id);
   const { enabled, preferred } = useSourceScope();
 
   if (installed) {

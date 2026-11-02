@@ -28,6 +28,7 @@ import { useDeepLinks } from "@/hooks/useDeepLinks";
 import { useDesktopIntegration } from "@/hooks/useDesktopIntegration";
 import { useSecurityPolicySync } from "@/hooks/useSecurityPolicySync";
 import { useExternalLinks } from "@/hooks/useExternalLinks";
+import { usePackageIndexSync } from "@/hooks/usePackageIndexSync";
 import { ScrollContainerContext, scrollRestore } from "@/hooks/useScrollContainer";
 import { useTheme } from "@/hooks/useTheme";
 import { isTauri } from "@/lib/tauri";
@@ -46,6 +47,8 @@ function BackgroundServices() {
   useAutoUpdateScheduler();
   // Odkazy unibox:// z webu a sdílených sad
   useDeepLinks();
+  // Indexy nainstalovaných, katalogu a nabídky Start pro karty (jednou pro celé okno)
+  usePackageIndexSync();
   return null;
 }
 

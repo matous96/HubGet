@@ -28,11 +28,12 @@
  */
 import { useMemo } from "react";
 import { useShallow } from "zustand/react/shallow";
-import { useInstalledIndex } from "@/hooks/usePackages";
+import { useInstalledEntry, useInstalledIndex } from "@/hooks/usePackages";
 import { useIconQuality } from "@/store/iconQuality";
+import { usePackageIndex } from "@/store/packageIndex";
 import type { CatalogEntry } from "@/types";
 import { appIconSrc, ICON_HOST, remoteIconSrc } from "./iconSrc";
-import { startAppFor, useStartApps } from "./launch";
+import { startAppFor } from "./launch";
 
 export { appIconSrc, fileIconSrc, remoteIconSrc } from "./iconSrc";
 
@@ -65,8 +66,9 @@ function orderSources(iconUrl: string | null | undefined, localAppId: string | u
 
 /** Seřazené zdroje ikony aplikace (bez duplicit). */
 export function useIconSources(id: string, name: string, iconUrl: string | null | undefined): string[] {
-  const installed = useInstalledIndex().get(id);
-  const { data: startApps } = useStartApps();
+  // Hotové indexy (store/packageIndex.ts) – ikona v každé kartě nezakládá vlastní dotazy
+  const installed = useInstalledEntry(id);
+  const startApps = usePackageIndex((s) => s.startApps);
   // Stejné párování jako u tlačítka Otevřít
   const local = installed && startApps ? startAppFor(startApps, name, installed) : undefined;
   // Rozlišení ikony z katalogu (neznámé = zatím se nezobrazila)
@@ -78,7 +80,7 @@ export function useIconSources(id: string, name: string, iconUrl: string | null 
 /** Zdroje ikon pro víc aplikací najednou (karta kolekce – barva podle ikon) – stejné jako useIconSources. */
 export function useIconSourcesOf(entries: Pick<CatalogEntry, "id" | "name" | "iconUrl">[]): string[][] {
   const installedIndex = useInstalledIndex();
-  const { data: startApps } = useStartApps();
+  const startApps = usePackageIndex((s) => s.startApps);
   const catalogSizes = useIconQuality(useShallow((s) => entries.map((e) => (e.iconUrl ? s.sizes[e.iconUrl] : undefined))));
 
   return useMemo(
