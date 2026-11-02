@@ -161,7 +161,10 @@
     ]
   },
   "microsoft-teams": {
-    "iconUrl": "https://res-1.cdn.office.net/files/fabric-cdn-prod_20230815.002/assets/brand-icons/product/svg/teams_48x1.svg"
+    "iconUrl": "https://res-1.cdn.office.net/files/fabric-cdn-prod_20230815.002/assets/brand-icons/product/svg/teams_48x1.svg",
+    "unigetKeys": [
+      "teams"
+    ]
   },
   "microsoft-windowsterminal": {
     "iconUrl": "https://raw.githubusercontent.com/microsoft/terminal/main/res/terminal/images/Square44x44Logo.targetsize-256.png",
@@ -545,5 +548,33 @@
     "categories": [
       "browsers"
     ]
+  },
+  "shinchiro-mpv": {
+    "unigetKeys": [
+      "mpv"
+    ]
+  },
+  "bambulab-bambustudio": {
+    "unigetKeys": [
+      "bambustudio"
+    ]
+  },
+  "dziemborowicz-hourglass": {
+    "unigetKeys": [
+      "hourglass"
+    ]
+  },
+  "zhornsoftware-stickies": {
+    "unigetKeys": [
+      "stickies"
+    ]
+  },
+  "evolus-pencil": {
+    "unigetKeys": [
+      "pencil"
+    ]
+  },
+  "scribus-scribus": {
+    "iconUrl": "https://cdn.jsdelivr.net/gh/scribusproject/scribus@ea7dd01684f3d6c62712e4c35d9e483141961b0c/resources/iconsets/1_7_0/scribus-icon.svg"
   }
 }

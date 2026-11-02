@@ -21,7 +21,7 @@ import type {
 import { CACHE_DIR, MAX_AGE, MAX_SCREENSHOTS, PIPELINE_DIR } from "../config.ts";
 import { cachedFetch, Limiter, mapLimit } from "../lib/http.ts";
 import { fixDeadCdn, fixWikimediaThumb, normalizeImageUrl } from "../lib/images.ts";
-import { unigetKeys, type UnigetData } from "../sources/unigetui.ts";
+import { unigetKeys, unigetOwnership, type UnigetApp, type UnigetData } from "../sources/unigetui.ts";
 import { log, progress } from "../lib/log.ts";
 import { isOfficialPublisher } from "../../../src/lib/verified.ts";
 import { wingetVariant } from "../../../src/lib/wingetVariant.ts";
@@ -57,6 +57,8 @@ interface Curated {
   categories?: CategoryId[];
   alternatives?: string[];
   installerFeatures?: InstallerFeature[];
+  /** Klíče databáze UniGetUI, které patří této aplikaci, i když je vytvoří i jiné (unigetOwnership). */
+  unigetKeys?: string[];
 }
 
 /** Id aplikace v katalogu – podle wingetu, jinak podle Chocolatey / Scoopu. */
@@ -107,7 +109,7 @@ function preferredInstaller(installers: WingetInstaller[]): WingetInstaller | un
  *  3. z balíčku Chocolatey,
  *  4. ikony deklarované na webu aplikace (doplní se později, jen když předchozí nestačí).
  */
-function iconCandidates(m: WingetManifest | null, unigetIcon: string | undefined, chocoIcon: string | null | undefined): string[] {
+function iconCandidates(m: Pick<WingetManifest, "Icons"> | null | undefined, unigetIcon: string | undefined, chocoIcon: string | null | undefined): string[] {
   const icons = m?.Icons ?? [];
   const light = icons.filter((i) => i.IconTheme !== "dark");
   const winget = [...light.filter((i) => i.IconFileType === "png"), ...light.filter((i) => i.IconFileType !== "png")];
@@ -132,12 +134,11 @@ function iconSite(homepage: string | null): string | null {
  */
 function screenshotsOf(
   r: AppRecord,
-  keys: string[],
+  /** Screenshoty z databáze UniGetUI (klíč, který aplikaci patří). */
+  fromUniget: string[],
   /** Ikony aplikace – mezi screenshoty nepatří. */
   icons: (string | null)[],
-  db: Map<string, string[]>,
 ): { screenshots: string[]; sources: ScreenshotSource[] } {
-  const fromUniget = keys.map((k) => db.get(k)).find((images) => images?.length) ?? [];
   const screenshots: string[] = [];
   const sources: ScreenshotSource[] = [];
   const add = (urls: string[], source: ScreenshotSource) => {
@@ -195,14 +196,15 @@ export async function buildCatalog(
     tick();
   });
 
-  // 2b) Ostatní balíčky wingetu: z manifestu jen popis, štítky a vydavatel
+  // 2b) Ostatní balíčky wingetu: z manifestu jen popis, štítky, vydavatel a ikona
+  // (bez ikony z manifestu zůstalo přes 2 000 aplikací bez ikony – Bethesda.net Launcher)
   const briefTargets = chosen.filter((x) => x.r.winget && !manifests.has(x.id)).slice(0, options.descriptions);
   log.step(`Popisy z manifestů wingetu: ${briefTargets.length} dalších aplikací`);
   const tickBrief = progress("popisy", briefTargets.length);
-  const briefs = new Map<string, Pick<WingetManifest, "ShortDescription" | "Tags" | "Publisher">>();
+  const briefs = new Map<string, Brief>();
   await mapLimit(briefTargets, 16, async (x) => {
     const m = await loadWingetManifest(x.r.winget!);
-    if (m) briefs.set(x.id, { ShortDescription: m.ShortDescription, Tags: m.Tags, Publisher: m.Publisher });
+    if (m) briefs.set(x.id, { ShortDescription: m.ShortDescription, Tags: m.Tags, Publisher: m.Publisher, Icons: m.Icons });
     tickBrief();
   });
 
@@ -222,6 +224,30 @@ export async function buildCatalog(
   const wingetNames = new Map(records.filter((r) => r.winget).map((r) => [r.winget!.id.toLowerCase(), cleanName(r.winget!.name)]));
   const catalogIds = new Set(chosen.map((x) => x.id));
 
+  // Klíče v databázi UniGetUI (id z Chocolatey / Scoopu / wingetu, název) a kdo je smí použít
+  const unigetApps = new Map<string, UnigetApp>(
+    chosen.map(({ r, id, popularity }) => {
+      const m = manifests.get(id) ?? null;
+      const name = displayName(r, m);
+      const scoop = r.scoop ? `${r.scoop.bucket}/${r.scoop.name}` : undefined;
+      return [
+        id,
+        {
+          id,
+          name,
+          popularity,
+          keys: unigetKeys({ chocolatey: r.choco?.id, scoop, winget: r.winget?.id }, name),
+          wingetId: r.winget?.id,
+          chocoId: r.choco?.id,
+          homepage: homepageOf(r, m),
+          publisher: publisherOf(r, m, briefs.get(id)),
+          owns: curated[id]?.unigetKeys,
+        },
+      ];
+    }),
+  );
+  const unigetAllowed = unigetOwnership([...unigetApps.values()]);
+
   // 4) Záznamy katalogu
   const firstSeen = await loadFirstSeen();
   const now = new Date().toISOString();
@@ -233,8 +259,9 @@ export async function buildCatalog(
     const m = manifests.get(id) ?? null;
     const brief = briefs.get(id);
     const c = curated[id];
-    const name = displayName(r, m);
-    const homepage = m?.PackageUrl ?? m?.PublisherUrl ?? r.choco?.projectUrl ?? r.scoop?.homepage ?? null;
+    const uni = unigetApps.get(id)!;
+    const { name } = uni;
+    const homepage = uni.homepage ?? null;
     const description = truncate(m?.ShortDescription ?? brief?.ShortDescription ?? r.choco?.summary ?? r.scoop?.description ?? "", 200);
     const tags = pickTags(m?.Tags ?? brief?.Tags, r.winget?.tags, r.choco?.tags);
     const support = m?.PublisherSupportUrl ?? null;
@@ -261,19 +288,21 @@ export async function buildCatalog(
     const chocoIssues = bugTrackerKey && repo && bugTrackerKey !== repositoryKey(repo) ? null : bugTracker;
 
     if (!(id in firstSeen.ids)) firstSeen.ids[id] = firstSeen.initialized ? now : "";
-    // Klíče v databázi UniGetUI (id z Chocolatey / Scoopu / wingetu, název)
-    const unigetKey = unigetKeys(
-      { chocolatey: r.choco?.id, scoop: r.scoop ? `${r.scoop.bucket}/${r.scoop.name}` : undefined, winget: r.winget?.id },
-      name,
-    );
-    const unigetIcon = unigetKey.map((k) => uniget.icons.get(k)).find(Boolean);
-    const candidates = iconCandidates(m, unigetIcon, r.choco?.iconUrl);
+    // Obrázky z databáze UniGetUI pod prvním klíčem, který aplikaci patří
+    const fromUniget = <T,>(db: Map<string, T>, urls: (value: T) => string[]) => {
+      for (const key of uni.keys) {
+        const value = db.get(key);
+        if (value !== undefined && unigetAllowed(uni, key, urls(value))) return value;
+      }
+    };
+    const unigetIcon = fromUniget(uniget.icons, (url) => [url]);
+    const candidates = iconCandidates(m ?? brief, unigetIcon, r.choco?.iconUrl);
     // Ruční ikona z curated.json platí bez měření; ostatní vybere krok 5 (nejostřejší)
     if (!c?.iconUrl) iconChoices.set(id, { candidates, site: iconSite(homepage) });
     const iconUrl = c?.iconUrl ?? candidates[0] ?? null;
-    const shots = screenshotsOf(r, unigetKey, [iconUrl, ...candidates], uniget.screenshots);
+    const shots = screenshotsOf(r, fromUniget(uniget.screenshots, (images) => images) ?? [], [iconUrl, ...candidates]);
 
-    const publisher = m?.Publisher ?? brief?.Publisher ?? (r.winget ? publisherFromId(r.winget.id) : (r.choco?.authors ?? ""));
+    const publisher = uni.publisher ?? "";
     // Nové kategorie jen v categoriesV2 (a jen když se liší) – starší verze HubGetu znají jen původní
     const signals = { tags, name, description, ids: [r.winget?.id, r.choco?.id, r.scoop && `${r.scoop.bucket}/${r.scoop.name}`].filter((x): x is string => !!x) };
     const categories = c?.categories ?? categorize(signals);
@@ -438,6 +467,13 @@ function displayName(r: AppRecord, m: WingetManifest | null): string {
   }
   return fromIndex ?? r.choco?.title ?? capitalize(r.scoop!.name);
 }
+
+type Brief = Pick<WingetManifest, "ShortDescription" | "Tags" | "Publisher" | "Icons">;
+
+const homepageOf = (r: AppRecord, m: WingetManifest | null) => m?.PackageUrl ?? m?.PublisherUrl ?? r.choco?.projectUrl ?? r.scoop?.homepage ?? null;
+
+const publisherOf = (r: AppRecord, m: WingetManifest | null, brief: Brief | undefined) =>
+  m?.Publisher ?? brief?.Publisher ?? (r.winget ? publisherFromId(r.winget.id) : (r.choco?.authors ?? ""));
 
 async function loadCurated(): Promise<Record<string, Curated>> {
   try {

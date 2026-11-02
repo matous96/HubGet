@@ -334,10 +334,12 @@ const hostOf = (url: string | null | undefined) => {
 /**
  * Ikonu z CDN wingetu (z manifestu, vytaženou z instalátoru) sdílí tolik aplikací
  * různých vydavatelů → je to výchozí ikona instalátoru, ne aplikace: Microsoft Teams,
- * Screenpresso, LanguageTool a JASP měly stejnou složku s obláčkem. Sdílené logo
- * z jiných zdrojů (Node.js, FFmpeg) je v pořádku.
+ * Screenpresso, LanguageTool a JASP měly stejnou složku s obláčkem, desítky dalších
+ * ikonu MSI, Electronu nebo Javy. Tři vydavatele mají i forky se skutečnou ikonou
+ * (Chromium a ungoogled-chromium, Apache NetBeans). Sdílené logo z jiných zdrojů
+ * (Node.js, FFmpeg) je v pořádku.
  */
-const SHARED_WINGET_ICON = 3;
+const SHARED_WINGET_ICON = 4;
 const WINGET_ICONS = "https://cdn.winget.microsoft.com/icons/";
 
 /** Vydavatel podle id balíčku ve wingetu („Microsoft.Teams“ → microsoft) – názvy vydavatelů se píšou různě. */

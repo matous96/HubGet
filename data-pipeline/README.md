@@ -26,7 +26,7 @@ katalogu (v Nastavení → Katalog je pak zdroj „Místní (pnpm pipeline)“).
 
 | Parametr | Výchozí | Význam |
 |---|---|---|
-| `--details N` / `--details all` | 2500 | kolika nejpopulárnějším aplikacím stáhnout manifest wingetu (podrobnosti, ikony, SHA-256…) |
+| `--details N` / `--details all` | 2500 | kolika nejpopulárnějším aplikacím vzít z manifestu wingetu podrobnosti (SHA-256, licence…); popis, štítky, vydavatele a ikonu mají všechny |
 | `--sizes N` | 300 | kolika z nich zjistit velikost instalátoru (požadavek HEAD na server vydavatele) |
 | `--limit N` | – | omezit katalog na N nejpopulárnějších aplikací (testování) |
 | `--local` | – | zkopírovat výsledek do `public/catalog.json` |
@@ -101,8 +101,13 @@ firem, nadací a projektů (`src/lib/verified.ts`, sdílené s aplikací).
 
 Kandidáti v pořadí podle důvěryhodnosti zdroje:
 
-1. ikona z manifestu wingetu (`cdn.winget.microsoft.com/icons/…`, PNG má přednost před ICO),
-2. ikona z komunitní databáze UniGetUI (~6 000 balíčků),
+1. ikona z manifestu wingetu (`cdn.winget.microsoft.com/icons/…`, PNG má přednost před ICO) –
+   kromě výchozí ikony instalátoru, kterou sdílí čtyři a víc vydavatelů (MSI, Electron,
+   Java, „složka s obláčkem“ u Microsoft Teams),
+2. ikona z komunitní databáze UniGetUI (~6 000 balíčků) – klíče nemají vydavatele
+   (`Devolutions.Launcher` → `launcher`), sdílený klíč proto dostane jen aplikace, které
+   obrázek prokazatelně patří (balíček Chocolatey, vlastník v adrese obrázku, přesný název
+   a výrazně vyšší popularita; ručně `unigetKeys` v `curated.json`),
 3. ikona balíčku Chocolatey (odkazy na zaniklá CDN rawgit.com a cdn.staticaly.com se
    přepíšou na jsDelivr, viz `src/lib/images.ts`),
 4. ikony deklarované na webu aplikace – `<link rel="icon" sizes>`, apple-touch-icon,
