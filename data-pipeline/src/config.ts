@@ -43,6 +43,9 @@ export const MAX_AGE = {
 export const UNIGETUI_SCREENSHOTS_URL =
   "https://raw.githubusercontent.com/Devolutions/UniGetUI/main/WebBasedData/screenshot-database-v2.json";
 
+/** Zvětšené malé ikony (build/upscale.ts) – zveřejňují se s katalogem na webu HubGetu. */
+export const UPSCALED_ICONS_URL = process.env.HUBGET_ICONS_URL ?? "https://hubget.eu/icons";
+
 /** Nejvýš tolik screenshotů u jedné aplikace. */
 export const MAX_SCREENSHOTS = 8;
 

@@ -34,7 +34,9 @@ katalogu (v Nastavení → Katalog je pak zdroj „Místní (pnpm pipeline)“).
 | `--pretty` | – | čitelně formátovaný JSON |
 
 Proměnné prostředí: `GITHUB_TOKEN` (vyšší limit GitHub API), `PYPI_COUNT`
-(počet balíčků na PyPI – PyPI ho neposkytuje jednoduchým API, jinak se použije odhad).
+(počet balíčků na PyPI – PyPI ho neposkytuje jednoduchým API, jinak se použije odhad),
+pro zvětšení malých ikon `REALESRGAN`, `MAGICK`, `CWEBP`, `UPSCALE_MINUTES` a
+`HUBGET_ICONS_URL` (viz [Zvětšení malých ikon](#zvětšení-malých-ikon)).
 
 Pomocné skripty:
 
@@ -140,6 +142,26 @@ Přehled podle zdrojů: `node data-pipeline/scripts/icon-report.ts [katalog.json
 Náhledy z Wikimedia Commons (ikony i screenshoty) existují jen ve standardních
 šířkách (120, 250, 330, 500, 960, 1280, 1920 px); jiná šířka („512px-…“) vrací
 chybu 400, proto se zaokrouhlí na nejbližší standardní (`fixWikimediaThumb`).
+
+### Zvětšení malých ikon
+
+Ikony 48–127 px by byly v dlaždici detailu malé (aplikace je zvětší nejvýš 2×, víc by
+byly rozmazané). `src/build/upscale.ts` je zvětší čtyřikrát modelem
+`realesrgan-x4plus-anime` ([Real-ESRGAN](https://github.com/xinntao/Real-ESRGAN), BSD-3),
+zmenší na nejvýš 256 px a uloží jako WebP do `out/icons`; workflow Katalog je zveřejní
+s katalogem na `https://hubget.eu/icons/` a `iconUrl` aplikace na ně odkáže.
+
+- Název souboru je otisk obsahu původní ikony a nastavení zvětšení – stejná ikona se
+  nezvětšuje znovu. Hotové jsou v `.cache/upscaled`; když mezipaměť chybí, stáhnou se
+  ze zveřejněného webu.
+- Nástroje dodá workflow: `REALESRGAN` (cesta k `realesrgan-ncnn-vulkan`, stažený s ověřeným
+  SHA-256), `MAGICK` (`convert` z ImageMagicku) a `CWEBP`. Na běžci bez grafické karty běží
+  přes softwarový Vulkan (Mesa lavapipe), proto má každý běh limit `UPSCALE_MINUTES`
+  (ve workflow 25) – zbytek dorovnají další běhy a do té doby zůstane původní ikona.
+- Bez nástrojů (místní běh) se použijí jen hotové zvětšeniny. Na Windows se nic nespouští –
+  `convert` je tam převod disku, proto se příkazy berou jen z proměnných prostředí.
+- Nasazení jen změny webu (bez pipeline) zvětšeniny zveřejněného katalogu stáhne
+  ze stávajícího webu (`scripts/published-icons.mjs`), jinak by je Pages smazal.
 
 ## Repozitář aplikace
 

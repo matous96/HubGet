@@ -10,6 +10,7 @@ import { join } from "node:path";
 import { OUT_DIR, ROOT_DIR } from "./config.ts";
 import { buildCatalog } from "./build/catalog.ts";
 import { dedupeWinget, pairSources } from "./build/match.ts";
+import { upscaleSmallIcons } from "./build/upscale.ts";
 import { stats } from "./lib/http.ts";
 import { log } from "./lib/log.ts";
 import { githubRepoOf } from "../../src/lib/github.ts";
@@ -91,6 +92,14 @@ for (const [entry, repo] of repoOf) {
   if (stars !== undefined && stars !== null) entry.githubStars = stars;
 }
 log.info(`hvězdičky: ${catalog.packages.filter((p) => p.githubStars !== undefined).length} aplikací z ${githubStars.size} repozitářů`);
+
+log.step("Zvětšení malých ikon");
+try {
+  await upscaleSmallIcons(catalog.packages);
+} catch (error) {
+  // Bez zvětšení zůstanou původní ikony – katalog se zveřejní i tak
+  log.warn(`zvětšení ikon selhalo: ${error instanceof Error ? error.message : error}`);
+}
 
 await mkdir(OUT_DIR, { recursive: true });
 const outFile = join(OUT_DIR, "catalog.json");

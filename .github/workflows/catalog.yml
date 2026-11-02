@@ -11,6 +11,9 @@
 # rozměry ikon, ikony webů, „první výskyt“ aplikací) se drží v mezipaměti Actions –
 # první běh trvá kolem 45 minut (hlavně ikony z webů aplikací), další pár minut.
 #
+# Malé ikony (48–127 px) zvětší Real-ESRGAN na procesoru (softwarový Vulkan) a web je
+# zveřejní na https://hubget.eu/icons/ – každý běh nejvýš UPSCALE_MINUTES, zbytek další.
+#
 # Nastavení (jednou): Settings → Pages → Build and deployment → Source: GitHub Actions.
 # Spustit jde i ručně: Actions → Katalog → Run workflow (vždy s novým katalogem).
 
@@ -72,8 +75,10 @@ jobs:
             exit 0
           fi
           mkdir -p data-pipeline/out
+          # Se zveřejněným katalogem i jeho zvětšené ikony (Pages by je jinak smazal)
           if curl -fsSL --compressed --retry 3 "$PAGES_CATALOG_URL" -o data-pipeline/out/catalog.json \
-            && node scripts/check-catalog.mjs data-pipeline/out/catalog.json; then
+            && node scripts/check-catalog.mjs data-pipeline/out/catalog.json \
+            && node scripts/published-icons.mjs data-pipeline/out/catalog.json data-pipeline/out/icons; then
             echo "reused=true" >> "$GITHUB_OUTPUT"
           else
             echo "Zveřejněný katalog nejde použít – vygeneruje se nový"
@@ -91,11 +96,40 @@ jobs:
           key: pipeline-${{ github.run_id }}
           restore-keys: pipeline-
 
+      # Zvětšení malých ikon (data-pipeline/src/build/upscale.ts): Real-ESRGAN (BSD-3) s ověřeným
+      # součtem, Vulkan na procesoru (Mesa lavapipe), ImageMagick a cwebp z balíčků Ubuntu.
+      # Když se nástroje nepodaří připravit, pipeline použije jen už zveřejněné zvětšeniny.
+      - name: Nástroje pro zvětšení ikon
+        if: steps.published.outputs.reused != 'true'
+        continue-on-error: true
+        env:
+          REALESRGAN_URL: https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.5.0/realesrgan-ncnn-vulkan-20220424-ubuntu.zip
+          REALESRGAN_SHA256: e5aa6eb131234b87c0c51f82b89390f5e3e642b7b70f2b9bbe95b6a285a40c96
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq --no-install-recommends mesa-vulkan-drivers libvulkan1 libgomp1 imagemagick webp
+          curl -fsSL --retry 3 "$REALESRGAN_URL" -o "$RUNNER_TEMP/realesrgan.zip"
+          echo "$REALESRGAN_SHA256  $RUNNER_TEMP/realesrgan.zip" | sha256sum -c -
+          unzip -q "$RUNNER_TEMP/realesrgan.zip" -d "$RUNNER_TEMP/realesrgan"
+          chmod +x "$RUNNER_TEMP/realesrgan/realesrgan-ncnn-vulkan"
+          # Zkouška na ukázkovém obrázku z balíčku – ověří i softwarový Vulkan
+          mkdir -p "$RUNNER_TEMP/realesrgan-test"
+          "$RUNNER_TEMP/realesrgan/realesrgan-ncnn-vulkan" -i "$RUNNER_TEMP/realesrgan/input2.jpg" -o "$RUNNER_TEMP/realesrgan-test/out.png" \
+            -n realesrgan-x4plus-anime -m "$RUNNER_TEMP/realesrgan/models"
+          test -s "$RUNNER_TEMP/realesrgan-test/out.png"
+          {
+            echo "REALESRGAN=$RUNNER_TEMP/realesrgan/realesrgan-ncnn-vulkan"
+            echo "MAGICK=convert"
+            echo "CWEBP=cwebp"
+          } >> "$GITHUB_ENV"
+
       - name: Data pipeline
         if: steps.published.outputs.reused != 'true'
         env:
           # Hvězdičky repozitářů z GraphQL API GitHubu (veřejná data, žádná oprávnění navíc)
           GITHUB_TOKEN: ${{ github.token }}
+          # Zvětšení ikon na procesoru – nejvýš tolik minut za běh, zbytek dorovnají další běhy
+          UPSCALE_MINUTES: 25
         run: node data-pipeline/src/index.ts
 
       # Rozbitý nebo neúplný katalog se nezveřejní – aplikace by ho stáhla všem
@@ -109,6 +143,8 @@ jobs:
           cp -R website/. _site/
           rm -f _site/vite.config.mjs
           cp data-pipeline/out/catalog.json _site/catalog.json
+          # Zvětšené malé ikony, na které katalog odkazuje (hubget.eu/icons/…)
+          if [ -d data-pipeline/out/icons ]; then mkdir -p _site/icons && cp -R data-pipeline/out/icons/. _site/icons/; fi
 
       - uses: actions/upload-pages-artifact@v3
         with:
