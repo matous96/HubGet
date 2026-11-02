@@ -13,6 +13,73 @@
     "manageTitle": "Vše pod kontrolou",
     "manageText": "Aktualizace a odinstalace všech aplikací na jednom místě – i těch, které jste instalovali dřív."
   },
+  "pillars": {
+    "hint": "Kliknutím zobrazíte podrobnosti",
+    "close": "Rozumím",
+    "safe": {
+      "lead": "HubGet instaluje jen aplikace z ověřených zdrojů a každý instalátor před spuštěním zkontroluje.",
+      "points": {
+        "sources": {
+          "title": "Oficiální repozitáře",
+          "text": "Aplikace pocházejí z WinGetu od Microsoftu, z Chocolatey a ze Scoopu. HubGet je nepřebaluje ani neupravuje."
+        },
+        "checksum": {
+          "title": "Kontrolní součet SHA-256",
+          "text": "Stažený instalátor se porovná s otiskem z repozitáře. Kdyby ho někdo cestou podvrhl, instalace se nespustí."
+        },
+        "antivirus": {
+          "title": "Kontrola na viry",
+          "text": "Balíčky ve WinGetu a Chocolatey při schválení procházejí automatickou kontrolou na viry a při spuštění instalátor prověří i antivirus ve Windows."
+        },
+        "publishers": {
+          "title": "Ověření vydavatelé",
+          "text": "Modrá fajfka u názvu znamená oficiálního vydavatele – Microsoft, Mozilla, VideoLAN a další – z oficiálního repozitáře."
+        }
+      }
+    },
+    "simple": {
+      "lead": "Instalace bez průvodců, bez klikání na Další a bez nabídek, které nechcete.",
+      "points": {
+        "silent": {
+          "title": "Tichá instalace",
+          "text": "Instalátor běží na pozadí bez otázek s výchozím nastavením a HubGet dá vědět, až bude hotovo. Průvodce zapnete v možnostech instalace."
+        },
+        "noExtras": {
+          "title": "Bez doplňků a reklam",
+          "text": "Obrazovky s nabídkami přibaleného softwaru se při tiché instalaci neukazují. V HubGetu nejsou žádné reklamy."
+        },
+        "queue": {
+          "title": "Víc aplikací najednou",
+          "text": "Vyberte několik aplikací nebo celou sadu – nainstalují se postupně ve frontě s průběhem v procentech, i po zavření okna."
+        },
+        "fallback": {
+          "title": "Záložní zdroj",
+          "text": "Když odkaz na stažení ve WinGetu nefunguje, HubGet sám zkusí Chocolatey nebo Scoop."
+        }
+      }
+    },
+    "manage": {
+      "lead": "Všechny aplikace v počítači na jednom místě – i ty, které jste instalovali dřív nebo jinak.",
+      "points": {
+        "overview": {
+          "title": "Přehled nainstalovaných",
+          "text": "HubGet najde aplikace z WinGetu, Chocolatey, Scoopu, Microsoft Storu i hry ze Steamu a ověří, že v počítači opravdu jsou."
+        },
+        "updates": {
+          "title": "Aktualizace",
+          "text": "Dostupné aktualizace uvidíte na jednom místě a nainstalujete je najednou – nebo je HubGet nainstaluje sám v čase, který nastavíte."
+        },
+        "uninstall": {
+          "title": "Odinstalace a úklid",
+          "text": "Aplikaci odinstalujete jedním kliknutím. S pokročilou odinstalací (Nastavení) HubGet nabídne smazat i zbytky, které po sobě nechala."
+        },
+        "startup": {
+          "title": "Po spuštění",
+          "text": "Uvidíte, co všechno se spouští s Windows a jak to zdržuje start, a zbytečné programy vypnete."
+        }
+      }
+    }
+  },
   "safe": {
     "apps": "Bezpečná instalace z oficiálního zdroje {{source}} · ověřený instalátor, bez virů",
     "dev": "Instalace přímo z oficiálního registru {{source}}, bez úprav",

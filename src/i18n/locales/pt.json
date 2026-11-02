@@ -13,6 +13,73 @@
     "manageTitle": "Tudo sob controle",
     "manageText": "Atualize e desinstale todos os seus aplicativos em um só lugar – até os que você instalou antes."
   },
+  "pillars": {
+    "hint": "Clique para ver os detalhes",
+    "close": "Entendi",
+    "safe": {
+      "lead": "O HubGet instala apenas apps de fontes verificadas e confere cada instalador antes de executá-lo.",
+      "points": {
+        "sources": {
+          "title": "Repositórios oficiais",
+          "text": "Os apps vêm do WinGet da Microsoft, do Chocolatey e do Scoop. O HubGet não os reempacota nem os modifica."
+        },
+        "checksum": {
+          "title": "Checksum SHA-256",
+          "text": "O instalador baixado é comparado com a impressão digital do repositório. Se alguém o tiver adulterado no caminho, a instalação não começa."
+        },
+        "antivirus": {
+          "title": "Verificação de vírus",
+          "text": "Os pacotes do WinGet e do Chocolatey passam por verificação automática de vírus ao serem aprovados, e ao executar o antivírus do Windows também confere o instalador."
+        },
+        "publishers": {
+          "title": "Editores verificados",
+          "text": "O selo azul ao lado do nome indica um editor oficial – Microsoft, Mozilla, VideoLAN e outros – de um repositório oficial."
+        }
+      }
+    },
+    "simple": {
+      "lead": "Instalações sem assistentes, sem clicar em Avançar e sem ofertas que você não quer.",
+      "points": {
+        "silent": {
+          "title": "Instalação silenciosa",
+          "text": "O instalador roda em segundo plano com as configurações padrão e sem perguntas, e o HubGet avisa quando terminar. O assistente pode ser ativado nas opções de instalação."
+        },
+        "noExtras": {
+          "title": "Sem extras nem anúncios",
+          "text": "Telas com ofertas de software adicional não aparecem numa instalação silenciosa. O HubGet não tem anúncios."
+        },
+        "queue": {
+          "title": "Vários apps de uma vez",
+          "text": "Escolha vários apps ou um pacote inteiro – eles são instalados um após o outro numa fila com o progresso em porcentagem, mesmo com a janela fechada."
+        },
+        "fallback": {
+          "title": "Fonte alternativa",
+          "text": "Se um link de download do WinGet não funcionar, o HubGet tenta sozinho o Chocolatey ou o Scoop."
+        }
+      }
+    },
+    "manage": {
+      "lead": "Todos os apps do seu PC num só lugar – inclusive os que você instalou antes ou de outra forma.",
+      "points": {
+        "overview": {
+          "title": "Visão geral dos instalados",
+          "text": "O HubGet encontra apps do WinGet, Chocolatey, Scoop, Microsoft Store e jogos da Steam, e confere se estão mesmo no seu PC."
+        },
+        "updates": {
+          "title": "Atualizações",
+          "text": "Veja as atualizações disponíveis num só lugar e instale todas de uma vez – ou deixe o HubGet instalá-las sozinho no horário que você definir."
+        },
+        "uninstall": {
+          "title": "Desinstalar e limpar",
+          "text": "Desinstale um app com um clique. Com a desinstalação avançada (Configurações), o HubGet também oferece apagar os restos deixados para trás."
+        },
+        "startup": {
+          "title": "Inicialização",
+          "text": "Veja tudo o que inicia com o Windows e o quanto isso atrasa a inicialização, e desative o que não precisa."
+        }
+      }
+    }
+  },
   "safe": {
     "apps": "Instalação segura da fonte oficial {{source}} · instalador verificado, sem vírus",
     "dev": "Instalado diretamente do registro oficial do {{source}}, sem modificações",

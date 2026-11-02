@@ -13,6 +13,73 @@
     "manageTitle": "Everything under control",
     "manageText": "Update and uninstall all your apps in one place – even the ones you installed earlier."
   },
+  "pillars": {
+    "hint": "Click for details",
+    "close": "Got it",
+    "safe": {
+      "lead": "HubGet installs only apps from verified sources and checks every installer before running it.",
+      "points": {
+        "sources": {
+          "title": "Official repositories",
+          "text": "Apps come from Microsoft’s WinGet, Chocolatey and Scoop. HubGet doesn’t repackage or modify them."
+        },
+        "checksum": {
+          "title": "SHA-256 checksum",
+          "text": "The downloaded installer is compared with the fingerprint from the repository. If someone tampered with it on the way, the installation won’t start."
+        },
+        "antivirus": {
+          "title": "Virus checks",
+          "text": "Packages in WinGet and Chocolatey go through automated virus scanning when they’re approved, and the antivirus in Windows checks the installer when it runs."
+        },
+        "publishers": {
+          "title": "Verified publishers",
+          "text": "A blue check next to the name means an official publisher – Microsoft, Mozilla, VideoLAN and others – from an official repository."
+        }
+      }
+    },
+    "simple": {
+      "lead": "Installs without setup wizards, without clicking Next and without offers you don’t want.",
+      "points": {
+        "silent": {
+          "title": "Silent install",
+          "text": "The installer runs in the background with default settings and no questions, and HubGet lets you know when it’s done. Turn the wizard on in install options."
+        },
+        "noExtras": {
+          "title": "No add-ons or ads",
+          "text": "Screens offering bundled software don’t appear during a silent install. HubGet has no ads."
+        },
+        "queue": {
+          "title": "Several apps at once",
+          "text": "Pick several apps or a whole bundle – they install one after another in a queue with progress in percent, even after you close the window."
+        },
+        "fallback": {
+          "title": "Fallback source",
+          "text": "When a WinGet download link is broken, HubGet tries Chocolatey or Scoop on its own."
+        }
+      }
+    },
+    "manage": {
+      "lead": "All the apps on your PC in one place – including those you installed earlier or some other way.",
+      "points": {
+        "overview": {
+          "title": "Installed apps overview",
+          "text": "HubGet finds apps from WinGet, Chocolatey, Scoop, the Microsoft Store and games from Steam, and checks that they’re really on your PC."
+        },
+        "updates": {
+          "title": "Updates",
+          "text": "See available updates in one place and install them all at once – or let HubGet install them on its own at a time you choose."
+        },
+        "uninstall": {
+          "title": "Uninstall and clean up",
+          "text": "Uninstall an app with one click. With advanced uninstall (Settings), HubGet also offers to delete the leftovers it left behind."
+        },
+        "startup": {
+          "title": "Startup",
+          "text": "See everything that starts with Windows and how much it slows startup, and turn off what you don’t need."
+        }
+      }
+    }
+  },
   "safe": {
     "apps": "Safe install from the official {{source}} source · verified installer, no viruses",
     "dev": "Installed directly from the official {{source}} registry, unmodified",

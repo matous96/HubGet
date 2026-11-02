@@ -13,6 +13,73 @@
     "manageTitle": "一切尽在掌控",
     "manageText": "在一个地方更新和卸载所有应用，包括您之前安装的应用。"
   },
+  "pillars": {
+    "hint": "点击查看详情",
+    "close": "知道了",
+    "safe": {
+      "lead": "HubGet 只安装来自可信来源的应用，并在运行前检查每个安装程序。",
+      "points": {
+        "sources": {
+          "title": "官方仓库",
+          "text": "应用来自微软的 WinGet、Chocolatey 和 Scoop。HubGet 不会重新打包或修改它们。"
+        },
+        "checksum": {
+          "title": "SHA-256 校验",
+          "text": "下载的安装程序会与仓库中的指纹比对。如果在传输途中被篡改，安装不会开始。"
+        },
+        "antivirus": {
+          "title": "病毒检查",
+          "text": "WinGet 和 Chocolatey 中的软件包在审核时会经过自动病毒扫描，运行时 Windows 的杀毒软件也会检查安装程序。"
+        },
+        "publishers": {
+          "title": "已验证的发布者",
+          "text": "名称旁的蓝色对勾表示来自官方仓库的官方发布者，如 Microsoft、Mozilla、VideoLAN 等。"
+        }
+      }
+    },
+    "simple": {
+      "lead": "无需安装向导，无需一路点“下一步”，也没有你不想要的推广。",
+      "points": {
+        "silent": {
+          "title": "静默安装",
+          "text": "安装程序以默认设置在后台运行，不会提问，完成后 HubGet 会通知你。可在安装选项中开启向导。"
+        },
+        "noExtras": {
+          "title": "无捆绑、无广告",
+          "text": "静默安装时不会出现推销捆绑软件的界面。HubGet 不含任何广告。"
+        },
+        "queue": {
+          "title": "一次安装多个应用",
+          "text": "选择多个应用或整套软件包，它们会在队列中依次安装并显示百分比进度，关闭窗口后也会继续。"
+        },
+        "fallback": {
+          "title": "备用来源",
+          "text": "当 WinGet 的下载链接失效时，HubGet 会自动尝试 Chocolatey 或 Scoop。"
+        }
+      }
+    },
+    "manage": {
+      "lead": "电脑上的所有应用集中在一处，包括你以前或通过其他方式安装的应用。",
+      "points": {
+        "overview": {
+          "title": "已安装应用一览",
+          "text": "HubGet 会找到来自 WinGet、Chocolatey、Scoop、Microsoft Store 的应用以及 Steam 游戏，并确认它们确实在电脑上。"
+        },
+        "updates": {
+          "title": "更新",
+          "text": "在一处查看所有可用更新并一次性安装，或让 HubGet 在你设定的时间自动安装。"
+        },
+        "uninstall": {
+          "title": "卸载与清理",
+          "text": "一键卸载应用。启用高级卸载（设置）后，HubGet 还会提示删除残留文件。"
+        },
+        "startup": {
+          "title": "开机启动",
+          "text": "查看随 Windows 启动的所有程序及其对启动速度的影响，并关闭不需要的程序。"
+        }
+      }
+    }
+  },
   "safe": {
     "apps": "从官方 {{source}} 源安全安装 · 安装程序已验证，无病毒",
     "dev": "直接从官方 {{source}} 注册表安装，未经修改",
