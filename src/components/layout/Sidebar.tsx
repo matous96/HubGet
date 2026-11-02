@@ -22,6 +22,7 @@ import { useInstalledItems } from "@/hooks/useInstalledItems";
 import { useInstallableStats } from "@/hooks/usePackages";
 import { isTauri, isTestBuild } from "@/lib/tauri";
 import { cn, formatAppCount } from "@/lib/utils";
+import { APP_VERSION } from "@/services/updates";
 import { useBundle } from "@/store/bundle";
 import { useFavorites } from "@/store/favorites";
 import { useJobs } from "@/store/jobs";
@@ -121,11 +122,11 @@ export function Sidebar() {
         </Section>
       </nav>
 
-      {/* Zdroje balíčků + „Přidat zdroj“, pod nimi nastavení */}
+      {/* Zdroje balíčků + „Přidat zdroj“, pod nimi nastavení s číslem verze HubGetu */}
       <SourcesPanel />
       <div className="flex items-center gap-1 px-3 pt-1 pb-3">
         <div className="min-w-0 flex-1">
-          <NavItem to="/settings" icon={Settings} label={t("nav.settings")} />
+          <NavItem to="/settings" icon={Settings} label={t("nav.settings")} badge={<Count>v{APP_VERSION}</Count>} />
         </div>
         {/* Protokoly, historie, verze, nápověda… */}
         <AppMenu />
