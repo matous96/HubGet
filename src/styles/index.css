@@ -77,12 +77,26 @@ body {
   user-select: none;
 }
 
-/* Plynulý přechod barev při přepnutí motivu. */
+/* Plynulý přechod barev (bez View Transitions). */
 body,
 .theme-transition {
   transition:
     background-color 200ms ease,
     color 200ms ease;
+}
+
+/* Přepnutí motivu: celé okno se prolne najednou (hooks/useTheme.ts). Přechody
+   barev jednotlivých prvků se mezitím vypnou – každý trvá jinak dlouho a v novém
+   snímku by se rozbíhaly nestejně. */
+.theme-switching *,
+.theme-switching *::before,
+.theme-switching *::after {
+  transition: none !important;
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 280ms;
+  animation-timing-function: ease;
 }
 
 /* Tenké posuvníky v duchu Windows 11. */
