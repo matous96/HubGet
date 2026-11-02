@@ -93,6 +93,8 @@ jobs:
           Invoke-WebRequest $env:VITE_CATALOG_URL -OutFile public/catalog.json
           node scripts/check-catalog.mjs public/catalog.json
           if ($LASTEXITCODE -ne 0) { throw "Katalog z $env:VITE_CATALOG_URL nejde přibalit – spusťte workflow Katalog" }
+          # Ikony redakčních aplikací pro první spuštění podle přibaleného katalogu (adresy musí sedět)
+          node scripts/first-run-icons.mjs public/catalog.json
 
       # ── 1. Aplikace ────────────────────────────────────────────────────
       - name: Sestavení aplikace (bez instalátorů)

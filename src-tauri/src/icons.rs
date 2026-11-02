@@ -4,7 +4,9 @@
 //! - `/remote?u=<adresa>` – ikona z internetu (katalog, favicony). Stáhne se
 //!   jednou (curl.exe), uloží do mezipaměti a příště se načte hned. ICO se
 //!   převede na PNG (prohlížeč některé ICO vykreslí prázdné – např. více
-//!   položek 256 × 256), prázdné obrázky se odmítnou.
+//!   položek 256 × 256), prázdné obrázky se odmítnou. Ikony redakčních
+//!   aplikací (sekce Dnes) jsou přibalené k instalaci (`first-run-icons`,
+//!   scripts/first-run-icons.mjs) – na prvním spuštění se nestahují.
 //! - `/app?id=<AppID>` – skutečná ikona nainstalované aplikace z její položky
 //!   v nabídce Start (EXE, zástupce i aplikace ze Storu), stejně jako ji
 //!   ukazuje Průzkumník (IShellItemImageFactory), uložená jako PNG.
@@ -51,9 +53,12 @@ const APP_ICON_SIZE: i32 = 256;
 /// Obsluha protokolu – práce běží mimo vlákno WebView.
 pub fn handle<R: Runtime>(ctx: UriSchemeContext<'_, R>, request: Request<Vec<u8>>, responder: UriSchemeResponder) {
     let cache = cache_dir(ctx.app_handle());
+    let bundled = ctx.app_handle().path().resource_dir().ok().map(|dir| dir.join(BUNDLED_DIR));
     let uri = request.uri().to_string();
     std::thread::spawn(move || {
-        let result = cache.ok_or_else(|| "mezipaměť není dostupná".to_string()).and_then(|dir| serve(&dir, &uri));
+        let result = cache
+            .ok_or_else(|| "mezipaměť není dostupná".to_string())
+            .and_then(|dir| serve(&dir, bundled.as_deref(), &uri));
         responder.respond(match result {
             Ok((bytes, mime)) => Response::builder()
                 .status(StatusCode::OK)
@@ -79,12 +84,12 @@ fn cache_dir<R: Runtime>(app: &AppHandle<R>) -> Option<PathBuf> {
 }
 
 /// Vyřídí požadavek: vrátí obrázek a jeho typ.
-fn serve(dir: &Path, uri: &str) -> Result<(Vec<u8>, &'static str), String> {
+fn serve(dir: &Path, bundled: Option<&Path>, uri: &str) -> Result<(Vec<u8>, &'static str), String> {
     let url = tauri::Url::parse(uri).map_err(|e| e.to_string())?;
     let param = |name: &str| url.query_pairs().find(|(k, _)| k == name).map(|(_, v)| v.into_owned());
     std::fs::create_dir_all(dir).map_err(|e| e.to_string())?;
     match url.path() {
-        "/remote" => remote_icon(dir, &param("u").ok_or("chybí adresa")?),
+        "/remote" => remote_icon(dir, bundled, &param("u").ok_or("chybí adresa")?),
         "/app" => app_icon(dir, &param("id").ok_or("chybí AppID")?).map(|bytes| (bytes, "image/png")),
         "/file" => file_icon(dir, &param("p").ok_or("chybí cesta")?).map(|bytes| (bytes, "image/png")),
         "/steam" => steam_icon(dir, &param("app").ok_or("chybí číslo hry")?).map(|bytes| (bytes, "image/png")),
@@ -158,13 +163,25 @@ impl Drop for DownloadSlot {
 
 // ── Ikony z internetu ────────────────────────────────────────────────────
 
-fn remote_icon(dir: &Path, url: &str) -> Result<(Vec<u8>, &'static str), String> {
+/// Složka přibalených ikon v instalaci (tauri.conf.json → bundle.resources).
+const BUNDLED_DIR: &str = "first-run-icons";
+
+fn remote_icon(dir: &Path, bundled: Option<&Path>, url: &str) -> Result<(Vec<u8>, &'static str), String> {
     if !(url.starts_with("https://") || url.starts_with("http://")) {
         return Err("neplatná adresa".into());
     }
     let name = hash(url);
     let path = dir.join(&name);
     let fail = dir.join(format!("{name}.fail"));
+    // Přibalená ikona (redakční aplikace sekce Dnes) – do mezipaměti bez stahování
+    if !path.exists() {
+        if let Some(normalized) = bundled.and_then(|b| std::fs::read(b.join(&name)).ok()).and_then(normalize) {
+            let _ = std::fs::write(&path, &normalized);
+            if let Some(mime) = sniff(&normalized) {
+                return Ok((normalized, mime));
+            }
+        }
+    }
     if !path.exists() {
         if failed_recently(&fail) {
             return Err("zdroj nedávno selhal".into());

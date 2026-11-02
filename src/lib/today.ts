@@ -20,7 +20,7 @@
  * Šipky na kartách listují výběry dalších / předchozích dní – každá karta zvlášť;
  * aplikace dne je jedna na celý den a nelistuje se.
  */
-import { APP_STORIES, COLLECTIONS, dayIndex, type AppStory, type CollectionStory } from "@/data/editorial";
+import { APP_STORIES, COLLECTIONS, PROFILE_COLLECTIONS, dayIndex, type AppStory, type CollectionStory } from "@/data/editorial";
 import { CATEGORIES, categoryColor } from "@/data/categories";
 import i18n from "@/i18n";
 import { isVerified } from "@/lib/verified";
@@ -168,11 +168,25 @@ function categoryCollection(
   };
 }
 
+/** Ručně psané kolekce v sekci Dnes první den (běžný uživatel / režim Vývojář). */
+const WELCOME_COLLECTIONS = { regular: ["new-pc", "focus"], developer: ["dev-setup", "new-pc"] };
+
+/** Všechny aplikace z redakčního obsahu – jejich ikony jsou přibalené k instalaci (scripts/first-run-icons.mjs). */
+const EDITORIAL_APPS = [
+  ...APP_STORIES.map((s) => s.appId),
+  ...[...COLLECTIONS, ...PROFILE_COLLECTIONS].flatMap((c) => c.appIds),
+];
+
 /**
  * Dnešní příběh, dvě kolekce a aplikace dne. `iconSize` = změřené rozlišení
  * ikony (store/iconQuality.ts), undefined = ještě neznámé: aplikace s malou
  * ikonou se v tipech, výběrech z kategorií a aplikaci dne přeskočí, neznámé
  * se vrátí v `unmeasured` ke změření (pak se výběr případně posune dál).
+ *
+ * `firstRun` = první den po instalaci: jen ručně psaný obsah (příběh, kolekce
+ * Nový počítač…, aplikace dne z redakčních aplikací), jehož ikony jsou přibalené –
+ * sekce se ukáže hned, bez stahování a měření ikon. Listování šipkami vede na
+ * běžný denní výběr.
  */
 export function todayPicks(
   all: CatalogEntry[],
@@ -181,6 +195,7 @@ export function todayPicks(
   iconSize: (entry: CatalogEntry) => number | undefined = () => undefined,
   date = new Date(),
   shift: TodayShift = NO_SHIFT,
+  firstRun = false,
 ): TodayPicks {
   const day = dayIndex(date);
   const resolve = (ids: string[]) => ids.map((id) => index.get(id)).filter((e): e is CatalogEntry => !!e);
@@ -205,14 +220,20 @@ export function todayPicks(
 
   /** Příběh a dvě kolekce pro daný posun (listování šipkami – každá karta ukáže výběr jiného dne). */
   const cards = (s: TodayShift) => {
-    // Velký příběh: ručně psaný, nebo tip na známou aplikaci
+    // Velký příběh: ručně psaný, nebo tip na známou aplikaci (první den jen ručně psaný)
     const storyDay = day + s.story;
-    const spotlightOrder = mod(storyDay, HANDWRITTEN_EVERY) !== 0 ? dailyOrder(known, storyDay, blurry) : [];
+    const welcomeStory = firstRun && s.story === 0;
+    const spotlightOrder = !welcomeStory && mod(storyDay, HANDWRITTEN_EVERY) !== 0 ? dailyOrder(known, storyDay, blurry) : [];
     const story = spotlightOrder[0]
       ? spotlight(spotlightOrder[0], storyDay)
-      : (handwritten[mod(Math.floor(storyDay / HANDWRITTEN_EVERY), Math.max(1, handwritten.length))] ?? APP_STORIES[0]);
+      : (handwritten[mod(welcomeStory ? day : Math.floor(storyDay / HANDWRITTEN_EVERY), Math.max(1, handwritten.length))] ?? APP_STORIES[0]);
 
     // Kolekce: ručně psané + výběry z kategorií (běžný uživatel bez vývojářských)
+    const welcome = (slot: 0 | 1) => {
+      const id = WELCOME_COLLECTIONS[developer ? "developer" : "regular"][slot];
+      const fixed = COLLECTIONS.find((c) => c.id === id);
+      return fixed && firstRun && s.collections[slot] === 0 ? { story: fixed, entries: resolve(fixed.appIds) } : undefined;
+    };
     const pick = (position: number) => {
       // Katalog se ještě načítá (prázdný seznam) – žádná kolekce, karta se neukáže
       if (!sources.length) return { story: COLLECTIONS[0], entries: [] as CatalogEntry[] };
@@ -225,28 +246,36 @@ export function todayPicks(
     const first = day + s.collections[0];
     let second = day + s.collections[1] + Math.max(1, Math.floor(sources.length / 2));
     if (mod(second, sources.length) === mod(first, sources.length)) second += s.collections[1] < 0 ? -1 : 1;
-    return { story, spotlightOrder, collections: [pick(first), pick(second)] };
+    return { story, spotlightOrder, collections: [welcome(0) ?? pick(first), welcome(1) ?? pick(second)] };
   };
 
   const { story, spotlightOrder, collections } = cards(shift);
 
   // Aplikace dne: jedna na celý den (bez listování) – známá ověřená aplikace (fajka u názvu),
-  // která není v dnešním příběhu ani kolekcích; listování ostatních karet ji nemění
+  // která není v dnešním příběhu ani kolekcích; listování ostatních karet ji nemění.
+  // První den z redakčních aplikací (přibalené ikony).
   const unshifted = shift === NO_SHIFT ? { story, collections } : cards(NO_SHIFT);
   const used = new Set([unshifted.story.appId, ...unshifted.collections.flatMap((c) => c.entries.map((e) => e.id))]);
-  const appOfDayOrder = dailyOrder(
-    known.filter((e) => isVerified(e)),
-    day + 7,
-    (e) => used.has(e.id) || blurry(e),
-  );
+  const appOfDayOrder = firstRun
+    ? dailyOrder(
+        resolve([...new Set(EDITORIAL_APPS)]).filter((e) => isVerified(e)),
+        day + 7,
+        (e) => used.has(e.id),
+      )
+    : dailyOrder(
+        known.filter((e) => isVerified(e)),
+        day + 7,
+        (e) => used.has(e.id) || blurry(e),
+      );
   const appOfDay = appOfDayOrder[0];
 
-  // Automaticky vybrané aplikace na kartách (ručně psané se neměří)
+  // Automaticky vybrané aplikace na kartách (ručně psané ani první den se neměří)
   const generated = collections.flatMap((c) => ("generated" in c ? c.entries : []));
-  const shown = [spotlightOrder[0], appOfDay, ...generated].filter((e): e is CatalogEntry => !!e);
+  const measuredAppOfDay = firstRun ? [] : appOfDayOrder;
+  const shown = [spotlightOrder[0], measuredAppOfDay[0], ...generated].filter((e): e is CatalogEntry => !!e);
   const notMeasured = (e: CatalogEntry) => iconSize(e) === undefined;
   // Ke změření i další kandidáti, ať se výběr po jednom měření ustálí
-  const candidates = [...spotlightOrder.slice(0, LOOKAHEAD), ...appOfDayOrder.slice(0, LOOKAHEAD), ...generated];
+  const candidates = [...spotlightOrder.slice(0, LOOKAHEAD), ...measuredAppOfDay.slice(0, LOOKAHEAD), ...generated];
 
   return {
     story,

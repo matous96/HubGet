@@ -120,6 +120,13 @@ async function loadRawCatalog(onFresh?: (fresh: LoadedCatalog) => void): Promise
       void refreshFromRemote(REMOTE_URL, cached, onFresh);
       return { catalog: cached, source: "cache" };
     }
+    // První spuštění (žádná uložená kopie): katalog přibalený k aplikaci hned (ve vývoji místní
+    // z pipeline), čerstvý se stáhne na pozadí – start nečeká na 4 MB z internetu
+    const packaged = onFresh ? await fetchCatalog(CATALOG_FILE, 15_000) : null;
+    if (packaged && onFresh) {
+      void refreshFromRemote(REMOTE_URL, packaged.data, onFresh);
+      return { catalog: packaged.data, source: "packaged" };
+    }
     const remote = await fetchCatalog(REMOTE_URL, 15_000);
     if (remote) {
       void saveToCache(remote.text);

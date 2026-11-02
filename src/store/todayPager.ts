@@ -6,6 +6,7 @@
 import { create } from "zustand";
 import { dayIndex } from "@/data/editorial";
 import { NO_SHIFT, type TodayShift } from "@/lib/today";
+import { useIconQuality } from "@/store/iconQuality";
 
 /** Karty, které jde listovat (aplikace dne je jedna na celý den). */
 export type TodaySlot = "story" | "collection0" | "collection1";
@@ -33,3 +34,23 @@ export const useTodayPager = create<TodayPagerState>()((set, get) => ({
 
 /** Posun pro dnešek (posun z minulého dne už neplatí). */
 export const useTodayShift = () => useTodayPager((s) => (s.day === dayIndex() ? s.shift : NO_SHIFT));
+
+const FIRST_DAY_KEY = "unibox-first-day";
+
+/**
+ * Je dnes první den po instalaci? Sekce Dnes pak ukazuje ručně psaný obsah
+ * s přibalenými ikonami (lib/today.ts – firstRun). Den se zapíše při prvním
+ * dotazu; dřívější instalace (už mají změřené ikony) první den nemají.
+ */
+export function isFirstDay(): boolean {
+  try {
+    let saved = localStorage.getItem(FIRST_DAY_KEY);
+    if (saved === null) {
+      saved = String(Object.keys(useIconQuality.getState().sizes).length ? 0 : dayIndex());
+      localStorage.setItem(FIRST_DAY_KEY, saved);
+    }
+    return Number(saved) === dayIndex();
+  } catch {
+    return false;
+  }
+}

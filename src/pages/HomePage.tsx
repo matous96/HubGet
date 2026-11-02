@@ -15,12 +15,12 @@ import { PackageCollection } from "@/components/package/PackageCollection";
 import { CollectionToolbar } from "@/components/ui/CollectionToolbar";
 import { CardSkeletons, ErrorState } from "@/components/ui/States";
 import { isDevOnly, useCatalog, useCatalogIndex, useModeFilter } from "@/hooks/usePackages";
-import { todayPicks, type TodayShift } from "@/lib/today";
+import { NO_SHIFT, todayPicks, type TodayShift } from "@/lib/today";
 import { trendingScore } from "@/lib/trending";
 import { cn, topN } from "@/lib/utils";
 import { measureIcon, useIconQuality } from "@/store/iconQuality";
 import { useSettings } from "@/store/settings";
-import { useTodayPager, useTodayShift, type TodaySlot } from "@/store/todayPager";
+import { isFirstDay, useTodayPager, useTodayShift, type TodaySlot } from "@/store/todayPager";
 import type { CatalogEntry } from "@/types";
 
 type Tab = "trending" | "popular" | "new" | "updated";
@@ -61,18 +61,22 @@ export function HomePage() {
     setShownShift(shift);
     if (frozenSizes) setFrozenSizes(useIconQuality.getState().sizes);
   }
+  // První den po instalaci: ručně psaný obsah s přibalenými ikonami – ukáže se hned (lib/today.ts)
+  const [firstRun] = useState(isFirstDay);
   const { today, neighbours } = useMemo(() => {
     const size = (e: CatalogEntry) => (e.iconUrl ? iconSizes[e.iconUrl] : 0);
     const at = (by: number): TodayShift => ({
       story: shift.story + by,
       collections: [shift.collections[0] + by, shift.collections[1] + by],
     });
+    const picks = (s: TodayShift, date?: Date) => todayPicks(all, catalogIndex, developer, size, date, s, firstRun && !date);
     return {
-      today: todayPicks(all, catalogIndex, developer, size, undefined, shift),
-      // Sousední výběry (šipka vpřed / vzad) – jejich ikony se změří předem
-      neighbours: [todayPicks(all, catalogIndex, developer, size, undefined, at(1)), todayPicks(all, catalogIndex, developer, size, undefined, at(-1))],
+      today: picks(shift),
+      // Sousední výběry (šipka vpřed / vzad) a první den i zítřejší běžný výběr – jejich ikony se
+      // změří (a stáhnou) předem
+      neighbours: [picks(at(1)), picks(at(-1)), ...(firstRun ? [picks(NO_SHIFT, new Date(Date.now() + 86_400_000))] : [])],
     };
-  }, [all, catalogIndex, developer, language, iconSizes, shift]);
+  }, [all, catalogIndex, developer, language, iconSizes, shift, firstRun]);
   const paging = (slot: TodaySlot) => ({ onPrev: () => move(slot, -1), onNext: () => move(slot, 1) });
 
   // Místo karet kostry, dokud nejsou změřené ikony zobrazovaných aplikací (na novém počítači se
@@ -97,7 +101,7 @@ export function HomePage() {
   // o několik sekund. Ostatní až po zobrazení karet.
   const unsettled = today.unsettled.map((e) => e.iconUrl ?? "").join("\n");
   const later = frozenSizes
-    ? [...today.unmeasured, ...neighbours.flatMap((n) => n.unmeasured)].map((e) => e.iconUrl ?? "").join("\n")
+    ? [...today.unmeasured, ...neighbours.flatMap((n) => [...n.unsettled, ...n.unmeasured])].map((e) => e.iconUrl ?? "").join("\n")
     : "";
   useEffect(() => {
     for (const url of unsettled.split("\n").filter(Boolean)) void measureIcon(url);

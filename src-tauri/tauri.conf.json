@@ -49,6 +49,7 @@
     "license": "MIT",
     "licenseFile": "installer/license.rtf",
     "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.ico"],
+    "resources": { "first-run-icons/": "first-run-icons/" },
     "windows": {
       "webviewInstallMode": { "type": "downloadBootstrapper" },
       "wix": { "upgradeCode": "83d1d49d-f9b7-5631-9b6f-d3de240a2612" },
