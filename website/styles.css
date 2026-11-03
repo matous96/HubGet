@@ -1096,6 +1096,16 @@ legend.field__label { margin-bottom: 8px; }
 .free__foot h3 { color: var(--free-text); font-size: 1.25rem; }
 .free__foot p { color: var(--free-muted); }
 
+/* ---------- Přepnutí motivu: jedno prolnutí celé stránky (main.js, View Transitions) ---------- */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.45s;
+  animation-timing-function: ease;
+}
+/* Během prolnutí bez vlastních přechodů prvků (tlačítka 0,15 s) – jinak by se animovaly dvakrát */
+.theme-switching,
+.theme-switching * { transition: none !important; }
+
 /* ---------- Animace při posunu ---------- */
 .reveal { opacity: 0; transform: translateY(16px); transition: opacity 0.6s ease, transform 0.6s ease; }
 .reveal.is-visible { opacity: 1; transform: none; }

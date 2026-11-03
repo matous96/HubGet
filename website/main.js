@@ -73,17 +73,26 @@ for (const el of document.querySelectorAll("[data-lang-switch]")) {
 // ---------- Motiv: světlý / tmavý ----------
 const root = document.documentElement;
 const media = matchMedia("(prefers-color-scheme: dark)");
+const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
 document.getElementById("theme-toggle")?.addEventListener("click", () => {
   const current = root.dataset.theme || (media.matches ? "dark" : "light");
   const next = current === "dark" ? "light" : "dark";
-  // Když se volba shoduje se systémem, nic neukládat – web pak dál sleduje Windows
-  if (next === (media.matches ? "dark" : "light")) {
-    delete root.dataset.theme;
-    try { localStorage.removeItem("unibox-theme"); } catch {}
-  } else {
-    root.dataset.theme = next;
-    try { localStorage.setItem("unibox-theme", next); } catch {}
-  }
+  const apply = () => {
+    // Když se volba shoduje se systémem, nic neukládat – web pak dál sleduje Windows
+    if (next === (media.matches ? "dark" : "light")) {
+      delete root.dataset.theme;
+      try { localStorage.removeItem("unibox-theme"); } catch {}
+    } else {
+      root.dataset.theme = next;
+      try { localStorage.setItem("unibox-theme", next); } catch {}
+    }
+  };
+  // Jedno plynulé prolnutí celé stránky (View Transitions) – jinak se pozadí přebarví hned,
+  // tlačítka za 0,15 s a snímky aplikace přeskočí. Vlastní přechody prvků během něj stojí
+  // (theme-switching), ať se nic neanimuje dvakrát. Bez podpory nebo s omezeným pohybem hned.
+  if (!document.startViewTransition || reducedMotion.matches) return apply();
+  root.classList.add("theme-switching");
+  document.startViewTransition(apply).finished.finally(() => root.classList.remove("theme-switching"));
 });
 
 // ---------- Snímky obrazovky: chybějící soubor nechá zástupnou pozici ----------
