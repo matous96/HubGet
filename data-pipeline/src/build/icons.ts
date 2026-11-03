@@ -6,6 +6,7 @@
  * Rozlišení se zjistí z hlavičky obrázku (stačí začátek souboru, lib/imageSize.ts)
  * a ukládá se do .cache/icon-sizes.json (platí MAX_AGE.iconSizes).
  */
+import { createHash } from "node:crypto";
 import { readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import type { CatalogEntry } from "../../../src/types/index.ts";
@@ -27,10 +28,24 @@ const CACHE_FILE = join(CACHE_DIR, "icon-sizes.json");
 const HEAD_BYTES = 128 * 1024;
 
 /**
- * Výsledek měření: rozměry, nebo chyba – trvalá (404, HTML místo obrázku) nebo
- * dočasná (přetížený či nedostupný server; zkusí se znovu příští den).
+ * Obecné obrázky místo ikony (rozměry a SHA-256 souboru). Chocolatey za balíček bez vlastní
+ * ikony vrací modrou krabičku s bublinami – v katalogu ji měly desítky aplikací (gnuplot,
+ * Fiddler, Sonic Pi, Gitea, neoficiální klient ChatGPT, se kterým se spojil i oficiální).
+ * Taková ikona se počítá jako nefunkční a vybere se další kandidát.
  */
-type Measured = { w: number; h: number; vector?: true; at: number } | { error: string; at: number };
+const PLACEHOLDERS = [{ w: 128, h: 128, sha256: "f75147f3739646fcd8705bae8e581206fa2bb0b08ac85a7357a7c1b479fc961e" }];
+
+const isPlaceholder = (size: ImageSize, body: Buffer) =>
+  PLACEHOLDERS.some(
+    (p) => p.w === size.width && p.h === size.height && p.sha256 === createHash("sha256").update(body).digest("hex"),
+  );
+
+/**
+ * Výsledek měření: rozměry, nebo chyba – trvalá (404, HTML místo obrázku, obecný obrázek)
+ * nebo dočasná (přetížený či nedostupný server; zkusí se znovu příští den).
+ * `checked` = obsah porovnaný s PLACEHOLDERS (starší záznamy s jejich rozměry se změří znovu).
+ */
+type Measured = { w: number; h: number; vector?: true; checked?: true; at: number } | { error: string; at: number };
 
 /** Dočasnou chybu zkusit znovu po dni (trvalé výsledky platí MAX_AGE.iconSizes). */
 const TRANSIENT_AGE = 24 * 3_600_000;
@@ -93,7 +108,9 @@ async function measureOnce(url: string): Promise<Measured> {
     if (status >= 400) return { error: String(status), at };
     const size = imageSize(body);
     if (!size) return { error: "format", at };
-    return size.vector ? { w: 0, h: 0, vector: true, at } : { w: size.width, h: size.height, at };
+    if (size.vector) return { w: 0, h: 0, vector: true, at };
+    if (isPlaceholder(size, body)) return { error: "placeholder", at };
+    return { w: size.width, h: size.height, checked: true, at };
   } catch (error) {
     return { error: (error as Error).name === "TimeoutError" ? "timeout" : "network", at };
   }
@@ -109,7 +126,11 @@ async function measure(url: string): Promise<Measured> {
   return result;
 }
 
-const expired = (m: Measured | undefined, now: number) => !m || now - m.at > (isTransient(m) ? TRANSIENT_AGE : MAX_AGE.iconSizes);
+/** Změřeno před kontrolou obecných obrázků a se stejnými rozměry – mohl by to být on. */
+const unchecked = (m: Measured) => !("error" in m) && !m.checked && PLACEHOLDERS.some((p) => p.w === m.w && p.h === m.h);
+
+const expired = (m: Measured | undefined, now: number) =>
+  !m || unchecked(m) || now - m.at > (isTransient(m) ? TRANSIENT_AGE : MAX_AGE.iconSizes);
 
 /** Fronty po serverech – na jeden server nejvýš `max` požadavků najednou. */
 function hostLimiters(max: number) {
@@ -146,6 +167,13 @@ export async function measureIcons(urls: string[]): Promise<Map<string, ImageSiz
     });
     await writeFile(CACHE_FILE, JSON.stringify(cache));
   }
+  const placeholders = new Set(
+    urls.filter((url) => {
+      const m = cache[url];
+      return !!m && "error" in m && m.error === "placeholder";
+    }),
+  );
+  if (placeholders.size) log.info(`ikony: ${placeholders.size} obecných obrázků místo ikony (Chocolatey) vyřazeno`);
   return new Map(
     urls.map((url) => {
       const m = cache[url];

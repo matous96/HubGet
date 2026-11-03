@@ -111,7 +111,9 @@ Kandidáti v pořadí podle důvěryhodnosti zdroje:
    obrázek prokazatelně patří (balíček Chocolatey, vlastník v adrese obrázku, přesný název
    a výrazně vyšší popularita; ručně `unigetKeys` v `curated.json`),
 3. ikona balíčku Chocolatey (odkazy na zaniklá CDN rawgit.com a cdn.staticaly.com se
-   přepíšou na jsDelivr, viz `src/lib/images.ts`),
+   přepíšou na jsDelivr, viz `src/lib/images.ts`) – kromě obecného obrázku, který galerie
+   vrací za balíček bez vlastní ikony (modrá krabička s bublinami, pozná se podle obsahu
+   souboru – `PLACEHOLDERS` v `src/build/icons.ts`; v listopadu 2026 ho mělo 140 aplikací),
 4. ikony deklarované na webu aplikace – `<link rel="icon" sizes>`, apple-touch-icon,
    ikony z web manifestu, bez nich `/apple-touch-icon.png` a `/favicon.ico` v kořeni
    webu (jen když předchozí nejsou ostré; weby služeb jako GitHub, Steam nebo
