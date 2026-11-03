@@ -10,6 +10,7 @@ import {
   remoteIconSrc,
   useIconSources,
 } from "@/lib/icons";
+import { analyzeIconTile, colorTile, iconTileOf } from "@/lib/iconTile";
 import { placeholderLook } from "@/lib/placeholderIcon";
 import { cn } from "@/lib/utils";
 import type { CategoryId } from "@/types";
@@ -33,11 +34,6 @@ interface PackageIconProps {
   iconUrl: string | null;
   /** Velikost v pixelech. */
   size?: number;
-  /**
-   * Dlaždici kategorie (ikona chybí nebo se stahuje) ukázat v bílém čtverci jako skutečnou
-   * ikonu – v banneru detailu má pozadí stejnou barvu a dlaždice by v něm zanikla.
-   */
-  framed?: boolean;
   className?: string;
 }
 
@@ -46,30 +42,19 @@ interface PackageIconProps {
  * aplikace z nabídky Start → ikona z katalogu → favicon webu vydavatele →
  * vygenerovaná dlaždice se symbolem kategorie (lib/placeholderIcon.ts).
  * Zdroj, který se nenačte, je prázdný nebo (z internetu) malý a rozmazaný,
- * se přeskočí; téměř bílá ikona dostane tmavou dlaždici, aby na bílé nezmizela.
+ * se přeskočí. Tvar jako na iOS (.icon-squircle); každá ikona – i symbol kategorie –
+ * leží s okrajem v bílé dlaždici s nádechem své barvy a stínem pod logem
+ * (lib/iconTile.ts), téměř bílá v tmavé, aby nezmizela.
  * Než se ikona stáhne, je místo prázdné bílé dlaždice vidět dlaždice kategorie –
  * skutečná ikona se přes ni prolne.
  */
-export function PackageIcon({ id, name, iconUrl, size = 48, framed, className }: PackageIconProps) {
+export function PackageIcon({ id, name, iconUrl, size = 48, className }: PackageIconProps) {
   const sources = useIconSources(id, name, iconUrl);
   const category = usePackageIndex((s) => s.catalog.get(id)?.categories[0]);
   const [, rerender] = useReducer((n: number) => n + 1, 0);
-  const radius = Math.round(size * 0.24); // „squircle“ zaoblení úměrné velikosti
   const src = sources.find((source) => !failedIcons.has(source));
 
-  /** Dlaždice kategorie – s `framed` menší uvnitř bílého čtverce se stejným okrajem jako skutečná ikona. */
-  const tile = (tileClassName?: string) => {
-    if (!framed) return <CategoryTile id={id} name={name} category={category} size={size} radius={radius} className={tileClassName} />;
-    const inner = Math.round(size * 0.68);
-    return (
-      <div
-        className={cn("flex items-center justify-center bg-white/95 ring-1 ring-black/5", tileClassName)}
-        style={{ width: size, height: size, borderRadius: radius }}
-      >
-        <CategoryTile id={id} name={name} category={category} size={inner} radius={Math.round(inner * 0.24)} />
-      </div>
-    );
-  };
+  const tile = (tileClassName?: string) => <CategoryTile id={id} name={name} category={category} size={size} className={tileClassName} />;
 
   if (src) {
     const inspectable = canInspect(src);
@@ -79,20 +64,21 @@ export function PackageIcon({ id, name, iconUrl, size = 48, framed, className }:
       rerender();
     };
     const show = () => {
-      if (shownIcons.has(src)) return;
       shownIcons.add(src);
-      rerender();
+      // Stejná ikona se mohla načíst zároveň jinde (banner a hlavička detailu) – i tak překreslit
+      if (!ready) rerender();
     };
+    const look = iconTileOf(src);
     return (
-      <div className={cn("relative shrink-0", className)} style={{ width: size, height: size, borderRadius: radius }}>
+      <div className={cn("icon-squircle relative shrink-0", className)} style={{ width: size, height: size }}>
         {!ready && tile("icon-placeholder absolute inset-0")}
         <div
           className={cn(
-            "absolute inset-0 flex items-center justify-center ring-1 ring-black/5 transition-opacity duration-200",
-            lightIcons.has(src) ? "bg-zinc-800" : "bg-white/95",
+            "icon-squircle absolute inset-0 flex items-center justify-center overflow-hidden ring-1 ring-black/5 transition-opacity duration-200 dark:ring-white/12",
+            !look && (lightIcons.has(src) ? "bg-zinc-800" : "bg-white/95"),
             ready ? "opacity-100" : "opacity-0",
           )}
-          style={{ borderRadius: radius, padding: size * 0.16 }}
+          style={{ background: look?.background, padding: size * 0.16 }}
         >
         <img
           key={src}
@@ -118,10 +104,13 @@ export function PackageIcon({ id, name, iconUrl, size = 48, framed, className }:
             const verdict = inspectIcon(img, src);
             if (verdict === "blank") return fail();
             if (verdict === "light") lightIcons.add(src);
+            analyzeIconTile(img, src, verdict === "light");
             show();
           }}
           onError={fail}
           className="size-full object-contain"
+          // Měkký stín pod logem úměrný velikosti ikony
+          style={look && { filter: `drop-shadow(0 ${size * 0.025}px ${size * 0.05}px ${look.shadow})` }}
         />
         </div>
       </div>
@@ -133,44 +122,38 @@ export function PackageIcon({ id, name, iconUrl, size = 48, framed, className }:
 }
 
 /**
- * Dlaždice s přechodem a symbolem kategorie, kruhy podle názvu a první písmeno
- * v rohu (v malé velikosti jen symbol) – místo ikony, která chybí nebo se stahuje.
+ * Bílá dlaždice jako u skutečných ikon se symbolem kategorie v její barvě a prvním
+ * písmenem v rohu (v malé velikosti jen symbol) – místo ikony, která chybí nebo se stahuje.
  */
 function CategoryTile({
   id,
   name,
   category,
   size,
-  radius,
   className,
 }: {
   id: string;
   name: string;
   category: CategoryId | undefined;
   size: number;
-  radius: number;
   className?: string;
 }) {
   const look = placeholderLook(id, name, category);
   const Icon = look.icon;
+  const { background, shadow } = colorTile(look.to);
   return (
     <div
       aria-hidden
-      className={cn("relative flex items-center justify-center overflow-hidden text-white shadow-inner", className)}
-      style={{ width: size, height: size, borderRadius: radius, background: `linear-gradient(135deg, ${look.from}, ${look.to})` }}
+      className={cn("icon-squircle relative flex items-center justify-center overflow-hidden ring-1 ring-black/5 dark:ring-white/12", className)}
+      style={{ width: size, height: size, background, color: look.to }}
     >
-      {size >= 24 &&
-        look.circles.map((c, i) => (
-          <span
-            key={i}
-            className="absolute rounded-full bg-white/15"
-            style={{ width: c.size * size, height: c.size * size, left: (c.x - c.size / 2) * size, top: (c.y - c.size / 2) * size }}
-          />
-        ))}
-      <Icon className="relative" style={{ width: size * 0.46, height: size * 0.46 }} strokeWidth={size >= 64 ? 1.75 : 2} />
+      <Icon
+        style={{ width: size * 0.46, height: size * 0.46, filter: `drop-shadow(0 ${size * 0.025}px ${size * 0.05}px ${shadow})` }}
+        strokeWidth={size >= 64 ? 1.75 : 2}
+      />
       {size >= 32 && (
         <span
-          className="absolute font-display leading-none font-bold opacity-85"
+          className="absolute font-display leading-none font-bold opacity-70"
           style={{ right: size * 0.1, bottom: size * 0.08, fontSize: Math.max(10, size * 0.18) }}
         >
           {look.letter}

@@ -73,16 +73,6 @@ export function brandPalette(entry: CatalogEntry): Palette {
   return { color: placeholderColors(entry.name)[1], light: false, ink: "#ffffff" };
 }
 
-/** Gradient pozadí karet a bannerů z hlavní barvy. */
-export const brandGradient = (color: string) =>
-  `linear-gradient(160deg, ${color}, color-mix(in srgb, ${color} 72%, black))`;
-
-/**
- * Stejný přechod jako brandGradient, ale jako průhledná vrstva nad
- * `background-color` – barvu pak jde plynule animovat (CSS transition).
- */
-export const BRAND_SHADE = "linear-gradient(160deg, transparent, rgb(0 0 0 / 0.28))";
-
 type Rgb = [number, number, number];
 
 export const rgbToHex = ([r, g, b]: Rgb) =>
@@ -136,10 +126,10 @@ export function isNeutralColor(hex: string): boolean {
   return !!rgb && rgbToHsl(rgb)[1] < NEUTRAL_SATURATION;
 }
 
-/** Plynulá změna barvy karty nebo banneru (barva pozadí s vrstvou BRAND_SHADE). */
+/** Plynulá změna barvy karty nebo banneru (barva pozadí s přechodem nad ní, tintOf v lib/iconTile.ts). */
 export const COLOR_TRANSITION = "background-color 450ms ease, color 450ms ease";
 
-const hexToRgb = (hex: string): Rgb | null => {
+export const hexToRgb = (hex: string): Rgb | null => {
   const m = hex.replace("#", "").match(/^([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i);
   return m ? (m.slice(1).map((v) => parseInt(v, 16)) as Rgb) : null;
 };

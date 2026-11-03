@@ -125,6 +125,60 @@ body,
   animation: icon-placeholder-in 200ms ease 150ms forwards;
 }
 
+/* Tvar ikon aplikací (PackageIcon) jako na iOS: superelipsa n ≈ 5 – zaoblení plynule
+   přechází do stran (na úhlopříčce stejně daleko od rohu jako ikony iOS, ~6,5 %).
+   Bez podpory corner-shape obyčejně zaoblený čtverec. */
+.icon-squircle {
+  border-radius: 22.5%;
+}
+@supports (corner-shape: superellipse(2.32)) {
+  .icon-squircle {
+    border-radius: 50%;
+    corner-shape: superellipse(2.32);
+  }
+}
+
+/* Plocha v odstínu barvy ikony (tintOf v lib/iconTile.ts – banner v detailu, karty na
+   domovské stránce, detail kolekce); barvu dává proměnná --tint. Ve světlém tématu světlý
+   odstín 7 → 20 % barvy (přechod 14 % barvy nad 7 % dá na konci 20 %; dlaždice ikon mají
+   jen slabší nádech, TINT_FROM / TINT_TO), v tmavém tmavá plocha s nádechem barvy. .tint-vars jen nastaví
+   proměnné (text a „sklo“ mimo plochu). */
+.tint-vars,
+.tint-surface {
+  --tint-from: color-mix(in srgb, var(--tint) 7%, white);
+  --tint-to: color-mix(in srgb, var(--tint) 20%, white);
+  --tint-overlay: color-mix(in srgb, var(--tint) 14%, transparent);
+  --tint-ink: color-mix(in srgb, var(--tint) 30%, #111827);
+}
+.dark .tint-vars,
+.dark .tint-surface {
+  --tint-from: color-mix(in srgb, var(--tint) 14%, var(--surface));
+  --tint-to: color-mix(in srgb, var(--tint) 24%, var(--surface));
+  --tint-overlay: color-mix(in srgb, var(--tint) 12%, transparent);
+  --tint-ink: color-mix(in srgb, var(--tint) 15%, white);
+}
+.tint-surface {
+  background-color: var(--tint-from);
+  background-image: linear-gradient(160deg, transparent, var(--tint-overlay));
+}
+
+/* Ikona „v bublině“ na kartě ve světlém odstínu (domovská stránka): dlaždice má podobný
+   odstín jako karta – tenký okraj a výrazný stín ji od karty oddělí. */
+.icon-lifted {
+  box-shadow:
+    0 0 0 1px rgb(0 0 0 / 0.07),
+    0 2px 6px rgb(0 0 0 / 0.1),
+    0 22px 40px -12px rgb(0 0 0 / 0.38);
+}
+/* V tmavém tématu světlý okraj – tmavá ikona s vlastním podkladem (TeamViewer) by na tmavé
+   ploše v odstínu stejné barvy zanikla. */
+.dark .icon-lifted {
+  box-shadow:
+    0 0 0 1px rgb(255 255 255 / 0.2),
+    0 2px 6px rgb(0 0 0 / 0.3),
+    0 22px 44px -12px rgb(0 0 0 / 0.65);
+}
+
 /* Bublina s popiskem (components/ui/Tooltip.tsx) – prolne se a přisune k prvku jako HoverHint. */
 @keyframes tooltip-in {
   from {

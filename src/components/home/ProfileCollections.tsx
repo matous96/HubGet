@@ -2,11 +2,12 @@ import { ArrowRight, Check, Download, Link2, PackagePlus } from "lucide-react";
 import { useMemo, type MouseEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
+import { Doodles } from "@/components/package/Doodles";
 import { PackageIcon } from "@/components/package/PackageIcon";
 import { localize, PROFILE_COLLECTIONS, type CollectionStory } from "@/data/editorial";
 import { useCollectionInstall } from "@/hooks/useCollectionInstall";
 import { pickSource, useCatalogIndex } from "@/hooks/usePackages";
-import { brandGradient, paletteFor } from "@/lib/color";
+import { tintOf } from "@/lib/iconTile";
 import { useBundle } from "@/store/bundle";
 import { useCollectionModal } from "@/store/collectionModal";
 import { useSettings } from "@/store/settings";
@@ -67,7 +68,8 @@ function ProfileCard({ story, entries }: { story: CollectionStory; entries: Cata
   const { pending, installAll } = useCollectionInstall(entries);
   const addToBundle = useBundle((s) => s.add);
   const toast = useToasts((s) => s.push);
-  const { ink } = paletteFor(story.color);
+  // Odstín barvy kolekce podle tématu (ve světlém jako dlaždice ikon)
+  const { style: tint, ink, hue } = tintOf(story.color);
   const title = localize(story.title, language);
 
   /** Přidá kolekci do sady balíčků – tam si ji jde upravit a sdílet. */
@@ -88,16 +90,18 @@ function ProfileCard({ story, entries }: { story: CollectionStory; entries: Cata
   return (
     <article
       onClick={() => openCollection(story)}
-      className="flex cursor-pointer flex-col overflow-hidden rounded-3xl shadow-card transition-[box-shadow,transform] duration-300 hover:shadow-card-hover active:scale-[0.99]"
-      style={{ background: brandGradient(story.color), color: ink }}
+      className="tint-surface relative flex cursor-pointer flex-col overflow-hidden rounded-3xl shadow-card transition-[box-shadow,transform] duration-300 hover:shadow-card-hover active:scale-[0.99]"
+      style={{ ...tint, color: ink }}
     >
-      <div className="flex-1 px-5 pt-5">
+      {/* Decentní vzorek symbolů podle zaměření (kategorie první aplikace) */}
+      <Doodles seedKey={story.id} category={entries[0]?.categories[0]} ink={hue} cols={6} rows={3} opacity={0.05} />
+      <div className="relative flex-1 px-5 pt-5">
         {/* Nadpis je tlačítko kvůli klávesnici a čtečkám obrazovky; myší se klikne kamkoli na kartu */}
         <button
           type="button"
           aria-haspopup="dialog"
           aria-label={t("collection.open", { name: title })}
-          className="block cursor-pointer rounded-xl text-left outline-none focus-visible:ring-4 focus-visible:ring-white/50"
+          className="block cursor-pointer rounded-xl text-left outline-none focus-visible:ring-4 focus-visible:ring-black/20"
         >
           <p className="text-[11px] font-semibold tracking-[0.12em] uppercase opacity-75">{localize(story.eyebrow, language)}</p>
           <h3 className="mt-1 font-display text-2xl leading-tight font-bold">{title}</h3>
@@ -112,14 +116,14 @@ function ProfileCard({ story, entries }: { story: CollectionStory; entries: Cata
               onClick={(event) => event.stopPropagation()}
               className="rounded-[10px] transition-transform hover:-translate-y-0.5"
             >
-              <PackageIcon id={e.id} name={e.name} iconUrl={e.iconUrl} size={40} className="shadow-lg shadow-black/20" />
+              <PackageIcon id={e.id} name={e.name} iconUrl={e.iconUrl} size={40} className="icon-lifted" />
             </Link>
           ))}
         </div>
       </div>
       {/* Tlačítka se nezalamují uvnitř; když se do úzké karty nevejdou vedle sebe, „Do sady“ přejde na další řádek */}
       <div
-        className="mt-4 flex flex-wrap items-center gap-2 px-5 py-3.5"
+        className="relative mt-4 flex flex-wrap items-center gap-2 px-5 py-3.5"
         style={{ background: glass(ink, 10), borderTop: `1px solid ${glass(ink, 12)}` }}
       >
         {pending.length > 0 ? (

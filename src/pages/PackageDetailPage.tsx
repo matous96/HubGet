@@ -231,7 +231,7 @@ function PackageDetailView({ entry: fullEntry, inCatalog }: { entry: CatalogEntr
           name={entry.name}
           iconUrl={entry.iconUrl}
           size={150}
-          className="row-span-2 shadow-2xl shadow-black/25"
+          className="icon-lifted row-span-2"
         />
         {/* Úzký detail: obal se „rozpustí“ (contents) a název i akce jsou samostatné položky mřížky –
             akce pod názvem přes celou šířku. Široký: jeden sloupec přes obě řádky, vpravo panel. */}

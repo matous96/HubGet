@@ -4,7 +4,8 @@ import { Link } from "react-router";
 import { getCategory } from "@/data/categories";
 import { allArchitectures, archSummary } from "@/lib/arch";
 import { useBrandPalette } from "@/hooks/useBrandPalette";
-import { BRAND_SHADE, COLOR_TRANSITION } from "@/lib/color";
+import { COLOR_TRANSITION } from "@/lib/color";
+import { tintOf } from "@/lib/iconTile";
 import { cn } from "@/lib/utils";
 import { getSource, steamAppId } from "@/services/managers";
 import { useSettings } from "@/store/settings";
@@ -14,12 +15,13 @@ import { PackageIcon } from "./PackageIcon";
 
 /**
  * Banner v horní části detailu ve stylu App Store:
- * barva značky (nebo dominantní barva ikony), dekorativní vzorek ikon podle
- * kategorie a uprostřed ikona s názvem aplikace. Pokud katalog dodá
- * `bannerUrl`, použije se obrázek.
+ * světlý odstín barvy značky (nebo dominantní barvy ikony) – stejný jako dlaždice
+ * ikony (lib/iconTile.ts), dekorativní vzorek ikon podle kategorie v té barvě
+ * a uprostřed ikona s názvem aplikace. Pokud katalog dodá `bannerUrl`, použije se obrázek.
  */
 export function PackageBanner({ entry }: { entry: CatalogEntry }) {
-  const { color, light, ink } = useBrandPalette(entry);
+  const { color } = useBrandPalette(entry);
+  const { style: tint, ink, hue } = tintOf(color);
 
   if (entry.bannerUrl) {
     return (
@@ -35,18 +37,17 @@ export function PackageBanner({ entry }: { entry: CatalogEntry }) {
   return (
     <div
       // Zaoblené rohy jako ostatní karty (banner už nesahá až k okrajům okna)
-      className="relative flex h-72 items-center justify-center overflow-hidden rounded-3xl shadow-card"
-      style={{ backgroundColor: color, backgroundImage: BRAND_SHADE, transition: COLOR_TRANSITION }}
+      className="tint-surface relative flex h-72 items-center justify-center overflow-hidden rounded-3xl shadow-card"
+      style={{ ...tint, transition: COLOR_TRANSITION }}
     >
       {/* Vzorek ikon */}
-      <Doodles seedKey={entry.id} category={entry.categories[0]} ink={ink} />
+      <Doodles seedKey={entry.id} category={entry.categories[0]} ink={hue} opacity={0.2} />
 
       {/* Plocha v barvě banneru za logem, aby vzorek nerušil (maska = měkký okraj) */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0"
+        className="tint-surface pointer-events-none absolute inset-0"
         style={{
-          backgroundColor: color,
           maskImage: "radial-gradient(ellipse 45% 60% at center, black 30%, transparent 100%)",
           transition: COLOR_TRANSITION,
         }}
@@ -59,13 +60,12 @@ export function PackageBanner({ entry }: { entry: CatalogEntry }) {
           name={entry.name}
           iconUrl={entry.iconUrl}
           size={96}
-          framed
-          className="shadow-2xl shadow-black/30"
+          className="icon-lifted"
         />
         <span
           // Vyšší řádkování + padding, aby truncate neořízl ocásky písmen (p, y, g)
           className="cursor-text truncate py-2 font-display text-6xl leading-[1.15] font-bold tracking-tight select-text"
-          style={{ color: ink, textShadow: light ? "none" : "0 2px 16px rgb(0 0 0 / 0.2)", transition: COLOR_TRANSITION }}
+          style={{ color: ink, transition: COLOR_TRANSITION }}
         >
           {entry.name}
         </span>

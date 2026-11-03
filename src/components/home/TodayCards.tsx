@@ -20,7 +20,8 @@ import { localize, type AppStory, type CollectionStory } from "@/data/editorial"
 import { useBrandPalette } from "@/hooks/useBrandPalette";
 import { useCollectionInstall } from "@/hooks/useCollectionInstall";
 import { useCollectionPalette } from "@/hooks/useCollectionPalette";
-import { BRAND_SHADE, brandGradient, COLOR_TRANSITION } from "@/lib/color";
+import { COLOR_TRANSITION } from "@/lib/color";
+import { tintOf } from "@/lib/iconTile";
 import { cn } from "@/lib/utils";
 import { useCollectionModal } from "@/store/collectionModal";
 import { useSettings } from "@/store/settings";
@@ -94,20 +95,21 @@ function StoryText({ eyebrow, title, subtitle, ink, large }: { eyebrow: string; 
 export function AppStoryCard({ story, entry, className, paging }: { story: AppStory; entry: CatalogEntry; className?: string; paging?: CardPaging }) {
   const { t } = useTranslation();
   const language = useSettings((s) => s.language);
-  const { color, ink } = useBrandPalette(entry);
-  const shade = `color-mix(in srgb, ${color} 80%, black)`;
+  const { color } = useBrandPalette(entry);
+  // Odstín barvy ikony podle tématu – stejný jako banner v detailu
+  const { style: tint, to: shade, ink, hue } = tintOf(color);
   const openDetail = useCardClick(entry.id);
 
   return (
     <article
       onClick={openDetail}
       className={cn(
-        "group relative flex min-h-[440px] cursor-pointer flex-col justify-end overflow-hidden rounded-3xl shadow-card transition-[box-shadow,transform] duration-300 hover:shadow-card-hover active:scale-[0.995]",
+        "tint-surface group relative flex min-h-[440px] cursor-pointer flex-col justify-end overflow-hidden rounded-3xl shadow-card transition-[box-shadow,transform] duration-300 hover:shadow-card-hover active:scale-[0.995]",
         className,
       )}
-      style={{ background: brandGradient(color) }}
+      style={{ ...tint, transition: `${COLOR_TRANSITION}, box-shadow 300ms, transform 300ms` }}
     >
-      <Doodles seedKey={story.id} category={entry.categories[0]} ink={ink} cols={8} rows={4} opacity={0.13} />
+      <Doodles seedKey={story.id} category={entry.categories[0]} ink={hue} cols={8} rows={4} opacity={0.12} />
       {paging && <CardPager {...paging} ink={ink} />}
 
       {/* Grafika: velká natočená ikona aplikace (dekorace – klik patří kartě) */}
@@ -117,7 +119,7 @@ export function AppStoryCard({ story, entry, className, paging }: { story: AppSt
           name={entry.name}
           iconUrl={entry.iconUrl}
           size={180}
-          className="-rotate-6 shadow-2xl shadow-black/30 transition-transform duration-500 group-hover:scale-105 group-hover:rotate-0"
+          className="icon-lifted -rotate-6 transition-transform duration-500 group-hover:scale-105 group-hover:rotate-0"
         />
       </div>
 
@@ -130,7 +132,7 @@ export function AppStoryCard({ story, entry, className, paging }: { story: AppSt
 
       {/* Nadpis jako odkaz – pro klávesnici a čtečky obrazovky; myší se klikne kamkoli na kartu */}
       <div className="relative px-7 pb-5">
-        <Link to={detailUrl(entry.id)} className="block rounded-xl outline-none focus-visible:ring-4 focus-visible:ring-white/50">
+        <Link to={detailUrl(entry.id)} className="block rounded-xl outline-none focus-visible:ring-4 focus-visible:ring-black/20">
           <StoryText
             eyebrow={localize(story.eyebrow, language)}
             title={localize(story.title, language)}
@@ -169,12 +171,14 @@ export function AppStoryCard({ story, entry, className, paging }: { story: AppSt
 // ── Aplikace dne ──────────────────────────────────────────────────────────
 
 /**
- * Vodorovná karta „Aplikace dne“: tmavé pozadí jemně zabarvené barvou značky,
+ * Vodorovná karta „Aplikace dne“ podle tématu: ve světlém světlý odstín barvy značky
+ * jako ostatní karty (tintOf), v tmavém tmavé pozadí jemně zabarvené barvou značky;
  * vlevo hvězdička, název a popis s akcemi, vpravo velká ikona se září.
  */
 export function AppOfTheDayCard({ entry, className }: { entry: CatalogEntry; className?: string }) {
   const { t } = useTranslation();
   const { color } = useBrandPalette(entry);
+  const { style: tint, ink } = tintOf(color);
   const base = `color-mix(in srgb, ${color} 22%, #0a1530)`;
   const openDetail = useCardClick(entry.id);
 
@@ -182,35 +186,45 @@ export function AppOfTheDayCard({ entry, className }: { entry: CatalogEntry; cla
     <article
       onClick={openDetail}
       className={cn(
-        "group relative flex min-h-[440px] cursor-pointer items-center overflow-hidden rounded-3xl text-white shadow-card transition-[box-shadow,transform] duration-300 hover:shadow-card-hover active:scale-[0.995]",
+        "tint-surface group relative flex min-h-[440px] cursor-pointer items-center overflow-hidden rounded-3xl text-(--ink) shadow-card transition-[box-shadow,transform] duration-300 hover:shadow-card-hover active:scale-[0.995] dark:text-white",
         className,
       )}
-      style={{ background: `linear-gradient(135deg, ${base}, color-mix(in srgb, ${base} 70%, black))` }}
+      style={{ ...tint, "--ink": ink } as CSSProperties}
     >
+      {/* Tmavé téma: tmavé pozadí s nádechem barvy značky */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 hidden dark:block"
+        style={{ background: `linear-gradient(135deg, ${base}, color-mix(in srgb, ${base} 70%, black))` }}
+      />
+
       {/* Záře barvy značky za ikonou */}
       <div
         aria-hidden
-        className="pointer-events-none absolute top-1/2 right-[12%] size-96 -translate-y-1/2 rounded-full opacity-40 blur-3xl"
+        className="pointer-events-none absolute top-1/2 right-[12%] size-96 -translate-y-1/2 rounded-full opacity-30 blur-3xl dark:opacity-40"
         style={{ background: color }}
       />
 
       <div className="relative grid w-full items-center gap-8 px-10 py-10 md:grid-cols-[1fr_auto]">
         <div className="max-w-md">
           <p className="flex items-center gap-2 text-lg font-medium">
-            <Star className="size-5 fill-current text-amber-300" />
+            <Star className="size-5 fill-current text-amber-500 dark:text-amber-300" />
             {t("home.appOfDay")}
           </p>
           <h2 className="mt-8 font-display text-5xl leading-[1.05] font-bold tracking-tight">
-            <Link to={detailUrl(entry.id)} className="rounded-lg outline-none focus-visible:ring-4 focus-visible:ring-white/40">
+            <Link
+              to={detailUrl(entry.id)}
+              className="rounded-lg outline-none focus-visible:ring-4 focus-visible:ring-black/20 dark:focus-visible:ring-white/40"
+            >
               <NameWithBadge name={entry.name} verified={isVerified(entry)} size={32} />
             </Link>
           </h2>
-          <p className="mt-3 text-lg text-white/80">{entry.description}</p>
-          <div className="relative z-10 mt-8 flex items-center gap-3 [&_button]:bg-white [&_button]:text-slate-900 [&_button]:shadow-none [&>span]:text-white">
+          <p className="mt-3 text-lg opacity-80">{entry.description}</p>
+          <div className="relative z-10 mt-8 flex items-center gap-3 [&_button]:bg-(--ink) [&_button]:text-white [&_button]:shadow-none [&>span]:text-(--ink) dark:[&_button]:bg-white dark:[&_button]:text-slate-900 dark:[&>span]:text-white">
             <PackageAction entry={entry} size="lg" />
             <Link
               to={detailUrl(entry.id)}
-              className="rounded-full bg-white/12 px-5 py-2.5 text-sm font-semibold transition-colors hover:bg-white/20"
+              className="rounded-full bg-black/6 px-5 py-2.5 text-sm font-semibold transition-colors hover:bg-black/10 dark:bg-white/12 dark:hover:bg-white/20"
             >
               {t("home.view")}
             </Link>
@@ -222,7 +236,7 @@ export function AppOfTheDayCard({ entry, className }: { entry: CatalogEntry; cla
           name={entry.name}
           iconUrl={entry.iconUrl}
           size={200}
-          className="pointer-events-none mx-auto rotate-3 shadow-2xl shadow-black/40 transition-transform duration-500 group-hover:scale-105 group-hover:rotate-0"
+          className="icon-lifted pointer-events-none mx-auto rotate-3 transition-transform duration-500 group-hover:scale-105 group-hover:rotate-0"
         />
       </div>
     </article>
@@ -263,9 +277,10 @@ export function CollectionCard({
   const openCollection = useCollectionModal((s) => s.open);
   const { pending, installAll } = useCollectionInstall(entries);
   // Barva podle ikon v sadě (převládající odstín), u pestré sady barva kolekce
-  const { color, ink } = useCollectionPalette(entries, story.color);
-  const shade = `color-mix(in srgb, ${color} 78%, black)`;
-  // Skutečná barva spodní lišty (tmavý přechod + 10 % průhledné vrstvy) – kroužek kolem ikon s ní splyne
+  const { color } = useCollectionPalette(entries, story.color);
+  // Odstín barvy podle tématu (ve světlém jako dlaždice ikon)
+  const { style: tint, to: shade, ink, hue } = tintOf(color);
+  // Skutečná barva spodní lišty (podklad pod textem + 10 % průhledné vrstvy) – kroužek kolem ikon s ní splyne
   const bar = `color-mix(in srgb, ${shade} 90%, ${ink})`;
   const title = localize(story.title, language);
 
@@ -274,12 +289,12 @@ export function CollectionCard({
       // Detail kolekce ve stejné barvě jako karta
       onClick={() => openCollection({ ...story, color })}
       className={cn(
-        "group relative flex min-h-[440px] cursor-pointer flex-col justify-end overflow-hidden rounded-3xl shadow-card transition-[box-shadow,transform] duration-300 hover:shadow-card-hover active:scale-[0.99]",
+        "tint-surface group relative flex min-h-[440px] cursor-pointer flex-col justify-end overflow-hidden rounded-3xl shadow-card transition-[box-shadow,transform] duration-300 hover:shadow-card-hover active:scale-[0.99]",
         className,
       )}
-      style={{ backgroundColor: color, backgroundImage: BRAND_SHADE, transition: `${COLOR_TRANSITION}, box-shadow 300ms, transform 300ms` }}
+      style={{ ...tint, transition: `${COLOR_TRANSITION}, box-shadow 300ms, transform 300ms` }}
     >
-      <Doodles seedKey={story.id} category={entries[0]?.categories[0]} ink={ink} cols={5} rows={4} opacity={0.12} />
+      <Doodles seedKey={story.id} category={entries[0]?.categories[0]} ink={hue} cols={5} rows={4} opacity={0.12} />
       {paging && <CardPager {...paging} ink={ink} />}
 
       {/* Grafika: tři plovoucí ikony z kolekce (klik otevře detail kolekce jako zbytek karty) */}
@@ -297,7 +312,7 @@ export function CollectionCard({
                 name={e.name}
                 iconUrl={e.iconUrl}
                 size={pos.size}
-                className="shadow-2xl shadow-black/30 transition-transform duration-200 hover:scale-110"
+                className="icon-lifted transition-transform duration-200 hover:scale-110"
               />
             </div>
           );
@@ -317,7 +332,7 @@ export function CollectionCard({
           type="button"
           aria-haspopup="dialog"
           aria-label={t("collection.open", { name: title })}
-          className="cursor-pointer rounded-xl text-left outline-none focus-visible:ring-4 focus-visible:ring-white/50"
+          className="cursor-pointer rounded-xl text-left outline-none focus-visible:ring-4 focus-visible:ring-black/20"
         >
           <StoryText eyebrow={localize(story.eyebrow, language)} title={title} subtitle={localize(story.subtitle, language)} ink={ink} />
         </button>

@@ -22,7 +22,7 @@ import { localize, type CollectionStory } from "@/data/editorial";
 import { useCollectionInstall } from "@/hooks/useCollectionInstall";
 import { useOverlay } from "@/hooks/useOverlay";
 import { useCatalogIndex } from "@/hooks/usePackages";
-import { brandGradient, paletteFor } from "@/lib/color";
+import { tintOf } from "@/lib/iconTile";
 import { useCollectionModal } from "@/store/collectionModal";
 import { useSettings } from "@/store/settings";
 import type { CatalogEntry } from "@/types";
@@ -68,7 +68,8 @@ function CollectionPanel({ story, onClose }: { story: CollectionStory; onClose: 
     [story, catalogIndex],
   );
   const { pending, installAll } = useCollectionInstall(entries);
-  const { ink } = paletteFor(story.color);
+  // Odstín barvy kolekce podle tématu – stejný jako karta
+  const { style: tint, from, ink, hue } = tintOf(story.color);
   const closeButton = useRef<HTMLButtonElement>(null);
 
   // Fokus na zavírací tlačítko (klávesnice, čtečky obrazovky); po zavření zpět, odkud přišel
@@ -83,7 +84,9 @@ function CollectionPanel({ story, onClose }: { story: CollectionStory; onClose: 
       role="dialog"
       aria-modal
       aria-label={localize(story.title, language)}
-      className="relative flex max-h-full w-full max-w-4xl flex-col overflow-hidden rounded-3xl bg-surface shadow-2xl"
+      // Proměnné odstínu i pro zavírací tlačítko mimo záhlaví
+      className="tint-vars relative flex max-h-full w-full max-w-4xl flex-col overflow-hidden rounded-3xl bg-surface shadow-2xl"
+      style={tint}
       initial={{ opacity: 0, scale: 0.94, y: 16 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       // Otevření pružinou, zavření krátkým plynulým zmizením (bez dokmitávání)
@@ -98,7 +101,7 @@ function CollectionPanel({ story, onClose }: { story: CollectionStory; onClose: 
         onClick={onClose}
         aria-label={t("common.close")}
         title={`${t("common.close")} (Esc)`}
-        className="absolute top-4 right-4 z-20 flex size-10 cursor-pointer items-center justify-center rounded-full backdrop-blur-md transition-transform hover:scale-105 focus-visible:ring-4 focus-visible:ring-white/50 focus-visible:outline-none"
+        className="absolute top-4 right-4 z-20 flex size-10 cursor-pointer items-center justify-center rounded-full backdrop-blur-md transition-transform hover:scale-105 focus-visible:ring-4 focus-visible:ring-black/20 focus-visible:outline-none"
         style={{ background: glass(ink, 22), color: ink }}
       >
         <X className="size-5" strokeWidth={2.5} />
@@ -106,8 +109,8 @@ function CollectionPanel({ story, onClose }: { story: CollectionStory; onClose: 
 
       <div className="min-h-0 overflow-y-auto">
         {/* Záhlaví v barvě kolekce */}
-        <header className="relative overflow-hidden px-8 pt-10 pb-8" style={{ background: brandGradient(story.color), color: ink }}>
-          <Doodles seedKey={story.id} category={entries[0]?.categories[0]} ink={ink} cols={8} rows={3} opacity={0.12} />
+        <header className="tint-surface relative overflow-hidden px-8 pt-10 pb-8" style={{ color: ink }}>
+          <Doodles seedKey={story.id} category={entries[0]?.categories[0]} ink={hue} cols={8} rows={3} opacity={0.2} />
           <div className="relative max-w-2xl pr-10">
             <p className="text-xs font-semibold tracking-[0.14em] uppercase opacity-75">{localize(story.eyebrow, language)}</p>
             <h2 className="mt-2 font-display text-4xl leading-[1.08] font-bold tracking-tight">{localize(story.title, language)}</h2>
@@ -118,7 +121,9 @@ function CollectionPanel({ story, onClose }: { story: CollectionStory; onClose: 
                 <button
                   type="button"
                   onClick={installAll}
-                  className="inline-flex h-11 cursor-pointer items-center gap-2 rounded-full bg-white px-6 text-sm font-semibold text-slate-900 shadow-lg shadow-black/20 transition hover:brightness-95"
+                  className="inline-flex h-11 cursor-pointer items-center gap-2 rounded-full px-6 text-sm font-semibold shadow-lg shadow-black/15 transition hover:opacity-90"
+                  // Barva textu záhlaví jako výplň: ve světlém tématu tmavé tlačítko, v tmavém světlé
+                  style={{ background: ink, color: from }}
                 >
                   <Download className="size-4" />
                   {t("collection.installAll", { count: pending.length })}
