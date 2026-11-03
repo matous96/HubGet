@@ -161,6 +161,13 @@ body,
   background-color: var(--tint-from);
   background-image: linear-gradient(160deg, transparent, var(--tint-overlay));
 }
+/* Banner v detailu (velká plocha s názvem aplikace): v tmavém tématu víc barvy než karty –
+   14–24 % na tmavém podkladu z něj dělalo skoro černou plochu. */
+.dark .tint-surface.tint-strong {
+  --tint-from: color-mix(in srgb, var(--tint) 30%, var(--surface));
+  --tint-to: color-mix(in srgb, var(--tint) 44%, var(--surface));
+  --tint-overlay: color-mix(in srgb, var(--tint) 20%, transparent);
+}
 
 /* Shody hledání v Nastavení (components/settings/SettingsSearch.tsx, CSS Custom Highlight API). */
 ::highlight(settings-search) {

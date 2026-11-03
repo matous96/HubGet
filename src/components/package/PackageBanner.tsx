@@ -37,7 +37,7 @@ export function PackageBanner({ entry }: { entry: CatalogEntry }) {
   return (
     <div
       // Zaoblené rohy jako ostatní karty (banner už nesahá až k okrajům okna)
-      className="tint-surface relative flex h-72 items-center justify-center overflow-hidden rounded-3xl shadow-card"
+      className="tint-surface tint-strong relative flex h-72 items-center justify-center overflow-hidden rounded-3xl shadow-card"
       style={{ ...tint, transition: COLOR_TRANSITION }}
     >
       {/* Vzorek ikon */}
@@ -46,7 +46,7 @@ export function PackageBanner({ entry }: { entry: CatalogEntry }) {
       {/* Plocha v barvě banneru za logem, aby vzorek nerušil (maska = měkký okraj) */}
       <div
         aria-hidden
-        className="tint-surface pointer-events-none absolute inset-0"
+        className="tint-surface tint-strong pointer-events-none absolute inset-0"
         style={{
           maskImage: "radial-gradient(ellipse 45% 60% at center, black 30%, transparent 100%)",
           transition: COLOR_TRANSITION,

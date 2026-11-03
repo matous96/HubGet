@@ -36,13 +36,15 @@ const TINT_TO = 5;
 /**
  * Barva, ze které se míchá světlý odstín: tmavá barva značky nebo ikony (Steam #1b2838)
  * by se s bílou ztratila v šedé – použije se její odstín se světlostí 42–62 % a aspoň
- * střední sytostí (Discord #5865f2 zůstane, jak je). Šedá (černobílá ikona, NEUTRAL_TONE)
- * zůstane šedou, barva v jiném zápisu než hex se nemění.
+ * střední sytostí (Discord #5865f2 zůstane, jak je). Šedá a černá (černobílá ikona,
+ * NEUTRAL_TONE, tmavá šedá z loga) zůstane šedou, jen světlejší (45–62 %) – v tmavém
+ * tématu by jinak banner splynul s černým pozadím. Barva v jiném zápisu než hex se nemění.
  */
 function tintSource(color: string): string {
   const rgb = hexToRgb(color);
-  if (!rgb || color === NEUTRAL_TONE || isNeutralColor(color)) return color;
+  if (!rgb) return color;
   const [h, s, l] = rgbToHsl(rgb);
+  if (color === NEUTRAL_TONE || isNeutralColor(color)) return rgbToHex(hslToRgb([h, s, Math.min(0.62, Math.max(0.45, l))]));
   return rgbToHex(hslToRgb([h, Math.max(s, 0.45), Math.min(0.62, Math.max(0.42, l))]));
 }
 
