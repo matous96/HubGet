@@ -78,9 +78,10 @@
         <div class="page-head__inner reveal">
           <p class="eyebrow" data-t="t1">Novinky</p>
           <h1 data-t="t2">Co je nového v&nbsp;HubGetu</h1>
-          <p class="lead" data-t="t3">Všechny změny od první veřejné verze 0.1.0, nejnovější nahoře. Od jejího vydání 21.&nbsp;10. vyšlo <!--obsah:updates-words-->dvaadvacet<!--/obsah:updates-words--> aktualizací.</p>
+          <p class="lead" data-t="t3">Všechny změny od první veřejné verze 0.1.0, nejnovější nahoře. Od jejího vydání 21.&nbsp;10. vyšlo <!--obsah:updates-words-->třiadvacet<!--/obsah:updates-words--> aktualizací.</p>
           <nav class="versions-nav" aria-label="Přejít na verzi">
             <!--obsah:versions-->
+            <a class="chip" href="#v0-1-23">0.1.23</a>
             <a class="chip" href="#v0-1-22">0.1.22</a>
             <a class="chip" href="#v0-1-21">0.1.21</a>
             <a class="chip" href="#v0-1-20">0.1.20</a>
@@ -108,8 +109,8 @@
           </nav>
         </div>
         <dl class="stats reveal">
-          <div><dt data-t="t4">Aktuální verze</dt><dd><!--obsah:version-->0.1.22<!--/obsah:version--></dd></div>
-          <div><dt data-t="t5">Aktualizací od verze 0.1.0</dt><dd><!--obsah:updates-->22<!--/obsah:updates--></dd></div>
+          <div><dt data-t="t4">Aktuální verze</dt><dd><!--obsah:version-->0.1.23<!--/obsah:version--></dd></div>
+          <div><dt data-t="t5">Aktualizací od verze 0.1.0</dt><dd><!--obsah:updates-->23<!--/obsah:updates--></dd></div>
           <div><dt data-t="t6">Aplikací v&nbsp;katalogu</dt><dd data-t="t7">25&nbsp;100+</dd></div>
           <div><dt data-t="t8">Správci naostro</dt><dd data-t="t9">WinGet · Chocolatey · Scoop + 8 pro vývojáře</dd></div>
         </dl>
@@ -236,6 +237,39 @@
 
         <div class="timeline">
           <!--obsah:releases-->
+          <!-- 0.1.23 -->
+          <article class="release" id="v0-1-23">
+            <div class="release__meta">
+              <span class="release__ver">0.1.23</span>
+              <time class="release__date" datetime="2026-11-03">3. 11. 2026</time>
+            </div>
+            <div class="card release__body">
+              <div class="release__head">
+                <h2>Vždy čerstvý katalog a&nbsp;rychlejší ikony</h2>
+                <span class="badge badge--live">Nejnovější</span>
+              </div>
+              <div class="changes changes--better">
+                <h3>Vylepšeno</h3>
+                <ul>
+                  <li><strong>Katalog se obnovuje i&nbsp;za běhu</strong> – HubGet, který zůstane v&nbsp;oznamovací oblasti, si novější katalog stáhne každých šest hodin: když se k&nbsp;oknu vrátíte, nebo na pozadí. Nové aplikace a&nbsp;ikony tak uvidíte i&nbsp;bez restartu.</li>
+                  <li>Odznaky Bezpečné, Jednoduché a&nbsp;Vše pod kontrolou v&nbsp;sekci Dnes i&nbsp;štítek Open source ukážou po najetí myší krátké vysvětlení a&nbsp;kliknutím podrobnosti.</li>
+                  <li>Popisky tlačítek v&nbsp;celé aplikaci mají stejný vzhled jako ostatní bubliny – i&nbsp;při ovládání klávesnicí a&nbsp;u&nbsp;okraje okna.</li>
+                  <li>Ikony aplikací se poprvé načtou zhruba čtyřikrát rychleji. Během stahování je místo bílého okénka vidět dlaždice kategorie a&nbsp;ikona se přes ni plynule prolne.</li>
+                  <li>Plynulejší posouvání dlouhých seznamů, třeba Nainstalovaných.</li>
+                  <li>Číslo verze HubGetu je v&nbsp;postranním panelu vedle Nastavení.</li>
+                  <li>V&nbsp;katalogu přes 2 000 nových ikon, zaostřené malé ikony a&nbsp;správně oddělené různé aplikace stejného jména (ChatGPT, ZAP…). Obecný obrázek z&nbsp;Chocolatey se už místo ikony nezobrazuje.</li>
+                  <li>Aktualizace HubGetu mají záložní adresu na hubget.eu – pro případ, že GitHub neodpoví.</li>
+                </ul>
+              </div>
+              <div class="changes changes--fix">
+                <h3>Opraveno</h3>
+                <ul>
+                  <li>Aplikace MSIX (např. Affinity) se po aktualizaci dál nabízely k&nbsp;aktualizaci a&nbsp;další pokus skončil chybou.</li>
+                </ul>
+              </div>
+            </div>
+          </article>
+
           <!-- 0.1.22 -->
           <article class="release" id="v0-1-22">
             <div class="release__meta">
@@ -245,7 +279,6 @@
             <div class="card release__body">
               <div class="release__head">
                 <h2>Okamžitý start a&nbsp;plynulý motiv</h2>
-                <span class="badge badge--live">Nejnovější</span>
               </div>
               <div class="changes changes--better">
                 <h3>Vylepšeno</h3>

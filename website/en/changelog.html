@@ -78,9 +78,10 @@
         <div class="page-head__inner reveal">
           <p class="eyebrow" data-t="t1">What’s new</p>
           <h1 data-t="t2">What’s new in&nbsp;HubGet</h1>
-          <p class="lead" data-t="t3">Every change since the first public version 0.1.0, newest first. <!--obsah:updates-words-capital-->Twenty-two<!--/obsah:updates-words-capital--> updates have shipped since its release on October&nbsp;21.</p>
+          <p class="lead" data-t="t3">Every change since the first public version 0.1.0, newest first. <!--obsah:updates-words-capital-->Twenty-three<!--/obsah:updates-words-capital--> updates have shipped since its release on October&nbsp;21.</p>
           <nav class="versions-nav" aria-label="Jump to version">
             <!--obsah:versions-->
+            <a class="chip" href="#v0-1-23">0.1.23</a>
             <a class="chip" href="#v0-1-22">0.1.22</a>
             <a class="chip" href="#v0-1-21">0.1.21</a>
             <a class="chip" href="#v0-1-20">0.1.20</a>
@@ -108,8 +109,8 @@
           </nav>
         </div>
         <dl class="stats reveal">
-          <div><dt data-t="t4">Current version</dt><dd><!--obsah:version-->0.1.22<!--/obsah:version--></dd></div>
-          <div><dt data-t="t5">Updates since 0.1.0</dt><dd><!--obsah:updates-->22<!--/obsah:updates--></dd></div>
+          <div><dt data-t="t4">Current version</dt><dd><!--obsah:version-->0.1.23<!--/obsah:version--></dd></div>
+          <div><dt data-t="t5">Updates since 0.1.0</dt><dd><!--obsah:updates-->23<!--/obsah:updates--></dd></div>
           <div><dt data-t="t6">Apps in the catalog</dt><dd data-t="t7">25,100+</dd></div>
           <div><dt data-t="t8">Package managers for real</dt><dd data-t="t9">WinGet · Chocolatey · Scoop + 8 for developers</dd></div>
         </dl>
@@ -236,6 +237,39 @@
 
         <div class="timeline">
           <!--obsah:releases-->
+          <!-- 0.1.23 -->
+          <article class="release" id="v0-1-23">
+            <div class="release__meta">
+              <span class="release__ver">0.1.23</span>
+              <time class="release__date" datetime="2026-11-03">Nov 3, 2026</time>
+            </div>
+            <div class="card release__body">
+              <div class="release__head">
+                <h2>Always a fresh catalog and faster icons</h2>
+                <span class="badge badge--live">Latest</span>
+              </div>
+              <div class="changes changes--better">
+                <h3>Improved</h3>
+                <ul>
+                  <li><strong>The catalog refreshes while HubGet runs</strong> – when HubGet stays in the notification area, it fetches a newer catalog every six hours: when you return to the window, or in the background. New apps and icons show up without a restart.</li>
+                  <li>The Safe, Simple and In control badges in the Today section and the Open source label show a short explanation on hover and the details on click.</li>
+                  <li>Button tooltips across the app share the look of the other bubbles – with the keyboard too and at the edge of the window.</li>
+                  <li>App icons load about four times faster the first time. While they download, a category tile shows instead of a blank square and the icon fades in over it.</li>
+                  <li>Smoother scrolling in long lists such as Installed.</li>
+                  <li>The HubGet version number now sits next to Settings in the sidebar.</li>
+                  <li>Over 2,000 new icons in the catalog, sharper small icons, and different apps with the same name (ChatGPT, ZAP…) kept apart. Chocolatey’s generic image no longer shows up in place of an icon.</li>
+                  <li>HubGet updates have a backup address on hubget.eu, in case GitHub doesn’t respond.</li>
+                </ul>
+              </div>
+              <div class="changes changes--fix">
+                <h3>Fixed</h3>
+                <ul>
+                  <li>MSIX apps (such as Affinity) kept being offered for update after updating, and the next attempt failed.</li>
+                </ul>
+              </div>
+            </div>
+          </article>
+
           <!-- 0.1.22 -->
           <article class="release" id="v0-1-22">
             <div class="release__meta">
@@ -245,7 +279,6 @@
             <div class="card release__body">
               <div class="release__head">
                 <h2>Instant first launch and a smooth theme switch</h2>
-                <span class="badge badge--live">Latest</span>
               </div>
               <div class="changes changes--better">
                 <h3>Improved</h3>
