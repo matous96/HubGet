@@ -1,0 +1,29 @@
+{
+  "seo": {
+    "title": "Contact – HubGet",
+    "description": "Write to the author of HubGet – a question, a bug, an idea or a collaboration offer. We’ll reply by email.",
+    "ogTitle": "Contact – HubGet",
+    "ogDescription": "Write to the author of HubGet – a question, a bug, an idea or a collaboration offer. We’ll reply by email."
+  },
+  "texty": {
+    "t1": "Contact",
+    "t2": "Write to us",
+    "t3": "Got a question, found a bug, or have an idea or a collaboration offer? We’ll reply by email.",
+    "t4": "Topic",
+    "t5": "Question",
+    "t6": "Bug",
+    "t7": "Idea",
+    "t8": "Collaboration",
+    "t9": "Other",
+    "t10": "Name <span class=\"field__opt\">(optional)</span>",
+    "t11": "Email",
+    "t12": "Message",
+    "t13": "How can we help?",
+    "t14": "To attach a screenshot of a bug, use the form in the app itself (Settings → Contact HubGet) after signing in.",
+    "t15": "The message is delivered by the Web3Forms service. We’ll only use your email to reply.",
+    "t16": "Send",
+    "t17": "Message sent",
+    "t18": "Thank you! The reply will go to {prvek}.",
+    "t19": "Write another message"
+  }
+}

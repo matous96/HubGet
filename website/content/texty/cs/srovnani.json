@@ -1,0 +1,31 @@
+{
+  "seo": {
+    "title": "Srovnání – HubGet",
+    "description": "Hledáte, čím instalovat aplikace ve Windows? Podívejte se, v čem se HubGet liší od jiných nástrojů – včetně toho, v čem jsou lepší ony.",
+    "ogTitle": "Srovnání – HubGet",
+    "ogDescription": "Hledáte, čím instalovat aplikace ve Windows? Podívejte se, v čem se HubGet liší od jiných nástrojů – včetně toho, v čem jsou lepší ony."
+  },
+  "texty": {
+    "t1": "Srovnání",
+    "t2": "Jak si HubGet stojí vedle alternativ.",
+    "t3": "Hledáte, čím instalovat aplikace ve Windows? Podívejte se, v čem se HubGet liší od jiných nástrojů – včetně toho, v čem jsou lepší ony.",
+    "t4": "<span class=\"vs\">vs</span> Ninite",
+    "t5": "Ninite zpopularizoval instalaci více aplikací najednou. Nabízí ale zhruba 150 vybraných aplikací a bez placené verze je neumí odinstalovat. HubGet má v katalogu přes 25 000 aplikací a spravuje je od instalace až po odinstalaci.",
+    "t6": "25 000+ aplikací místo zhruba 150",
+    "t7": "Aktualizace a odinstalace přímo v aplikaci",
+    "t8": "Zdarma a open source, i pro firmy",
+    "t9": "Přečtěte si celé srovnání {→}",
+    "t10": "<span class=\"vs\">vs</span> UniGetUI",
+    "t11": "UniGetUI je vyspělá desktopová aplikace pro správu balíčků z mnoha správců najednou. HubGet jde jinou cestou: místo seznamu balíčků nabízí obchod s aplikacemi, ve kterém objevujete, porovnáváte a instalujete jako v App Storu.",
+    "t12": "Domovská stránka Dnes, kolekce a žebříčky",
+    "t13": "Jedna aplikace = jedna karta se všemi zdroji",
+    "t14": "Režim Běžný uživatel bez knihoven a nástrojů",
+    "t15": "Přečtěte si celé srovnání {→}",
+    "t16": "<span class=\"vs\">vs</span> Winstall.app",
+    "t17": "Winstall.app je webová stránka, na které vyberete aplikace z WinGetu a necháte si vygenerovat příkaz pro terminál. HubGet aplikace z WinGetu, Chocolatey a Scoopu rovnou nainstaluje, aktualizuje i odinstaluje.",
+    "t18": "Instalace, aktualizace i odinstalace přímo v aplikaci",
+    "t19": "Tři zdroje v jednom katalogu",
+    "t20": "Záložní zdroj, když odkaz ve WinGetu nefunguje",
+    "t21": "Přečtěte si celé srovnání {→}"
+  }
+}

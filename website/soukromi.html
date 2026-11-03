@@ -20,27 +20,27 @@
   </script>
 </head>
 <body>
-  <a class="skip" href="#obsah">Přeskočit na obsah</a>
+  <a class="skip" href="#obsah" data-t="s1">Přeskočit na obsah</a>
 
   <header class="nav" id="nav">
     <div class="wrap nav__inner">
       <a class="brand" href="index.html" aria-label="HubGet – úvod">
         <img src="assets/unibox-logo.svg" alt="" width="32" height="32">
-        <span>HubGet</span>
+        <span data-t="s2">HubGet</span>
       </a>
       <nav class="nav__links" aria-label="Hlavní navigace">
-        <a href="funkce.html">Funkce</a>
-        <a href="spravci.html">Správci balíčků</a>
-        <a href="novinky.html">Novinky</a>
-        <a href="srovnani.html">Srovnání</a>
-        <a href="co-chystame.html">Co chystáme</a>
-        <a href="otazky.html">Otázky</a>
-        <a class="nav__menu-only" href="kontakt.html">Kontakt</a>
+        <a href="funkce.html" data-t="s3">Funkce</a>
+        <a href="spravci.html" data-t="s4">Správci balíčků</a>
+        <a href="novinky.html" data-t="s5">Novinky</a>
+        <a href="srovnani.html" data-t="s6">Srovnání</a>
+        <a href="co-chystame.html" data-t="s7">Co chystáme</a>
+        <a href="otazky.html" data-t="s8">Otázky</a>
+        <a class="nav__menu-only" href="kontakt.html" data-t="s9">Kontakt</a>
       </nav>
       <div class="nav__actions">
-        <a class="lang-switch" href="en/privacy.html" hreflang="en" lang="en" data-lang-switch title="English" aria-label="Switch to English">EN</a>
+        <a class="lang-switch" href="en/privacy.html" hreflang="en" lang="en" data-lang-switch title="English" aria-label="Switch to English" data-t="s10">EN</a>
         <a class="icon-btn nav__mail" href="kontakt.html" aria-label="Napište nám" title="Kontakt"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="4.5" width="19" height="15" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m3 7 9 6 9-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
-        <a class="btn btn--primary btn--sm" href="index.html#stahnout">Stáhnout</a>
+        <a class="btn btn--primary btn--sm" href="index.html#stahnout" data-t="s11">Stáhnout</a>
       </div>
     </div>
   </header>
@@ -49,65 +49,65 @@
     <section class="page-head">
       <div class="wrap">
         <div class="page-head__inner">
-          <p class="eyebrow">Ochrana soukromí</p>
-          <h1>Co HubGet dělá s&nbsp;daty</h1>
-          <p class="lead">Žádná telemetrie, analytika ani reklamy. Co máte nainstalované, zůstává ve vašem počítači.</p>
+          <p class="eyebrow" data-t="t1">Ochrana soukromí</p>
+          <h1 data-t="t2">Co HubGet dělá s&nbsp;daty</h1>
+          <p class="lead" data-t="t3">Žádná telemetrie, analytika ani reklamy. Co máte nainstalované, zůstává ve vašem počítači.</p>
         </div>
       </div>
     </section>
 
     <article class="wrap legal">
-      <p class="note"><strong>Zkráceně:</strong> HubGet neodesílá žádné údaje o vás ani o vašem počítači. Síť používá jen k&nbsp;funkcím popsaným níže – každý server přitom vidí běžné údaje požadavku (IP adresu, čas, verzi programu). Přihlášení je dobrovolné a bez něj HubGet funguje celý kromě hodnocení a synchronizace.</p>
+      <p class="note" data-t="t4"><strong>Zkráceně:</strong> HubGet neodesílá žádné údaje o&nbsp;vás ani o&nbsp;vašem počítači. Síť používá jen k&nbsp;funkcím popsaným níže – každý server přitom vidí běžné údaje požadavku (IP adresu, čas, verzi programu). Přihlášení je dobrovolné a&nbsp;bez něj HubGet funguje celý kromě hodnocení a&nbsp;synchronizace.</p>
 
-      <h2>Bez přihlášení</h2>
+      <h2 data-t="t5">Bez přihlášení</h2>
       <ul>
-        <li><strong>Katalog aplikací</strong> (soubor catalog.json) se stahuje z webu projektu. Neobsahuje nic o vás – je pro všechny stejný.</li>
-        <li><strong>Ikony a screenshoty aplikací</strong> se načítají z adres uvedených v katalogu (weby vydavatelů, GitHub, jsDelivr, Chocolatey, Wikimedia, Steam) a ukládají do mezipaměti v počítači. Favicony webů aplikací HubGet za běhu nehledá – služby jako Google se tak nedozvědí, které aplikace si prohlížíte.</li>
-        <li><strong>Správci balíčků</strong> (WinGet, Chocolatey, Scoop, npm, pip, Cargo, vcpkg, .NET, PowerShell Gallery) hledají, instalují a aktualizují přes své vlastní servery a řídí se svými zásadami. HubGet jim předává jen to, co hledáte nebo instalujete.</li>
-        <li><strong>Hvězdičky z GitHubu</strong> v detailu aplikace: dotaz na api.github.com s názvem repozitáře aplikace.</li>
-        <li><strong>Aktualizace HubGetu</strong>: kontrola souboru latest.json v GitHub Releases. Automatickou kontrolu vypnete v&nbsp;Nastavení → Obecné.</li>
-        <li><strong>Kontaktní formulář</strong> v aplikaci i na webu odešle téma, jméno, e-mail a zprávu přes službu <a href="https://web3forms.com" rel="noopener">Web3Forms</a>, která je doručí e-mailem autorovi HubGetu. V aplikaci se přikládají i technické údaje (verze HubGetu a Windows, jazyk), pokud je ve formuláři nevypnete. Váš e-mail použijeme jen k odpovědi.</li>
-        <li><strong>Odkazy</strong> (web aplikace, podpora, GitHub) se otevírají ve vašem prohlížeči.</li>
+        <li data-t="t6"><strong>Katalog aplikací</strong> (soubor catalog.json) se stahuje z&nbsp;webu projektu. Neobsahuje nic o&nbsp;vás – je pro všechny stejný.</li>
+        <li data-t="t7"><strong>Ikony a&nbsp;screenshoty aplikací</strong> se načítají z&nbsp;adres uvedených v&nbsp;katalogu (weby vydavatelů, GitHub, jsDelivr, Chocolatey, Wikimedia, Steam) a&nbsp;ukládají do mezipaměti v&nbsp;počítači. Favicony webů aplikací HubGet za běhu nehledá – služby jako Google se tak nedozvědí, které aplikace si prohlížíte.</li>
+        <li data-t="t8"><strong>Správci balíčků</strong> (WinGet, Chocolatey, Scoop, npm, pip, Cargo, vcpkg, .NET, PowerShell Gallery) hledají, instalují a&nbsp;aktualizují přes své vlastní servery a&nbsp;řídí se svými zásadami. HubGet jim předává jen to, co hledáte nebo instalujete.</li>
+        <li data-t="t9"><strong>Hvězdičky z&nbsp;GitHubu</strong> v&nbsp;detailu aplikace: dotaz na api.github.com s&nbsp;názvem repozitáře aplikace.</li>
+        <li data-t="t10"><strong>Aktualizace HubGetu</strong>: kontrola souboru latest.json v&nbsp;GitHub Releases. Automatickou kontrolu vypnete v&nbsp;Nastavení → Obecné.</li>
+        <li data-t="t11"><strong>Kontaktní formulář</strong> v&nbsp;aplikaci i&nbsp;na webu odešle téma, jméno, e-mail a&nbsp;zprávu přes službu <a href="https://web3forms.com" rel="noopener">Web3Forms</a>, která je doručí e-mailem autorovi HubGetu. V&nbsp;aplikaci se přikládají i&nbsp;technické údaje (verze HubGetu a&nbsp;Windows, jazyk), pokud je ve formuláři nevypnete. Váš e-mail použijeme jen k&nbsp;odpovědi.</li>
+        <li data-t="t12"><strong>Odkazy</strong> (web aplikace, podpora, GitHub) se otevírají ve vašem prohlížeči.</li>
       </ul>
 
-      <h2>S přihlášením (dobrovolné)</h2>
+      <h2 data-t="t13">S&nbsp;přihlášením (dobrovolné)</h2>
       <ul>
-        <li><strong>Přihlášení</strong> přes GitHub nebo Google proběhne v prohlížeči – HubGet nikdy nevidí vaše heslo. Od poskytovatele dostane jméno, e-mail a obrázek účtu. Relace je v počítači uložená šifrovaně (Windows DPAPI).</li>
-        <li><strong>Hodnocení hvězdičkami</strong> se zobrazuje jen jako souhrn (průměr a počet), bez jmen.</li>
-        <li><strong>Recenze</strong> jsou veřejné pod jménem z vašeho účtu – HubGet to při psaní ukáže. Recenzi můžete kdykoli upravit nebo smazat.</li>
-        <li><strong>Snímky obrazovky</strong>, které k aplikaci přidáte, HubGet před odesláním zmenší a uloží ve formátu WebP bez metadat (EXIF, poloha). Ostatním se zobrazí pod jménem z vašeho účtu, až je schválí správce; do té doby je vidíte jen vy. Snímek můžete kdykoli smazat.</li>
-        <li><strong>Snímky obrazovky v kontaktním formuláři</strong> se uloží do soukromého úložiště a do e-mailu jde odkaz na ně, platný 90 dní.</li>
-        <li><strong>Synchronizace</strong> ukládá do účtu oblíbené, sadu balíčků, předvolby vzhledu a jazyka a předvolby oznámení. Jednotlivé oblasti i celou synchronizaci vypnete v&nbsp;Nastavení → Obecné → Synchronizace, tamtéž data z účtu smažete. Vlastní příkazy instalace, oprávnění a plán automatických aktualizací do účtu nejdou.</li>
-        <li>Data účtu jsou v databázi <a href="https://supabase.com/privacy" rel="noopener">Supabase</a> a vidí je jen jejich vlastník. Smazáním účtu se smažou i hodnocení, recenze, snímky obrazovky a synchronizovaná data. Šifrované zálohy databáze se uchovávají nejvýš 90 dní, takže smazaná data z nich zmizí nejpozději do 90 dnů.</li>
+        <li data-t="t14"><strong>Přihlášení</strong> přes GitHub nebo Google proběhne v&nbsp;prohlížeči – HubGet nikdy nevidí vaše heslo. Od poskytovatele dostane jméno, e-mail a&nbsp;obrázek účtu. Relace je v&nbsp;počítači uložená šifrovaně (Windows DPAPI).</li>
+        <li data-t="t15"><strong>Hodnocení hvězdičkami</strong> se zobrazuje jen jako souhrn (průměr a&nbsp;počet), bez jmen.</li>
+        <li data-t="t16"><strong>Recenze</strong> jsou veřejné pod jménem z&nbsp;vašeho účtu – HubGet to při psaní ukáže. Recenzi můžete kdykoli upravit nebo smazat.</li>
+        <li data-t="t17"><strong>Snímky obrazovky</strong>, které k&nbsp;aplikaci přidáte, HubGet před odesláním zmenší a&nbsp;uloží ve formátu WebP bez metadat (EXIF, poloha). Ostatním se zobrazí pod jménem z&nbsp;vašeho účtu, až je schválí správce; do té doby je vidíte jen vy. Snímek můžete kdykoli smazat.</li>
+        <li data-t="t18"><strong>Snímky obrazovky v&nbsp;kontaktním formuláři</strong> se uloží do soukromého úložiště a&nbsp;do e-mailu jde odkaz na ně, platný 90 dní.</li>
+        <li data-t="t19"><strong>Synchronizace</strong> ukládá do účtu oblíbené, sadu balíčků, předvolby vzhledu a&nbsp;jazyka a&nbsp;předvolby oznámení. Jednotlivé oblasti i&nbsp;celou synchronizaci vypnete v&nbsp;Nastavení → Obecné → Synchronizace, tamtéž data z&nbsp;účtu smažete. Vlastní příkazy instalace, oprávnění a&nbsp;plán automatických aktualizací do účtu nejdou.</li>
+        <li data-t="t20">Data účtu jsou v&nbsp;databázi <a href="https://supabase.com/privacy" rel="noopener">Supabase</a> a&nbsp;vidí je jen jejich vlastník. Smazáním účtu se smažou i&nbsp;hodnocení, recenze, snímky obrazovky a&nbsp;synchronizovaná data. Šifrované zálohy databáze se uchovávají nejvýš 90 dní, takže smazaná data z&nbsp;nich zmizí nejpozději do 90 dnů.</li>
       </ul>
 
-      <h2>Pro vývojáře: publikování aplikace</h2>
-      <p>Průvodce publikováním ve WinGetu stáhne instalátor ze zadané adresy (jen ke zjištění údajů, nespouští ho). Odeslání do repozitáře microsoft/winget-pkgs proběhne z vašeho účtu na GitHubu; přístupový token zůstane jen v paměti po dobu průvodce.</p>
+      <h2 data-t="t21">Pro vývojáře: publikování aplikace</h2>
+      <p data-t="t22">Průvodce publikováním ve WinGetu stáhne instalátor ze zadané adresy (jen ke zjištění údajů, nespouští ho). Odeslání do repozitáře microsoft/winget-pkgs proběhne z&nbsp;vašeho účtu na GitHubu; přístupový token zůstane jen v&nbsp;paměti po dobu průvodce.</p>
 
-      <h2>Co zůstává v počítači</h2>
-      <p>Nastavení, mezipaměť katalogu a ikon, historie operací a protokoly jsou jen ve vašem počítači (složka aplikace v %LOCALAPPDATA% a úložiště okna). HubGet je nikam neposílá – protokol pro nahlášení chyby odešlete jen vy sami.</p>
+      <h2 data-t="t23">Co zůstává v&nbsp;počítači</h2>
+      <p data-t="t24">Nastavení, mezipaměť katalogu a&nbsp;ikon, historie operací a&nbsp;protokoly jsou jen ve vašem počítači (složka aplikace v&nbsp;%LOCALAPPDATA% a&nbsp;úložiště okna). HubGet je nikam neposílá – protokol pro nahlášení chyby odešlete jen vy sami.</p>
 
-      <h2>Kontakt</h2>
-      <p>Otázky k ochraně soukromí pište přes <a href="kontakt.html">kontaktní formulář</a> nebo na <a data-link="github" href="#">GitHub</a>. Viz také <a href="podpis-kodu.html">Zásady podepisování kódu</a>.</p>
+      <h2 data-t="t25">Kontakt</h2>
+      <p data-t="t26">Otázky k&nbsp;ochraně soukromí pište přes <a href="kontakt.html">kontaktní formulář</a> nebo na <a data-link="github" href="#">GitHub</a>. Viz také <a href="podpis-kodu.html">Zásady podepisování kódu</a>.</p>
     </article>
   </main>
 
   <footer class="footer">
     <div class="wrap footer__inner">
       <div class="footer__brand">
-        <a class="brand" href="index.html"><img src="assets/unibox-logo.svg" alt="" width="28" height="28"><span>HubGet</span></a>
-        <p>Obchod s aplikacemi pro Windows. Open source, licence MIT.</p>
+        <a class="brand" href="index.html"><img src="assets/unibox-logo.svg" alt="" width="28" height="28"><span data-t="s2">HubGet</span></a>
+        <p data-t="s12">Obchod s&nbsp;aplikacemi pro Windows. Open source, licence MIT.</p>
       </div>
       <nav class="footer__links" aria-label="Odkazy">
-        <a data-link="github" href="#">GitHub</a>
-        <a href="novinky.html">Novinky</a>
-        <a href="soukromi.html">Ochrana soukromí</a>
-        <a href="podpis-kodu.html">Podepisování kódu</a>
-        <a href="en/privacy.html" hreflang="en" lang="en" data-lang-switch>English</a>
+        <a data-link="github" href="#" data-t="s13">GitHub</a>
+        <a href="novinky.html" data-t="s5">Novinky</a>
+        <a href="soukromi.html" data-t="s15">Ochrana soukromí</a>
+        <a href="podpis-kodu.html" data-t="s16">Podepisování kódu</a>
+        <a href="en/privacy.html" hreflang="en" lang="en" data-lang-switch data-t="s17">English</a>
       </nav>
     </div>
     <div class="wrap footer__note">
-      <p>HubGet není spojen se společností Microsoft ani s projekty WinGet, Chocolatey a Scoop. Windows je ochranná známka společnosti Microsoft.</p>
+      <p data-t="s18">HubGet není spojen se společností Microsoft ani s&nbsp;projekty WinGet, Chocolatey a&nbsp;Scoop. Windows je ochranná známka společnosti Microsoft.</p>
     </div>
   </footer>
 

@@ -1,0 +1,35 @@
+{
+  "texty": {
+    "s1": "Přeskočit na obsah",
+    "s2": "HubGet",
+    "s3": "Funkce",
+    "s4": "Správci balíčků",
+    "s5": "Novinky",
+    "s6": "Srovnání",
+    "s7": "Co chystáme",
+    "s8": "Otázky",
+    "s9": "Kontakt",
+    "s10": "EN",
+    "s11": "Stáhnout",
+    "s12": "Obchod s aplikacemi pro Windows. Open source, licence MIT.",
+    "s13": "GitHub",
+    "s14": "Všechny verze",
+    "s15": "Ochrana soukromí",
+    "s16": "Podepisování kódu",
+    "s17": "English",
+    "s18": "HubGet není spojen se společností Microsoft ani s projekty WinGet, Chocolatey a Scoop. Windows je ochranná známka společnosti Microsoft."
+  },
+  "hlasky": {
+    "placeholder": "Odkaz brzy doplníme",
+    "copy": "Kopírovat",
+    "copied": "Zkopírováno ✓",
+    "copyFailed": "Nelze kopírovat",
+    "menuOpen": "Otevřít menu",
+    "menuClose": "Zavřít menu",
+    "sending": "Odesílám…",
+    "contactOffline": "Zprávu se nepodařilo odeslat. Zkontrolujte připojení k internetu.",
+    "contactRateLimit": "Teď nejde odeslat další zprávu. Zkuste to prosím za chvíli.",
+    "contactFailed": "Zprávu se nepodařilo odeslat. Zkuste to prosím znovu, nebo problém nahlaste na GitHubu.",
+    "contactReason": "Důvod"
+  }
+}

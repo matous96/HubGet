@@ -1,0 +1,28 @@
+{
+  "seo": {
+    "title": "What’s new – HubGet",
+    "description": "The HubGet changelog since the first public version 0.1.0: what’s new in every release, what we improved and fixed, and what’s coming next.",
+    "ogTitle": "What’s new – HubGet",
+    "ogDescription": "What’s new in HubGet – the changelog since version 0.1.0."
+  },
+  "texty": {
+    "t1": "What’s new",
+    "t2": "What’s new in HubGet",
+    "t3": "Every change since the first public version 0.1.0, newest first. {auto:updates-words-capital} updates have shipped since its release on October 21.",
+    "t4": "Current version",
+    "t5": "Updates since 0.1.0",
+    "t6": "Apps in the catalog",
+    "t7": "25,100+",
+    "t8": "Package managers for real",
+    "t9": "WinGet · Chocolatey · Scoop + 8 for developers",
+    "t10": "At a glance",
+    "t11": "The biggest changes since version 0.1.0",
+    "t12": "Changelog",
+    "t13": "Release by release",
+    "t14": "What’s new in each version, what we improved and what we fixed.",
+    "t15": "Try the latest version",
+    "t16": "HubGet is free and open source. You’ll find older installers among all releases.",
+    "t17": "Download HubGet",
+    "t18": "All releases"
+  }
+}

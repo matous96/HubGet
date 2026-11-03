@@ -1,0 +1,36 @@
+{
+  "texty": {
+    "s1": "Skip to content",
+    "s2": "HubGet",
+    "s3": "Features",
+    "s4": "Package managers",
+    "s5": "What’s new",
+    "s6": "Compare",
+    "s7": "Roadmap",
+    "s8": "FAQ",
+    "s9": "Contact",
+    "s10": "CZ",
+    "s11": "Download",
+    "s12": "The app store for Windows. Open source, MIT license.",
+    "s13": "GitHub",
+    "s14": "All releases",
+    "s15": "Privacy",
+    "s16": "Code signing",
+    "s17": "Česky",
+    "s18": "HubGet is not affiliated with Microsoft or with the WinGet, Chocolatey and Scoop projects. Windows is a trademark of Microsoft Corporation.",
+    "s19": "An app store for Windows. Open source, MIT license."
+  },
+  "hlasky": {
+    "placeholder": "Link coming soon",
+    "copy": "Copy",
+    "copied": "Copied ✓",
+    "copyFailed": "Can’t copy",
+    "menuOpen": "Open menu",
+    "menuClose": "Close menu",
+    "sending": "Sending…",
+    "contactOffline": "The message couldn’t be sent. Check your internet connection.",
+    "contactRateLimit": "Another message can’t be sent right now. Please try again in a moment.",
+    "contactFailed": "The message couldn’t be sent. Please try again, or report the problem on GitHub.",
+    "contactReason": "Reason"
+  }
+}

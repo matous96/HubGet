@@ -1,0 +1,34 @@
+{
+  "seo": {
+    "title": "Ochrana soukromí – HubGet",
+    "description": "Jaká data HubGet používá: bez telemetrie a reklam, síť jen pro katalog, ikony, správce balíčků a volitelné přihlášení."
+  },
+  "texty": {
+    "t1": "Ochrana soukromí",
+    "t2": "Co HubGet dělá s daty",
+    "t3": "Žádná telemetrie, analytika ani reklamy. Co máte nainstalované, zůstává ve vašem počítači.",
+    "t4": "**Zkráceně:** HubGet neodesílá žádné údaje o vás ani o vašem počítači. Síť používá jen k funkcím popsaným níže – každý server přitom vidí běžné údaje požadavku (IP adresu, čas, verzi programu). Přihlášení je dobrovolné a bez něj HubGet funguje celý kromě hodnocení a synchronizace.",
+    "t5": "Bez přihlášení",
+    "t6": "**Katalog aplikací** (soubor catalog.json) se stahuje z webu projektu. Neobsahuje nic o vás – je pro všechny stejný.",
+    "t7": "**Ikony a screenshoty aplikací** se načítají z adres uvedených v katalogu (weby vydavatelů, GitHub, jsDelivr, Chocolatey, Wikimedia, Steam) a ukládají do mezipaměti v počítači. Favicony webů aplikací HubGet za běhu nehledá – služby jako Google se tak nedozvědí, které aplikace si prohlížíte.",
+    "t8": "**Správci balíčků** (WinGet, Chocolatey, Scoop, npm, pip, Cargo, vcpkg, .NET, PowerShell Gallery) hledají, instalují a aktualizují přes své vlastní servery a řídí se svými zásadami. HubGet jim předává jen to, co hledáte nebo instalujete.",
+    "t9": "**Hvězdičky z GitHubu** v detailu aplikace: dotaz na api.github.com s názvem repozitáře aplikace.",
+    "t10": "**Aktualizace HubGetu**: kontrola souboru latest.json v GitHub Releases. Automatickou kontrolu vypnete v Nastavení → Obecné.",
+    "t11": "**Kontaktní formulář** v aplikaci i na webu odešle téma, jméno, e-mail a zprávu přes službu [Web3Forms](https://web3forms.com), která je doručí e-mailem autorovi HubGetu. V aplikaci se přikládají i technické údaje (verze HubGetu a Windows, jazyk), pokud je ve formuláři nevypnete. Váš e-mail použijeme jen k odpovědi.",
+    "t12": "**Odkazy** (web aplikace, podpora, GitHub) se otevírají ve vašem prohlížeči.",
+    "t13": "S přihlášením (dobrovolné)",
+    "t14": "**Přihlášení** přes GitHub nebo Google proběhne v prohlížeči – HubGet nikdy nevidí vaše heslo. Od poskytovatele dostane jméno, e-mail a obrázek účtu. Relace je v počítači uložená šifrovaně (Windows DPAPI).",
+    "t15": "**Hodnocení hvězdičkami** se zobrazuje jen jako souhrn (průměr a počet), bez jmen.",
+    "t16": "**Recenze** jsou veřejné pod jménem z vašeho účtu – HubGet to při psaní ukáže. Recenzi můžete kdykoli upravit nebo smazat.",
+    "t17": "**Snímky obrazovky**, které k aplikaci přidáte, HubGet před odesláním zmenší a uloží ve formátu WebP bez metadat (EXIF, poloha). Ostatním se zobrazí pod jménem z vašeho účtu, až je schválí správce; do té doby je vidíte jen vy. Snímek můžete kdykoli smazat.",
+    "t18": "**Snímky obrazovky v kontaktním formuláři** se uloží do soukromého úložiště a do e-mailu jde odkaz na ně, platný 90 dní.",
+    "t19": "**Synchronizace** ukládá do účtu oblíbené, sadu balíčků, předvolby vzhledu a jazyka a předvolby oznámení. Jednotlivé oblasti i celou synchronizaci vypnete v Nastavení → Obecné → Synchronizace, tamtéž data z účtu smažete. Vlastní příkazy instalace, oprávnění a plán automatických aktualizací do účtu nejdou.",
+    "t20": "Data účtu jsou v databázi [Supabase](https://supabase.com/privacy) a vidí je jen jejich vlastník. Smazáním účtu se smažou i hodnocení, recenze, snímky obrazovky a synchronizovaná data. Šifrované zálohy databáze se uchovávají nejvýš 90 dní, takže smazaná data z nich zmizí nejpozději do 90 dnů.",
+    "t21": "Pro vývojáře: publikování aplikace",
+    "t22": "Průvodce publikováním ve WinGetu stáhne instalátor ze zadané adresy (jen ke zjištění údajů, nespouští ho). Odeslání do repozitáře microsoft/winget-pkgs proběhne z vašeho účtu na GitHubu; přístupový token zůstane jen v paměti po dobu průvodce.",
+    "t23": "Co zůstává v počítači",
+    "t24": "Nastavení, mezipaměť katalogu a ikon, historie operací a protokoly jsou jen ve vašem počítači (složka aplikace v %LOCALAPPDATA% a úložiště okna). HubGet je nikam neposílá – protokol pro nahlášení chyby odešlete jen vy sami.",
+    "t25": "Kontakt",
+    "t26": "Otázky k ochraně soukromí pište přes [kontaktní formulář](kontakt.html) nebo na [GitHub](@github). Viz také [Zásady podepisování kódu](podpis-kodu.html)."
+  }
+}

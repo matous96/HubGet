@@ -1,0 +1,31 @@
+{
+  "seo": {
+    "title": "Časté otázky – HubGet",
+    "description": "Odpovědi na časté otázky o HubGetu: varování SmartScreenu, účet, bezpečnost, práva správce a instalátory EXE a MSI.",
+    "ogTitle": "Časté otázky – HubGet",
+    "ogDescription": "Odpovědi na časté otázky o HubGetu: varování SmartScreenu, účet, bezpečnost, práva správce a instalátory EXE a MSI."
+  },
+  "texty": {
+    "t1": "Otázky a odpovědi",
+    "t2": "Časté otázky",
+    "t3": "Edge při stahování hlásí, že se instalátor „běžně nestahuje“. Co s tím?",
+    "t4": "Edge posuzuje reputaci stahovaných souborů. Nový instalátor, který zatím není digitálně podepsaný a stáhlo ho jen málo lidí, ji ještě nemá – proto varuje. Neznamená to, že je v souboru virus. HubGet stahujte jen z tohoto webu nebo z [oficiálních vydání na GitHubu](@releases). V Edgi najeďte na stahovaný soubor a klikněte na **…** → **Ponechat** → **Zobrazit další** → **Přesto ponechat**. Při spuštění pak může ještě varovat SmartScreen – viz další otázka. Bezplatný digitální podpis pro open source (SignPath Foundation) připravujeme; s ním by varování mělo časem zmizet.",
+    "t5": "Windows při spuštění instalátoru hlásí varování SmartScreenu. Je to v pořádku?",
+    "t6": "Instalátor HubGetu zatím není digitálně podepsaný, a Windows proto zobrazí okno „Systém Windows ochránil váš počítač“. Klikněte na **Další informace** a potom na **Přesto spustit**. Podepsaný instalátor je mezi věcmi, které chystáme.",
+    "t7": "Co znamená „preview“ verze?",
+    "t8": "HubGet je zatím v rané fázi vývoje – první veřejná verze 0.1.0 vyšla v říjnu 2026 a od té doby přibývají aktualizace (viz [Novinky](novinky.html)). Naostro fungují WinGet, Chocolatey, Scoop i správci pro vývojáře (npm, pip, Cargo a další) – hledání, instalace, aktualizace i odinstalace. Občas můžete narazit na chybu.",
+    "t9": "Je HubGet zdarma?",
+    "t10": "Ano. HubGet je open source pod licencí MIT – zdarma, bez reklam a bez přibalených doplňků. Zdrojový kód najdete na [GitHubu](@github).",
+    "t11": "Potřebuji účet?",
+    "t12": "Ne. Přihlášení přes GitHub je dobrovolné a hodí se jen pro hodnocení, recenze, přidávání snímků obrazovky a synchronizaci mezi počítači. Instalace, aktualizace i odinstalace fungují bez účtu. Co se při přihlášení ukládá, popisují [zásady ochrany soukromí](soukromi.html).",
+    "t13": "Odkud HubGet aplikace stahuje? Je to bezpečné?",
+    "t14": "Jen z oficiálních repozitářů správců balíčků. HubGet instalátor stáhne a WinGet ho před spuštěním ověří kontrolním součtem SHA-256 – pokud by se soubor lišil od zveřejněného, instalace neproběhne.",
+    "t15": "Uvidím v HubGetu i aplikace, které jsem instaloval dřív?",
+    "t16": "Ano. Přehled nainstalovaných ukáže i programy instalované mimo WinGet, aplikace z Microsoft Storu a hry ze Steamu. Můžete je aktualizovat, odinstalovat nebo spustit tlačítkem Otevřít.",
+    "t17": "Potřebuji práva správce?",
+    "t18": "K instalaci HubGetu ne – instalátor EXE instaluje pro aktuálního uživatele. Pokud nějaká instalace aplikace práva správce vyžaduje, HubGet ji sám zopakuje s jejich vyžádáním (UAC).",
+    "t19": "Jaký je rozdíl mezi instalátorem EXE a MSI?",
+    "t20": "EXE je doporučený pro většinu lidí, instaluje bez práv správce a nabízí češtinu i angličtinu. MSI se hodí pro hromadné nasazení ve firmách.",
+    "t21": "Nenašli jste odpověď? [Napište nám](kontakt.html)."
+  }
+}

@@ -14,19 +14,30 @@ const LINKS = {
 // v aplikaci (src/config.ts – CONTACT_FORM_KEY). Klíč je veřejný a sdílí měsíční limit.
 const CONTACT_FORM_KEY = "b43a3256-556d-4f08-a4e2-45d6b81e0c66";
 
-// Texty, které vkládá skript – podle jazyka stránky (<html lang="…">)
+// Texty, které vkládá skript – podle jazyka stránky (<html lang="…">). Upravují se v Pages CMS
+// (website/content/texty/<jazyk>/spolecne.json → hlasky), přepisuje je scripts/website-texts.mjs.
 const TEXTS = {
   cs: {
-    placeholder: "Odkaz brzy doplníme", copy: "Kopírovat", copied: "Zkopírováno ✓", copyFailed: "Nelze kopírovat",
-    menuOpen: "Otevřít menu", menuClose: "Zavřít menu", sending: "Odesílám…",
+    placeholder: "Odkaz brzy doplníme",
+    copy: "Kopírovat",
+    copied: "Zkopírováno ✓",
+    copyFailed: "Nelze kopírovat",
+    menuOpen: "Otevřít menu",
+    menuClose: "Zavřít menu",
+    sending: "Odesílám…",
     contactOffline: "Zprávu se nepodařilo odeslat. Zkontrolujte připojení k internetu.",
     contactRateLimit: "Teď nejde odeslat další zprávu. Zkuste to prosím za chvíli.",
     contactFailed: "Zprávu se nepodařilo odeslat. Zkuste to prosím znovu, nebo problém nahlaste na GitHubu.",
     contactReason: "Důvod",
   },
   en: {
-    placeholder: "Link coming soon", copy: "Copy", copied: "Copied ✓", copyFailed: "Can’t copy",
-    menuOpen: "Open menu", menuClose: "Close menu", sending: "Sending…",
+    placeholder: "Link coming soon",
+    copy: "Copy",
+    copied: "Copied ✓",
+    copyFailed: "Can’t copy",
+    menuOpen: "Open menu",
+    menuClose: "Close menu",
+    sending: "Sending…",
     contactOffline: "The message couldn’t be sent. Check your internet connection.",
     contactRateLimit: "Another message can’t be sent right now. Please try again in a moment.",
     contactFailed: "The message couldn’t be sent. Please try again, or report the problem on GitHub.",

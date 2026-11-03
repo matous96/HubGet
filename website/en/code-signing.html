@@ -20,27 +20,27 @@
   </script>
 </head>
 <body>
-  <a class="skip" href="#obsah">Skip to content</a>
+  <a class="skip" href="#obsah" data-t="s1">Skip to content</a>
 
   <header class="nav" id="nav">
     <div class="wrap nav__inner">
       <a class="brand" href="index.html" aria-label="HubGet – home">
         <img src="../assets/unibox-logo.svg" alt="" width="32" height="32">
-        <span>HubGet</span>
+        <span data-t="s2">HubGet</span>
       </a>
       <nav class="nav__links" aria-label="Main navigation">
-        <a href="features.html">Features</a>
-        <a href="package-managers.html">Package managers</a>
-        <a href="changelog.html">What’s new</a>
-        <a href="compare.html">Compare</a>
-        <a href="roadmap.html">Roadmap</a>
-        <a href="faq.html">FAQ</a>
-        <a class="nav__menu-only" href="contact.html">Contact</a>
+        <a href="features.html" data-t="s3">Features</a>
+        <a href="package-managers.html" data-t="s4">Package managers</a>
+        <a href="changelog.html" data-t="s5">What’s new</a>
+        <a href="compare.html" data-t="s6">Compare</a>
+        <a href="roadmap.html" data-t="s7">Roadmap</a>
+        <a href="faq.html" data-t="s8">FAQ</a>
+        <a class="nav__menu-only" href="contact.html" data-t="s9">Contact</a>
       </nav>
       <div class="nav__actions">
-        <a class="lang-switch" href="../podpis-kodu.html" hreflang="cs" lang="cs" data-lang-switch title="Česky" aria-label="Přepnout do češtiny">CZ</a>
+        <a class="lang-switch" href="../podpis-kodu.html" hreflang="cs" lang="cs" data-lang-switch title="Česky" aria-label="Přepnout do češtiny" data-t="s10">CZ</a>
         <a class="icon-btn nav__mail" href="contact.html" aria-label="Write to us" title="Contact"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="4.5" width="19" height="15" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m3 7 9 6 9-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
-        <a class="btn btn--primary btn--sm" href="index.html#stahnout">Download</a>
+        <a class="btn btn--primary btn--sm" href="index.html#stahnout" data-t="s11">Download</a>
       </div>
     </div>
   </header>
@@ -49,67 +49,67 @@
     <section class="page-head">
       <div class="wrap">
         <div class="page-head__inner">
-          <p class="eyebrow">Code signing policy</p>
-          <h1>Signed HubGet</h1>
-          <p class="lead">A digital signature confirms that an installer comes from the HubGet project and nobody changed it along the way.</p>
+          <p class="eyebrow" data-t="t1">Code signing policy</p>
+          <h1 data-t="t2">Signed HubGet</h1>
+          <p class="lead" data-t="t3">A digital signature confirms that an installer comes from the HubGet project and nobody changed it along the way.</p>
         </div>
       </div>
     </section>
 
     <article class="wrap legal">
-      <p class="note"><strong>Free code signing provided by <a href="https://signpath.io" rel="noopener">SignPath.io</a>, certificate by <a href="https://signpath.org" rel="noopener">SignPath Foundation</a>.</strong></p>
+      <p class="note"><strong data-t="t4">Free code signing provided by <a href="https://signpath.io" rel="noopener">SignPath.io</a>, certificate by <a href="https://signpath.org" rel="noopener">SignPath Foundation</a>.</strong></p>
 
-      <h2>What gets signed</h2>
+      <h2 data-t="t5">What gets signed</h2>
       <ul>
-        <li>The <strong>unibox.exe</strong> program and the <strong>EXE (NSIS)</strong> and <strong>MSI</strong> installers from the official releases on <a data-link="releases" href="#">GitHub</a>.</li>
-        <li>Every signed file is produced by an automated build (GitHub Actions) from the source code in the public <a data-link="github" href="#">HubGet repository</a> – never on a developer's computer.</li>
-        <li>We only sign files built from the project's own code. Third-party tools and libraries are signed by their authors.</li>
-        <li>The publisher in the signature is <strong>SignPath Foundation</strong>, the product name is <strong>HubGet</strong>.</li>
+        <li data-t="t6">The <strong>unibox.exe</strong> program and the <strong>EXE (NSIS)</strong> and <strong>MSI</strong> installers from the official releases on <a data-link="releases" href="#">GitHub</a>.</li>
+        <li data-t="t7">Every signed file is produced by an automated build (GitHub Actions) from the source code in the public <a data-link="github" href="#">HubGet repository</a> – never on a developer's computer.</li>
+        <li data-t="t8">We only sign files built from the project's own code. Third-party tools and libraries are signed by their authors.</li>
+        <li data-t="t9">The publisher in the signature is <strong>SignPath Foundation</strong>, the product name is <strong>HubGet</strong>.</li>
       </ul>
 
-      <h2>Who stands behind the signature</h2>
+      <h2 data-t="t10">Who stands behind the signature</h2>
       <!-- Při změně týmu upravit i v podpis-kodu.html a v SignPath -->
       <table>
-        <thead><tr><th>Role</th><th>Who</th><th>What they may do</th></tr></thead>
+        <thead><tr><th data-t="t11">Role</th><th data-t="t12">Who</th><th data-t="t13">What they may do</th></tr></thead>
         <tbody>
-          <tr><td>Committers</td><td><a href="https://github.com/matous96">matous96</a> (repository owner)</td><td>Change the source code without further review.</td></tr>
-          <tr><td>Reviewers</td><td><a href="https://github.com/matous96">matous96</a></td><td>Review every contribution from people outside the team (pull requests) before merging.</td></tr>
-          <tr><td>Approvers</td><td><a href="https://github.com/matous96">matous96</a></td><td>Manually approve every signing request in SignPath – nothing is signed without approval.</td></tr>
+          <tr><td data-t="t14">Committers</td><td data-t="t15"><a href="https://github.com/matous96" rel="noopener">matous96</a> (repository owner)</td><td data-t="t16">Change the source code without further review.</td></tr>
+          <tr><td data-t="t17">Reviewers</td><td><a href="https://github.com/matous96" data-t="t18">matous96</a></td><td data-t="t19">Review every contribution from people outside the team (pull requests) before merging.</td></tr>
+          <tr><td data-t="t20">Approvers</td><td><a href="https://github.com/matous96" data-t="t21">matous96</a></td><td data-t="t22">Manually approve every signing request in SignPath – nothing is signed without approval.</td></tr>
         </tbody>
       </table>
-      <p>All team members use multi-factor authentication on GitHub and SignPath.</p>
+      <p data-t="t23">All team members use multi-factor authentication on GitHub and SignPath.</p>
 
-      <h2>Privacy</h2>
-      <p>HubGet doesn't send telemetry or information about your computer. When and why it talks to servers (catalog, icons, package managers, optional sign-in) is described in the <a href="privacy.html">privacy policy</a>.</p>
+      <h2 data-t="t24">Privacy</h2>
+      <p data-t="t25">HubGet doesn't send telemetry or information about your computer. When and why it talks to servers (catalog, icons, package managers, optional sign-in) is described in the <a href="privacy.html">privacy policy</a>.</p>
 
-      <h2>How to verify the signature</h2>
+      <h2 data-t="t26">How to verify the signature</h2>
       <ul>
-        <li>Right-click the installer → <strong>Properties → Digital Signatures</strong>: signed by “SignPath Foundation”.</li>
-        <li>In PowerShell: <code>Get-AuthenticodeSignature .\HubGet_*_x64-setup.exe</code> – status <code>Valid</code>.</li>
-        <li>Don't run an installer downloaded from anywhere other than the official releases, without a signature or with a different publisher.</li>
+        <li data-t="t27">Right-click the installer → <strong>Properties → Digital Signatures</strong>: signed by “SignPath Foundation”.</li>
+        <li data-t="t28">In PowerShell: <code>Get-AuthenticodeSignature .\HubGet_*_x64-setup.exe</code> – status <code>Valid</code>.</li>
+        <li data-t="t29">Don't run an installer downloaded from anywhere other than the official releases, without a signature or with a different publisher.</li>
       </ul>
 
-      <h2>Reporting a problem</h2>
-      <p>Report a suspicious signed file or misuse of the signature through the <a href="contact.html">contact form</a> and to <a href="https://signpath.org" rel="noopener">SignPath Foundation</a>.</p>
+      <h2 data-t="t30">Reporting a problem</h2>
+      <p data-t="t31">Report a suspicious signed file or misuse of the signature through the <a href="contact.html">contact form</a> and to <a href="https://signpath.org" rel="noopener">SignPath Foundation</a>.</p>
     </article>
   </main>
 
   <footer class="footer">
     <div class="wrap footer__inner">
       <div class="footer__brand">
-        <a class="brand" href="index.html"><img src="../assets/unibox-logo.svg" alt="" width="28" height="28"><span>HubGet</span></a>
-        <p>An app store for Windows. Open source, MIT license.</p>
+        <a class="brand" href="index.html"><img src="../assets/unibox-logo.svg" alt="" width="28" height="28"><span data-t="s2">HubGet</span></a>
+        <p data-t="s19">An app store for Windows. Open source, MIT license.</p>
       </div>
       <nav class="footer__links" aria-label="Links">
-        <a data-link="github" href="#">GitHub</a>
-        <a href="changelog.html">What’s new</a>
-        <a href="privacy.html">Privacy</a>
-        <a href="code-signing.html">Code signing</a>
-        <a href="../podpis-kodu.html" hreflang="cs" lang="cs" data-lang-switch>Česky</a>
+        <a data-link="github" href="#" data-t="s13">GitHub</a>
+        <a href="changelog.html" data-t="s5">What’s new</a>
+        <a href="privacy.html" data-t="s15">Privacy</a>
+        <a href="code-signing.html" data-t="s16">Code signing</a>
+        <a href="../podpis-kodu.html" hreflang="cs" lang="cs" data-lang-switch data-t="s17">Česky</a>
       </nav>
     </div>
     <div class="wrap footer__note">
-      <p>HubGet is not affiliated with Microsoft or with the WinGet, Chocolatey and Scoop projects. Windows is a trademark of Microsoft Corporation.</p>
+      <p data-t="s18">HubGet is not affiliated with Microsoft or with the WinGet, Chocolatey and Scoop projects. Windows is a trademark of Microsoft Corporation.</p>
     </div>
   </footer>
 

@@ -1,0 +1,42 @@
+{
+  "seo": {
+    "title": "Správci balíčků – HubGet",
+    "description": "HubGet je v rané fázi vývoje. Píšeme na rovinu, co už umí a co teprve připravujeme.",
+    "ogTitle": "Správci balíčků – HubGet",
+    "ogDescription": "HubGet je v rané fázi vývoje. Píšeme na rovinu, co už umí a co teprve připravujeme."
+  },
+  "texty": {
+    "t1": "Správci balíčků",
+    "t2": "Co ve verzi {auto:version} funguje naostro.",
+    "t3": "HubGet je v rané fázi vývoje. Píšeme na rovinu, co už umí a co teprve připravujeme.",
+    "t4": "WinGet",
+    "t5": "Plně funkční",
+    "t6": "Výpis nainstalovaných aplikací, hledání, instalace, aktualizace, odinstalace i stažení instalátoru.",
+    "t7": "15 776 balíčků v katalogu",
+    "t8": "Chocolatey",
+    "t9": "Plně funkční",
+    "t10": "Hledání, instalace, aktualizace a odinstalace přímo v aplikaci, včetně přehledu dostupných aktualizací. Chybějící Chocolatey nainstaluje HubGet jedním kliknutím.",
+    "t11": "12 027 aplikací v katalogu",
+    "t12": "Scoop",
+    "t13": "Plně funkční",
+    "t14": "Hledání, instalace, aktualizace a odinstalace bez práv správce. Chybějící Scoop, Git i buckety doplní HubGet sám.",
+    "t15": "4 702 aplikací v katalogu",
+    "t16": "Pro vývojáře",
+    "t17": "Funkční",
+    "t18": "npm, Bun, pip, Cargo, vcpkg, .NET Tool, PowerShell 7 / 5 – hledání, instalace, aktualizace a odinstalace v režimu Vývojář. Chybějící Node.js, Python, Rust, .NET SDK nebo PowerShell 7 nainstaluje HubGet přes WinGet.",
+    "t19": "Pro pokročilé a vývojáře",
+    "t20": "Režim Vývojář a příkazy ke zkopírování.",
+    "t21": "Přepněte do režimu „Vývojář“ a spravujte i knihovny a nástroje pro vývojáře – hledání, instalace, aktualizace i odinstalace přímo v HubGetu. U každé aplikace najdete hotové příkazy pro WinGet, Chocolatey, Scoop a další – zkopírujete je jedním kliknutím. Sady balíčků exportujete jako skript PowerShellu.",
+    "t22": "npm, Bun, pip, Cargo, vcpkg, .NET Tool a PowerShell naostro",
+    "t23": "Chybějící Node.js, Python nebo Rust doinstaluje jedním kliknutím",
+    "t24": "Přehled příkazů pro terminál u každého správce, s vysvětlením",
+    "t25": "Export a import profilů",
+    "t26": "WinGet",
+    "t27": "Chocolatey",
+    "t28": "Scoop",
+    "t29": "PS&gt;",
+    "t30": "winget install --id Microsoft.VisualStudioCode -e",
+    "t31": "Kopírovat",
+    "t32": "Příklad příkazů, které HubGet zobrazí u Visual Studio Code."
+  }
+}

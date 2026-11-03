@@ -1,0 +1,29 @@
+{
+  "seo": {
+    "title": "Kontakt – HubGet",
+    "description": "Napište autorovi HubGetu – dotaz, chyba, nápad nebo nabídka spolupráce. Odpovíme e-mailem.",
+    "ogTitle": "Kontakt – HubGet",
+    "ogDescription": "Napište autorovi HubGetu – dotaz, chyba, nápad nebo nabídka spolupráce. Odpovíme e-mailem."
+  },
+  "texty": {
+    "t1": "Kontakt",
+    "t2": "Napište nám",
+    "t3": "Máte dotaz, narazili jste na chybu, nebo máte nápad či nabídku spolupráce? Odpovíme vám e-mailem.",
+    "t4": "Téma",
+    "t5": "Dotaz",
+    "t6": "Chyba",
+    "t7": "Nápad",
+    "t8": "Spolupráce",
+    "t9": "Jiné",
+    "t10": "Jméno <span class=\"field__opt\">(nepovinné)</span>",
+    "t11": "E-mail",
+    "t12": "Zpráva",
+    "t13": "S čím vám můžeme pomoct?",
+    "t14": "Snímek obrazovky s chybou přiložíte ve formuláři přímo v aplikaci (Nastavení → Kontaktovat HubGet) po přihlášení.",
+    "t15": "Zprávu doručí služba Web3Forms. Váš e-mail použijeme jen k odpovědi.",
+    "t16": "Odeslat",
+    "t17": "Zpráva je odeslaná",
+    "t18": "Děkujeme! Odpověď přijde na {prvek}.",
+    "t19": "Napsat další zprávu"
+  }
+}

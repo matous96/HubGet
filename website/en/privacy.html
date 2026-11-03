@@ -20,27 +20,27 @@
   </script>
 </head>
 <body>
-  <a class="skip" href="#obsah">Skip to content</a>
+  <a class="skip" href="#obsah" data-t="s1">Skip to content</a>
 
   <header class="nav" id="nav">
     <div class="wrap nav__inner">
       <a class="brand" href="index.html" aria-label="HubGet – home">
         <img src="../assets/unibox-logo.svg" alt="" width="32" height="32">
-        <span>HubGet</span>
+        <span data-t="s2">HubGet</span>
       </a>
       <nav class="nav__links" aria-label="Main navigation">
-        <a href="features.html">Features</a>
-        <a href="package-managers.html">Package managers</a>
-        <a href="changelog.html">What’s new</a>
-        <a href="compare.html">Compare</a>
-        <a href="roadmap.html">Roadmap</a>
-        <a href="faq.html">FAQ</a>
-        <a class="nav__menu-only" href="contact.html">Contact</a>
+        <a href="features.html" data-t="s3">Features</a>
+        <a href="package-managers.html" data-t="s4">Package managers</a>
+        <a href="changelog.html" data-t="s5">What’s new</a>
+        <a href="compare.html" data-t="s6">Compare</a>
+        <a href="roadmap.html" data-t="s7">Roadmap</a>
+        <a href="faq.html" data-t="s8">FAQ</a>
+        <a class="nav__menu-only" href="contact.html" data-t="s9">Contact</a>
       </nav>
       <div class="nav__actions">
-        <a class="lang-switch" href="../soukromi.html" hreflang="cs" lang="cs" data-lang-switch title="Česky" aria-label="Přepnout do češtiny">CZ</a>
+        <a class="lang-switch" href="../soukromi.html" hreflang="cs" lang="cs" data-lang-switch title="Česky" aria-label="Přepnout do češtiny" data-t="s10">CZ</a>
         <a class="icon-btn nav__mail" href="contact.html" aria-label="Write to us" title="Contact"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="4.5" width="19" height="15" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m3 7 9 6 9-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
-        <a class="btn btn--primary btn--sm" href="index.html#stahnout">Download</a>
+        <a class="btn btn--primary btn--sm" href="index.html#stahnout" data-t="s11">Download</a>
       </div>
     </div>
   </header>
@@ -49,65 +49,65 @@
     <section class="page-head">
       <div class="wrap">
         <div class="page-head__inner">
-          <p class="eyebrow">Privacy</p>
-          <h1>What HubGet does with data</h1>
-          <p class="lead">No telemetry, analytics or ads. What you have installed stays on your computer.</p>
+          <p class="eyebrow" data-t="t1">Privacy</p>
+          <h1 data-t="t2">What HubGet does with data</h1>
+          <p class="lead" data-t="t3">No telemetry, analytics or ads. What you have installed stays on your computer.</p>
         </div>
       </div>
     </section>
 
     <article class="wrap legal">
-      <p class="note"><strong>In short:</strong> HubGet doesn't send any information about you or your computer. It uses the network only for the features described below – each server sees the usual request details (IP address, time, program version). Sign-in is optional; without it everything works except ratings and sync.</p>
+      <p class="note" data-t="t4"><strong>In short:</strong> HubGet doesn't send any information about you or your computer. It uses the network only for the features described below – each server sees the usual request details (IP address, time, program version). Sign-in is optional; without it everything works except ratings and sync.</p>
 
-      <h2>Without signing in</h2>
+      <h2 data-t="t5">Without signing in</h2>
       <ul>
-        <li><strong>The app catalog</strong> (catalog.json) is downloaded from the project website. It contains nothing about you – it's the same for everyone.</li>
-        <li><strong>App icons and screenshots</strong> load from the addresses listed in the catalog (publisher websites, GitHub, jsDelivr, Chocolatey, Wikimedia, Steam) and are cached on your computer. HubGet doesn't look up website favicons at runtime – services such as Google don't learn which apps you browse.</li>
-        <li><strong>Package managers</strong> (WinGet, Chocolatey, Scoop, npm, pip, Cargo, vcpkg, .NET, PowerShell Gallery) search, install and update through their own servers under their own policies. HubGet only passes on what you search for or install.</li>
-        <li><strong>GitHub stars</strong> in app details: a request to api.github.com with the app's repository name.</li>
-        <li><strong>HubGet updates</strong>: a check of latest.json on GitHub Releases. Turn off automatic checks in Settings → General.</li>
-        <li><strong>The contact form</strong> in the app and on the website sends the topic, name, email and message through the <a href="https://web3forms.com" rel="noopener">Web3Forms</a> service, which delivers them by email to the author of HubGet. In the app, technical details (HubGet and Windows version, language) are attached too unless you turn them off in the form. We only use your email to reply.</li>
-        <li><strong>Links</strong> (app website, support, GitHub) open in your browser.</li>
+        <li data-t="t6"><strong>The app catalog</strong> (catalog.json) is downloaded from the project website. It contains nothing about you – it's the same for everyone.</li>
+        <li data-t="t7"><strong>App icons and screenshots</strong> load from the addresses listed in the catalog (publisher websites, GitHub, jsDelivr, Chocolatey, Wikimedia, Steam) and are cached on your computer. HubGet doesn't look up website favicons at runtime – services such as Google don't learn which apps you browse.</li>
+        <li data-t="t8"><strong>Package managers</strong> (WinGet, Chocolatey, Scoop, npm, pip, Cargo, vcpkg, .NET, PowerShell Gallery) search, install and update through their own servers under their own policies. HubGet only passes on what you search for or install.</li>
+        <li data-t="t9"><strong>GitHub stars</strong> in app details: a request to api.github.com with the app's repository name.</li>
+        <li data-t="t10"><strong>HubGet updates</strong>: a check of latest.json on GitHub Releases. Turn off automatic checks in Settings → General.</li>
+        <li data-t="t11"><strong>The contact form</strong> in the app and on the website sends the topic, name, email and message through the <a href="https://web3forms.com" rel="noopener">Web3Forms</a> service, which delivers them by email to the author of HubGet. In the app, technical details (HubGet and Windows version, language) are attached too unless you turn them off in the form. We only use your email to reply.</li>
+        <li data-t="t12"><strong>Links</strong> (app website, support, GitHub) open in your browser.</li>
       </ul>
 
-      <h2>When signed in (optional)</h2>
+      <h2 data-t="t13">When signed in (optional)</h2>
       <ul>
-        <li><strong>Sign-in</strong> with GitHub or Google happens in your browser – HubGet never sees your password. It receives your name, email and profile picture from the provider. The session is stored encrypted on your computer (Windows DPAPI).</li>
-        <li><strong>Star ratings</strong> are shown only as a summary (average and count), without names.</li>
-        <li><strong>Reviews</strong> are public under your account name – HubGet shows this while you write. You can edit or delete your review at any time.</li>
-        <li><strong>Screenshots</strong> you add to an app are downscaled by HubGet before upload and saved as WebP without metadata (EXIF, location). Others see them under your account name once a moderator approves them; until then only you see them. You can delete a screenshot at any time.</li>
-        <li><strong>Screenshots in the contact form</strong> are stored in private storage and the email contains a link to them that is valid for 90 days.</li>
-        <li><strong>Sync</strong> stores your favorites, package bundle, appearance and language preferences and notification preferences in your account. Turn off individual areas or sync entirely in Settings → General → Sync, where you can also delete the data from your account. Custom install commands, permissions and the automatic update schedule never go to the account.</li>
-        <li>Account data is stored in a <a href="https://supabase.com/privacy" rel="noopener">Supabase</a> database and only its owner can see it. Deleting your account deletes your ratings, reviews, screenshots and synced data too. Encrypted database backups are kept for at most 90 days, so deleted data disappears from them within 90 days at the latest.</li>
+        <li data-t="t14"><strong>Sign-in</strong> with GitHub or Google happens in your browser – HubGet never sees your password. It receives your name, email and profile picture from the provider. The session is stored encrypted on your computer (Windows DPAPI).</li>
+        <li data-t="t15"><strong>Star ratings</strong> are shown only as a summary (average and count), without names.</li>
+        <li data-t="t16"><strong>Reviews</strong> are public under your account name – HubGet shows this while you write. You can edit or delete your review at any time.</li>
+        <li data-t="t17"><strong>Screenshots</strong> you add to an app are downscaled by HubGet before upload and saved as WebP without metadata (EXIF, location). Others see them under your account name once a moderator approves them; until then only you see them. You can delete a screenshot at any time.</li>
+        <li data-t="t18"><strong>Screenshots in the contact form</strong> are stored in private storage and the email contains a link to them that is valid for 90 days.</li>
+        <li data-t="t19"><strong>Sync</strong> stores your favorites, package bundle, appearance and language preferences and notification preferences in your account. Turn off individual areas or sync entirely in Settings → General → Sync, where you can also delete the data from your account. Custom install commands, permissions and the automatic update schedule never go to the account.</li>
+        <li data-t="t20">Account data is stored in a <a href="https://supabase.com/privacy" rel="noopener">Supabase</a> database and only its owner can see it. Deleting your account deletes your ratings, reviews, screenshots and synced data too. Encrypted database backups are kept for at most 90 days, so deleted data disappears from them within 90 days at the latest.</li>
       </ul>
 
-      <h2>For developers: publishing an app</h2>
-      <p>The WinGet publishing wizard downloads the installer from the address you enter (only to read its details – it never runs it). Submitting to the microsoft/winget-pkgs repository happens from your GitHub account; the access token stays in memory only while the wizard is open.</p>
+      <h2 data-t="t21">For developers: publishing an app</h2>
+      <p data-t="t22">The WinGet publishing wizard downloads the installer from the address you enter (only to read its details – it never runs it). Submitting to the microsoft/winget-pkgs repository happens from your GitHub account; the access token stays in memory only while the wizard is open.</p>
 
-      <h2>What stays on your computer</h2>
-      <p>Settings, the catalog and icon cache, operation history and logs live only on your computer (the app folder in %LOCALAPPDATA% and the window storage). HubGet doesn't send them anywhere – you send a log for a bug report yourself.</p>
+      <h2 data-t="t23">What stays on your computer</h2>
+      <p data-t="t24">Settings, the catalog and icon cache, operation history and logs live only on your computer (the app folder in %LOCALAPPDATA% and the window storage). HubGet doesn't send them anywhere – you send a log for a bug report yourself.</p>
 
-      <h2>Contact</h2>
-      <p>Send privacy questions through the <a href="contact.html">contact form</a> or on <a data-link="github" href="#">GitHub</a>. See also the <a href="code-signing.html">Code signing policy</a>.</p>
+      <h2 data-t="t25">Contact</h2>
+      <p data-t="t26">Send privacy questions through the <a href="contact.html">contact form</a> or on <a data-link="github" href="#">GitHub</a>. See also the <a href="code-signing.html">Code signing policy</a>.</p>
     </article>
   </main>
 
   <footer class="footer">
     <div class="wrap footer__inner">
       <div class="footer__brand">
-        <a class="brand" href="index.html"><img src="../assets/unibox-logo.svg" alt="" width="28" height="28"><span>HubGet</span></a>
-        <p>An app store for Windows. Open source, MIT license.</p>
+        <a class="brand" href="index.html"><img src="../assets/unibox-logo.svg" alt="" width="28" height="28"><span data-t="s2">HubGet</span></a>
+        <p data-t="s19">An app store for Windows. Open source, MIT license.</p>
       </div>
       <nav class="footer__links" aria-label="Links">
-        <a data-link="github" href="#">GitHub</a>
-        <a href="changelog.html">What’s new</a>
-        <a href="privacy.html">Privacy</a>
-        <a href="code-signing.html">Code signing</a>
-        <a href="../soukromi.html" hreflang="cs" lang="cs" data-lang-switch>Česky</a>
+        <a data-link="github" href="#" data-t="s13">GitHub</a>
+        <a href="changelog.html" data-t="s5">What’s new</a>
+        <a href="privacy.html" data-t="s15">Privacy</a>
+        <a href="code-signing.html" data-t="s16">Code signing</a>
+        <a href="../soukromi.html" hreflang="cs" lang="cs" data-lang-switch data-t="s17">Česky</a>
       </nav>
     </div>
     <div class="wrap footer__note">
-      <p>HubGet is not affiliated with Microsoft or with the WinGet, Chocolatey and Scoop projects. Windows is a trademark of Microsoft Corporation.</p>
+      <p data-t="s18">HubGet is not affiliated with Microsoft or with the WinGet, Chocolatey and Scoop projects. Windows is a trademark of Microsoft Corporation.</p>
     </div>
   </footer>
 

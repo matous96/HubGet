@@ -20,27 +20,27 @@
   </script>
 </head>
 <body>
-  <a class="skip" href="#obsah">Přeskočit na obsah</a>
+  <a class="skip" href="#obsah" data-t="s1">Přeskočit na obsah</a>
 
   <header class="nav" id="nav">
     <div class="wrap nav__inner">
       <a class="brand" href="index.html" aria-label="HubGet – úvod">
         <img src="assets/unibox-logo.svg" alt="" width="32" height="32">
-        <span>HubGet</span>
+        <span data-t="s2">HubGet</span>
       </a>
       <nav class="nav__links" aria-label="Hlavní navigace">
-        <a href="funkce.html">Funkce</a>
-        <a href="spravci.html">Správci balíčků</a>
-        <a href="novinky.html">Novinky</a>
-        <a href="srovnani.html">Srovnání</a>
-        <a href="co-chystame.html">Co chystáme</a>
-        <a href="otazky.html">Otázky</a>
-        <a class="nav__menu-only" href="kontakt.html">Kontakt</a>
+        <a href="funkce.html" data-t="s3">Funkce</a>
+        <a href="spravci.html" data-t="s4">Správci balíčků</a>
+        <a href="novinky.html" data-t="s5">Novinky</a>
+        <a href="srovnani.html" data-t="s6">Srovnání</a>
+        <a href="co-chystame.html" data-t="s7">Co chystáme</a>
+        <a href="otazky.html" data-t="s8">Otázky</a>
+        <a class="nav__menu-only" href="kontakt.html" data-t="s9">Kontakt</a>
       </nav>
       <div class="nav__actions">
-        <a class="lang-switch" href="en/code-signing.html" hreflang="en" lang="en" data-lang-switch title="English" aria-label="Switch to English">EN</a>
+        <a class="lang-switch" href="en/code-signing.html" hreflang="en" lang="en" data-lang-switch title="English" aria-label="Switch to English" data-t="s10">EN</a>
         <a class="icon-btn nav__mail" href="kontakt.html" aria-label="Napište nám" title="Kontakt"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="4.5" width="19" height="15" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m3 7 9 6 9-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
-        <a class="btn btn--primary btn--sm" href="index.html#stahnout">Stáhnout</a>
+        <a class="btn btn--primary btn--sm" href="index.html#stahnout" data-t="s11">Stáhnout</a>
       </div>
     </div>
   </header>
@@ -49,68 +49,67 @@
     <section class="page-head">
       <div class="wrap">
         <div class="page-head__inner">
-          <p class="eyebrow">Zásady podepisování kódu</p>
-          <h1>Podepsaný HubGet</h1>
-          <p class="lead">Digitální podpis potvrzuje, že instalátor pochází z&nbsp;projektu HubGet a nikdo ho cestou nezměnil.</p>
+          <p class="eyebrow" data-t="t1">Zásady podepisování kódu</p>
+          <h1 data-t="t2">Podepsaný HubGet</h1>
+          <p class="lead" data-t="t3">Digitální podpis potvrzuje, že instalátor pochází z&nbsp;projektu HubGet a&nbsp;nikdo ho cestou nezměnil.</p>
         </div>
       </div>
     </section>
 
     <article class="wrap legal">
-      <p class="note"><strong>Free code signing provided by <a href="https://signpath.io" rel="noopener">SignPath.io</a>, certificate by <a href="https://signpath.org" rel="noopener">SignPath Foundation</a>.</strong><br>
-        Bezplatný podpis kódu poskytuje SignPath.io, certifikát vydala SignPath Foundation.</p>
+      <p class="note" data-t="t4"><strong>Free code signing provided by <a href="https://signpath.io" rel="noopener">SignPath.io</a>, certificate by <a href="https://signpath.org" rel="noopener">SignPath Foundation</a>.</strong><br>Bezplatný podpis kódu poskytuje SignPath.io, certifikát vydala SignPath Foundation.</p>
 
-      <h2>Co se podepisuje</h2>
+      <h2 data-t="t5">Co se podepisuje</h2>
       <ul>
-        <li>Program <strong>unibox.exe</strong> a instalátory <strong>EXE (NSIS)</strong> a <strong>MSI</strong> z&nbsp;oficiálních vydání na <a data-link="releases" href="#">GitHubu</a>.</li>
-        <li>Každý podepsaný soubor vzniká automatickým sestavením (GitHub Actions) ze zdrojového kódu ve veřejném <a data-link="github" href="#">repozitáři HubGetu</a> – nikdy z&nbsp;počítače vývojáře.</li>
-        <li>Podepisujeme jen soubory sestavené z&nbsp;vlastního kódu projektu. Nástroje a knihovny třetích stran podepisují jejich autoři.</li>
-        <li>Vydavatelem v&nbsp;podpisu je <strong>SignPath Foundation</strong>, název produktu je <strong>HubGet</strong>.</li>
+        <li data-t="t6">Program <strong>unibox.exe</strong> a&nbsp;instalátory <strong>EXE (NSIS)</strong> a&nbsp;<strong>MSI</strong> z&nbsp;oficiálních vydání na <a data-link="releases" href="#">GitHubu</a>.</li>
+        <li data-t="t7">Každý podepsaný soubor vzniká automatickým sestavením (GitHub Actions) ze zdrojového kódu ve veřejném <a data-link="github" href="#">repozitáři HubGetu</a> – nikdy z&nbsp;počítače vývojáře.</li>
+        <li data-t="t8">Podepisujeme jen soubory sestavené z&nbsp;vlastního kódu projektu. Nástroje a&nbsp;knihovny třetích stran podepisují jejich autoři.</li>
+        <li data-t="t9">Vydavatelem v&nbsp;podpisu je <strong>SignPath Foundation</strong>, název produktu je <strong>HubGet</strong>.</li>
       </ul>
 
-      <h2>Kdo za podpisem stojí</h2>
+      <h2 data-t="t10">Kdo za podpisem stojí</h2>
       <!-- Při změně týmu upravit i v en/code-signing.html a v SignPath -->
       <table>
-        <thead><tr><th>Role</th><th>Kdo</th><th>Co smí</th></tr></thead>
+        <thead><tr><th data-t="t11">Role</th><th data-t="t12">Kdo</th><th data-t="t13">Co smí</th></tr></thead>
         <tbody>
-          <tr><td>Autoři</td><td><a href="https://github.com/matous96">matous96</a> (vlastník repozitáře)</td><td>Mění zdrojový kód bez další kontroly.</td></tr>
-          <tr><td>Revizoři</td><td><a href="https://github.com/matous96">matous96</a></td><td>Kontrolují každý příspěvek od lidí mimo tým (pull request) před sloučením.</td></tr>
-          <tr><td>Schvalovatelé</td><td><a href="https://github.com/matous96">matous96</a></td><td>Ručně schvalují každý podpis v SignPath – bez schválení se nic nepodepíše.</td></tr>
+          <tr><td data-t="t14">Autoři</td><td data-t="t15"><a href="https://github.com/matous96" rel="noopener">matous96</a> (vlastník repozitáře)</td><td data-t="t16">Mění zdrojový kód bez další kontroly.</td></tr>
+          <tr><td data-t="t17">Revizoři</td><td><a href="https://github.com/matous96" data-t="t18">matous96</a></td><td data-t="t19">Kontrolují každý příspěvek od lidí mimo tým (pull request) před sloučením.</td></tr>
+          <tr><td data-t="t20">Schvalovatelé</td><td><a href="https://github.com/matous96" data-t="t21">matous96</a></td><td data-t="t22">Ručně schvalují každý podpis v&nbsp;SignPath – bez schválení se nic nepodepíše.</td></tr>
         </tbody>
       </table>
-      <p>Všichni členové týmu používají dvoufázové ověření na GitHubu i v SignPath.</p>
+      <p data-t="t23">Všichni členové týmu používají dvoufázové ověření na GitHubu i&nbsp;v&nbsp;SignPath.</p>
 
-      <h2>Ochrana soukromí</h2>
-      <p>HubGet neodesílá telemetrii ani údaje o vašem počítači. Kdy a proč komunikuje se servery (katalog, ikony, správci balíčků, volitelné přihlášení), popisují <a href="soukromi.html">zásady ochrany soukromí</a>.</p>
+      <h2 data-t="t24">Ochrana soukromí</h2>
+      <p data-t="t25">HubGet neodesílá telemetrii ani údaje o&nbsp;vašem počítači. Kdy a&nbsp;proč komunikuje se servery (katalog, ikony, správci balíčků, volitelné přihlášení), popisují <a href="soukromi.html">zásady ochrany soukromí</a>.</p>
 
-      <h2>Jak podpis ověřit</h2>
+      <h2 data-t="t26">Jak podpis ověřit</h2>
       <ul>
-        <li>Pravým tlačítkem na instalátor → <strong>Vlastnosti → Digitální podpisy</strong>: podepsal „SignPath Foundation“.</li>
-        <li>V PowerShellu: <code>Get-AuthenticodeSignature .\HubGet_*_x64-setup.exe</code> – stav <code>Valid</code>.</li>
-        <li>Instalátor stažený odjinud než z&nbsp;oficiálních vydání, bez podpisu nebo s&nbsp;jiným vydavatelem nespouštějte.</li>
+        <li data-t="t27">Pravým tlačítkem na instalátor → <strong>Vlastnosti → Digitální podpisy</strong>: podepsal „SignPath Foundation“.</li>
+        <li data-t="t28">V&nbsp;PowerShellu: <code>Get-AuthenticodeSignature .\HubGet_*_x64-setup.exe</code> – stav <code>Valid</code>.</li>
+        <li data-t="t29">Instalátor stažený odjinud než z&nbsp;oficiálních vydání, bez podpisu nebo s&nbsp;jiným vydavatelem nespouštějte.</li>
       </ul>
 
-      <h2>Nahlášení problému</h2>
-      <p>Podezřelý podepsaný soubor nebo zneužití podpisu nahlaste přes <a href="kontakt.html">kontaktní formulář</a> a také <a href="https://signpath.org" rel="noopener">SignPath Foundation</a>.</p>
+      <h2 data-t="t30">Nahlášení problému</h2>
+      <p data-t="t31">Podezřelý podepsaný soubor nebo zneužití podpisu nahlaste přes <a href="kontakt.html">kontaktní formulář</a> a&nbsp;také <a href="https://signpath.org" rel="noopener">SignPath Foundation</a>.</p>
     </article>
   </main>
 
   <footer class="footer">
     <div class="wrap footer__inner">
       <div class="footer__brand">
-        <a class="brand" href="index.html"><img src="assets/unibox-logo.svg" alt="" width="28" height="28"><span>HubGet</span></a>
-        <p>Obchod s aplikacemi pro Windows. Open source, licence MIT.</p>
+        <a class="brand" href="index.html"><img src="assets/unibox-logo.svg" alt="" width="28" height="28"><span data-t="s2">HubGet</span></a>
+        <p data-t="s12">Obchod s&nbsp;aplikacemi pro Windows. Open source, licence MIT.</p>
       </div>
       <nav class="footer__links" aria-label="Odkazy">
-        <a data-link="github" href="#">GitHub</a>
-        <a href="novinky.html">Novinky</a>
-        <a href="soukromi.html">Ochrana soukromí</a>
-        <a href="podpis-kodu.html">Podepisování kódu</a>
-        <a href="en/code-signing.html" hreflang="en" lang="en" data-lang-switch>English</a>
+        <a data-link="github" href="#" data-t="s13">GitHub</a>
+        <a href="novinky.html" data-t="s5">Novinky</a>
+        <a href="soukromi.html" data-t="s15">Ochrana soukromí</a>
+        <a href="podpis-kodu.html" data-t="s16">Podepisování kódu</a>
+        <a href="en/code-signing.html" hreflang="en" lang="en" data-lang-switch data-t="s17">English</a>
       </nav>
     </div>
     <div class="wrap footer__note">
-      <p>HubGet není spojen se společností Microsoft ani s projekty WinGet, Chocolatey a Scoop. Windows je ochranná známka společnosti Microsoft.</p>
+      <p data-t="s18">HubGet není spojen se společností Microsoft ani s&nbsp;projekty WinGet, Chocolatey a&nbsp;Scoop. Windows je ochranná známka společnosti Microsoft.</p>
     </div>
   </footer>
 

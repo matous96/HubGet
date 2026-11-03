@@ -1,0 +1,39 @@
+{
+  "seo": {
+    "title": "Zásady podepisování kódu – HubGet",
+    "description": "Jak a kdo podepisuje HubGet: bezplatný podpis kódu SignPath.io s certifikátem SignPath Foundation, sestavení z veřejného repozitáře a schvalování každého vydání."
+  },
+  "texty": {
+    "t1": "Zásady podepisování kódu",
+    "t2": "Podepsaný HubGet",
+    "t3": "Digitální podpis potvrzuje, že instalátor pochází z projektu HubGet a nikdo ho cestou nezměnil.",
+    "t4": "**Free code signing provided by [SignPath.io](https://signpath.io), certificate by [SignPath Foundation](https://signpath.org).**\nBezplatný podpis kódu poskytuje SignPath.io, certifikát vydala SignPath Foundation.",
+    "t5": "Co se podepisuje",
+    "t6": "Program **unibox.exe** a instalátory **EXE (NSIS)** a **MSI** z oficiálních vydání na [GitHubu](@releases).",
+    "t7": "Každý podepsaný soubor vzniká automatickým sestavením (GitHub Actions) ze zdrojového kódu ve veřejném [repozitáři HubGetu](@github) – nikdy z počítače vývojáře.",
+    "t8": "Podepisujeme jen soubory sestavené z vlastního kódu projektu. Nástroje a knihovny třetích stran podepisují jejich autoři.",
+    "t9": "Vydavatelem v podpisu je **SignPath Foundation**, název produktu je **HubGet**.",
+    "t10": "Kdo za podpisem stojí",
+    "t11": "Role",
+    "t12": "Kdo",
+    "t13": "Co smí",
+    "t14": "Autoři",
+    "t15": "[matous96](https://github.com/matous96) (vlastník repozitáře)",
+    "t16": "Mění zdrojový kód bez další kontroly.",
+    "t17": "Revizoři",
+    "t18": "matous96",
+    "t19": "Kontrolují každý příspěvek od lidí mimo tým (pull request) před sloučením.",
+    "t20": "Schvalovatelé",
+    "t21": "matous96",
+    "t22": "Ručně schvalují každý podpis v SignPath – bez schválení se nic nepodepíše.",
+    "t23": "Všichni členové týmu používají dvoufázové ověření na GitHubu i v SignPath.",
+    "t24": "Ochrana soukromí",
+    "t25": "HubGet neodesílá telemetrii ani údaje o vašem počítači. Kdy a proč komunikuje se servery (katalog, ikony, správci balíčků, volitelné přihlášení), popisují [zásady ochrany soukromí](soukromi.html).",
+    "t26": "Jak podpis ověřit",
+    "t27": "Pravým tlačítkem na instalátor → **Vlastnosti → Digitální podpisy**: podepsal „SignPath Foundation“.",
+    "t28": "V PowerShellu: `Get-AuthenticodeSignature .\\HubGet_*_x64-setup.exe` – stav `Valid`.",
+    "t29": "Instalátor stažený odjinud než z oficiálních vydání, bez podpisu nebo s jiným vydavatelem nespouštějte.",
+    "t30": "Nahlášení problému",
+    "t31": "Podezřelý podepsaný soubor nebo zneužití podpisu nahlaste přes [kontaktní formulář](kontakt.html) a také [SignPath Foundation](https://signpath.org)."
+  }
+}

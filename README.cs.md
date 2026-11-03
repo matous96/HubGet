@@ -460,15 +460,16 @@ v Novinkách nová verze chybí.
 
 ### Úpravy webu v prohlížeči (Pages CMS)
 
-Novinky (`novinky.html`, `en/changelog.html`) a Co chystáme (`co-chystame.html`,
-`en/roadmap.html`) se upravují ve formuláři v prohlížeči přes
-[Pages CMS](https://pagescms.org) (open source, zdarma) – bez psaní HTML:
+Texty webu se upravují ve formulářích v prohlížeči přes
+[Pages CMS](https://pagescms.org) (open source, zdarma) – bez psaní HTML: Novinky
+(`novinky.html`, `en/changelog.html`), Co chystáme (`co-chystame.html`,
+`en/roadmap.html`) a všechny ostatní texty stránek (viz [Texty stránek](#texty-stránek)):
 
 1. Na [app.pagescms.org](https://app.pagescms.org) se přihlaste přes GitHub.
 2. Nainstalujte aplikaci Pages CMS na GitHubu jen pro repozitář `matous96/unibox`
    (Only select repositories).
 3. Otevřete repozitář – v menu jsou **Novinky** (jedna položka na verzi, česky
-   i anglicky) a **Co chystáme**.
+   i anglicky), **Co chystáme** a **Texty webu – česky / anglicky** (stránka po stránce).
 4. Uložení je commit do `main`. Workflow Katalog (běh „Web – aktualizace“) z dat
    vygeneruje stránky a do pár minut je zveřejní.
 
@@ -482,9 +483,34 @@ text, anglická stránka ukáže český; vadný záznam se přeskočí s upozor
 Data jsou ve `website/content/` (`novinky/<verze>.json`, `co-chystame.json`),
 formulář popisuje `.pages.yml`. Stránky z nich přepíše `scripts/website-content.mjs`
 (ručně `pnpm website:content`, spouští ho i `pnpm release` a workflow) – jen oblasti
-mezi značkami `<!--obsah:klíč-->` … `<!--/obsah:klíč-->`, zbytek stránek se upravuje
-v HTML. Po úpravě v Pages CMS stáhněte změny (`git pull`), než budete pokračovat
-v práci lokálně.
+mezi značkami `<!--obsah:klíč-->` … `<!--/obsah:klíč-->`. Po úpravě v Pages CMS
+stáhněte změny (`git pull`), než budete pokračovat v práci lokálně.
+
+#### Texty stránek
+
+Každý text na stránce (nadpisy, odstavce, tlačítka, buňky tabulek, menu…) má
+v HTML atribut `data-t` a jeho znění je ve `website/content/texty/<jazyk>/<stránka>.json`
+– spolu s titulkem a popisem pro vyhledávače a snímky obrazovky (soubor z knihovny
+`website/img` a popis obrázku). Menu, zápatí a hlášky skriptu (`TEXTS` ve
+`website/main.js`) jsou společné pro všechny stránky jazyka (`spolecne.json`). Pole
+formuláře jsou v pořadí na stránce a popis říká, co text je a v které sekci
+(„Odstavec · Proč HubGet“).
+
+Text píšete stejně jako v Novinkách (`**tučně**`, `[odkaz](adresa)`, `` `kód` ``, nový
+řádek = zalomení). Ve složených závorkách jsou části stránky, které se ve formuláři
+nepíšou: `{ikona}` a `{prvek}` (ikona, obrázek či ozdoba z HTML – zůstane, kde značka
+stojí; smazáním zmizí), `{auto:version}` a jiné `{auto:…}` (číslo verze, velikost
+instalátoru – doplní se samy), `{ano}` `{ne}` `{částečně}` `{info}` (anglicky `{yes}`
+`{no}` `{partly}` `{info}`) – značka ve srovnávací tabulce – a `{→}`. Ojedinělé HTML
+s textem (ukázky aplikace na stránce Funkce) zůstává ve formuláři jako HTML.
+
+`scripts/website-texts.mjs` (`pnpm website:content`, spouští ho i `pnpm release`) stránky
+a data sladí: novým textům v HTML přidělí `data-t` a přidá je do dat, text upravený
+v HTML od posledního commitu převezme do dat (jinak platí data), texty, které ze stránek
+zmizely, z dat odebere a přegeneruje formuláře na konci `.pages.yml` (od značky „Texty
+stránek“ – ručně se upravuje jen část nad ní). Rozvržení stránek (nové sekce, vzhled) se
+dál mění v HTML; po úpravě stačí `pnpm website:content`. Workflow Katalog spouští
+`website-texts.mjs --render`, které jen vepíše data do HTML.
 
 Web je rozdělený do podstránek podle horní navigace – domovská stránka nese jen úvod,
 novinky, pilíře, rozcestník, „Zdarma“ a stažení:
@@ -499,7 +525,8 @@ novinky, pilíře, rozcestník, „Zdarma“ a stažení:
 | `otazky.html` | `en/faq.html` | časté otázky |
 
 Nová stránka patří do navigace všech stránek (`nav.nav__links`, aktuální s
-`aria-current="page"`) a do `website/vite.config.mjs`.
+`aria-current="page"`) a do `website/vite.config.mjs`; `pnpm website:content` jí pak
+založí texty a formulář v Pages CMS.
 
 ### Vzhled instalátoru (NSIS)
 

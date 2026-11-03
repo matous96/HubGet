@@ -1,0 +1,34 @@
+{
+  "seo": {
+    "title": "Privacy – HubGet",
+    "description": "What data HubGet uses: no telemetry or ads, network only for the catalog, icons, package managers and optional sign-in."
+  },
+  "texty": {
+    "t1": "Privacy",
+    "t2": "What HubGet does with data",
+    "t3": "No telemetry, analytics or ads. What you have installed stays on your computer.",
+    "t4": "**In short:** HubGet doesn't send any information about you or your computer. It uses the network only for the features described below – each server sees the usual request details (IP address, time, program version). Sign-in is optional; without it everything works except ratings and sync.",
+    "t5": "Without signing in",
+    "t6": "**The app catalog** (catalog.json) is downloaded from the project website. It contains nothing about you – it's the same for everyone.",
+    "t7": "**App icons and screenshots** load from the addresses listed in the catalog (publisher websites, GitHub, jsDelivr, Chocolatey, Wikimedia, Steam) and are cached on your computer. HubGet doesn't look up website favicons at runtime – services such as Google don't learn which apps you browse.",
+    "t8": "**Package managers** (WinGet, Chocolatey, Scoop, npm, pip, Cargo, vcpkg, .NET, PowerShell Gallery) search, install and update through their own servers under their own policies. HubGet only passes on what you search for or install.",
+    "t9": "**GitHub stars** in app details: a request to api.github.com with the app's repository name.",
+    "t10": "**HubGet updates**: a check of latest.json on GitHub Releases. Turn off automatic checks in Settings → General.",
+    "t11": "**The contact form** in the app and on the website sends the topic, name, email and message through the [Web3Forms](https://web3forms.com) service, which delivers them by email to the author of HubGet. In the app, technical details (HubGet and Windows version, language) are attached too unless you turn them off in the form. We only use your email to reply.",
+    "t12": "**Links** (app website, support, GitHub) open in your browser.",
+    "t13": "When signed in (optional)",
+    "t14": "**Sign-in** with GitHub or Google happens in your browser – HubGet never sees your password. It receives your name, email and profile picture from the provider. The session is stored encrypted on your computer (Windows DPAPI).",
+    "t15": "**Star ratings** are shown only as a summary (average and count), without names.",
+    "t16": "**Reviews** are public under your account name – HubGet shows this while you write. You can edit or delete your review at any time.",
+    "t17": "**Screenshots** you add to an app are downscaled by HubGet before upload and saved as WebP without metadata (EXIF, location). Others see them under your account name once a moderator approves them; until then only you see them. You can delete a screenshot at any time.",
+    "t18": "**Screenshots in the contact form** are stored in private storage and the email contains a link to them that is valid for 90 days.",
+    "t19": "**Sync** stores your favorites, package bundle, appearance and language preferences and notification preferences in your account. Turn off individual areas or sync entirely in Settings → General → Sync, where you can also delete the data from your account. Custom install commands, permissions and the automatic update schedule never go to the account.",
+    "t20": "Account data is stored in a [Supabase](https://supabase.com/privacy) database and only its owner can see it. Deleting your account deletes your ratings, reviews, screenshots and synced data too. Encrypted database backups are kept for at most 90 days, so deleted data disappears from them within 90 days at the latest.",
+    "t21": "For developers: publishing an app",
+    "t22": "The WinGet publishing wizard downloads the installer from the address you enter (only to read its details – it never runs it). Submitting to the microsoft/winget-pkgs repository happens from your GitHub account; the access token stays in memory only while the wizard is open.",
+    "t23": "What stays on your computer",
+    "t24": "Settings, the catalog and icon cache, operation history and logs live only on your computer (the app folder in %LOCALAPPDATA% and the window storage). HubGet doesn't send them anywhere – you send a log for a bug report yourself.",
+    "t25": "Contact",
+    "t26": "Send privacy questions through the [contact form](contact.html) or on [GitHub](@github). See also the [Code signing policy](code-signing.html)."
+  }
+}

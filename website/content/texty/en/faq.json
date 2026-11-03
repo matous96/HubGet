@@ -1,0 +1,31 @@
+{
+  "seo": {
+    "title": "FAQ – HubGet",
+    "description": "Answers to common questions about HubGet: SmartScreen warnings, accounts, safety, admin rights and the EXE and MSI installers.",
+    "ogTitle": "FAQ – HubGet",
+    "ogDescription": "Answers to common questions about HubGet: SmartScreen warnings, accounts, safety, admin rights and the EXE and MSI installers."
+  },
+  "texty": {
+    "t1": "Questions and answers",
+    "t2": "Frequently asked questions",
+    "t3": "Edge says the installer “isn’t commonly downloaded”. What should I do?",
+    "t4": "Edge judges downloads by their reputation. A new installer that isn’t digitally signed yet and has been downloaded by only a few people doesn’t have any, so Edge warns – it doesn’t mean the file contains a virus. Only download HubGet from this website or from the [official releases on GitHub](@releases). In Edge, hover over the download and click **…** → **Keep** → **Show more** → **Keep anyway**. Windows SmartScreen may warn once more when you run it – see the next question. We’re preparing a free code signing certificate for open source (SignPath Foundation); with it, the warning should disappear over time.",
+    "t5": "Windows shows a SmartScreen warning when I run the installer. Is that okay?",
+    "t6": "The HubGet installer isn’t digitally signed yet, so Windows shows the “Windows protected your PC” dialog. Click **More info** and then **Run anyway**. A signed installer is on our roadmap.",
+    "t7": "What does “preview” mean?",
+    "t8": "HubGet is still in an early stage of development – the first public version 0.1.0 came out in October 2026 and updates have been arriving since (see [What’s new](changelog.html)). WinGet, Chocolatey, Scoop and developer package managers (npm, pip, Cargo and more) work for real – search, install, update and uninstall. You may run into the occasional bug.",
+    "t9": "Is HubGet free?",
+    "t10": "Yes. HubGet is open source under the MIT license – free, with no ads and no bundled extras. The source code is on [GitHub](@github).",
+    "t11": "Do I need an account?",
+    "t12": "No. Signing in with GitHub is optional and only needed for ratings, reviews, adding screenshots and sync between computers. Installing, updating and uninstalling work without an account. The [privacy policy](privacy.html) describes what's stored when you sign in.",
+    "t13": "Where does HubGet download apps from? Is it safe?",
+    "t14": "Only from the official repositories of package managers. HubGet downloads the installer and WinGet verifies its SHA-256 checksum before running it – if the file differs from the published one, the installation doesn’t happen.",
+    "t15": "Will HubGet show apps I installed before?",
+    "t16": "Yes. The installed apps overview includes programs installed outside WinGet, Microsoft Store apps and Steam games. You can update them, uninstall them or launch them with the Open button.",
+    "t17": "Do I need administrator rights?",
+    "t18": "Not to install HubGet – the EXE installer installs for the current user. If installing an app requires administrator rights, HubGet retries it and asks for them (UAC).",
+    "t19": "What’s the difference between the EXE and MSI installers?",
+    "t20": "The EXE is recommended for most people: it installs without administrator rights and offers English and Czech. The MSI is meant for deploying across a company.",
+    "t21": "Didn’t find an answer? [Write to us](contact.html)."
+  }
+}

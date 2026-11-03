@@ -16,7 +16,7 @@
     "version:bump": "node scripts/bump-version.mjs",
     "release": "node scripts/release.mjs",
     "website:release": "node scripts/website-release.mjs",
-    "website:content": "node scripts/website-content.mjs",
+    "website:content": "node scripts/website-texts.mjs && node scripts/website-content.mjs",
     "downloads": "node scripts/downloads.mjs",
     "sign:dev-cert": "node scripts/dev-certificate.mjs",
     "backup:decrypt": "node scripts/backup-crypt.mjs decrypt"

@@ -1,0 +1,42 @@
+{
+  "seo": {
+    "title": "Package managers – HubGet",
+    "description": "HubGet is in early development. We’re upfront about what it can already do and what is still on the way.",
+    "ogTitle": "Package managers – HubGet",
+    "ogDescription": "HubGet is in early development. We’re upfront about what it can already do and what is still on the way."
+  },
+  "texty": {
+    "t1": "Package managers",
+    "t2": "What works for real in version {auto:version}.",
+    "t3": "HubGet is in early development. We’re upfront about what it can already do and what is still on the way.",
+    "t4": "WinGet",
+    "t5": "Fully working",
+    "t6": "Listing installed apps, search, install, update, uninstall and installer download.",
+    "t7": "15,776 packages in the catalog",
+    "t8": "Chocolatey",
+    "t9": "Fully working",
+    "t10": "Search, install, update and uninstall right in the app, including an overview of available updates. If Chocolatey is missing, HubGet installs it in one click.",
+    "t11": "12,027 apps in the catalog",
+    "t12": "Scoop",
+    "t13": "Fully working",
+    "t14": "Search, install, update and uninstall without admin rights. HubGet adds a missing Scoop, Git and buckets by itself.",
+    "t15": "4,702 apps in the catalog",
+    "t16": "For developers",
+    "t17": "Working",
+    "t18": "npm, Bun, pip, Cargo, vcpkg, .NET Tool, PowerShell 7 / 5 – search, install, update and uninstall in Developer mode. If Node.js, Python, Rust, the .NET SDK or PowerShell 7 is missing, HubGet installs it via WinGet.",
+    "t19": "For power users and developers",
+    "t20": "Developer mode and copy-ready commands.",
+    "t21": "Switch to “Developer” mode to manage libraries and developer tools too – search, install, update and uninstall right in HubGet. Every app comes with ready-made commands for WinGet, Chocolatey, Scoop and more – copy them in one click. Export bundles as a PowerShell script.",
+    "t22": "npm, Bun, pip, Cargo, vcpkg, .NET Tool and PowerShell for real",
+    "t23": "Installs a missing Node.js, Python or Rust in one click",
+    "t24": "An overview of terminal commands for every manager, with explanations",
+    "t25": "Profile export and import",
+    "t26": "WinGet",
+    "t27": "Chocolatey",
+    "t28": "Scoop",
+    "t29": "PS&gt;",
+    "t30": "winget install --id Microsoft.VisualStudioCode -e",
+    "t31": "Copy",
+    "t32": "Example commands HubGet shows for Visual Studio Code."
+  }
+}

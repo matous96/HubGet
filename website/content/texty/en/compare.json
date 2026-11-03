@@ -1,0 +1,31 @@
+{
+  "seo": {
+    "title": "Compare – HubGet",
+    "description": "Looking for a way to install apps on Windows? See how HubGet differs from other tools – including where they do better.",
+    "ogTitle": "Compare – HubGet",
+    "ogDescription": "Looking for a way to install apps on Windows? See how HubGet differs from other tools – including where they do better."
+  },
+  "texty": {
+    "t1": "Comparison",
+    "t2": "How HubGet stacks up against the alternatives.",
+    "t3": "Looking for a way to install apps on Windows? See how HubGet differs from other tools – including where they do better.",
+    "t4": "<span class=\"vs\">vs</span> Ninite",
+    "t5": "Ninite made installing several apps at once popular. But it offers around 150 hand-picked apps and can’t uninstall them without the paid version. HubGet has more than 25,000 apps in its catalog and manages them from install to uninstall.",
+    "t6": "25,000+ apps instead of around 150",
+    "t7": "Updates and uninstalls right in the app",
+    "t8": "Free and open source, for businesses too",
+    "t9": "Read the full comparison {→}",
+    "t10": "<span class=\"vs\">vs</span> UniGetUI",
+    "t11": "UniGetUI is a mature desktop app for managing packages from many package managers at once. HubGet takes a different path: instead of a package list, it’s an app store where you discover, compare and install apps like in the App Store.",
+    "t12": "A Today home page, collections and charts",
+    "t13": "One app = one card with every source",
+    "t14": "Regular user mode without libraries and tools",
+    "t15": "Read the full comparison {→}",
+    "t16": "<span class=\"vs\">vs</span> Winstall.app",
+    "t17": "Winstall.app is a website where you pick apps from WinGet and get a command to run in your terminal. HubGet installs, updates and uninstalls apps from WinGet, Chocolatey and Scoop for you.",
+    "t18": "Install, update and uninstall right in the app",
+    "t19": "Three sources in one catalog",
+    "t20": "A fallback source when a WinGet download link is broken",
+    "t21": "Read the full comparison {→}"
+  }
+}

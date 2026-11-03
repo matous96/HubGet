@@ -1,0 +1,39 @@
+{
+  "seo": {
+    "title": "Code signing policy – HubGet",
+    "description": "How and by whom HubGet is signed: free code signing by SignPath.io with a SignPath Foundation certificate, builds from the public repository and approval of every release."
+  },
+  "texty": {
+    "t1": "Code signing policy",
+    "t2": "Signed HubGet",
+    "t3": "A digital signature confirms that an installer comes from the HubGet project and nobody changed it along the way.",
+    "t4": "Free code signing provided by [SignPath.io](https://signpath.io), certificate by [SignPath Foundation](https://signpath.org).",
+    "t5": "What gets signed",
+    "t6": "The **unibox.exe** program and the **EXE (NSIS)** and **MSI** installers from the official releases on [GitHub](@releases).",
+    "t7": "Every signed file is produced by an automated build (GitHub Actions) from the source code in the public [HubGet repository](@github) – never on a developer's computer.",
+    "t8": "We only sign files built from the project's own code. Third-party tools and libraries are signed by their authors.",
+    "t9": "The publisher in the signature is **SignPath Foundation**, the product name is **HubGet**.",
+    "t10": "Who stands behind the signature",
+    "t11": "Role",
+    "t12": "Who",
+    "t13": "What they may do",
+    "t14": "Committers",
+    "t15": "[matous96](https://github.com/matous96) (repository owner)",
+    "t16": "Change the source code without further review.",
+    "t17": "Reviewers",
+    "t18": "matous96",
+    "t19": "Review every contribution from people outside the team (pull requests) before merging.",
+    "t20": "Approvers",
+    "t21": "matous96",
+    "t22": "Manually approve every signing request in SignPath – nothing is signed without approval.",
+    "t23": "All team members use multi-factor authentication on GitHub and SignPath.",
+    "t24": "Privacy",
+    "t25": "HubGet doesn't send telemetry or information about your computer. When and why it talks to servers (catalog, icons, package managers, optional sign-in) is described in the [privacy policy](privacy.html).",
+    "t26": "How to verify the signature",
+    "t27": "Right-click the installer → **Properties → Digital Signatures**: signed by “SignPath Foundation”.",
+    "t28": "In PowerShell: `Get-AuthenticodeSignature .\\HubGet_*_x64-setup.exe` – status `Valid`.",
+    "t29": "Don't run an installer downloaded from anywhere other than the official releases, without a signature or with a different publisher.",
+    "t30": "Reporting a problem",
+    "t31": "Report a suspicious signed file or misuse of the signature through the [contact form](contact.html) and to [SignPath Foundation](https://signpath.org)."
+  }
+}
