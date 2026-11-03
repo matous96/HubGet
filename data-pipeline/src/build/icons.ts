@@ -31,14 +31,25 @@ const HEAD_BYTES = 128 * 1024;
  * Obecné obrázky místo ikony (rozměry a SHA-256 souboru). Chocolatey za balíček bez vlastní
  * ikony vrací modrou krabičku s bublinami – v katalogu ji měly desítky aplikací (gnuplot,
  * Fiddler, Sonic Pi, Gitea, neoficiální klient ChatGPT, se kterým se spojil i oficiální).
- * Taková ikona se počítá jako nefunkční a vybere se další kandidát.
+ * Taková ikona se počítá jako nefunkční a vybere se další kandidát. Obrázek z `prefix`, který
+ * se nepodařilo změřit (třeba když Chocolatey omezí počet požadavků z CI), se nepoužije ani jako
+ * poslední možnost – raději avatar než krabička; příští běh ho změří znovu.
  */
-const PLACEHOLDERS = [{ w: 128, h: 128, sha256: "f75147f3739646fcd8705bae8e581206fa2bb0b08ac85a7357a7c1b479fc961e" }];
+const PLACEHOLDERS = [
+  {
+    prefix: "https://community.chocolatey.org/content/packageimages/",
+    w: 128,
+    h: 128,
+    sha256: "f75147f3739646fcd8705bae8e581206fa2bb0b08ac85a7357a7c1b479fc961e",
+  },
+];
 
 const isPlaceholder = (size: ImageSize, body: Buffer) =>
   PLACEHOLDERS.some(
     (p) => p.w === size.width && p.h === size.height && p.sha256 === createHash("sha256").update(body).digest("hex"),
   );
+/** Adresa, kde se místo ikony může vrátit obecný obrázek – neověřená se nepoužije. */
+const mayBePlaceholder = (url: string) => PLACEHOLDERS.some((p) => url.startsWith(p.prefix));
 
 /**
  * Výsledek měření: rozměry, nebo chyba – trvalá (404, HTML místo obrázku, obecný obrázek)
@@ -47,8 +58,11 @@ const isPlaceholder = (size: ImageSize, body: Buffer) =>
  */
 type Measured = { w: number; h: number; vector?: true; checked?: true; at: number } | { error: string; at: number };
 
-/** Dočasnou chybu zkusit znovu po dni (trvalé výsledky platí MAX_AGE.iconSizes). */
-const TRANSIENT_AGE = 24 * 3_600_000;
+/**
+ * Dočasnou chybu zkusit znovu v příštím denním běhu (trvalé výsledky platí MAX_AGE.iconSizes).
+ * Kratší než den – plánované spuštění se o minuty posouvá a 24 h by ho mohly přeskočit.
+ */
+const TRANSIENT_AGE = 12 * 3_600_000;
 /** Chyba, která pomine: limit požadavků, chyba serveru, časový limit, výpadek sítě. */
 const isTransient = (m: Measured | undefined) => !!m && "error" in m && /^(429|5\d\d|timeout|network)$/.test(m.error);
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -144,7 +158,8 @@ function hostLimiters(max: number) {
 
 /**
  * Změří ikony (z mezipaměti, nové a staré stáhne) – adresa → rozměry,
- * null = nejde načíst, undefined = server je teď nedostupný (rozměr neznámý).
+ * null = nejde načíst (i nezměřený obrázek z Chocolatey), undefined = server je teď nedostupný
+ * (rozměr neznámý).
  */
 export async function measureIcons(urls: string[]): Promise<Map<string, ImageSize | null | undefined>> {
   const cache = await readCache();
@@ -157,7 +172,10 @@ export async function measureIcons(urls: string[]): Promise<Map<string, ImageSiz
     const limiterOf = hostLimiters(4);
     let unsaved = 0;
     await mapLimit(todo, 48, async (url) => {
-      cache[url] = await limiterOf(url).run(() => measure(url));
+      const result = await limiterOf(url).run(() => measure(url));
+      // Dočasná chyba nepřepíše ověřený výsledek (zůstane i jeho stáří – příště se zkusí znovu)
+      const previous = cache[url];
+      cache[url] = isTransient(result) && previous && !isTransient(previous) && !unchecked(previous) ? previous : result;
       tick();
       // Průběžně ukládat – přerušený běh nezačíná od nuly
       if (++unsaved >= 1000) {
@@ -174,9 +192,12 @@ export async function measureIcons(urls: string[]): Promise<Map<string, ImageSiz
     }),
   );
   if (placeholders.size) log.info(`ikony: ${placeholders.size} obecných obrázků místo ikony (Chocolatey) vyřazeno`);
+  const unverified = new Set(urls.filter((url) => mayBePlaceholder(url) && (!cache[url] || isTransient(cache[url]))));
+  if (unverified.size) log.info(`ikony: ${unverified.size} nezměřených obrázků z Chocolatey (server nedostupný) vynecháno`);
   return new Map(
     urls.map((url) => {
       const m = cache[url];
+      if (unverified.has(url)) return [url, null];
       if (!m || isTransient(m)) return [url, undefined];
       return [url, "error" in m ? null : { width: m.w, height: m.h, vector: m.vector }];
     }),

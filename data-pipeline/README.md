@@ -135,7 +135,10 @@ všude – aplikace bez použitelné ikony nemá `iconUrl` a Unibox vykreslí av
 s iniciálami (v desktopové aplikaci má přednost skutečná ikona nainstalovaného
 programu – viz README.cs.md). Stejnou mez hlídá i aplikace u ikon, které se
 změnily po sestavení katalogu. Ikonu, kterou kvůli výpadku serveru nešlo změřit,
-pipeline nezahodí (zkusí ji znovu příští den). Změřené rozměry jsou
+pipeline nezahodí (zkusí ji znovu příští den) a dříve ověřený rozměr výpadek
+nepřepíše. Výjimkou je galerie Chocolatey: nezměřený obrázek z ní může být obecná
+krabička, takže se nepoužije (v listopadu 2026 se měření v CI u 53 obrázků nepovedlo –
+nejspíš limit požadavků Chocolatey – a krabička jim v katalogu zůstala). Změřené rozměry jsou
 v `.cache/icon-sizes.json`, ikony webů v `.cache/web-icons.json` (platí 30 dní).
 
 Přehled podle zdrojů: `node data-pipeline/scripts/icon-report.ts [katalog.json] [--list]`
