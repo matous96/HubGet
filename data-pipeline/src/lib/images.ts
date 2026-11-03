@@ -2,23 +2,9 @@
  * Adresy obrázků z komunitních zdrojů: oprava zaniklých CDN, převod na HTTPS
  * a vytažení screenshotů z popisu balíčku (Markdown / HTML).
  */
+import { fixDeadCdn } from "../../../src/lib/imageCdn.ts";
 
-/**
- * Zaniklé CDN nad GitHubem (rawgit.com, cdn.staticaly.com) – stejné soubory
- * nabízí jsDelivr: /gh/<uživatel>/<repozitář>@<větev nebo commit>/<cesta>,
- * obrázkový proxy staticaly se nahradí původní adresou. Adresa bez větve
- * (např. „…/repo//icons/x.png“) nejde opravit → null.
- */
-export function fixDeadCdn(url: string): string | null {
-  const proxied = url.match(/^https?:\/\/cdn\.staticaly\.com\/img\/(.+)$/);
-  if (proxied) return `https://${proxied[1]}`;
-  const dead = url.match(
-    /^https?:\/\/(?:cdn\.rawgit\.com|rawgit\.com|cdn\.staticaly\.com\/gh)\/([^/]+)\/([^/]+)\/([^/]*)\/(.+)$/,
-  );
-  if (!dead) return url;
-  const [, user, repo, ref, path] = dead;
-  return ref ? `https://cdn.jsdelivr.net/gh/${user}/${repo}@${ref}/${path}` : null;
-}
+export { fixDeadCdn };
 
 /** Šířky náhledů, které Wikimedia Commons vydá (jiné vrátí chybu 400). */
 const WIKIMEDIA_WIDTHS = [120, 250, 330, 500, 960, 1280, 1920];

@@ -1,6 +1,6 @@
 import { useQueries, type UseQueryResult } from "@tanstack/react-query";
 import { AlertTriangle } from "lucide-react";
-import { useMemo } from "react";
+import { useDeferredValue, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router";
 import { queryKeys } from "@/app/queryClient";
@@ -76,6 +76,9 @@ export function SearchPage() {
   const { t } = useTranslation();
   const [params] = useSearchParams();
   const query = params.get("q")?.trim() ?? "";
+  // Výsledky (25 000 aplikací + desítky karet) se počítají a kreslí s nižší prioritou –
+  // React je při dalším stisku přeruší, psaní tak nikdy nečeká na překreslení
+  const deferredQuery = useDeferredValue(query);
   const debounced = useDebounce(query, 300);
   const { data: catalogData } = useCatalog();
   // Zamčený zdroj (levý panel): katalog i živé hledání jen v něm
@@ -83,7 +86,7 @@ export function SearchPage() {
 
   // 1) Okamžité výsledky z katalogu
   const catalogResults = useMemo(() => {
-    const q = normalize(query);
+    const q = normalize(deferredQuery);
     if (!q || !catalogData) return [];
     const matches: Match[] = [];
     for (const record of catalogSearchIndex(catalogData)) {
@@ -91,7 +94,7 @@ export function SearchPage() {
       if (s > 0 && inLockedSource(record.entry, lock)) matches.push({ p: record.entry, s, verified: isVerified(record.entry) });
     }
     return matches.sort(byRelevance).map((x) => x.p);
-  }, [catalogData, query, lock]);
+  }, [catalogData, deferredQuery, lock]);
 
   // 2) Průběžné výsledky přímo od všech zapnutých správců (balíčky, které katalog nezná).
   // Každý správce zvlášť: rychlé (WinGet, Scoop ~0,1 s) se ukážou hned, nečekají na pomalé (Chocolatey ~3 s).

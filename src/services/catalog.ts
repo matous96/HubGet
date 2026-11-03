@@ -13,6 +13,8 @@
  *  5. malý ukázkový katalog ze zdrojového kódu – funguje vždy.
  */
 import type { Catalog } from "@/types";
+import { fixDeadCdn } from "@/lib/imageCdn";
+import { whenQuiet } from "@/lib/quiet";
 import { sortBySourceOrder } from "@/services/managers/sources";
 
 const CACHE_NAME = "unibox-catalog";
@@ -57,15 +59,18 @@ export async function loadCatalog(onFresh?: (fresh: LoadedCatalog) => void): Pro
   const cacheFirst = !!onFresh && !loadedOnce;
   loadedOnce = true;
   const loaded = await loadRawCatalog(cacheFirst);
-  shown = loaded.catalog;
+  shownAt = loaded.catalog.generatedAt;
   if (loaded.source === "remote") nextAttempt = Date.now() + REFRESH_INTERVAL;
   if (cacheFirst && REMOTE_URL) watchRemote(REMOTE_URL, onFresh);
   return prepare(loaded);
 }
 
 let loadedOnce = false;
-/** Zobrazený katalog – čerstvý se předá dál, jen když se od něj liší. */
-let shown: Catalog | null = null;
+/**
+ * Kdy vznikl zobrazený katalog – čerstvý se předá dál, jen když se od něj liší. Jen datum:
+ * celý původní katalog by vedle připraveného (prepare) zbytečně držel v paměti druhou kopii.
+ */
+let shownAt: string | null = null;
 /** Kdy je na řadě další pokus o stažení (0 = hned). */
 let nextAttempt = 0;
 let refreshing = false;
@@ -82,10 +87,10 @@ let storedAt: string | undefined;
  */
 function watchRemote(url: string, onFresh: (fresh: LoadedCatalog) => void) {
   const refresh = async () => {
-    if (refreshing || !shown || Date.now() < nextAttempt) return;
+    if (refreshing || shownAt === null || Date.now() < nextAttempt) return;
     refreshing = true;
-    const ok = await refreshFromRemote(url, shown, (fresh) => {
-      shown = fresh.catalog;
+    const ok = await refreshFromRemote(url, shownAt, (fresh) => {
+      shownAt = fresh.catalog.generatedAt;
       onFresh(prepare(fresh));
     });
     nextAttempt = Date.now() + (ok ? REFRESH_INTERVAL : RETRY_INTERVAL);
@@ -107,6 +112,9 @@ function prepare(loaded: LoadedCatalog): LoadedCatalog {
     ...p,
     categories: p.categoriesV2 ?? p.categories,
     sources: sortBySourceOrder(p.sources),
+    // Screenshoty z rozbitého CDN (cdn.statically.io přesměruje na HTTP) v katalogu z doby před
+    // opravou v pipeline – načítají se přímo, ne přes icon:// jako ikony
+    ...(p.screenshots && { screenshots: p.screenshots.map(fixDeadCdn).filter((url): url is string => !!url) }),
   }));
   // Aplikace jen z webu výrobce mezi ostatní podle popularity (katalog je podle ní seřazený)
   for (const web of loaded.catalog.webOnly ?? []) {
@@ -121,25 +129,44 @@ function prepare(loaded: LoadedCatalog): LoadedCatalog {
  * Čerstvý katalog na pozadí: uloží ho a předá dál, jen když je jiný než zobrazená kopie.
  * Vrátí, jestli se ho podařilo stáhnout.
  */
-async function refreshFromRemote(url: string, current: Catalog, onFresh: (fresh: LoadedCatalog) => void): Promise<boolean> {
+async function refreshFromRemote(url: string, currentAt: string, onFresh: (fresh: LoadedCatalog) => void): Promise<boolean> {
   // Na pozadí nic nespěchá – delší limit i pro pomalé připojení
-  const remote = await fetchCatalog(url, 120_000);
-  if (!remote) return false; // offline – zůstane uložená kopie
-  if (remote.data.generatedAt !== storedAt) void saveToCache(remote.text, remote.data.generatedAt);
-  if (remote.data.generatedAt !== current.generatedAt) onFresh({ catalog: remote.data, source: "remote" });
+  const text = await fetchText(url, 120_000);
+  if (text === null) return false; // offline – zůstane uložená kopie
+  // Zpracování katalogu (parsování, indexy, překreslení) zablokuje okno na stovky ms –
+  // až uživatel chvíli nic nedělá nebo je okno skryté (obnova jde i po návratu k oknu)
+  await whenQuiet();
+  const data = parseCatalog(text);
+  if (!data) return false;
+  if (data.generatedAt !== storedAt) void saveToCache(text, data.generatedAt);
+  if (data.generatedAt !== currentAt) onFresh({ catalog: data, source: "remote" });
   return true;
 }
 
 /** Stáhne a ověří katalog z adresy; null při chybě nebo neplatných datech. */
 async function fetchCatalog(url: string, timeoutMs: number): Promise<{ data: Catalog; text: string } | null> {
+  const text = await fetchText(url, timeoutMs);
+  const data = text === null ? null : parseCatalog(text);
+  return data && text !== null ? { data, text } : null;
+}
+
+/** Text katalogu z adresy; null při chybě (offline, chyba sítě, soubor neexistuje). */
+async function fetchText(url: string, timeoutMs: number): Promise<string | null> {
   try {
     const res = await fetch(url, { signal: AbortSignal.timeout(timeoutMs) });
-    if (!res.ok) return null;
-    const text = await res.text();
-    const data: unknown = JSON.parse(text);
-    return isValid(data) ? { data, text } : null;
+    return res.ok ? await res.text() : null;
   } catch {
-    return null; // offline, chyba sítě nebo soubor neexistuje
+    return null;
+  }
+}
+
+/** Katalog z textu; null u neplatného JSON nebo jiného schématu. */
+function parseCatalog(text: string): Catalog | null {
+  try {
+    const data: unknown = JSON.parse(text);
+    return isValid(data) ? data : null;
+  } catch {
+    return null;
   }
 }
 

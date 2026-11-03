@@ -68,8 +68,18 @@ pub struct Tracker<'a> {
     /// Instalátor předem stáhl HubGet (download.rs) – správce už jen instaluje.
     prefetched: bool,
     last_line: Option<String>,
+    /// Poslední řádek, který hlásí chybu (error_line) – lepší vodítko než poslední řádek.
+    error_line: Option<String>,
     /// Instalátor spadl – kód výjimky Windows z výstupu správce (0xC0000005…).
     crash: Option<u32>,
+}
+
+/// Řádek s chybovou hláškou správce: Chocolatey „ERROR: Running […] was not successful. Exit
+/// code was '1603'…“, Scoop a winget „Error: …“ / „error: …“, winget „Installer failed with
+/// exit code: 1603“. Poslední řádek Chocolatey („See the log for details“) o příčině nic neříká.
+fn error_line(text: &str) -> bool {
+    let line = text.trim_start().to_ascii_lowercase();
+    line.starts_with("error") || line.starts_with("installer failed") || line.starts_with("fatal")
 }
 
 impl<'a> Tracker<'a> {
@@ -84,6 +94,7 @@ impl<'a> Tracker<'a> {
             watch: None,
             prefetched: false,
             last_line: None,
+            error_line: None,
             crash: None,
         }
     }
@@ -149,9 +160,9 @@ impl<'a> Tracker<'a> {
         self.sender.set(phase, percent);
     }
 
-    /// Poslední řádek výstupu (vodítko k neznámé chybě).
+    /// Vodítko k neznámé chybě: poslední řádek s chybovou hláškou, jinak poslední řádek výstupu.
     pub fn take_last_line(&mut self) -> Option<String> {
-        self.last_line.take()
+        self.error_line.take().or_else(|| self.last_line.take())
     }
 
     pub fn line(&mut self, text: &str) {
@@ -207,6 +218,9 @@ impl<'a> Tracker<'a> {
             self.crash = installer_crash(text);
         }
         let _ = self.sender.channel.send(OpEvent::Line { text: text.to_string() });
+        if error_line(text) {
+            self.error_line = Some(text.trim().to_string());
+        }
         self.last_line = Some(text.to_string());
     }
 }
@@ -320,6 +334,16 @@ fn largest_new_file(dirs: &[PathBuf], since: SystemTime) -> Option<u64> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn error_lines_from_managers() {
+        assert!(error_line("ERROR: Running [\"C:\\aimp.exe\" /SILENT] was not successful. Exit code was '1603'."));
+        assert!(error_line("  Error: Couldn't find manifest for 'foo'."));
+        assert!(error_line("Installer failed with exit code: 1603"));
+        assert!(!error_line("Chocolatey installed 0/1 packages. 1 packages failed."));
+        assert!(!error_line(" See the log for details (C:\\ProgramData\\chocolatey\\logs\\chocolatey.log)."));
+        assert!(!error_line("No errors found"));
+    }
 
     #[test]
     fn clixml_to_messages() {

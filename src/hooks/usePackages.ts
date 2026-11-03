@@ -32,6 +32,9 @@ export function useCatalog() {
     // Novější katalog stažený na pozadí po startu z uložené kopie
     queryFn: () => loadCatalog((fresh) => queryClient.setQueryData(queryKeys.catalog, fresh)),
     staleTime: Infinity,
+    // Porovnávání starého a nového katalogu položku po položce (25 000 aplikací) by při
+    // každé obnově zablokovalo okno na ~60 ms – nový katalog je vždy celý jiný objekt
+    structuralSharing: false,
   });
 }
 
