@@ -202,13 +202,13 @@ export function AppOfTheDayCard({ entry, className }: { entry: CatalogEntry; cla
       {/* Symboly toho, co aplikace dělá (kategorie) – jako na ostatních kartách */}
       <Doodles seedKey={entry.id} category={entry.categories[0]} ink={hue} cols={8} rows={4} opacity={0.12} />
 
-      {/* Záře barvy značky za ikonou; šedá (černobílá ikona – Plex) jen v tmavém tématu,
-          ve světlém by byla jako špinavá skvrna */}
+      {/* Záře barvy značky za ikonou – ve světlém tématu jen jemná (na světlém odstínu karty
+          by výrazná působila jako velká skvrna), šedá (černobílá ikona – Plex) jen v tmavém */}
       <div
         aria-hidden
         className={cn(
           "pointer-events-none absolute top-1/2 right-[12%] size-96 -translate-y-1/2 rounded-full blur-3xl dark:opacity-40",
-          isNeutralColor(hue) ? "opacity-0" : "opacity-30",
+          isNeutralColor(hue) ? "opacity-0" : "opacity-12",
         )}
         style={{ background: hue }}
       />
