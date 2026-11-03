@@ -113,7 +113,10 @@ Kandidáti v pořadí podle důvěryhodnosti zdroje:
 3. ikona balíčku Chocolatey (odkazy na zaniklá CDN rawgit.com a cdn.staticaly.com se
    přepíšou na jsDelivr, viz `src/lib/images.ts`) – kromě obecného obrázku, který galerie
    vrací za balíček bez vlastní ikony (modrá krabička s bublinami, pozná se podle obsahu
-   souboru – `PLACEHOLDERS` v `src/build/icons.ts`; v listopadu 2026 ho mělo 140 aplikací),
+   souboru – `PLACEHOLDERS` v `src/build/icons.ts`; v listopadu 2026 ho mělo 140 aplikací
+   a existoval ve dvou souborech: server Chocolatey posílá jiný než starší kopie
+   v mezipaměti Cloudflare – nová varianta se jen doplní do seznamu otisků, obrázky
+   s rozměry krabičky mají otisk uložený v mezipaměti a znovu se neměří),
 4. ikony deklarované na webu aplikace – `<link rel="icon" sizes>`, apple-touch-icon,
    ikony z web manifestu, bez nich `/apple-touch-icon.png` a `/favicon.ico` v kořeni
    webu (jen když předchozí nejsou ostré; weby služeb jako GitHub, Steam nebo
@@ -137,8 +140,7 @@ programu – viz README.cs.md). Stejnou mez hlídá i aplikace u ikon, které se
 změnily po sestavení katalogu. Ikonu, kterou kvůli výpadku serveru nešlo změřit,
 pipeline nezahodí (zkusí ji znovu příští den) a dříve ověřený rozměr výpadek
 nepřepíše. Výjimkou je galerie Chocolatey: nezměřený obrázek z ní může být obecná
-krabička, takže se nepoužije (v listopadu 2026 se měření v CI u 53 obrázků nepovedlo –
-nejspíš limit požadavků Chocolatey – a krabička jim v katalogu zůstala). Změřené rozměry jsou
+krabička, takže se nepoužije. Změřené rozměry jsou
 v `.cache/icon-sizes.json`, ikony webů v `.cache/web-icons.json` (platí 30 dní).
 
 Přehled podle zdrojů: `node data-pipeline/scripts/icon-report.ts [katalog.json] [--list]`

@@ -28,8 +28,8 @@ const CACHE_FILE = join(CACHE_DIR, "icon-sizes.json");
 const HEAD_BYTES = 128 * 1024;
 
 /**
- * Obecné obrázky místo ikony (rozměry a SHA-256 souboru). Chocolatey za balíček bez vlastní
- * ikony vrací modrou krabičku s bublinami – v katalogu ji měly desítky aplikací (gnuplot,
+ * Obecné obrázky místo ikony (adresa, rozměry a SHA-256 souboru). Chocolatey za balíček bez
+ * vlastní ikony vrací modrou krabičku s bublinami – v katalogu ji měly desítky aplikací (gnuplot,
  * Fiddler, Sonic Pi, Gitea, neoficiální klient ChatGPT, se kterým se spojil i oficiální).
  * Taková ikona se počítá jako nefunkční a vybere se další kandidát. Obrázek z `prefix`, který
  * se nepodařilo změřit (třeba když Chocolatey omezí počet požadavků z CI), se nepoužije ani jako
@@ -40,23 +40,31 @@ const PLACEHOLDERS = [
     prefix: "https://community.chocolatey.org/content/packageimages/",
     w: 128,
     h: 128,
-    sha256: "f75147f3739646fcd8705bae8e581206fa2bb0b08ac85a7357a7c1b479fc961e",
+    // Tentýž obrázek ve dvou souborech: 9 056 B (starší kopie v mezipaměti Cloudflare v Evropě)
+    // a 10 918 B (server Chocolatey – ten dostalo CI a 53 aplikacím krabička zůstala)
+    sha256: [
+      "f75147f3739646fcd8705bae8e581206fa2bb0b08ac85a7357a7c1b479fc961e",
+      "8553ea214999fe62abafb5bc5122de767b7f675f54fefd710414642ddab11018",
+    ],
   },
 ];
 
-const isPlaceholder = (size: ImageSize, body: Buffer) =>
-  PLACEHOLDERS.some(
-    (p) => p.w === size.width && p.h === size.height && p.sha256 === createHash("sha256").update(body).digest("hex"),
-  );
 /** Adresa, kde se místo ikony může vrátit obecný obrázek – neověřená se nepoužije. */
 const mayBePlaceholder = (url: string) => PLACEHOLDERS.some((p) => url.startsWith(p.prefix));
+/** Adresa i rozměry jako obecný obrázek – u takového se ukládá otisk obsahu. */
+const placeholderShape = (url: string, w: number, h: number) =>
+  PLACEHOLDERS.some((p) => url.startsWith(p.prefix) && p.w === w && p.h === h);
+/** Obecný obrázek podle otisku – nový otisk v PLACEHOLDERS platí hned, bez nového měření. */
+const isPlaceholder = (m: Measured) =>
+  "error" in m ? m.error === "placeholder" : !!m.sha256 && PLACEHOLDERS.some((p) => p.sha256.includes(m.sha256!));
 
 /**
- * Výsledek měření: rozměry, nebo chyba – trvalá (404, HTML místo obrázku, obecný obrázek)
- * nebo dočasná (přetížený či nedostupný server; zkusí se znovu příští den).
- * `checked` = obsah porovnaný s PLACEHOLDERS (starší záznamy s jejich rozměry se změří znovu).
+ * Výsledek měření: rozměry, nebo chyba – trvalá (404, HTML místo obrázku) nebo dočasná
+ * (přetížený či nedostupný server; zkusí se znovu příští den). `sha256` = otisk obsahu
+ * u obrázků s adresou a rozměry obecného obrázku (starší záznamy bez něj se změří znovu;
+ * chyba „placeholder“ je z doby před otisky).
  */
-type Measured = { w: number; h: number; vector?: true; checked?: true; at: number } | { error: string; at: number };
+type Measured = { w: number; h: number; vector?: true; sha256?: string; at: number } | { error: string; at: number };
 
 /**
  * Dočasnou chybu zkusit znovu v příštím denním běhu (trvalé výsledky platí MAX_AGE.iconSizes).
@@ -123,8 +131,8 @@ async function measureOnce(url: string): Promise<Measured> {
     const size = imageSize(body);
     if (!size) return { error: "format", at };
     if (size.vector) return { w: 0, h: 0, vector: true, at };
-    if (isPlaceholder(size, body)) return { error: "placeholder", at };
-    return { w: size.width, h: size.height, checked: true, at };
+    if (!placeholderShape(url, size.width, size.height)) return { w: size.width, h: size.height, at };
+    return { w: size.width, h: size.height, sha256: createHash("sha256").update(body).digest("hex"), at };
   } catch (error) {
     return { error: (error as Error).name === "TimeoutError" ? "timeout" : "network", at };
   }
@@ -140,11 +148,11 @@ async function measure(url: string): Promise<Measured> {
   return result;
 }
 
-/** Změřeno před kontrolou obecných obrázků a se stejnými rozměry – mohl by to být on. */
-const unchecked = (m: Measured) => !("error" in m) && !m.checked && PLACEHOLDERS.some((p) => p.w === m.w && p.h === m.h);
+/** Změřeno bez otisku, ale s adresou a rozměry obecného obrázku – mohl by to být on. */
+const unchecked = (url: string, m: Measured) => !("error" in m) && !m.sha256 && placeholderShape(url, m.w, m.h);
 
-const expired = (m: Measured | undefined, now: number) =>
-  !m || unchecked(m) || now - m.at > (isTransient(m) ? TRANSIENT_AGE : MAX_AGE.iconSizes);
+const expired = (url: string, m: Measured | undefined, now: number) =>
+  !m || unchecked(url, m) || now - m.at > (isTransient(m) ? TRANSIENT_AGE : MAX_AGE.iconSizes);
 
 /** Fronty po serverech – na jeden server nejvýš `max` požadavků najednou. */
 function hostLimiters(max: number) {
@@ -164,7 +172,7 @@ function hostLimiters(max: number) {
 export async function measureIcons(urls: string[]): Promise<Map<string, ImageSize | null | undefined>> {
   const cache = await readCache();
   const now = Date.now();
-  const todo = [...new Set(urls)].filter((url) => expired(cache[url], now));
+  const todo = [...new Set(urls)].filter((url) => expired(url, cache[url], now));
   if (todo.length) {
     log.info(`ikony k změření: ${todo.length} (${urls.length - todo.length} z mezipaměti)`);
     const tick = progress("ikony", todo.length);
@@ -175,7 +183,7 @@ export async function measureIcons(urls: string[]): Promise<Map<string, ImageSiz
       const result = await limiterOf(url).run(() => measure(url));
       // Dočasná chyba nepřepíše ověřený výsledek (zůstane i jeho stáří – příště se zkusí znovu)
       const previous = cache[url];
-      cache[url] = isTransient(result) && previous && !isTransient(previous) && !unchecked(previous) ? previous : result;
+      cache[url] = isTransient(result) && previous && !isTransient(previous) && !unchecked(url, previous) ? previous : result;
       tick();
       // Průběžně ukládat – přerušený běh nezačíná od nuly
       if (++unsaved >= 1000) {
@@ -185,19 +193,14 @@ export async function measureIcons(urls: string[]): Promise<Map<string, ImageSiz
     });
     await writeFile(CACHE_FILE, JSON.stringify(cache));
   }
-  const placeholders = new Set(
-    urls.filter((url) => {
-      const m = cache[url];
-      return !!m && "error" in m && m.error === "placeholder";
-    }),
-  );
+  const placeholders = new Set(urls.filter((url) => !!cache[url] && isPlaceholder(cache[url])));
   if (placeholders.size) log.info(`ikony: ${placeholders.size} obecných obrázků místo ikony (Chocolatey) vyřazeno`);
   const unverified = new Set(urls.filter((url) => mayBePlaceholder(url) && (!cache[url] || isTransient(cache[url]))));
   if (unverified.size) log.info(`ikony: ${unverified.size} nezměřených obrázků z Chocolatey (server nedostupný) vynecháno`);
   return new Map(
     urls.map((url) => {
       const m = cache[url];
-      if (unverified.has(url)) return [url, null];
+      if (placeholders.has(url) || unverified.has(url)) return [url, null];
       if (!m || isTransient(m)) return [url, undefined];
       return [url, "error" in m ? null : { width: m.w, height: m.h, vector: m.vector }];
     }),
