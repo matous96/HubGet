@@ -99,12 +99,17 @@ content:
         order: desc
     fields:
       - name: version
-        label: Verze
+        label: Řada verzí
         type: string
         required: true
+        description: Jeden záznam na řadu verzí – „0.2“ pokrývá 0.2.0, 0.2.1… Nová verze řady se dopíše do jejího záznamu.
         pattern:
-          regex: "^\\d+\\.\\d+\\.\\d+$"
-          message: Číslo verze ve tvaru 0.1.23
+          regex: "^\\d+\\.\\d+(\\.\\d+)?$"
+          message: Číslo řady ve tvaru 0.2 (nebo verze 0.1.23)
+      - name: releases
+        label: Počet vydání v řadě
+        type: number
+        description: Kolik verzí řada zahrnuje (0.1.0 až 0.1.23 = 24) – podle toho web počítá aktualizace od první verze.
       - name: date
         label: Datum vydání
         type: date

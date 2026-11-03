@@ -1,8 +1,20 @@
 {
-  "version": "0.2.0",
+  "version": "0.2",
   "date": "2026-11-03",
+  "releases": 1,
   "cs": {
     "title": "Nový vzhled ikon a hledání v Nastavení",
+    "lead": "Verze 0.2.0.",
+    "highlights": [
+      {
+        "title": "Nový vzhled ikon",
+        "text": "Jednotné dlaždice jako na iOS a bannery i karty v barvě aplikace – ve světlém i tmavém tématu."
+      },
+      {
+        "title": "Hledání v Nastavení",
+        "text": "Ctrl+F najde jakoukoli volbu ze všech sekcí – i historii operací, která je nově v Nastavení."
+      }
+    ],
     "new": [
       "**Nový vzhled ikon** – tvar jako na iOS a všechny ikony ve stejné bílé dlaždici s jemným nádechem své barvy a stínem pod logem. Aplikace bez ikony mají symbol kategorie v její barvě.",
       "**Hledání v Nastavení** (i Ctrl+F) – najde volbu ve všech sekcích, zvýrazní shodu a přepínače fungují přímo ve výsledcích. Diakritika nerozhoduje.",
@@ -21,6 +33,17 @@
   },
   "en": {
     "title": "A new look for icons and search in Settings",
+    "lead": "Version 0.2.0.",
+    "highlights": [
+      {
+        "title": "A new look for icons",
+        "text": "Consistent iOS-style tiles, and banners and cards in the app’s color – in both light and dark themes."
+      },
+      {
+        "title": "Search in Settings",
+        "text": "Ctrl+F finds any option across all sections – including operation history, now part of Settings."
+      }
+    ],
     "new": [
       "**A new look for icons** – an iOS-style shape, with every icon in the same white tile, a subtle hint of its color and a soft shadow under the logo. Apps without an icon show their category symbol in its color.",
       "**Search in Settings** (also Ctrl+F) – finds an option in every section, highlights the match, and toggles work right in the results. Accents don’t matter.",

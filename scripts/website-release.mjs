@@ -71,7 +71,8 @@ function cards(release, lang) {
 /** HTML sekce „To nejlepší z verze“ (odsazení jako v souboru). */
 export function newsBlock(release, lang) {
   const page = PAGES[lang];
-  const anchor = `${page.changelog}#v${release.version.replaceAll(".", "-")}`;
+  // Novinky mají jeden záznam na řadu verzí (0.2.0, 0.2.1… → „0.2“, website/content/novinky)
+  const anchor = `${page.changelog}#v${release.version.split(".").slice(0, 2).join("-")}`;
   const list = cards(release, lang);
   const card = (c, i) => [
     `          <a class="card news-card reveal" href="${c.href ?? anchor}">`,

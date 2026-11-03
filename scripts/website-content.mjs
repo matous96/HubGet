@@ -1,12 +1,14 @@
 // Novinky a Co chystáme na webu z datových souborů ve website/content/ – upravuje je
 // Pages CMS (konfigurace .pages.yml v kořeni repozitáře), ručně stačí upravit JSON.
 // Ve stránkách přepíše oblasti mezi značkami <!--obsah:klíč--> … <!--/obsah:klíč-->:
-//   novinky.html, en/changelog.html (vydání z content/novinky/*.json):
+//   novinky.html, en/changelog.html (vydání z content/novinky/*.json – jeden soubor na řadu
+//   verzí, „0.1“, „0.2“…, s počtem vydání v řadě `releases`; jde i jednotlivá verze „0.1.23“):
 //     releases        historie změn, nejnovější verze nahoře,
 //     versions        čipy verzí pod nadpisem,
 //     highlights      karty „V kostce“ (body `highlights` všech vydání od nejstaršího),
 //     version, updates, updates-words, updates-words-capital
-//                     aktuální verze a počet aktualizací od první verze (číslem i slovy),
+//                     aktuální verze a počet aktualizací od první verze (číslem i slovy –
+//                     součet `releases` všech řad bez první verze),
 //   co-chystame.html, en/roadmap.html (content/co-chystame.json):
 //     lead, roadmap   úvod a seznam plánů.
 // Spouští ho workflow Katalog před zveřejněním webu (úprava v Pages CMS se tak projeví hned)
@@ -94,8 +96,10 @@ const anchor = (version) => `v${version.replaceAll(".", "-")}`;
 const compareVersions = (a, b) => {
   const pa = a.split(".").map(Number);
   const pb = b.split(".").map(Number);
-  return pa[0] - pb[0] || pa[1] - pb[1] || pa[2] - pb[2];
+  return pa[0] - pb[0] || pa[1] - pb[1] || (pa[2] ?? 0) - (pb[2] ?? 0);
 };
+/** Kolik vydání záznam pokrývá – řada verzí („0.1“ = 0.1.0 až 0.1.23) víc, jednotlivá verze jedno. */
+const releaseCount = (release) => (Number.isInteger(release.releases) && release.releases > 0 ? release.releases : 1);
 const list = (value) => (Array.isArray(value) ? value.filter((item) => typeof item === "string" && item.trim()) : []);
 
 /** Vydání z content/novinky/*.json seřazená od nejnovějšího; vadné soubory přeskočí s varováním. */
@@ -111,8 +115,8 @@ function loadReleases(root, warn) {
       warn(where, `nejde přečíst (${error.message}) – vydání se přeskočí`);
       continue;
     }
-    if (!/^\d+\.\d+\.\d+$/.test(data.version ?? "")) {
-      warn(where, "chybí číslo verze ve tvaru 0.1.23 – vydání se přeskočí");
+    if (!/^\d+\.\d+(\.\d+)?$/.test(data.version ?? "")) {
+      warn(where, "chybí číslo řady verzí ve tvaru 0.2 (nebo verze 0.1.23) – vydání se přeskočí");
       continue;
     }
     if (!/^\d{4}-\d{2}-\d{2}$/.test(data.date ?? "")) {
@@ -179,7 +183,7 @@ function releaseBlock(release, lang, { latest, first }) {
 /** Hodnoty značek stránky Novinky v jazyce `lang`. */
 function changelogValues(releases, lang) {
   const page = PAGES[lang];
-  const updates = releases.length - 1;
+  const updates = releases.reduce((sum, release) => sum + releaseCount(release), 0) - 1;
   const highlights = releases.toReversed().flatMap((release) => {
     const [text, textLang] = localized(release, lang);
     return (text.highlights ?? []).filter((h) => h?.title?.trim()).map((h) => ({ ...h, version: release.version, lang: textLang }));
@@ -254,14 +258,32 @@ function fill(path, values) {
  * Vygeneruje Novinky a Co chystáme (CZ i EN) z website/content/. Vrátí seznam varování
  * (vadná data, chybějící značky), vygenerované verze a počet plánů.
  */
+/**
+ * Aktuální verze pro Novinky: verze aplikace (src-tauri/tauri.conf.json), když patří do nejnovější
+ * řady („0.2.0“ k „0.2“) – záznamy jsou po řadách a samotné číslo řady by verzi nepřesně zkrátilo.
+ */
+function currentVersion(root, releases) {
+  const latest = releases[0]?.version ?? "";
+  try {
+    const app = JSON.parse(readFileSync(join(root, "src-tauri", "tauri.conf.json"), "utf8")).version;
+    if (typeof app === "string" && (app === latest || app.startsWith(`${latest}.`))) return app;
+  } catch {
+    /* bez konfigurace aplikace číslo z Novinek */
+  }
+  return latest;
+}
+
 export function updateContent(root) {
   const warnings = [];
   const warn = (file, message) => warnings.push({ file, message });
   const releases = loadReleases(root, warn);
   const roadmap = JSON.parse(readFileSync(join(root, "website", "content", "co-chystame.json"), "utf8"));
+  const current = currentVersion(root, releases);
   for (const [lang, page] of Object.entries(PAGES)) {
     if (releases.length) {
-      for (const key of fill(join(root, page.changelog), changelogValues(releases, lang))) warn(page.changelog, `chybí značka <!--obsah:${key}-->`);
+      for (const key of fill(join(root, page.changelog), { ...changelogValues(releases, lang), version: current })) {
+        warn(page.changelog, `chybí značka <!--obsah:${key}-->`);
+      }
     } else {
       warn("website/content/novinky", "žádné platné vydání – Novinky zůstaly beze změny");
     }

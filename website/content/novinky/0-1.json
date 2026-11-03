@@ -1,0 +1,99 @@
+{
+  "version": "0.1",
+  "date": "2026-10-21",
+  "releases": 24,
+  "cs": {
+    "title": "Obchod s aplikacemi pro Windows",
+    "lead": "Verze 0.1.0 až 0.1.23 (21. 10. – 3. 11. 2026) – od první veřejné preview po kompletní správu aplikací z WinGetu, Chocolatey, Scoopu i správců pro vývojáře.",
+    "highlights": [
+      {
+        "title": "Vše na jednom místě",
+        "text": "Katalog s více než 25 000 aplikacemi z WinGetu, Chocolatey a Scoopu – aplikace dostupná ve více zdrojích má jednu kartu."
+      },
+      {
+        "title": "Okno ve stylu Windows 11 a běh na pozadí",
+        "text": "Vlastní titulková lišta, ikona u hodin s rychlou nabídkou a instalace, které doběhnou i po zavření okna."
+      },
+      {
+        "title": "Správci pro vývojáře",
+        "text": "npm, Bun, pip, Cargo, vcpkg, .NET Tool a PowerShell – hledání, instalace, aktualizace i odinstalace v režimu Vývojář."
+      },
+      {
+        "title": "Aktualizace pod kontrolou",
+        "text": "Automatická kontrola i instalace v daný čas, minimální stáří verzí a výjimky pro baterii a měřené připojení."
+      },
+      {
+        "title": "Čistá odinstalace",
+        "text": "Pokročilá odinstalace najde zbytky na disku i v registru, se sledováním instalace smaže vše, co instalátor vytvořil."
+      },
+      {
+        "title": "Hodnocení, recenze a synchronizace",
+        "text": "Přihlášení přes GitHub: hvězdičky, recenze a snímky od komunity, oblíbené a sady na všech vašich počítačích."
+      }
+    ],
+    "new": [
+      "**Katalog s více než 25 000 aplikacemi** z WinGetu, Chocolatey a Scoopu – sekce Dnes s kolekcemi a Aplikací dne, kategorie, Nejstahovanější, Skokani týdne a aplikace z webu výrobce.",
+      "**Instalace, aktualizace a odinstalace** přes WinGet, Chocolatey i Scoop – hromadně, s volbami instalace (tichá, jako správce, pro všechny uživatele), ověřením SHA-256 a záložním zdrojem, když jeden selže.",
+      "**Správci pro vývojáře** – npm, Bun, pip, Cargo, vcpkg, .NET Tool a PowerShell v režimu Vývojář. Chybějící Node.js, Python nebo Rust doinstaluje jedním kliknutím.",
+      "**Nainstalované aplikace** včetně programů mimo správce balíčků, aplikací z Microsoft Storu a her ze Steamu a EA app. Aktualizovat vše, ignorované a odložené aktualizace.",
+      "**Automatické aktualizace** v naplánovaný čas a dny, s minimálním stářím verzí, výjimkami pro baterii a měřené připojení a potvrzením toho, co potřebuje práva správce.",
+      "**Čistá odinstalace a sledování instalace** – zbytky na disku i v registru, běžící aplikace HubGet před operací sám zavře.",
+      "**Po spuštění** – programy i aplikace ze Storu, které se spouštějí po přihlášení do Windows, na jednom místě.",
+      "**Účet přes GitHub** – hodnocení, recenze a snímky obrazovky od komunity a synchronizace oblíbených, sady balíčků a předvoleb mezi počítači.",
+      "**Sady balíčků a profil** – přenos aplikací na nový počítač (JSON i přehledná stránka HTML), kolekce podle zaměření a odkazy z webu, které se otevřou rovnou v HubGetu.",
+      "**Běh na pozadí u hodin** s oznámeními, spouštěním s Windows a oknem ve stylu Windows 11.",
+      "**Sedm jazyků**, světlý a tmavý motiv, vlastní barva zvýraznění, příkazy pro terminál a pro vývojáře průvodce publikováním ve WinGetu.",
+      "**Nový název HubGet** (dřív Unibox) a web hubget.eu – aktualizace převedla instalaci i s nastavením."
+    ],
+    "improved": [
+      "Rychlý start z uložené kopie katalogu, plynulé seznamy s tisíci aplikací, katalog obnovovaný za běhu a ikony načtené zhruba čtyřikrát rychleji."
+    ]
+  },
+  "en": {
+    "title": "An app store for Windows",
+    "lead": "Versions 0.1.0 to 0.1.23 (Oct 21 – Nov 3, 2026) – from the first public preview to complete app management with WinGet, Chocolatey, Scoop and developer package managers.",
+    "highlights": [
+      {
+        "title": "Everything in one place",
+        "text": "A catalog of over 25,000 apps from WinGet, Chocolatey and Scoop – an app available from several sources has a single card."
+      },
+      {
+        "title": "A Windows 11 window that runs in the background",
+        "text": "A custom title bar, a tray icon with a quick menu, and installs that finish even after you close the window."
+      },
+      {
+        "title": "Developer package managers",
+        "text": "npm, Bun, pip, Cargo, vcpkg, .NET Tool and PowerShell – search, install, update and uninstall in Developer mode."
+      },
+      {
+        "title": "Updates under control",
+        "text": "Automatic checks and installs at a set time, a minimum version age, and exceptions for battery and metered connections."
+      },
+      {
+        "title": "Clean uninstall",
+        "text": "Advanced uninstall finds leftovers on disk and in the registry; with install tracking it removes everything the installer created."
+      },
+      {
+        "title": "Ratings, reviews and sync",
+        "text": "Sign in with GitHub: stars, reviews and screenshots from the community, plus favorites and bundles on all your PCs."
+      }
+    ],
+    "new": [
+      "**A catalog of over 25,000 apps** from WinGet, Chocolatey and Scoop – the Today section with collections and App of the day, categories, Top charts, Weekly risers and apps from the developer’s website.",
+      "**Install, update and uninstall** with WinGet, Chocolatey and Scoop – in bulk, with install options (silent, as administrator, for all users), SHA-256 verification and a fallback source when one fails.",
+      "**Developer package managers** – npm, Bun, pip, Cargo, vcpkg, .NET Tool and PowerShell in Developer mode. Missing Node.js, Python or Rust installs with one click.",
+      "**Installed apps**, including programs outside package managers, Microsoft Store apps and games from Steam and the EA app. Update all, ignored and snoozed updates.",
+      "**Automatic updates** on a schedule, with a minimum version age, exceptions for battery and metered connections, and confirmation for anything that needs admin rights.",
+      "**Clean uninstall and install tracking** – leftovers on disk and in the registry; HubGet closes running apps on its own before an operation.",
+      "**Startup** – programs and Store apps that start when you sign in to Windows, all in one place.",
+      "**GitHub account** – ratings, reviews and screenshots from the community, and sync of favorites, your package bundle and preferences across PCs.",
+      "**Package bundles and profiles** – move your apps to a new PC (JSON or a readable HTML page), collections by interest, and website links that open straight in HubGet.",
+      "**Runs in the notification area** with notifications, starting with Windows and a Windows 11-style window.",
+      "**Seven languages**, light and dark themes, a custom accent color, terminal commands, and a WinGet publishing wizard for developers.",
+      "**The new name HubGet** (formerly Unibox) and the hubget.eu website – the update moved your install over with all settings."
+    ],
+    "improved": [
+      "Fast startup from a saved catalog copy, smooth lists with thousands of apps, a catalog that refreshes while HubGet runs, and icons that load about four times faster."
+    ]
+  }
+}
