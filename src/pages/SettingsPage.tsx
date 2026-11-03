@@ -14,6 +14,7 @@ import {
   FlaskConical,
   GraduationCap,
   Heart,
+  History,
   Info,
   Lock,
   LockOpen,
@@ -22,14 +23,16 @@ import {
   Mail,
   Palette,
   RefreshCw,
+  Search,
   Settings2,
   ShieldAlert,
   SkipForward,
   Sparkles,
   Terminal,
   Upload,
+  X,
 } from "lucide-react";
-import { Fragment, useRef } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router";
 import { queryClient, queryKeys } from "@/app/queryClient";
@@ -41,19 +44,22 @@ import { formatPinUntil, unpinLabel } from "@/components/package/UpdatePin";
 import { AccentColorRow } from "@/components/settings/AccentColorRow";
 import { CommandGuide } from "@/components/settings/CommandGuide";
 import { ContactSection } from "@/components/settings/ContactSection";
+import { HistorySection } from "@/components/settings/HistorySection";
 import { NotificationsSection } from "@/components/settings/NotificationsSection";
 import { PackageUpdatesSection } from "@/components/settings/PackageUpdatesSection";
 import { SecuritySection } from "@/components/settings/SecuritySection";
+import { SettingsSearch } from "@/components/settings/SettingsSearch";
 import { SyncCard } from "@/components/settings/SyncCard";
 import { Card, Row, Switch, SwitchRow } from "@/components/settings/SettingsUi";
 import { Button } from "@/components/ui/Button";
 import { Segmented } from "@/components/ui/CollectionToolbar";
 import { PageHeader, Spinner } from "@/components/ui/States";
 import { useManagerStatus } from "@/hooks/useManagerStatus";
+import { overlayOpen } from "@/hooks/useOverlay";
 import { useCatalog } from "@/hooks/usePackages";
 import { PROFILE_ACCEPT, useProfileTransfer } from "@/hooks/useProfileTransfer";
 import { LANGUAGES } from "@/i18n";
-import { cn } from "@/lib/utils";
+import { cn, normalize } from "@/lib/utils";
 import { getSource, isTauri, SOURCES } from "@/services/managers";
 import { forgetTrace, installTraces } from "@/services/tracker";
 import { useAuth } from "@/store/auth";
@@ -77,6 +83,7 @@ const SECTIONS = [
   { id: "appearance", icon: Palette },
   { id: "updates", icon: RefreshCw },
   { id: "notifications", icon: Bell },
+  { id: "history", icon: History },
   { id: "security", icon: ShieldAlert },
   { id: "managers", icon: Boxes },
   { id: "backup", icon: Archive },
@@ -87,27 +94,125 @@ const SECTIONS = [
 
 type SectionId = (typeof SECTIONS)[number]["id"];
 
-/** Nastavení: podzáložky vlevo, obsah vybrané vpravo. */
+/**
+ * Sekce, jejichž obsah hledání neprochází – dlouhé texty (poznámky k verzím, příkazy pro
+ * terminál, záznamy historie) by k většině dotazů přidaly šum. Najdou se jen podle svého názvu.
+ */
+const SEARCH_BY_NAME_ONLY: SectionId[] = ["news", "commands", "history"];
+
+/** Obsah sekce Nastavení. */
+function SectionContent({ id }: { id: SectionId }) {
+  switch (id) {
+    case "general":
+      return <GeneralSection />;
+    case "appearance":
+      return <AppearanceSection />;
+    case "updates":
+      return (
+        <>
+          <PackageUpdatesSection />
+          <PinsCard />
+        </>
+      );
+    case "notifications":
+      return <NotificationsSection />;
+    case "history":
+      return <HistorySection />;
+    case "security":
+      return <SecuritySection />;
+    case "managers":
+      return <ManagersSection />;
+    case "backup":
+      return (
+        <>
+          <BackupCard />
+          <CatalogCard />
+        </>
+      );
+    case "commands":
+      return <CommandGuide placeholders />;
+    case "news":
+      return <NewsSection />;
+    case "contact":
+      return <ContactSection />;
+  }
+}
+
+/** Nastavení: podzáložky vlevo (nad nimi hledání), obsah vybrané vpravo. */
 export function SettingsPage() {
   const { t } = useTranslation();
   const [params, setParams] = useSearchParams();
   const requested = params.get("section");
   const section: SectionId = SECTIONS.some((s) => s.id === requested) ? (requested as SectionId) : "general";
+  const [query, setQuery] = useState("");
+  const searching = normalize(query.trim()).length >= 2;
+  const searchInput = useRef<HTMLInputElement>(null);
+
+  const open = (id: SectionId) => {
+    setQuery("");
+    setParams(id === "general" ? {} : { section: id }, { replace: true });
+  };
+
+  // Ctrl+F v Nastavení hledá v nastavení – dřív než zkratka hlavního hledání (TopBar)
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "f" && !overlayOpen()) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        searchInput.current?.focus();
+        searchInput.current?.select();
+      }
+    };
+    window.addEventListener("keydown", onKey, true);
+    return () => window.removeEventListener("keydown", onKey, true);
+  }, []);
 
   return (
     <div>
       <PageHeader title={t("settings.title")} />
       <div className="flex items-start gap-8">
         <nav className="sticky top-2 flex w-60 shrink-0 flex-col gap-0.5" aria-label={t("settings.title")}>
+          <div className="relative mb-2">
+            <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted" />
+            <input
+              ref={searchInput}
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Escape" && query) {
+                  e.stopPropagation();
+                  setQuery("");
+                }
+              }}
+              placeholder={t("settings.searchPlaceholder")}
+              aria-label={t("settings.searchPlaceholder")}
+              className="h-10 w-full rounded-xl border border-line bg-surface pr-9 pl-9 text-sm outline-none placeholder:text-muted focus:border-accent/60 [&::-webkit-search-cancel-button]:hidden"
+            />
+            {query && (
+              <button
+                type="button"
+                onClick={() => {
+                  setQuery("");
+                  searchInput.current?.focus();
+                }}
+                aria-label={t("settings.searchClear")}
+                title={t("settings.searchClear")}
+                className="absolute top-1/2 right-2 flex size-6 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full text-muted transition-colors hover:bg-surface-2 hover:text-fg"
+              >
+                <X className="size-3.5" />
+              </button>
+            )}
+          </div>
           {SECTIONS.map(({ id, icon: Icon }) => (
             <button
               key={id}
               type="button"
-              onClick={() => setParams(id === "general" ? {} : { section: id }, { replace: true })}
-              aria-current={section === id ? "page" : undefined}
+              onClick={() => open(id)}
+              aria-current={!searching && section === id ? "page" : undefined}
               className={cn(
                 "flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium transition-colors",
-                section === id ? "bg-accent/12 text-accent" : "text-fg/80 hover:bg-surface-2 hover:text-fg",
+                !searching && section === id ? "bg-accent/12 text-accent" : "text-fg/80 hover:bg-surface-2 hover:text-fg",
               )}
             >
               {/* Nebezpečná nastavení: žlutý je jen štít s vykřičníkem, text jako u ostatních položek */}
@@ -118,27 +223,32 @@ export function SettingsPage() {
         </nav>
 
         <div className="min-w-0 max-w-3xl flex-1">
-          <h2 className="mb-4 font-display text-2xl font-bold">{t(`settingsNav.${section}`)}</h2>
-          {section === "general" && <GeneralSection />}
-          {section === "appearance" && <AppearanceSection />}
-          {section === "updates" && (
+          {searching ? (
+            <SettingsSearch query={query}>
+              {SECTIONS.map(({ id }) => (
+                <div key={id} data-settings-section className="mb-8">
+                  {/* Název sekce – kliknutím se sekce otevře a hledání skončí */}
+                  <button
+                    type="button"
+                    data-settings-section-title
+                    onClick={() => open(id)}
+                    className="mb-4 cursor-pointer font-display text-2xl font-bold transition-colors hover:text-accent"
+                  >
+                    {t(`settingsNav.${id}`)}
+                  </button>
+                  {/* Sekce prohledávané jen podle názvu: obsah až po shodě v názvu (filtr ji jinak skryje) */}
+                  {(!SEARCH_BY_NAME_ONLY.includes(id) || normalize(t(`settingsNav.${id}`)).includes(normalize(query.trim()))) && (
+                    <SectionContent id={id} />
+                  )}
+                </div>
+              ))}
+            </SettingsSearch>
+          ) : (
             <>
-              <PackageUpdatesSection />
-              <PinsCard />
+              <h2 className="mb-4 font-display text-2xl font-bold">{t(`settingsNav.${section}`)}</h2>
+              <SectionContent id={section} />
             </>
           )}
-          {section === "notifications" && <NotificationsSection />}
-          {section === "security" && <SecuritySection />}
-          {section === "managers" && <ManagersSection />}
-          {section === "backup" && (
-            <>
-              <BackupCard />
-              <CatalogCard />
-            </>
-          )}
-          {section === "commands" && <CommandGuide placeholders />}
-          {section === "news" && <NewsSection />}
-          {section === "contact" && <ContactSection />}
         </div>
       </div>
     </div>

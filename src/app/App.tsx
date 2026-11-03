@@ -7,7 +7,6 @@ import { CategoryPage } from "@/pages/CategoryPage";
 import { FavoritesPage } from "@/pages/FavoritesPage";
 import { CommandsPage } from "@/pages/CommandsPage";
 import { HelpPage } from "@/pages/HelpPage";
-import { HistoryPage } from "@/pages/HistoryPage";
 import { HomePage } from "@/pages/HomePage";
 import { InstalledPage } from "@/pages/InstalledPage";
 import { LogsPage } from "@/pages/LogsPage";
@@ -59,7 +58,8 @@ export function App() {
             <Route path="publish" element={<PublishPage />} />
             <Route path="publish/winget" element={<PublishWingetPage />} />
             <Route path="about" element={<AboutPage />} />
-            <Route path="history" element={<HistoryPage />} />
+            {/* Historie operací je sekcí Nastavení – starší odkazy (oznámení, nápověda) vedou tam */}
+            <Route path="history" element={<Navigate to="/settings?section=history" replace />} />
             <Route path="logs" element={<LogsPage />} />
             <Route path="help" element={<HelpPage />} />
             <Route path="commands" element={<CommandsPage />} />

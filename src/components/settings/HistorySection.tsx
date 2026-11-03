@@ -6,7 +6,7 @@ import { PackageIcon } from "@/components/package/PackageIcon";
 import { SourceBadge } from "@/components/package/SourceBadge";
 import { Button } from "@/components/ui/Button";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
-import { EmptyState, PageHeader } from "@/components/ui/States";
+import { EmptyState } from "@/components/ui/States";
 import { fallbackEntry, useCatalogIndex } from "@/hooks/usePackages";
 import { cn } from "@/lib/utils";
 import { useHistory, type HistoryEntry } from "@/store/history";
@@ -16,27 +16,40 @@ import type { OperationKind } from "@/types";
 
 type KindFilter = "all" | OperationKind | "failed";
 
-/** Historie operací: dokončené, zrušené i neúspěšné operace seskupené po dnech. */
-export function HistoryPage() {
+/**
+ * Kolik záznamů vykreslit najednou – historie jich drží až 500 (automatické aktualizace)
+ * a každý má ikonu; starší přibývají tlačítkem.
+ */
+const PAGE = 100;
+
+/**
+ * Historie operací (sekce Nastavení, dřív samostatná stránka – /history na ni přesměruje):
+ * dokončené, zrušené i neúspěšné operace seskupené po dnech.
+ */
+export function HistorySection() {
   const { t } = useTranslation();
   const language = useSettings((s) => s.language);
   const { items, clear } = useHistory();
   const [filter, setFilter] = useState<KindFilter>("all");
+  const [shown, setShown] = useState(PAGE);
   const [confirmClear, setConfirmClear] = useState(false);
 
-  const filtered = items.filter((i) =>
-    filter === "all" ? true : filter === "failed" ? i.outcome !== "success" : i.kind === filter,
+  const filtered = useMemo(
+    () => items.filter((i) => (filter === "all" ? true : filter === "failed" ? i.outcome !== "success" : i.kind === filter)),
+    [items, filter],
   );
 
-  // Skupiny podle dne (Dnes, Včera, datum)
+  // Skupiny podle dne (Dnes, Včera, datum) z vykreslených záznamů
   const groups = useMemo(() => {
     const map = new Map<string, HistoryEntry[]>();
-    for (const item of filtered) {
+    for (const item of filtered.slice(0, shown)) {
       const key = new Date(item.finishedAt).toDateString();
-      map.set(key, [...(map.get(key) ?? []), item]);
+      const group = map.get(key);
+      if (group) group.push(item);
+      else map.set(key, [item]);
     }
     return [...map.entries()];
-  }, [filtered]);
+  }, [filtered, shown]);
 
   const dayLabel = (key: string) => {
     const date = new Date(key);
@@ -58,27 +71,24 @@ export function HistoryPage() {
 
   return (
     <>
-      <PageHeader
-        title={t("history.title")}
-        subtitle={t("history.subtitle")}
-        actions={
-          <>
-            <Link
-              to="/logs"
-              className="inline-flex h-10 items-center gap-2 rounded-full border border-line bg-surface px-4 text-sm font-semibold transition-colors hover:bg-surface-2"
-            >
-              <SquareTerminal className="size-4" />
-              {t("history.openLogs")}
-            </Link>
-            {items.length > 0 && (
-              <Button variant="secondary" onClick={() => setConfirmClear(true)}>
-                <Trash2 className="size-4" />
-                {t("history.clear")}
-              </Button>
-            )}
-          </>
-        }
-      />
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+        <p className="text-sm text-muted">{t("history.subtitle")}</p>
+        <div className="flex gap-2">
+          <Link
+            to="/logs"
+            className="inline-flex h-10 items-center gap-2 rounded-full border border-line bg-surface px-4 text-sm font-semibold transition-colors hover:bg-surface-2"
+          >
+            <SquareTerminal className="size-4" />
+            {t("history.openLogs")}
+          </Link>
+          {items.length > 0 && (
+            <Button variant="secondary" onClick={() => setConfirmClear(true)}>
+              <Trash2 className="size-4" />
+              {t("history.clear")}
+            </Button>
+          )}
+        </div>
+      </div>
 
       {items.length === 0 ? (
         <EmptyState icon={History} message={t("history.empty")} />
@@ -90,7 +100,10 @@ export function HistoryPage() {
                 key={f.id}
                 type="button"
                 aria-pressed={filter === f.id}
-                onClick={() => setFilter(f.id)}
+                onClick={() => {
+                  setFilter(f.id);
+                  setShown(PAGE);
+                }}
                 className={cn(
                   "h-8 cursor-pointer rounded-full border px-3.5 text-sm font-medium transition-colors",
                   filter === f.id
@@ -118,6 +131,13 @@ export function HistoryPage() {
                 </div>
               </section>
             ))
+          )}
+          {filtered.length > shown && (
+            <div className="flex justify-center">
+              <Button variant="secondary" onClick={() => setShown((n) => n + PAGE)}>
+                {t("history.showOlder", { count: filtered.length - shown })}
+              </Button>
+            </div>
           )}
         </>
       )}

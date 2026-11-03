@@ -117,7 +117,7 @@ export function NotificationCenter() {
             )}
 
             <Link
-              to="/history"
+              to="/settings?section=history"
               onClick={() => setOpen(false)}
               className="flex items-center justify-center gap-1.5 border-t border-line px-4 py-2.5 text-xs font-medium text-muted transition-colors hover:bg-surface-2 hover:text-fg"
             >

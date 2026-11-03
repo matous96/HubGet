@@ -5,11 +5,18 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
+/** Atributy data-settings-* používá hledání v Nastavení (SettingsSearch) – karta, její nadpis a řádky. */
 export function Card({ title, children, className }: { title?: string; children: ReactNode; className?: string }) {
   return (
-    <section className={cn("mb-6 rounded-2xl border border-line bg-surface p-2 shadow-card", className)}>
-      {title && <h2 className="px-4 pt-3 pb-1 text-sm font-semibold tracking-wide text-muted uppercase">{title}</h2>}
-      <div className="divide-y divide-line">{children}</div>
+    <section data-settings-card className={cn("mb-6 rounded-2xl border border-line bg-surface p-2 shadow-card", className)}>
+      {title && (
+        <h2 data-settings-title className="px-4 pt-3 pb-1 text-sm font-semibold tracking-wide text-muted uppercase">
+          {title}
+        </h2>
+      )}
+      <div data-settings-body className="divide-y divide-line">
+        {children}
+      </div>
     </section>
   );
 }
@@ -27,7 +34,7 @@ export function Row({
   disabled?: boolean;
 }) {
   return (
-    <div className={cn("flex items-center justify-between gap-6 px-4 py-3.5", disabled && "opacity-50")}>
+    <div data-settings-row className={cn("flex items-center justify-between gap-6 px-4 py-3.5", disabled && "opacity-50")}>
       <div className="min-w-0">
         {label && <p className="text-sm font-medium">{label}</p>}
         {hint && <div className="mt-0.5 max-w-md text-xs text-muted">{hint}</div>}

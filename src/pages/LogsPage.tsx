@@ -64,7 +64,7 @@ export function LogsPage() {
         subtitle={t("logs.subtitle")}
         actions={
           <Link
-            to="/history"
+            to="/settings?section=history"
             className="inline-flex h-10 items-center gap-2 rounded-full border border-line bg-surface px-4 text-sm font-semibold transition-colors hover:bg-surface-2"
           >
             <History className="size-4" />

@@ -47,7 +47,7 @@ export function HelpPage() {
                   i18nKey={`help.faq.${id}.a`}
                   components={{
                     logs: <Link to="/logs" className="font-medium text-accent hover:underline" />,
-                    history: <Link to="/history" className="font-medium text-accent hover:underline" />,
+                    history: <Link to="/settings?section=history" className="font-medium text-accent hover:underline" />,
                     bundles: <Link to="/bundles" className="font-medium text-accent hover:underline" />,
                     publish: <Link to="/publish" className="font-medium text-accent hover:underline" />,
                     settings: <Link to="/settings" className="font-medium text-accent hover:underline" />,

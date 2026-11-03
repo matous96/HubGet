@@ -162,6 +162,12 @@ body,
   background-image: linear-gradient(160deg, transparent, var(--tint-overlay));
 }
 
+/* Shody hledání v Nastavení (components/settings/SettingsSearch.tsx, CSS Custom Highlight API). */
+::highlight(settings-search) {
+  background-color: color-mix(in srgb, var(--accent) 28%, transparent);
+  color: inherit;
+}
+
 /* Ikona „v bublině“ na kartě ve světlém odstínu (domovská stránka): dlaždice má podobný
    odstín jako karta – tenký okraj a výrazný stín ji od karty oddělí. */
 .icon-lifted {

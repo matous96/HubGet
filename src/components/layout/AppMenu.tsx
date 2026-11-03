@@ -81,7 +81,7 @@ export function AppMenu() {
             className="absolute bottom-0 left-full z-40 ml-3 w-80 origin-bottom-left rounded-2xl border border-line bg-surface p-1.5 shadow-card-hover"
           >
             <MenuItem icon={SquareTerminal} label={t("menu.logs")} onClick={() => go("/logs")} />
-            <MenuItem icon={History} label={t("menu.history")} onClick={() => go("/history")} />
+            <MenuItem icon={History} label={t("menu.history")} onClick={() => go("/settings?section=history")} />
             <Separator />
             <MenuItem icon={Info} label={t("menu.version", { version: APP_VERSION })} disabled />
             <MenuItem
