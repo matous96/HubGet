@@ -2,6 +2,9 @@
 #   https://hubget.eu/              – web HubGetu (složka website/)
 #   https://hubget.eu/catalog.json  – katalog aplikací
 #   https://hubget.eu/latest.json   – záložní kopie latest.json posledního vydání (aktualizace HubGetu)
+#   https://hubget.eu/catalog-report.json – výpis z posledního běhu pipeline (počty, obecné obrázky
+#                                    místo ikon, porovnání se zveřejněným katalogem; logy Actions
+#                                    jsou jen pro přihlášené)
 # (vlastní doména v Settings → Pages; matous96.github.io/HubGet na ni přesměruje – stará
 # …github.io/unibox z doby před přejmenováním repozitáře už ne, GitHub Pages to neumí)
 # Katalog denně vygeneruje data pipeline. Odtud si ho stahují nainstalované HubGet
@@ -17,6 +20,10 @@
 # Malé ikony (48–127 px) zvětší Real-ESRGAN na procesoru (softwarový Vulkan) a web je
 # zveřejní na https://hubget.eu/icons/ – každý běh nejvýš UPSCALE_MINUTES, zbytek další.
 #
+# Nový katalog s výrazně méně aplikacemi nebo ikonami než zveřejněný (výpadek zdroje, chyba
+# pipeline) se nezveřejní – běh skončí chybou a na webu zůstane dosavadní katalog. Záměrnou
+# změnu pustí ruční spuštění se zaškrtnutým „povolit_pokles“ (scripts/check-catalog.mjs).
+#
 # Nastavení (jednou): Settings → Pages → Build and deployment → Source: GitHub Actions.
 # Spustit jde i ručně: Actions → Katalog → Run workflow (vždy s novým katalogem).
 
@@ -27,6 +34,11 @@ on:
   schedule:
     - cron: "23 2 * * *" # každý den
   workflow_dispatch:
+    inputs:
+      povolit_pokles:
+        description: "Zveřejnit i katalog s výrazně méně aplikacemi nebo ikonami (záměrná změna)"
+        type: boolean
+        default: false
   push:
     branches: [main]
     # Změna pipeline (i kódu, který sdílí s aplikací) vygeneruje nový katalog hned – ne až v noci
@@ -83,6 +95,9 @@ jobs:
             && node scripts/check-catalog.mjs data-pipeline/out/catalog.json \
             && node scripts/published-icons.mjs data-pipeline/out/catalog.json data-pipeline/out/icons; then
             echo "reused=true" >> "$GITHUB_OUTPUT"
+            # Výpis z běhu, který zveřejněný katalog vytvořil (nepovinný)
+            curl -fsSL --retry 3 "${PAGES_CATALOG_URL%catalog.json}catalog-report.json" -o data-pipeline/out/report.json \
+              || rm -f data-pipeline/out/report.json
           else
             echo "Zveřejněný katalog nejde použít – vygeneruje se nový"
           fi
@@ -135,9 +150,20 @@ jobs:
           UPSCALE_MINUTES: 25
         run: node data-pipeline/src/index.ts
 
-      # Rozbitý nebo neúplný katalog se nezveřejní – aplikace by ho stáhla všem
+      # Rozbitý nebo neúplný katalog se nezveřejní – aplikace by ho stáhla všem. Nový se porovná
+      # se zveřejněným: výrazný pokles aplikací nebo ikon ho taky zastaví (pustí ho „povolit_pokles“)
+      # a porovnání se zapíše do výpisu z běhu
       - name: Kontrola katalogu
-        run: node scripts/check-catalog.mjs data-pipeline/out/catalog.json
+        env:
+          REUSED: ${{ steps.published.outputs.reused }}
+          CATALOG_ALLOW_DROP: ${{ inputs.povolit_pokles && '1' || '' }}
+        run: |
+          if [ "$REUSED" = "true" ]; then
+            node scripts/check-catalog.mjs data-pipeline/out/catalog.json
+          else
+            curl -fsSL --compressed --retry 3 "$PAGES_CATALOG_URL" -o "$RUNNER_TEMP/published.json" || rm -f "$RUNNER_TEMP/published.json"
+            node scripts/check-catalog.mjs data-pipeline/out/catalog.json --previous "$RUNNER_TEMP/published.json" --report data-pipeline/out/report.json
+          fi
 
       # Web je čisté HTML/CSS/JS s relativními odkazy. Texty stránek, Novinky a Co chystáme se
       # nejdřív vepíšou z website/content/ (úpravy z Pages CMS) – vadný záznam se přeskočí
@@ -152,6 +178,8 @@ jobs:
           cp data-pipeline/out/catalog.json _site/catalog.json
           # Zvětšené malé ikony, na které katalog odkazuje (hubget.eu/icons/…)
           if [ -d data-pipeline/out/icons ]; then mkdir -p _site/icons && cp -R data-pipeline/out/icons/. _site/icons/; fi
+          # Výpis z běhu pipeline (hubget.eu/catalog-report.json)
+          if [ -f data-pipeline/out/report.json ]; then cp data-pipeline/out/report.json _site/catalog-report.json; fi
           # Záložní adresa aktualizací HubGetu (druhý endpoint v tauri.conf.json): latest.json
           # posledního zveřejněného vydání; když GitHub neodpoví, zůstane dosavadní kopie z webu
           valid='const m = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8")); if (!m.version || !m.platforms?.["windows-x86_64"]?.signature) process.exit(1)'

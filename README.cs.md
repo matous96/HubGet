@@ -426,7 +426,10 @@ Nastavení (jednou): repozitář → **Settings → Pages → Build and deployme
 GitHub Actions**, pak **Actions → Katalog → Run workflow**. První běh trvá kolem
 45 minut (stažení všech zdrojů, ikony z webů aplikací), další díky mezipaměti Actions
 pár minut. Před zveřejněním katalog zkontroluje `scripts/check-catalog.mjs` (schéma,
-aspoň 10 000 aplikací) – po výpadku zdroje zůstane na webu předchozí verze. Workflow
+aspoň 10 000 aplikací) a porovná ho se zveřejněným – pokles aplikací nebo ikon o 10 %
+a víc ho zastaví (záměrnou změnu pustí ruční spuštění s „povolit_pokles“), takže po
+výpadku zdroje zůstane na webu předchozí verze. Výpis z posledního běhu pipeline je na
+https://hubget.eu/catalog-report.json. Workflow
 **Vydání** přibalí k instalátoru právě zveřejněný katalog.
 
 ## Produkční sestavení (instalátor)

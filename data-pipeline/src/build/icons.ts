@@ -14,6 +14,7 @@ import { CACHE_DIR, MAX_AGE, USER_AGENT } from "../config.ts";
 import { imageSize, type ImageSize } from "../lib/imageSize.ts";
 import { Limiter, mapLimit } from "../lib/http.ts";
 import { log, progress } from "../lib/log.ts";
+import { reportMetric } from "../lib/report.ts";
 
 /** Ikona aspoň takhle velká je ostrá v kartě i v detailu aplikace (dlaždice 150 px, obrázek ~100 px při 150 % DPI). */
 export const SHARP_ICON = 128;
@@ -51,7 +52,7 @@ const PLACEHOLDERS = [
 
 /** Adresa, kde se místo ikony může vrátit obecný obrázek – neověřená se nepoužije. */
 const mayBePlaceholder = (url: string) => PLACEHOLDERS.some((p) => url.startsWith(p.prefix));
-/** Adresa i rozměry jako obecný obrázek – u takového se ukládá otisk obsahu. */
+/** Adresa i rozměry jako obecný obrázek – záznam bez otisku se změří hned znovu. */
 const placeholderShape = (url: string, w: number, h: number) =>
   PLACEHOLDERS.some((p) => url.startsWith(p.prefix) && p.w === w && p.h === h);
 /** Obecný obrázek podle otisku – nový otisk v PLACEHOLDERS platí hned, bez nového měření. */
@@ -60,11 +61,17 @@ const isPlaceholder = (m: Measured) =>
 
 /**
  * Výsledek měření: rozměry, nebo chyba – trvalá (404, HTML místo obrázku) nebo dočasná
- * (přetížený či nedostupný server; zkusí se znovu příští den). `sha256` = otisk obsahu
- * u obrázků s adresou a rozměry obecného obrázku (starší záznamy bez něj se změří znovu;
- * chyba „placeholder“ je z doby před otisky).
+ * (přetížený či nedostupný server; zkusí se znovu příští den). `sha256` = otisk staženého
+ * začátku souboru (u obrázků do HEAD_BYTES celého) pro PLACEHOLDERS a sharedContent;
+ * starší záznamy ho dostanou postupně (HASH_BACKFILL), chyba „placeholder“ je z doby před otisky.
  */
 type Measured = { w: number; h: number; vector?: true; sha256?: string; at: number } | { error: string; at: number };
+
+/** Rozměry ikony z měření i s otiskem obsahu. */
+export type MeasuredSize = ImageSize & { sha256?: string };
+
+/** Kolik starších záznamů bez otisku za běh změřit znovu (ostatní dostanou otisk, až vyprší). */
+const HASH_BACKFILL = 3000;
 
 /**
  * Dočasnou chybu zkusit znovu v příštím denním běhu (trvalé výsledky platí MAX_AGE.iconSizes).
@@ -130,9 +137,9 @@ async function measureOnce(url: string): Promise<Measured> {
     if (status >= 400) return { error: String(status), at };
     const size = imageSize(body);
     if (!size) return { error: "format", at };
-    if (size.vector) return { w: 0, h: 0, vector: true, at };
-    if (!placeholderShape(url, size.width, size.height)) return { w: size.width, h: size.height, at };
-    return { w: size.width, h: size.height, sha256: createHash("sha256").update(body).digest("hex"), at };
+    const sha256 = createHash("sha256").update(body).digest("hex");
+    if (size.vector) return { w: 0, h: 0, vector: true, sha256, at };
+    return { w: size.width, h: size.height, sha256, at };
   } catch (error) {
     return { error: (error as Error).name === "TimeoutError" ? "timeout" : "network", at };
   }
@@ -169,12 +176,24 @@ function hostLimiters(max: number) {
  * null = nejde načíst (i nezměřený obrázek z Chocolatey), undefined = server je teď nedostupný
  * (rozměr neznámý).
  */
-export async function measureIcons(urls: string[]): Promise<Map<string, ImageSize | null | undefined>> {
+export async function measureIcons(urls: string[]): Promise<Map<string, MeasuredSize | null | undefined>> {
   const cache = await readCache();
   const now = Date.now();
-  const todo = [...new Set(urls)].filter((url) => expired(url, cache[url], now));
+  const unique = [...new Set(urls)];
+  const todo = unique.filter((url) => expired(url, cache[url], now));
+  // Otisky starších záznamů postupně, nejstarší první – najednou by to byly desítky tisíc požadavků
+  const due = new Set(todo);
+  const needsHash = (m: Measured | undefined) => !!m && !("error" in m) && !m.sha256;
+  const backfill = unique
+    .filter((url) => !due.has(url) && needsHash(cache[url]))
+    .sort((a, b) => cache[a].at - cache[b].at)
+    .slice(0, HASH_BACKFILL);
+  todo.push(...backfill);
   if (todo.length) {
-    log.info(`ikony k změření: ${todo.length} (${urls.length - todo.length} z mezipaměti)`);
+    log.info(
+      `ikony k změření: ${todo.length} (${unique.length - todo.length} z mezipaměti` +
+        `${backfill.length ? `, ${backfill.length} kvůli otisku obsahu` : ""})`,
+    );
     const tick = progress("ikony", todo.length);
     // Na jeden server nejvýš 4 požadavky najednou (CDN Chocolatey, jsDelivr…)
     const limiterOf = hostLimiters(4);
@@ -202,10 +221,52 @@ export async function measureIcons(urls: string[]): Promise<Map<string, ImageSiz
       const m = cache[url];
       if (placeholders.has(url) || unverified.has(url)) return [url, null];
       if (!m || isTransient(m)) return [url, undefined];
-      return [url, "error" in m ? null : { width: m.w, height: m.h, vector: m.vector }];
+      return [url, "error" in m ? null : { width: m.w, height: m.h, vector: m.vector, sha256: m.sha256 }];
     }),
   );
 }
+
+/**
+ * Stejný obrázek na aspoň SHARED_CONTENT_URLS různých adresách u aspoň SHARED_CONTENT_OWNERS
+ * různých vydavatelů (u ikon webů různých webů) není ikona aplikace, ale obecný obrázek serveru:
+ * výchozí obrázek galerie balíčků, favicon šablony webu. Pozná i varianty, které v PLACEHOLDERS
+ * nejsou (u krabičky Chocolatey by stačil sám). Stejná adresa u více aplikací (logo Node.js) se
+ * počítá jednou a různé verze jedné aplikace mají jednoho vydavatele, takže pravidlu nevadí.
+ */
+const SHARED_CONTENT_URLS = 8;
+const SHARED_CONTENT_OWNERS = 5;
+
+export interface SharedImage {
+  sha256: string;
+  urls: string[];
+  owners: number;
+}
+
+/** Skupiny adres se stejným obsahem; `owners` = adresa → vydavatelé (nebo weby), kterým patří. */
+export function sharedContent(owners: Map<string, Set<string>>, sizes: Map<string, MeasuredSize | null | undefined>): SharedImage[] {
+  const groups = new Map<string, { urls: string[]; owners: Set<string> }>();
+  for (const [url, who] of owners) {
+    const sha256 = sizes.get(url)?.sha256;
+    if (!sha256) continue;
+    const group = groups.get(sha256) ?? { urls: [], owners: new Set<string>() };
+    group.urls.push(url);
+    for (const owner of who) group.owners.add(owner);
+    groups.set(sha256, group);
+  }
+  return [...groups]
+    .filter(([, g]) => g.urls.length >= SHARED_CONTENT_URLS && g.owners.size >= SHARED_CONTENT_OWNERS)
+    .map(([sha256, g]) => ({ sha256, urls: g.urls, owners: g.owners.size }));
+}
+
+function logShared(kind: string, groups: SharedImage[]) {
+  for (const g of groups) {
+    log.info(`ikony: obecný obrázek ${g.sha256.slice(0, 8)} (${kind}) – ${g.urls.length} adres, ${g.owners} vlastníků, např. ${g.urls.slice(0, 2).join(", ")} – vyřazen`);
+  }
+}
+
+/** Pro výpis z běhu: skupina obecného obrázku s pár příklady adres. */
+const sharedSummary = (groups: SharedImage[]) =>
+  groups.map((g) => ({ sha256: g.sha256.slice(0, 16), urls: g.urls.length, owners: g.owners, examples: g.urls.slice(0, 3) }));
 
 // ── Ikony webu aplikace ────────────────────────────────────────────────
 
@@ -388,8 +449,8 @@ const hostOf = (url: string | null | undefined) => {
  * různých vydavatelů → je to výchozí ikona instalátoru, ne aplikace: Microsoft Teams,
  * Screenpresso, LanguageTool a JASP měly stejnou složku s obláčkem, desítky dalších
  * ikonu MSI, Electronu nebo Javy. Tři vydavatele mají i forky se skutečnou ikonou
- * (Chromium a ungoogled-chromium, Apache NetBeans). Sdílené logo z jiných zdrojů
- * (Node.js, FFmpeg) je v pořádku.
+ * (Chromium a ungoogled-chromium, Apache NetBeans). Sdílené logo z jiných zdrojů na jedné
+ * adrese (Node.js, FFmpeg) je v pořádku; stejný obrázek na mnoha adresách hlídá sharedContent.
  */
 const SHARED_WINGET_ICON = 4;
 const WINGET_ICONS = "https://cdn.winget.microsoft.com/icons/";
@@ -429,6 +490,17 @@ export async function chooseSharpIcons(packages: CatalogEntry[], choices: Map<st
     log.info(`ikony: ${generic.size} výchozích ikon instalátoru z CDN wingetu (sdílí je ≥ ${SHARED_WINGET_ICON} vydavatelé) vyřazeno`);
   }
   const sizes = await measureIcons([...choices.values()].flatMap((c) => c.candidates));
+  // Stejný obsah na mnoha adresách u různých vydavatelů – obecný obrázek serveru (sharedContent)
+  const owners = new Map<string, Set<string>>();
+  for (const entry of packages) {
+    for (const url of choices.get(entry.id)?.candidates ?? []) owners.set(url, (owners.get(url) ?? new Set<string>()).add(wingetPublisher(entry)));
+  }
+  const sharedSources = sharedContent(owners, sizes);
+  if (sharedSources.length) {
+    const drop = new Set(sharedSources.flatMap((g) => g.urls));
+    for (const choice of choices.values()) choice.candidates = choice.candidates.filter((url) => !drop.has(url));
+    logShared("ikony z balíčků", sharedSources);
+  }
   const sharpFromSources = (c: IconChoice) => c.candidates.some((url) => iconPixels(sizes.get(url)) >= SHARP_ICON);
 
   // Weby se stránkami víc aplikací z katalogu – jejich ikona patří webu
@@ -443,8 +515,18 @@ export async function chooseSharpIcons(packages: CatalogEntry[], choices: Map<st
   const web = await webIcons(needWeb.map((c) => c.site!));
   const uses = new Map<string, number>();
   for (const c of needWeb) for (const url of web.get(c.site!) ?? []) uses.set(url, (uses.get(url) ?? 0) + 1);
-  const ownWebIcons = (c: IconChoice) => (ownSite(c) ? (web.get(c.site!) ?? []).filter((url) => (uses.get(url) ?? 0) < SHARED_WEB_ICON) : []);
+  const genericWeb = new Set<string>();
+  const ownWebIcons = (c: IconChoice) =>
+    ownSite(c) ? (web.get(c.site!) ?? []).filter((url) => (uses.get(url) ?? 0) < SHARED_WEB_ICON && !genericWeb.has(url)) : [];
   for (const [url, size] of await measureIcons(needWeb.flatMap(ownWebIcons))) sizes.set(url, size);
+  // Favicon šablony webu: stejný obrázek na různých adresách mnoha webů
+  const siteOwners = new Map<string, Set<string>>();
+  for (const c of needWeb) {
+    for (const url of ownWebIcons(c)) siteOwners.set(url, (siteOwners.get(url) ?? new Set<string>()).add(hostOf(c.site) ?? c.site!));
+  }
+  const sharedWeb = sharedContent(siteOwners, sizes);
+  for (const url of sharedWeb.flatMap((g) => g.urls)) genericWeb.add(url);
+  logShared("ikony webů", sharedWeb);
 
   const counts = { sharp: 0, usable: 0, unknown: 0, fromWeb: 0, none: 0, dropped: 0 };
   for (const entry of packages) {
@@ -466,4 +548,5 @@ export async function chooseSharpIcons(packages: CatalogEntry[], choices: Map<st
       `${counts.unknown} nezměřených (server nedostupný), ${counts.fromWeb} z webu aplikace, ` +
       `${counts.none} bez ikony (z toho ${counts.dropped} s malou nebo nefunkční ikonou → avatar)`,
   );
+  reportMetric("icons", { ...counts, genericWinget: generic.size, sharedImages: sharedSummary([...sharedSources, ...sharedWeb]) });
 }

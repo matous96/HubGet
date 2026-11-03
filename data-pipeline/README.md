@@ -20,7 +20,8 @@ Balíčky npm, pip, Cargo… v katalogu nejsou – je jich miliony a Unibox je h
 pnpm pipeline --local
 ```
 
-Výsledek je v `data-pipeline/out/catalog.json`. S `--local` se zkopíruje i do
+Výsledek je v `data-pipeline/out/catalog.json` (výpis z běhu v `out/report.json`,
+viz Nasazení). S `--local` se zkopíruje i do
 `public/catalog.json`, odkud ho při `pnpm dev` načte aplikace místo ukázkového
 katalogu (v Nastavení → Katalog je pak zdroj „Místní (pnpm pipeline)“).
 
@@ -115,8 +116,8 @@ Kandidáti v pořadí podle důvěryhodnosti zdroje:
    vrací za balíček bez vlastní ikony (modrá krabička s bublinami, pozná se podle obsahu
    souboru – `PLACEHOLDERS` v `src/build/icons.ts`; v listopadu 2026 ho mělo 140 aplikací
    a existoval ve dvou souborech: server Chocolatey posílá jiný než starší kopie
-   v mezipaměti Cloudflare – nová varianta se jen doplní do seznamu otisků, obrázky
-   s rozměry krabičky mají otisk uložený v mezipaměti a znovu se neměří),
+   v mezipaměti Cloudflare – nová varianta se jen doplní do seznamu otisků; otisk obsahu
+   má v mezipaměti každý změřený obrázek, takže platí hned bez nového měření),
 4. ikony deklarované na webu aplikace – `<link rel="icon" sizes>`, apple-touch-icon,
    ikony z web manifestu, bez nich `/apple-touch-icon.png` a `/favicon.ico` v kořeni
    webu (jen když předchozí nejsou ostré; weby služeb jako GitHub, Steam nebo
@@ -142,6 +143,15 @@ pipeline nezahodí (zkusí ji znovu příští den) a dříve ověřený rozměr
 nepřepíše. Výjimkou je galerie Chocolatey: nezměřený obrázek z ní může být obecná
 krabička, takže se nepoužije. Změřené rozměry jsou
 v `.cache/icon-sizes.json`, ikony webů v `.cache/web-icons.json` (platí 30 dní).
+
+**Obecné obrázky podle obsahu** (`sharedContent`): stejný soubor na aspoň 8 různých
+adresách u aspoň 5 vydavatelů (u ikon webů 5 různých webů) není ikona aplikace, ale obecný
+obrázek serveru – výchozí obrázek galerie balíčků, favicon šablony webu – a vyřadí se.
+Pozná tak i varianty, které v `PLACEHOLDERS` nejsou. Stejná adresa u více aplikací (logo
+Node.js) se počítá jednou a verze jedné aplikace (Electron 34–44) mají jednoho vydavatele.
+Otisk SHA-256 se ukládá u každého měření; záznamy z doby před otisky ho dostanou postupně,
+nejvýš 3 000 za běh (`HASH_BACKFILL`), a do té doby se do pravidla nepočítají. Nalezené
+skupiny jsou ve výpisu z běhu (`metrics.icons.sharedImages`).
 
 Přehled podle zdrojů: `node data-pipeline/scripts/icon-report.ts [katalog.json] [--list]`
 (s `--list` i nejpopulárnější aplikace s malou ikonou).
@@ -244,3 +254,16 @@ Workflow `.github/workflows/catalog.yml` spouští pipeline každý den na GitHu
 (`scripts/check-catalog.mjs`) zveřejní na GitHub Pages – výchozí adresa katalogu
 v sestavené aplikaci. Aplikace si poslední staženou kopii drží v mezipaměti a funguje
 i offline. Podrobnosti v README.cs.md (Vzdálený katalog).
+
+Kontrola porovná nový katalog se zveřejněným: pokles aplikací (celkem i z wingetu,
+Chocolatey a Scoopu) nebo aplikací s ikonou o 10 % a víc katalog nezveřejní – běh skončí
+chybou a na webu zůstane dosavadní; pokles o 2 % a víc (i u snímků) ohlásí jako upozornění.
+Záměrnou změnu pustí ruční spuštění workflow se zaškrtnutým „povolit_pokles“
+(`CATALOG_ALLOW_DROP=1`).
+
+**Výpis z běhu** (`out/report.json`, `src/lib/report.ts`): počty z katalogu, ikony (ostré,
+z webu, bez ikony, vyřazené obecné obrázky), HTTP, upozornění, celý průběh bez průběžných
+počítadel a porovnání se zveřejněným katalogem. Workflow ho zveřejní na
+https://hubget.eu/catalog-report.json – logy GitHub Actions vidí jen přihlášení, takže
+podle výpisu jde zjistit, co se s katalogem stalo. Zastavený běh výpis nezveřejní
+(na webu zůstane výpis z posledního zveřejněného katalogu).

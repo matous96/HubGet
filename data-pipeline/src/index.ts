@@ -13,6 +13,7 @@ import { dedupeWinget, pairSources } from "./build/match.ts";
 import { upscaleSmallIcons } from "./build/upscale.ts";
 import { stats } from "./lib/http.ts";
 import { log } from "./lib/log.ts";
+import { reportMetric, writeReport } from "./lib/report.ts";
 import { githubRepoOf } from "../../src/lib/github.ts";
 import { loadChocolatey } from "./sources/chocolatey.ts";
 import { loadGithubStars } from "./sources/github.ts";
@@ -116,6 +117,15 @@ log.info(
   `HTTP: ${stats.requests} požadavků, ${stats.cacheHits} z mezipaměti, ${stats.notModified}× beze změny (304), ` +
     `${(stats.downloadedBytes / 1e6).toFixed(1)} MB staženo, ${stats.retries} opakování`,
 );
+reportMetric("catalog", {
+  packages: catalog.packages.length,
+  webOnly: catalog.webOnly?.length ?? 0,
+  icons: catalog.packages.filter((p) => p.iconUrl).length,
+  screenshots: withScreenshots.length,
+  megabytes: Number((json.length / 1e6).toFixed(1)),
+});
+reportMetric("http", { ...stats });
+await writeReport(join(OUT_DIR, "report.json"), catalog.generatedAt);
 
 // --local: zkopírovat do public/, odkud ho načte vývojový server aplikace
 if (arg("local")) {
