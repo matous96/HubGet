@@ -28,6 +28,60 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
   {
+    version: "0.2.0",
+    date: "2026-11-03",
+    highlights: [
+      {
+        cs: "Nový vzhled ikon: tvar jako na iOS a všechny ikony ve stejné bílé dlaždici s jemným nádechem své barvy a stínem pod logem. Aplikace bez ikony mají symbol kategorie v její barvě.",
+        en: "A new look for icons: an iOS-style shape, with every icon in the same white tile, a subtle hint of its color and a soft shadow under the logo. Apps without an icon show their category symbol in its color.",
+      },
+      {
+        cs: "Bannery v detailu aplikace a karty na domovské stránce mají odstín barvy aplikace – ve světlém tématu světlý, v tmavém tmavý. Aplikace dne se řídí tématem.",
+        en: "App banners and home page cards take on the app's color – light in the light theme, dark in the dark theme. App of the Day follows the theme.",
+      },
+      {
+        cs: "Hledání v Nastavení (i Ctrl+F): najde volbu ve všech sekcích, zvýrazní shodu a přepínače fungují přímo ve výsledcích. Diakritika nerozhoduje.",
+        en: "Search in Settings (also Ctrl+F): finds an option in every section, highlights the match, and toggles work right in the results. Accents don't matter.",
+      },
+      {
+        cs: "Historie operací je nově v Nastavení a starší záznamy se načítají po stovkách.",
+        en: "Operation history now lives in Settings, and older entries load a hundred at a time.",
+      },
+      {
+        cs: "Plynulejší práce: nový katalog stažený za běhu se zpracuje, až chvíli nic neděláte, a výsledky hledání nezdržují psaní. HubGet si bere méně paměti.",
+        en: "Smoother to use: a new catalog downloaded in the background is applied once you pause for a moment, and search results never hold up typing. HubGet uses less memory.",
+      },
+      {
+        cs: "Chyba instalace ukazuje skutečnou příčinu od správce balíčků (třeba kód chyby instalátoru), ne jen „podrobnosti v protokolu“.",
+        en: "Installation errors show the actual cause from the package manager (such as the installer's error code), not just “see the log for details”.",
+      },
+      {
+        cs: "Opraveno: aktualizace ChatGPT se nabízela pořád dokola – HubGet teď oznámí, že se dokončí po restartu počítače, a do té doby ji nenabízí.",
+        en: "Fixed: the ChatGPT update kept being offered over and over – HubGet now says it will finish after a restart and stops offering it until then.",
+      },
+      {
+        cs: "Opraveno: snímky obrazovky některých aplikací (třeba KiCad) se nenačetly a ikona v banneru občas zůstala zástupnou dlaždicí.",
+        en: "Fixed: screenshots of some apps (such as KiCad) didn't load, and the banner icon sometimes stayed a placeholder tile.",
+      },
+    ],
+    featured: [
+      {
+        title: { cs: "Nový vzhled ikon", en: "A new look for icons" },
+        text: {
+          cs: "Jednotné dlaždice jako na iOS a bannery v barvě aplikace – ve světlém i tmavém tématu.",
+          en: "Consistent iOS-style tiles and banners in the app's color – in both light and dark themes.",
+        },
+      },
+      {
+        title: { cs: "Hledání v Nastavení", en: "Search in Settings" },
+        text: {
+          cs: "Ctrl+F najde jakoukoli volbu ze všech sekcí – i historii operací, která je nově v Nastavení.",
+          en: "Ctrl+F finds any option across all sections – including operation history, now part of Settings.",
+        },
+      },
+    ],
+  },
+  {
     version: "0.1.23",
     date: "2026-11-03",
     highlights: [
