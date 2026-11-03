@@ -166,6 +166,11 @@ impl OperationResult {
         self.error_key
     }
 
+    /// Úspěch, který se projeví až po restartu (winget jen připravil novou verzi MSIX).
+    pub fn with_restart_required(self) -> Self {
+        OperationResult { restart_required: true, ..self }
+    }
+
     /// Chyba, po které se ukázalo, že cíl operace už je splněný (winget: „není co
     /// aktualizovat“ u aplikace, která už nejnovější verzi má).
     pub fn into_success(self) -> Self {

@@ -6,7 +6,7 @@
 //!   stahování z výstupu a výsledek z návratového kódu (HRESULT).
 
 use serde::{Deserialize, Serialize};
-use std::collections::{BTreeSet, HashSet};
+use std::collections::{BTreeMap, BTreeSet, HashSet};
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::Mutex;
@@ -227,6 +227,80 @@ fn winget_list() -> Result<Vec<PsInstalled>, String> {
     Ok(refresh_changed(items))
 }
 
+/// Aktualizace MSIX, které winget jen připravil: balíček používá běžící proces (ChatGPT
+/// svou službu Windows, která běží od startu počítače), registrace nové verze selže
+/// s 0x80073D02 a winget přesto skončí úspěchem („Restart the application to complete the
+/// upgrade“). Nová verze se použije až po zavření aplikace nebo restartu počítače – do té
+/// doby by HubGet tutéž aktualizaci nabízel pořád dokola. Ukládá se do `pending-updates.json`
+/// v datech aplikace i s časem startu počítače: platí i po restartu HubGetu, po restartu
+/// počítače se zahodí (vypnutí s rychlým spuštěním Windows služby nezastaví ani čas startu nezmění).
+static PENDING: Mutex<Option<Pending>> = Mutex::new(None);
+
+#[derive(Default, Serialize, Deserialize)]
+struct Pending {
+    /// Start počítače (s od 1970), ke kterému záznamy patří.
+    boot: u64,
+    /// Id balíčku malými písmeny → připravená verze.
+    packages: BTreeMap<String, String>,
+}
+
+fn pending_file(app: &AppHandle) -> Option<PathBuf> {
+    Some(app.path().app_local_data_dir().ok()?.join("pending-updates.json"))
+}
+
+/// Start počítače podle doby běhu Windows (s od 1970).
+fn boot_time() -> u64 {
+    // SAFETY: GetTickCount64 nemá parametry ani vedlejší účinky
+    let uptime = unsafe { windows_sys::Win32::System::SystemInformation::GetTickCount64() };
+    let now = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map_or(0, |d| d.as_millis() as u64);
+    now.saturating_sub(uptime) / 1000
+}
+
+/// Připravené aktualizace z tohoto startu počítače (ze souboru se načtou při prvním použití).
+fn with_pending<T>(app: &AppHandle, f: impl FnOnce(&mut Pending) -> T) -> T {
+    with_pending_in(pending_file(app).as_deref(), f)
+}
+
+fn with_pending_in<T>(file: Option<&Path>, f: impl FnOnce(&mut Pending) -> T) -> T {
+    let mut guard = PENDING.lock().unwrap_or_else(|e| e.into_inner());
+    let pending = guard.get_or_insert_with(|| {
+        file.and_then(|file| std::fs::read(file).ok()).and_then(|bytes| serde_json::from_slice(&bytes).ok()).unwrap_or_default()
+    });
+    // Hodiny se při synchronizaci času posunou o pár sekund – jiný start je jiný o víc
+    let boot = boot_time();
+    if pending.boot.abs_diff(boot) > 120 {
+        *pending = Pending { boot, packages: BTreeMap::new() };
+    }
+    f(pending)
+}
+
+fn remember_pending(app: &AppHandle, package_id: &str, version: String) {
+    remember_pending_in(pending_file(app).as_deref(), package_id, version);
+}
+
+fn remember_pending_in(file: Option<&Path>, package_id: &str, version: String) {
+    let json = with_pending_in(file, |pending| {
+        pending.packages.insert(package_id.to_lowercase(), version);
+        serde_json::to_vec(pending)
+    });
+    if let (Some(file), Ok(json)) = (file, json) {
+        let _ = file.parent().map(std::fs::create_dir_all);
+        let _ = std::fs::write(file, json);
+    }
+}
+
+/// Aktualizaci, kterou winget jen připravil (Pending), znovu nenabízet.
+fn hide_pending(mut items: Vec<PsInstalled>, pending: &BTreeMap<String, String>) -> Vec<PsInstalled> {
+    if !pending.is_empty() {
+        for item in &mut items {
+            if pending.get(&item.id.to_lowercase()).is_some_and(|version| *version == item.update) {
+                item.update.clear();
+            }
+        }
+    }
+    items
+}
+
 /// Balíčky, které od spuštění HubGetu změnila jeho operace (nebo se po chybě „není
 /// co aktualizovat“ ukázaly jako aktuální). Modul čte přes server wingetu
 /// (WindowsPackageManagerServer), který běží s HubGetem a u aplikací MSIX drží
@@ -389,11 +463,12 @@ fn is_ea_game(p: &PsInstalled, registry: &arp::Registry) -> bool {
 ///     jen se zástupcem v nabídce Start, který odliší instalaci od složky
 ///     ponechané odinstalátorem.
 #[tauri::command]
-pub async fn winget_installed() -> Result<Vec<Installed>, String> {
-    background(|| {
+pub async fn winget_installed(app: AppHandle) -> Result<Vec<Installed>, String> {
+    background(move || {
+        let pending = with_pending(&app, |pending| pending.packages.clone());
         let registry = arp::Registry::load();
         let mut items: Vec<Installed> = match winget_list() {
-            Ok(items) => items
+            Ok(items) => hide_pending(items, &pending)
                 .into_iter()
                 .filter(|p| verified(p, &registry))
                 .map(|p| {
@@ -754,6 +829,20 @@ pub async fn winget_operation(
         if matches!(current, Some(Some(Listed { available: None, .. }))) {
             result = result.into_success();
         }
+    } else if request.kind == Kind::Update && result.is_success() {
+        // Úspěch, po kterém winget nabízí pořád novou verzi: aplikace MSIX ji jen připravila
+        // a použije ji po zavření nebo restartu počítače (viz PENDING)
+        let package_id = request.package_id.clone();
+        let current = background(move || Ok(cli_listed(&package_id))).await?;
+        if let Some(Some(Listed { available: Some(version), .. })) = current {
+            let (app, package_id) = (app.clone(), request.package_id.clone());
+            background(move || {
+                remember_pending(&app, &package_id, version);
+                Ok(())
+            })
+            .await?;
+            result = result.with_restart_required();
+        }
     }
     if result.is_success() {
         mark_changed(&request.package_id);
@@ -947,6 +1036,49 @@ mod tests {
         assert_eq!(parse_list("App  Vendor.App  < 2.0  winget\n", "Vendor.App"), None);
         assert_eq!(parse_list("App  Vendor.App  1.2.3.45…  winget\n", "Vendor.App"), None);
         assert_eq!(parse_list(current, "Canva.Affinity.Beta"), None);
+    }
+
+    #[test]
+    fn prepared_update_not_offered_again() {
+        let ps = |id: &str, version: &str, update: &str| PsInstalled {
+            id: id.into(),
+            name: id.into(),
+            version: version.into(),
+            source: "winget".into(),
+            update: update.into(),
+        };
+        let pending = BTreeMap::from([("test.pendingmsix".to_string(), "2.0".to_string())]);
+        let items = hide_pending(
+            vec![
+                // Připravená verze se nenabízí, novější ano; jiné balíčky beze změny
+                ps("Test.PendingMsix", "1.0", "2.0"),
+                ps("Test.Other", "1.0", "2.0"),
+            ],
+            &pending,
+        );
+        assert_eq!(items[0].update, "");
+        assert_eq!(items[1].update, "2.0");
+        let items = hide_pending(vec![ps("Test.PendingMsix", "1.0", "2.1")], &pending);
+        assert_eq!(items[0].update, "2.1");
+        // Start počítače z doby běhu: v minulosti a mezi dvěma voláními stejný
+        assert!(boot_time() > 1_600_000_000 && boot_time().abs_diff(boot_time()) <= 1);
+    }
+
+    #[test]
+    fn prepared_update_survives_restart_of_hubget_not_of_pc() {
+        let file = std::env::temp_dir().join(format!("hubget-pending-{}.json", std::process::id()));
+        let _ = std::fs::remove_file(&file);
+        let packages = |file: &Path| with_pending_in(Some(file), |pending| pending.packages.clone());
+        remember_pending_in(Some(&file), "OpenAI.ChatGPT", "26.1027.6604.0".into());
+        // Nový HubGet (prázdná paměť) načte záznam ze souboru
+        *PENDING.lock().unwrap() = None;
+        assert_eq!(packages(&file).get("openai.chatgpt").map(String::as_str), Some("26.1027.6604.0"));
+        // Záznam z jiného startu počítače se zahodí
+        std::fs::write(&file, r#"{"boot":1600000000,"packages":{"openai.chatgpt":"26.1027.6604.0"}}"#).unwrap();
+        *PENDING.lock().unwrap() = None;
+        assert!(packages(&file).is_empty());
+        *PENDING.lock().unwrap() = None;
+        let _ = std::fs::remove_file(&file);
     }
 
     #[test]
