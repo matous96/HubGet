@@ -2,7 +2,8 @@
  * Odkazy na komunitu projektu. Hodnoty lze přepsat v souboru .env.local
  * (VITE_GITHUB_URL, VITE_SUPPORT_URL…).
  */
-export const GITHUB_URL: string = import.meta.env.VITE_GITHUB_URL ?? "https://github.com/matous96/unibox";
+// Nenastavená proměnná ve workflow Vydání je prázdný řetězec – i pak výchozí adresa
+export const GITHUB_URL: string = import.meta.env.VITE_GITHUB_URL || "https://github.com/matous96/HubGet";
 /**
  * Dobrovolný příspěvek na vývoj (Revolut) – karta Podpořit HubGet v Nastavení.
  * Prázdná hodnota (VITE_SUPPORT_URL=) kartu skryje.

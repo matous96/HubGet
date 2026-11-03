@@ -11,7 +11,7 @@ export const CACHE_DIR = join(PIPELINE_DIR, ".cache");
 export const OUT_DIR = join(PIPELINE_DIR, "out");
 
 /** Identifikace pro servery (slušnost vůči API – je vidět, kdo se ptá). */
-export const USER_AGENT = "HubGet-data-pipeline/0.1 (+https://github.com/matous96/unibox)";
+export const USER_AGENT = "HubGet-data-pipeline/0.1 (+https://github.com/matous96/HubGet)";
 
 const HOUR = 3_600_000;
 

@@ -16,7 +16,7 @@
       "Ve výsledcích hledání jsou ověřené aplikace (s fajkou) nahoře – „terminal“ ukáže nejdřív Windows Terminal, ne méně známé nástroje se slovem na začátku názvu.",
       "Karty kolekcí v sekci Dnes mají barvu, která u jejich ikon převládá – výběr modrých aplikací je modrý.",
       "Instalátor před instalací ukáže [zásady ochrany soukromí](soukromi.html) a licenci. Favicony webů aplikací se už nehledají přes služby Googlu a DuckDuckGo.",
-      "**Zdrojový kód na GitHubu** – HubGet je veřejně na [github.com/matous96/unibox](@github) pod licencí MIT a aktualizace se stahují z GitHub Releases."
+      "**Zdrojový kód na GitHubu** – HubGet je veřejně na [github.com/matous96/HubGet](@github) pod licencí MIT a aktualizace se stahují z GitHub Releases."
     ],
     "highlights": [
       {
@@ -44,7 +44,7 @@
       "Verified apps (with the check mark) come first in search results – “terminal” shows Windows Terminal first, not lesser-known tools that merely start with the word.",
       "Collection cards in Today take the color that prevails in their icons – a set of blue apps is blue.",
       "The installer shows the [privacy policy](privacy.html) and license before installing. App website favicons are no longer looked up through Google and DuckDuckGo services.",
-      "**Source code on GitHub** – HubGet is public at [github.com/matous96/unibox](@github) under the MIT license, and updates are downloaded from GitHub Releases."
+      "**Source code on GitHub** – HubGet is public at [github.com/matous96/HubGet](@github) under the MIT license, and updates are downloaded from GitHub Releases."
     ],
     "highlights": [
       {

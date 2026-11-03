@@ -14,7 +14,7 @@ for installers on the web, with no ads and no bundled extras.
 
 [![MIT license](https://img.shields.io/badge/license-MIT-5b6cf9)](LICENSE) [![Windows 10 and 11](https://img.shields.io/badge/Windows-10%20%7C%2011-0078d4)](#download) [![Tauri 2](https://img.shields.io/badge/Tauri-2-24c8db?logo=tauri&logoColor=white)](https://tauri.app) [![React 19](https://img.shields.io/badge/React-19-61dafb?logo=react&logoColor=black)](https://react.dev) [![Free and open source](https://img.shields.io/badge/free-open%20source-2ea44f)](#free-and-open-source)
 
-**[⬇️ Download for Windows](https://github.com/matous96/unibox/releases/latest)** &nbsp;·&nbsp; [🌐 hubget.eu](https://hubget.eu/en/index.html) &nbsp;·&nbsp; [Tour](#tour) &nbsp;·&nbsp; [Package managers](#package-managers) &nbsp;·&nbsp; [For developers](#for-developers)
+**[⬇️ Download for Windows](https://github.com/matous96/HubGet/releases/latest)** &nbsp;·&nbsp; [🌐 hubget.eu](https://hubget.eu/en/index.html) &nbsp;·&nbsp; [Tour](#tour) &nbsp;·&nbsp; [Package managers](#package-managers) &nbsp;·&nbsp; [For developers](#for-developers)
 
 <br>
 
@@ -107,7 +107,7 @@ retries it with administrator rights by itself.
 
 ## Download
 
-**[Download the latest version](https://github.com/matous96/unibox/releases/latest)** –
+**[Download the latest version](https://github.com/matous96/HubGet/releases/latest)** –
 the **EXE** installer installs for the current user without administrator rights, the
 **MSI** suits company deployments. Requirements: Windows 10 or 11 (64-bit) and WebView2,
 which comes preinstalled with Windows. HubGet then keeps itself up to date. More on the

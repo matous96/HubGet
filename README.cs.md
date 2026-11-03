@@ -14,7 +14,7 @@ instalátorů po webu, bez reklam a přibalených doplňků.
 
 [![Licence MIT](https://img.shields.io/badge/licence-MIT-5b6cf9)](LICENSE) [![Windows 10 a 11](https://img.shields.io/badge/Windows-10%20%7C%2011-0078d4)](#stažení) [![Tauri 2](https://img.shields.io/badge/Tauri-2-24c8db?logo=tauri&logoColor=white)](https://tauri.app) [![React 19](https://img.shields.io/badge/React-19-61dafb?logo=react&logoColor=black)](https://react.dev) [![Zdarma a open source](https://img.shields.io/badge/zdarma-open%20source-2ea44f)](#zdarma-a-open-source)
 
-**[⬇️ Stáhnout pro Windows](https://github.com/matous96/unibox/releases/latest)** &nbsp;·&nbsp; [🌐 hubget.eu](https://hubget.eu/) &nbsp;·&nbsp; [Prohlídka](#prohlídka) &nbsp;·&nbsp; [Správci balíčků](#správci-balíčků) &nbsp;·&nbsp; [Pro vývojáře](#dokumentace-pro-vývojáře)
+**[⬇️ Stáhnout pro Windows](https://github.com/matous96/HubGet/releases/latest)** &nbsp;·&nbsp; [🌐 hubget.eu](https://hubget.eu/) &nbsp;·&nbsp; [Prohlídka](#prohlídka) &nbsp;·&nbsp; [Správci balíčků](#správci-balíčků) &nbsp;·&nbsp; [Pro vývojáře](#dokumentace-pro-vývojáře)
 
 <br>
 
@@ -107,7 +107,7 @@ s právy správce.
 
 ## Stažení
 
-**[Stáhnout nejnovější verzi](https://github.com/matous96/unibox/releases/latest)** –
+**[Stáhnout nejnovější verzi](https://github.com/matous96/HubGet/releases/latest)** –
 instalátor **EXE** instaluje pro aktuálního uživatele bez práv správce, **MSI** se hodí
 pro nasazení ve firmách. Požadavky: Windows 10 nebo 11 (64bit) a WebView2, který je ve
 Windows předinstalovaný. HubGet se pak aktualizuje sám. Víc na webu:
@@ -466,7 +466,7 @@ Texty webu se upravují ve formulářích v prohlížeči přes
 `en/roadmap.html`) a všechny ostatní texty stránek (viz [Texty stránek](#texty-stránek)):
 
 1. Na [app.pagescms.org](https://app.pagescms.org) se přihlaste přes GitHub.
-2. Nainstalujte aplikaci Pages CMS na GitHubu jen pro repozitář `matous96/unibox`
+2. Nainstalujte aplikaci Pages CMS na GitHubu jen pro repozitář `matous96/HubGet`
    (Only select repositories).
 3. Otevřete repozitář – v menu jsou **Novinky** (jedna položka na verzi, česky
    i anglicky), **Co chystáme** a **Texty webu – česky / anglicky** (stránka po stránce).
@@ -581,7 +581,9 @@ stažení při testování.
 Soukromý klíč je v `%USERPROFILE%\.tauri\unibox-updater.key` (mimo repozitář,
 bez hesla; jiné umístění: proměnná `UNIBOX_UPDATER_KEY`). **Zálohujte ho** – bez něj
 nejde vydat aktualizaci, kterou by už nainstalované HubGet přijaly. Aktualizace se
-hledají ve vydáních repozitáře `matous96/unibox` (`plugins.updater.endpoints`).
+hledají ve vydáních repozitáře `matous96/HubGet` (`plugins.updater.endpoints`; verze
+do 0.1.22 na staré adrese `matous96/unibox`, kterou GitHub po přejmenování přesměruje –
+nový repozitář jménem `unibox` proto nezakládejte).
 
 Výsledek v `src-tauri/target/release/bundle/`:
 
@@ -716,7 +718,7 @@ Podmínky SignPath Foundation (signpath.org/terms) a co je v projektu připraven
 | Podmínka | Stav |
 |---|---|
 | Licence schválená OSI, jen open-source součásti | MIT ✓ |
-| Veřejný repozitář, sestavení z něj automaticky v CI | [github.com/matous96/unibox](https://github.com/matous96/unibox), workflow Vydání ✓ |
+| Veřejný repozitář, sestavení z něj automaticky v CI | [github.com/matous96/HubGet](https://github.com/matous96/HubGet), workflow Vydání ✓ |
 | Projekt už vydaný a udržovaný | vydání 0.1.14 a 0.1.15 na GitHubu ✓ |
 | Stránka „Code signing policy“ s poděkováním SignPath, rolemi a odkazem na zásady soukromí, odkaz z úvodní stránky a ze stahování | [hubget.eu/podpis-kodu.html](https://hubget.eu/podpis-kodu.html), [en/code-signing.html](https://hubget.eu/en/code-signing.html), role: matous96 ✓ |
 | Zásady ochrany soukromí; software, který kontaktuje servery, je ukáže při instalaci a umožní funkce vypnout | `website/soukromi.html`, `website/en/privacy.html` ✓; instalátor NSIS i MSI ukáže před instalací stránku „Ochrana soukromí a licence“ ✓ (`bundle.licenseFile`); kontrolu aktualizací, synchronizaci a přihlášení jde vypnout ✓ |
@@ -725,7 +727,7 @@ Podmínky SignPath Foundation (signpath.org/terms) a co je v projektu připraven
 
 Postup:
 
-1. Veřejný repozitář: [github.com/matous96/unibox](https://github.com/matous96/unibox)
+1. Veřejný repozitář: [github.com/matous96/HubGet](https://github.com/matous96/HubGet)
    (adresa je v `plugins.updater.endpoints` v `src-tauri/tauri.conf.json`, v `src/config.ts`
    a v `LINKS` ve `website/main.js`).
 2. Vydejte první verzi workflowem bez podpisu (značka `v<verze>`), ať je projekt „vydaný“.

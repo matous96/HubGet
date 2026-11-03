@@ -73,7 +73,7 @@
     },
     "updater": {
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEM2NjA2NTI0NjgwMEE4M0MKUldROHFBQm9KR1ZneHMzL01zMFBibTNkbGFPRE5MQzV2dENKUU05R0xJYzRzTzVQRXFOYW0vaDgK",
-      "endpoints": ["https://github.com/matous96/unibox/releases/latest/download/latest.json"],
+      "endpoints": ["https://github.com/matous96/HubGet/releases/latest/download/latest.json"],
       "requireSignedVersion": true,
       "windows": { "installMode": "passive" }
     }

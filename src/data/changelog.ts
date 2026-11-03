@@ -404,8 +404,8 @@ export const CHANGELOG: Release[] = [
         en: "The installer shows the privacy policy and license before installing. App website favicons are no longer looked up through Google and DuckDuckGo services.",
       },
       {
-        cs: "Zdrojový kód je veřejně na GitHubu (github.com/matous96/unibox, licence MIT) a aktualizace HubGetu se stahují z GitHub Releases.",
-        en: "The source code is public on GitHub (github.com/matous96/unibox, MIT license) and HubGet updates are downloaded from GitHub Releases.",
+        cs: "Zdrojový kód je veřejně na GitHubu (github.com/matous96/HubGet, licence MIT) a aktualizace HubGetu se stahují z GitHub Releases.",
+        en: "The source code is public on GitHub (github.com/matous96/HubGet, MIT license) and HubGet updates are downloaded from GitHub Releases.",
       },
     ],
     featured: [

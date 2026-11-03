@@ -18,7 +18,8 @@ import { sortBySourceOrder } from "@/services/managers/sources";
 const CACHE_NAME = "unibox-catalog";
 const CACHE_URL = "/__unibox/catalog.json";
 // Ve vývoji bez nastavení žádný – načte se místní z pipeline. Web a katalog jsou na GitHub Pages
-// s doménou hubget.eu; starší verze stahují z matous96.github.io/unibox, které na ni přesměruje.
+// s doménou hubget.eu; verze do 0.1.18 stahují z matous96.github.io/unibox, které po přejmenování
+// repozitáře na HubGet (listopad 2026) nepřesměruje – zůstane jim uložený katalog, dokud se neaktualizují.
 const REMOTE_URL: string | undefined =
   import.meta.env.VITE_CATALOG_URL || (import.meta.env.DEV ? undefined : "https://hubget.eu/catalog.json");
 /** Katalog z public/ – ve vývoji „místní“, v sestavené aplikaci „přibalený“. */

@@ -60,7 +60,7 @@ impl Dev {
     }
 }
 
-const USER_AGENT: &str = "HubGet (https://github.com/unibox-app/unibox)";
+const USER_AGENT: &str = "HubGet (https://github.com/matous96/HubGet)";
 const LIST_TIMEOUT: Duration = Duration::from_secs(60);
 
 // ── Nalezení nástrojů ────────────────────────────────────────────────────

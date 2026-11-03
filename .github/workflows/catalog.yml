@@ -1,7 +1,8 @@
 # Katalog aplikací a web zdarma na GitHub Pages:
 #   https://hubget.eu/              – web HubGetu (složka website/)
 #   https://hubget.eu/catalog.json  – katalog aplikací
-# (vlastní doména v Settings → Pages; matous96.github.io/unibox na ni přesměruje)
+# (vlastní doména v Settings → Pages; matous96.github.io/HubGet na ni přesměruje – stará
+# …github.io/unibox z doby před přejmenováním repozitáře už ne, GitHub Pages to neumí)
 # Katalog denně vygeneruje data pipeline. Odtud si ho stahují nainstalované HubGet
 # (výchozí VITE_CATALOG_URL v sestavené aplikaci) a přibalí ho workflow Vydání.
 # Změna webu v main se zveřejní hned – s posledním zveřejněným katalogem, bez pipeline.
