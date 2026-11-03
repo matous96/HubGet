@@ -1,8 +1,9 @@
 /**
  * Aktualizace samotného HubGetu (tauri-plugin-updater).
  *
- * Nainstalovaný HubGet si stáhne latest.json z GitHub Releases (adresa
- * v tauri.conf.json → plugins.updater.endpoints). Je-li tam novější verze,
+ * Nainstalovaný HubGet si stáhne latest.json z GitHub Releases, když GitHub neodpoví,
+ * kopii z hubget.eu (adresy v tauri.conf.json → plugins.updater.endpoints, v tomto
+ * pořadí; plugin vezme první platnou odpověď). Je-li tam novější verze,
  * nabídne ji; instalátor se po stažení ověří podpisem (veřejný klíč je
  * v aplikaci, soukromý jen u vydavatele – scripts/release.mjs) a spustí se
  * v pasivním režimu, po instalaci se HubGet znovu spustí.

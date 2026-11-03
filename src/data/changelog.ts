@@ -28,6 +28,60 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
   {
+    version: "0.1.23",
+    date: "2026-11-03",
+    highlights: [
+      {
+        cs: "Katalog aplikací se obnovuje i za běhu: HubGet, který zůstane v oznamovací oblasti, si novější katalog stáhne každých šest hodin – když se k oknu vrátíte, nebo na pozadí.",
+        en: "The app catalog now refreshes while HubGet runs: when it stays in the notification area, it fetches a newer catalog every six hours – when you return to the window, or in the background.",
+      },
+      {
+        cs: "Odznaky Bezpečné, Jednoduché a Vše pod kontrolou v sekci Dnes i štítek Open source ukážou po najetí myší krátké vysvětlení a kliknutím podrobnosti.",
+        en: "The Safe, Simple and In control badges in the Today section and the Open source label show a short explanation on hover and the details on click.",
+      },
+      {
+        cs: "Popisky tlačítek v celé aplikaci mají stejný vzhled jako ostatní bubliny – i při ovládání klávesnicí a u okraje okna.",
+        en: "Button tooltips across the app share the look of the other bubbles – with the keyboard too and at the edge of the window.",
+      },
+      {
+        cs: "Ikony aplikací se poprvé načtou zhruba čtyřikrát rychleji. Během stahování je místo bílého okénka vidět dlaždice kategorie a ikona se přes ni plynule prolne.",
+        en: "App icons load about four times faster the first time. While they download, a category tile shows instead of a blank square and the icon fades in over it.",
+      },
+      {
+        cs: "Plynulejší posouvání dlouhých seznamů, třeba Nainstalovaných. Číslo verze HubGetu je v postranním panelu vedle Nastavení.",
+        en: "Smoother scrolling in long lists such as Installed. The HubGet version number now sits next to Settings in the sidebar.",
+      },
+      {
+        cs: "V katalogu přes 2 000 nových ikon, zaostřené malé ikony a správně oddělené různé aplikace stejného jména (ChatGPT, ZAP…).",
+        en: "Over 2,000 new icons in the catalog, sharper small icons, and different apps with the same name (ChatGPT, ZAP…) kept apart.",
+      },
+      {
+        cs: "Aktualizace HubGetu mají záložní adresu na hubget.eu – pro případ, že GitHub neodpoví.",
+        en: "HubGet updates have a backup address on hubget.eu, in case GitHub doesn't respond.",
+      },
+      {
+        cs: "Opraveno: aplikace MSIX (např. Affinity) se po aktualizaci dál nabízely k aktualizaci a další pokus skončil chybou.",
+        en: "Fixed: MSIX apps (such as Affinity) kept being offered for update after updating, and the next attempt failed.",
+      },
+    ],
+    featured: [
+      {
+        title: { cs: "Vždy čerstvý katalog", en: "Always a fresh catalog" },
+        text: {
+          cs: "HubGet v oznamovací oblasti si nové aplikace a ikony stáhne sám – bez restartu.",
+          en: "HubGet in the notification area picks up new apps and icons on its own – no restart needed.",
+        },
+      },
+      {
+        title: { cs: "Rychlejší ikony", en: "Faster icons" },
+        text: {
+          cs: "Ikony se poprvé načtou zhruba čtyřikrát rychleji a během stahování nebliká bílé okénko.",
+          en: "Icons load about four times faster the first time, with no blank square flashing while they download.",
+        },
+      },
+    ],
+  },
+  {
     version: "0.1.22",
     date: "2026-11-02",
     highlights: [

@@ -1,6 +1,7 @@
 # Katalog aplikací a web zdarma na GitHub Pages:
 #   https://hubget.eu/              – web HubGetu (složka website/)
 #   https://hubget.eu/catalog.json  – katalog aplikací
+#   https://hubget.eu/latest.json   – záložní kopie latest.json posledního vydání (aktualizace HubGetu)
 # (vlastní doména v Settings → Pages; matous96.github.io/HubGet na ni přesměruje – stará
 # …github.io/unibox z doby před přejmenováním repozitáře už ne, GitHub Pages to neumí)
 # Katalog denně vygeneruje data pipeline. Odtud si ho stahují nainstalované HubGet
@@ -151,6 +152,17 @@ jobs:
           cp data-pipeline/out/catalog.json _site/catalog.json
           # Zvětšené malé ikony, na které katalog odkazuje (hubget.eu/icons/…)
           if [ -d data-pipeline/out/icons ]; then mkdir -p _site/icons && cp -R data-pipeline/out/icons/. _site/icons/; fi
+          # Záložní adresa aktualizací HubGetu (druhý endpoint v tauri.conf.json): latest.json
+          # posledního zveřejněného vydání; když GitHub neodpoví, zůstane dosavadní kopie z webu
+          valid='const m = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8")); if (!m.version || !m.platforms?.["windows-x86_64"]?.signature) process.exit(1)'
+          for url in "https://github.com/${{ github.repository }}/releases/latest/download/latest.json" "https://hubget.eu/latest.json"; do
+            if curl -fsSL --retry 3 "$url" -o _site/latest.json && node -e "$valid" _site/latest.json; then
+              echo "latest.json z $url"
+              break
+            fi
+            rm -f _site/latest.json
+          done
+          [ -f _site/latest.json ] || echo "::warning::latest.json se nepodařilo stáhnout – záložní adresa aktualizací chybí"
 
       - uses: actions/upload-pages-artifact@v3
         with:

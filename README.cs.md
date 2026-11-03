@@ -583,7 +583,11 @@ bez hesla; jiné umístění: proměnná `UNIBOX_UPDATER_KEY`). **Zálohujte ho*
 nejde vydat aktualizaci, kterou by už nainstalované HubGet přijaly. Aktualizace se
 hledají ve vydáních repozitáře `matous96/HubGet` (`plugins.updater.endpoints`; verze
 do 0.1.22 na staré adrese `matous96/unibox`, kterou GitHub po přejmenování přesměruje –
-nový repozitář jménem `unibox` proto nezakládejte).
+nový repozitář jménem `unibox` proto nezakládejte). Od 0.1.23 je druhou adresou kopie
+`https://hubget.eu/latest.json`: workflow Katalog ji při každém nasazení webu převezme
+z posledního zveřejněného vydání a HubGet ji použije, jen když GitHub odpoví chybou
+(třeba po dalším přejmenování). Kopie může být až den stará – proto je až druhá; pravost
+hlídá podpis, ne adresa.
 
 Výsledek v `src-tauri/target/release/bundle/`:
 
