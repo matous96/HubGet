@@ -78,9 +78,10 @@
         <div class="page-head__inner reveal">
           <p class="eyebrow" data-t="t1">What’s new</p>
           <h1 data-t="t2">What’s new in&nbsp;HubGet</h1>
-          <p class="lead" data-t="t3">Every change since the first public version 0.1.0, newest first. <!--obsah:updates-words-capital-->Twenty-three<!--/obsah:updates-words-capital--> updates have shipped since its release on October&nbsp;21.</p>
+          <p class="lead" data-t="t3">Every change since the first public version 0.1.0, newest first. <!--obsah:updates-words-capital-->Twenty-four<!--/obsah:updates-words-capital--> updates have shipped since its release on October&nbsp;21.</p>
           <nav class="versions-nav" aria-label="Jump to version">
             <!--obsah:versions-->
+            <a class="chip" href="#v0-2-0">0.2.0</a>
             <a class="chip" href="#v0-1-23">0.1.23</a>
             <a class="chip" href="#v0-1-22">0.1.22</a>
             <a class="chip" href="#v0-1-21">0.1.21</a>
@@ -109,8 +110,8 @@
           </nav>
         </div>
         <dl class="stats reveal">
-          <div><dt data-t="t4">Current version</dt><dd><!--obsah:version-->0.1.23<!--/obsah:version--></dd></div>
-          <div><dt data-t="t5">Updates since 0.1.0</dt><dd><!--obsah:updates-->23<!--/obsah:updates--></dd></div>
+          <div><dt data-t="t4">Current version</dt><dd><!--obsah:version-->0.2.0<!--/obsah:version--></dd></div>
+          <div><dt data-t="t5">Updates since 0.1.0</dt><dd><!--obsah:updates-->24<!--/obsah:updates--></dd></div>
           <div><dt data-t="t6">Apps in the catalog</dt><dd data-t="t7">25,100+</dd></div>
           <div><dt data-t="t8">Package managers for real</dt><dd data-t="t9">WinGet · Chocolatey · Scoop + 8 for developers</dd></div>
         </dl>
@@ -237,6 +238,44 @@
 
         <div class="timeline">
           <!--obsah:releases-->
+          <!-- 0.2.0 -->
+          <article class="release" id="v0-2-0">
+            <div class="release__meta">
+              <span class="release__ver">0.2.0</span>
+              <time class="release__date" datetime="2026-11-03">Nov 3, 2026</time>
+            </div>
+            <div class="card release__body">
+              <div class="release__head">
+                <h2>A new look for icons and search in Settings</h2>
+                <span class="badge badge--live">Latest</span>
+              </div>
+              <div class="changes changes--new">
+                <h3>New</h3>
+                <ul>
+                  <li><strong>A new look for icons</strong> – an iOS-style shape, with every icon in the same white tile, a subtle hint of its color and a soft shadow under the logo. Apps without an icon show their category symbol in its color.</li>
+                  <li><strong>Search in Settings</strong> (also Ctrl+F) – finds an option in every section, highlights the match, and toggles work right in the results. Accents don’t matter.</li>
+                  <li>App banners and home page cards take on the app’s color – light in the light theme, dark in the dark theme. App of the Day follows the theme.</li>
+                </ul>
+              </div>
+              <div class="changes changes--better">
+                <h3>Improved</h3>
+                <ul>
+                  <li>Operation history now lives in Settings, and older entries load a hundred at a time.</li>
+                  <li>A new catalog downloaded in the background is applied once you pause for a moment – the window never freezes while you work. Search results never hold up typing, and HubGet uses less memory.</li>
+                  <li>Installation errors show the actual cause from the package manager (such as the installer’s error code), not just “see the log for details”.</li>
+                </ul>
+              </div>
+              <div class="changes changes--fix">
+                <h3>Fixed</h3>
+                <ul>
+                  <li>The ChatGPT update kept being offered over and over – HubGet now says it will finish after a restart and stops offering it until then.</li>
+                  <li>Screenshots of some apps (such as KiCad) didn’t load.</li>
+                  <li>The banner icon on an app’s page sometimes stayed a placeholder tile.</li>
+                </ul>
+              </div>
+            </div>
+          </article>
+
           <!-- 0.1.23 -->
           <article class="release" id="v0-1-23">
             <div class="release__meta">
@@ -246,7 +285,6 @@
             <div class="card release__body">
               <div class="release__head">
                 <h2>Always a fresh catalog and faster icons</h2>
-                <span class="badge badge--live">Latest</span>
               </div>
               <div class="changes changes--better">
                 <h3>Improved</h3>

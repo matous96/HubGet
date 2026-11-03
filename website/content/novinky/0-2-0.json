@@ -1,0 +1,40 @@
+{
+  "version": "0.2.0",
+  "date": "2026-11-03",
+  "cs": {
+    "title": "Nový vzhled ikon a hledání v Nastavení",
+    "new": [
+      "**Nový vzhled ikon** – tvar jako na iOS a všechny ikony ve stejné bílé dlaždici s jemným nádechem své barvy a stínem pod logem. Aplikace bez ikony mají symbol kategorie v její barvě.",
+      "**Hledání v Nastavení** (i Ctrl+F) – najde volbu ve všech sekcích, zvýrazní shodu a přepínače fungují přímo ve výsledcích. Diakritika nerozhoduje.",
+      "Bannery v detailu aplikace a karty na domovské stránce mají odstín barvy aplikace – ve světlém tématu světlý, v tmavém tmavý. Aplikace dne se řídí tématem."
+    ],
+    "improved": [
+      "Historie operací je nově v Nastavení a starší záznamy se načítají po stovkách.",
+      "Nový katalog stažený za běhu se zpracuje, až chvíli nic neděláte – okno se při práci nezasekne. Výsledky hledání nezdržují psaní a HubGet si bere méně paměti.",
+      "Chyba instalace ukazuje skutečnou příčinu od správce balíčků (třeba kód chyby instalátoru), ne jen „podrobnosti v protokolu“."
+    ],
+    "fixed": [
+      "Aktualizace ChatGPT se nabízela pořád dokola – HubGet teď oznámí, že se dokončí po restartu počítače, a do té doby ji nenabízí.",
+      "Snímky obrazovky některých aplikací (třeba KiCad) se nenačetly.",
+      "Ikona v banneru detailu občas zůstala zástupnou dlaždicí."
+    ]
+  },
+  "en": {
+    "title": "A new look for icons and search in Settings",
+    "new": [
+      "**A new look for icons** – an iOS-style shape, with every icon in the same white tile, a subtle hint of its color and a soft shadow under the logo. Apps without an icon show their category symbol in its color.",
+      "**Search in Settings** (also Ctrl+F) – finds an option in every section, highlights the match, and toggles work right in the results. Accents don’t matter.",
+      "App banners and home page cards take on the app’s color – light in the light theme, dark in the dark theme. App of the Day follows the theme."
+    ],
+    "improved": [
+      "Operation history now lives in Settings, and older entries load a hundred at a time.",
+      "A new catalog downloaded in the background is applied once you pause for a moment – the window never freezes while you work. Search results never hold up typing, and HubGet uses less memory.",
+      "Installation errors show the actual cause from the package manager (such as the installer’s error code), not just “see the log for details”."
+    ],
+    "fixed": [
+      "The ChatGPT update kept being offered over and over – HubGet now says it will finish after a restart and stops offering it until then.",
+      "Screenshots of some apps (such as KiCad) didn’t load.",
+      "The banner icon on an app’s page sometimes stayed a placeholder tile."
+    ]
+  }
+}
