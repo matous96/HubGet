@@ -20,7 +20,7 @@ import { localize, type AppStory, type CollectionStory } from "@/data/editorial"
 import { useBrandPalette } from "@/hooks/useBrandPalette";
 import { useCollectionInstall } from "@/hooks/useCollectionInstall";
 import { useCollectionPalette } from "@/hooks/useCollectionPalette";
-import { COLOR_TRANSITION } from "@/lib/color";
+import { COLOR_TRANSITION, isNeutralColor } from "@/lib/color";
 import { tintOf } from "@/lib/iconTile";
 import { cn } from "@/lib/utils";
 import { useCollectionModal } from "@/store/collectionModal";
@@ -173,12 +173,13 @@ export function AppStoryCard({ story, entry, className, paging }: { story: AppSt
 /**
  * Vodorovná karta „Aplikace dne“ podle tématu: ve světlém světlý odstín barvy značky
  * jako ostatní karty (tintOf), v tmavém tmavé pozadí jemně zabarvené barvou značky;
- * vlevo hvězdička, název a popis s akcemi, vpravo velká ikona se září.
+ * v pozadí vzorek symbolů podle kategorie aplikace, vlevo hvězdička, název a popis
+ * s akcemi, vpravo velká ikona se září.
  */
 export function AppOfTheDayCard({ entry, className }: { entry: CatalogEntry; className?: string }) {
   const { t } = useTranslation();
   const { color } = useBrandPalette(entry);
-  const { style: tint, ink } = tintOf(color);
+  const { style: tint, ink, hue } = tintOf(color);
   const base = `color-mix(in srgb, ${color} 22%, #0a1530)`;
   const openDetail = useCardClick(entry.id);
 
@@ -198,11 +199,18 @@ export function AppOfTheDayCard({ entry, className }: { entry: CatalogEntry; cla
         style={{ background: `linear-gradient(135deg, ${base}, color-mix(in srgb, ${base} 70%, black))` }}
       />
 
-      {/* Záře barvy značky za ikonou */}
+      {/* Symboly toho, co aplikace dělá (kategorie) – jako na ostatních kartách */}
+      <Doodles seedKey={entry.id} category={entry.categories[0]} ink={hue} cols={8} rows={4} opacity={0.12} />
+
+      {/* Záře barvy značky za ikonou; šedá (černobílá ikona – Plex) jen v tmavém tématu,
+          ve světlém by byla jako špinavá skvrna */}
       <div
         aria-hidden
-        className="pointer-events-none absolute top-1/2 right-[12%] size-96 -translate-y-1/2 rounded-full opacity-30 blur-3xl dark:opacity-40"
-        style={{ background: color }}
+        className={cn(
+          "pointer-events-none absolute top-1/2 right-[12%] size-96 -translate-y-1/2 rounded-full blur-3xl dark:opacity-40",
+          isNeutralColor(hue) ? "opacity-0" : "opacity-30",
+        )}
+        style={{ background: hue }}
       />
 
       <div className="relative grid w-full items-center gap-8 px-10 py-10 md:grid-cols-[1fr_auto]">
