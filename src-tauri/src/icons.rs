@@ -97,7 +97,26 @@ fn serve(dir: &Path, bundled: Option<&Path>, uri: &str) -> Result<(Vec<u8>, &'st
 }
 
 fn hash(text: &str) -> String {
-    Sha256::digest(text.as_bytes()).iter().map(|b| format!("{b:02x}")).collect()
+    sha256_hex(text.as_bytes())
+}
+
+fn sha256_hex(bytes: &[u8]) -> String {
+    Sha256::digest(bytes).iter().map(|b| format!("{b:02x}")).collect()
+}
+
+/// Obecné obrázky místo ikony (SHA-256 souboru) – stejné jako PLACEHOLDERS v datové pipeline
+/// (data-pipeline/src/build/icons.ts): Chocolatey za balíček bez vlastní ikony vrací modrou
+/// krabičku s bublinami (dva soubory: 9 056 B a 10 918 B). Katalog z doby před kontrolou
+/// v pipeline ji měl u stovek aplikací (Visual C++ 2013) – takový zdroj se odmítne jako
+/// nefunkční a karta ukáže další zdroj, nebo ikonu kategorie (PackageIcon).
+const PLACEHOLDER_SHA256: [&str; 2] = [
+    "f75147f3739646fcd8705bae8e581206fa2bb0b08ac85a7357a7c1b479fc961e",
+    "8553ea214999fe62abafb5bc5122de767b7f675f54fefd710414642ddab11018",
+];
+
+/// Je obrázek obecná krabička Chocolatey? (Větší soubor jí být nemůže – otisk se nepočítá.)
+fn is_placeholder(bytes: &[u8]) -> bool {
+    bytes.len() <= 16 * 1024 && PLACEHOLDER_SHA256.contains(&sha256_hex(bytes).as_str())
 }
 
 fn is_fresh(path: &Path, ttl: Duration) -> bool {
@@ -197,6 +216,9 @@ fn remote_icon(dir: &Path, bundled: Option<&Path>, url: &str) -> Result<(Vec<u8>
                     return Err(e.message);
                 }
             };
+            if is_placeholder(&raw) {
+                return remember_failure(&fail, "obecný obrázek místo ikony");
+            }
             // Uložit už upravenou podobu (ICO → PNG), příště se jen přečte
             let Some(normalized) = normalize(raw) else { return remember_failure(&fail, "není to použitelný obrázek") };
             std::fs::write(&path, &normalized).map_err(|e| e.to_string())?;
@@ -204,6 +226,11 @@ fn remote_icon(dir: &Path, bundled: Option<&Path>, url: &str) -> Result<(Vec<u8>
         }
     }
     let bytes = std::fs::read(&path).map_err(|e| e.to_string())?;
+    // Krabička uložená do mezipaměti dřívější verzí – smazat, příště se adresa ani nestáhne
+    if is_placeholder(&bytes) {
+        let _ = std::fs::remove_file(&path);
+        return remember_failure(&fail, "obecný obrázek místo ikony");
+    }
     let mime = sniff(&bytes).ok_or("neznámý formát")?;
     Ok((bytes, mime))
 }
@@ -621,6 +648,14 @@ mod tests {
         let mut out = std::io::Cursor::new(Vec::new());
         image.write_to(&mut out, image::ImageFormat::Png).unwrap();
         out.into_inner()
+    }
+
+    #[test]
+    fn placeholder_by_hash_only() {
+        assert!(PLACEHOLDER_SHA256.iter().all(|h| h.len() == 64 && h.bytes().all(|b| b.is_ascii_hexdigit())));
+        let icon = png_of(image::DynamicImage::ImageRgba8(image::RgbaImage::from_pixel(128, 128, image::Rgba([90, 160, 220, 255]))));
+        assert!(!is_placeholder(&icon));
+        assert!(!is_placeholder(&[]));
     }
 
     #[test]
