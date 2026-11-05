@@ -52,22 +52,32 @@ export const PackageRow = memo(function PackageRow({ entry, showUninstall, compa
       <SelectCheckbox entry={entry} className="absolute top-1 left-1" />
       <PackageIcon id={entry.id} name={entry.name} iconUrl={entry.iconUrl} size={44} />
 
-      <div className="min-w-0 flex-1">
+      {/* @container: odznak kategorie jen při dost širokém sloupci (dvousloupcový žebříček by jinak názvu nechal pár písmen) */}
+      <div className="@container min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          <h3 className="flex min-w-0 items-center gap-1 text-sm font-semibold">
+          <h3 className="flex min-w-0 items-center text-sm font-semibold">
             <Link
               to={`/package/${encodeURIComponent(entry.id)}`}
               className="block min-w-0 truncate outline-none after:absolute after:inset-0 after:rounded-xl focus-visible:after:ring-2 focus-visible:after:ring-accent"
             >
               {entry.name}
             </Link>
-            {isVerified(entry) && <VerifiedBadge size={14} />}
+            {/* Za názvem 1 px, který se smí ztratit: šířka nadpisu podle obsahu se při měřítku 150 % zaokrouhlí
+                o zlomek pixelu dolů a jinak by ho ubral název – „Git“ by se zkrátil na „G…“ */}
+            {isVerified(entry) ? (
+              <span className="inline-flex min-w-[17px] shrink-[1000] pl-1">
+                <VerifiedBadge size={14} />
+              </span>
+            ) : (
+              <span aria-hidden className="w-px shrink-[1000]" />
+            )}
           </h3>
-          <span className="truncate text-xs text-muted">{entry.publisher}</span>
+          {/* Vydavatel se zkracuje dřív než název aplikace */}
+          <span className="min-w-0 shrink-[10000] truncate text-xs text-muted">{entry.publisher}</span>
           {!installed && entry.sources.length > 1 && <SourceDots sources={entry.sources.map((s) => s.source)} />}
           {/* Aplikace jen z webu výrobce; nainstalovaná ho má u verze (širší řádek) */}
           {isWebOnly(entry) && (!installed || compact) && <WebBadge className="shrink-0" />}
-          <CategoryBadge category={entry.categories[0]} className="hidden shrink-0 sm:inline-flex" />
+          <CategoryBadge category={entry.categories[0]} className="shrink-0 @max-sm:hidden" />
         </div>
         <p className="truncate text-[13px] text-muted">{entry.description || entry.sources[0]?.packageId}</p>
       </div>

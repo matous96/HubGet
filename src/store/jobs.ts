@@ -335,9 +335,28 @@ export const useJobs = create<JobsState>()((set, get) => {
     return result;
   };
 
-  /** Vezme další úlohu z fronty a spustí ji u příslušného správce. */
+  /**
+   * Vezme další úlohu z fronty a spustí ji. Nečekaná chyba (dialog, oznámení…) frontu
+   * nezastaví: úloha se vyřadí a pokračuje se další – jinak by zůstalo `running` a žádná
+   * další instalace by do restartu HubGetu neproběhla.
+   */
   const processNext = async () => {
     if (running) return;
+    const appId = queue[0];
+    try {
+      await runNext();
+    } catch (error) {
+      console.error("Fronta operací:", error);
+      if (appId) {
+        handles.delete(appId);
+        remove(appId);
+      }
+      running = false;
+      void processNext();
+    }
+  };
+
+  const runNext = async () => {
     const appId = queue.shift();
     if (!appId) return;
     let job = get().jobs[appId];
@@ -359,6 +378,13 @@ export const useJobs = create<JobsState>()((set, get) => {
     let trace: number | null = null;
     if ((await managerReady(job.source, job.background)) && (await prepareProcesses(job))) {
       if (shouldTrack(job)) trace = await traceBegin().catch(() => null);
+      // Uživatel úlohu zrušil během přípravy (snímek systému, zjišťování běžících procesů) – úloha
+      // z karty zmizela, operace se tedy nespustí (jinak by proběhla bez průběhu na kartě)
+      if (!get().jobs[appId]) {
+        if (trace !== null) await traceDiscard(trace).catch(() => undefined);
+        running = false;
+        return processNext();
+      }
       result = await attempt(job);
     }
 

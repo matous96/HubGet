@@ -87,7 +87,13 @@ export function TopBar() {
           type="search"
           value={value}
           onChange={(e) => update(e.target.value)}
-          onKeyDown={(e) => e.key === "Escape" && update("")}
+          // Escape smaže dotaz; prázdné pole jen opustí – jinak by Escape na jiné stránce (detail aplikace)
+          // přepnul na prázdnou stránku hledání
+          onKeyDown={(e) => {
+            if (e.key !== "Escape") return;
+            if (value) update("");
+            else e.currentTarget.blur();
+          }}
           // Index pro vyhledávání připravit hned při kliknutí do pole, ne až při prvním písmenu
           onFocus={() => catalog && requestIdleCallback(() => catalogSearchIndex(catalog), { timeout: 300 })}
           placeholder={placeholder}

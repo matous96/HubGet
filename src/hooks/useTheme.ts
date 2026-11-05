@@ -53,7 +53,11 @@ export function useTheme() {
       }
       // Vlastní přechody barev vypnout – prolíná se snímek celého okna (styles/index.css)
       root.classList.add("theme-switching");
-      document.startViewTransition(update).finished.finally(() => root.classList.remove("theme-switching"));
+      const transition = document.startViewTransition(update);
+      // Prolnutí přerušené změnou velikosti okna (maximalizace, přichycení) odmítne `ready` – motiv se
+      // i tak přepne, jen bez animace; bez zachycení by to skončilo jako chyba ve zvonečku
+      transition.ready.catch(() => undefined);
+      transition.finished.catch(() => undefined).finally(() => root.classList.remove("theme-switching"));
     };
     apply();
     if (theme !== "system") return;

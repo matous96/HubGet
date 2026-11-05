@@ -59,7 +59,9 @@ export function installGlobalErrorHandlers() {
   // Zablokované pravidly CSP (src-tauri/tauri.conf.json): ve vývoji s oznámením – stejná CSP
   // platí i tam (vite.config.ts), takže se chyba ukáže dřív než po vydání; v aplikaci jen do konzole
   document.addEventListener("securitypolicyviolation", (event) => {
-    const message = `CSP zablokovala ${event.effectiveDirective}: ${event.blockedURI || "inline"}`;
+    // Odkud požadavek přišel (soubor:řádek) – u blob: a inline by jinak nebylo poznat, který kód to byl
+    const origin = event.sourceFile ? ` (${event.sourceFile.replace(/^.*\/\/[^/]+/, "")}:${event.lineNumber})` : "";
+    const message = `CSP zablokovala ${event.effectiveDirective}: ${event.blockedURI || "inline"}${origin}`;
     if (import.meta.env.DEV) reportError(new Error(message), "csp");
     else console.error(`[HubGet] ${message}`);
   });

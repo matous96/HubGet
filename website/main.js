@@ -92,7 +92,10 @@ document.getElementById("theme-toggle")?.addEventListener("click", () => {
   // (theme-switching), ať se nic neanimuje dvakrát. Bez podpory nebo s omezeným pohybem hned.
   if (!document.startViewTransition || reducedMotion.matches) return apply();
   root.classList.add("theme-switching");
-  document.startViewTransition(apply).finished.finally(() => root.classList.remove("theme-switching"));
+  // Přerušené prolnutí (změna velikosti okna) odmítne „ready“ – motiv se přepne i tak, jen bez animace
+  const transition = document.startViewTransition(apply);
+  transition.ready.catch(() => {});
+  transition.finished.catch(() => {}).finally(() => root.classList.remove("theme-switching"));
 });
 
 // ---------- Snímky obrazovky: chybějící soubor nechá zástupnou pozici ----------
