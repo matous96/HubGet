@@ -1,14 +1,18 @@
 {
   "version": "0.2",
   "date": "2026-11-03",
-  "releases": 1,
+  "releases": 2,
   "cs": {
-    "title": "Nový vzhled ikon a hledání v Nastavení",
-    "lead": "Verze 0.2.0.",
+    "title": "Nový vzhled ikon, vlastní vzhled aplikací a hledání v Nastavení",
+    "lead": "Verze 0.2.0 až 0.2.1 (3. – 5. 11. 2026).",
     "highlights": [
       {
         "title": "Nový vzhled ikon",
         "text": "Jednotné dlaždice jako na iOS a bannery i karty v barvě aplikace – ve světlém i tmavém tématu."
+      },
+      {
+        "title": "Vlastní vzhled aplikací",
+        "text": "Barva banneru a vlastní ikona u každé aplikace – jen pro vás a na všech vašich počítačích."
       },
       {
         "title": "Hledání v Nastavení",
@@ -18,26 +22,37 @@
     "new": [
       "**Nový vzhled ikon** – tvar jako na iOS a všechny ikony ve stejné bílé dlaždici s jemným nádechem své barvy a stínem pod logem. Aplikace bez ikony mají symbol kategorie v její barvě.",
       "**Hledání v Nastavení** (i Ctrl+F) – najde volbu ve všech sekcích, zvýrazní shodu a přepínače fungují přímo ve výsledcích. Diakritika nerozhoduje.",
-      "Bannery v detailu aplikace a karty na domovské stránce mají odstín barvy aplikace – ve světlém tématu světlý, v tmavém tmavý. Aplikace dne se řídí tématem."
+      "Bannery v detailu aplikace a karty na domovské stránce mají odstín barvy aplikace – ve světlém tématu světlý, v tmavém tmavý. Aplikace dne se řídí tématem.",
+      "**Vlastní vzhled aplikací** (0.2.1) – v detailu aplikace tlačítkem s paletou v rohu banneru nastavíte barvu banneru a karet a vlastní ikonu z obrázku (PNG, JPG, SVG, ICO…). Vidíte ho jen vy – a po přihlášení na všech svých počítačích."
     ],
     "improved": [
       "Historie operací je nově v Nastavení a starší záznamy se načítají po stovkách.",
       "Nový katalog stažený za běhu se zpracuje, až chvíli nic neděláte – okno se při práci nezasekne. Výsledky hledání nezdržují psaní a HubGet si bere méně paměti.",
-      "Chyba instalace ukazuje skutečnou příčinu od správce balíčků (třeba kód chyby instalátoru), ne jen „podrobnosti v protokolu“."
+      "Chyba instalace ukazuje skutečnou příčinu od správce balíčků (třeba kód chyby instalátoru), ne jen „podrobnosti v protokolu“.",
+      "Barevnější tmavé téma (0.2.1): bannery a karty mají sytější barvy, všechny stejně světlé – fialová ani modrá už nejsou tmavší než tyrkysová. Symboly ve vzorku jsou lépe vidět.",
+      "Aplikace z Chocolatey s obecnou ikonou (modrá krabice) mají místo ní dlaždici své kategorie.",
+      "Synchronizace stahuje jen to, co se od minula změnilo, a chyba jedné části nezastaví ostatní."
     ],
     "fixed": [
       "Aktualizace ChatGPT se nabízela pořád dokola – HubGet teď oznámí, že se dokončí po restartu počítače, a do té doby ji nenabízí.",
       "Snímky obrazovky některých aplikací (třeba KiCad) se nenačetly.",
-      "Ikona v banneru detailu občas zůstala zástupnou dlaždicí."
+      "Ikona v banneru detailu občas zůstala zástupnou dlaždicí.",
+      "V žebříčku Nejstahovanější se ve dvou sloupcích zkracovaly názvy aplikací („7…“, „G…“).",
+      "Instalace zrušená během přípravy se i tak spustila a nečekaná chyba mohla zastavit frontu operací až do restartu.",
+      "Escape ve vyhledávání na jiné stránce otevřel prázdné hledání, přepnutí motivu při změně velikosti okna hlásilo chybu a šipky na kartách kolekcí zakrývaly ikony."
     ]
   },
   "en": {
-    "title": "A new look for icons and search in Settings",
-    "lead": "Version 0.2.0.",
+    "title": "A new look for icons, custom app looks and search in Settings",
+    "lead": "Versions 0.2.0 to 0.2.1 (Nov 3–5, 2026).",
     "highlights": [
       {
         "title": "A new look for icons",
         "text": "Consistent iOS-style tiles, and banners and cards in the app’s color – in both light and dark themes."
+      },
+      {
+        "title": "Custom app looks",
+        "text": "A banner color and your own icon for any app – just for you, on all your PCs."
       },
       {
         "title": "Search in Settings",
@@ -47,17 +62,24 @@
     "new": [
       "**A new look for icons** – an iOS-style shape, with every icon in the same white tile, a subtle hint of its color and a soft shadow under the logo. Apps without an icon show their category symbol in its color.",
       "**Search in Settings** (also Ctrl+F) – finds an option in every section, highlights the match, and toggles work right in the results. Accents don’t matter.",
-      "App banners and home page cards take on the app’s color – light in the light theme, dark in the dark theme. App of the Day follows the theme."
+      "App banners and home page cards take on the app’s color – light in the light theme, dark in the dark theme. App of the Day follows the theme.",
+      "**Custom app looks** (0.2.1) – on an app’s page, the palette button in the corner of the banner lets you set the banner and card color and your own icon from an image (PNG, JPG, SVG, ICO…). Only you see it – on all your PCs once you’re signed in."
     ],
     "improved": [
       "Operation history now lives in Settings, and older entries load a hundred at a time.",
       "A new catalog downloaded in the background is applied once you pause for a moment – the window never freezes while you work. Search results never hold up typing, and HubGet uses less memory.",
-      "Installation errors show the actual cause from the package manager (such as the installer’s error code), not just “see the log for details”."
+      "Installation errors show the actual cause from the package manager (such as the installer’s error code), not just “see the log for details”.",
+      "A more colorful dark theme (0.2.1): banners and cards have richer colors that are all equally light – purple and blue are no longer darker than teal. The pattern symbols are easier to see.",
+      "Chocolatey apps with the generic icon (the blue box) now show their category tile instead.",
+      "Sync downloads only what changed since last time, and a problem with one part no longer stops the rest."
     ],
     "fixed": [
       "The ChatGPT update kept being offered over and over – HubGet now says it will finish after a restart and stops offering it until then.",
       "Screenshots of some apps (such as KiCad) didn’t load.",
-      "The banner icon on an app’s page sometimes stayed a placeholder tile."
+      "The banner icon on an app’s page sometimes stayed a placeholder tile.",
+      "App names in Top Charts were cut short in the two-column layout (“7…”, “G…”).",
+      "An installation canceled while it was being prepared still ran, and an unexpected error could stop the operation queue until a restart.",
+      "Escape in search on another page opened an empty search, switching the theme while resizing the window reported an error, and the arrows on collection cards covered the icons."
     ]
   }
 }

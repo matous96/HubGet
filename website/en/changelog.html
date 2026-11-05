@@ -78,7 +78,7 @@
         <div class="page-head__inner reveal">
           <p class="eyebrow" data-t="t1">What’s new</p>
           <h1 data-t="t2">What’s new in&nbsp;HubGet</h1>
-          <p class="lead" data-t="t3">What each series of HubGet versions brought, newest first. <!--obsah:updates-words-capital-->Twenty-four<!--/obsah:updates-words-capital--> updates have shipped since the first version 0.1.0 came out on October&nbsp;21.</p>
+          <p class="lead" data-t="t3">What each series of HubGet versions brought, newest first. <!--obsah:updates-words-capital-->Twenty-five<!--/obsah:updates-words-capital--> updates have shipped since the first version 0.1.0 came out on October&nbsp;21.</p>
           <nav class="versions-nav" aria-label="Jump to version">
             <!--obsah:versions-->
             <a class="chip" href="#v0-2">0.2</a>
@@ -87,8 +87,8 @@
           </nav>
         </div>
         <dl class="stats reveal">
-          <div><dt data-t="t4">Current version</dt><dd><!--obsah:version-->0.2.0<!--/obsah:version--></dd></div>
-          <div><dt data-t="t5">Updates since 0.1.0</dt><dd><!--obsah:updates-->24<!--/obsah:updates--></dd></div>
+          <div><dt data-t="t4">Current version</dt><dd><!--obsah:version-->0.2.1<!--/obsah:version--></dd></div>
+          <div><dt data-t="t5">Updates since 0.1.0</dt><dd><!--obsah:updates-->25<!--/obsah:updates--></dd></div>
           <div><dt data-t="t6">Apps in the catalog</dt><dd data-t="t7">25,100+</dd></div>
           <div><dt data-t="t8">Package managers for real</dt><dd data-t="t9">WinGet · Chocolatey · Scoop + 8 for developers</dd></div>
         </dl>
@@ -141,6 +141,11 @@
           </article>
           <article class="card highlight reveal">
             <span class="highlight__ver">Version 0.2</span>
+            <h3>Custom app looks</h3>
+            <p>A banner color and your own icon for any app – just for you, on all your PCs.</p>
+          </article>
+          <article class="card highlight reveal">
+            <span class="highlight__ver">Version 0.2</span>
             <h3>Search in Settings</h3>
             <p>Ctrl+F finds any option across all sections – including operation history, now part of Settings.</p>
           </article>
@@ -168,16 +173,17 @@
             </div>
             <div class="card release__body">
               <div class="release__head">
-                <h2>A new look for icons and search in Settings</h2>
+                <h2>A new look for icons, custom app looks and search in Settings</h2>
                 <span class="badge badge--live">Latest</span>
               </div>
-              <p class="release__lead">Version 0.2.0.</p>
+              <p class="release__lead">Versions 0.2.0 to 0.2.1 (Nov 3–5, 2026).</p>
               <div class="changes changes--new">
                 <h3>New</h3>
                 <ul>
                   <li><strong>A new look for icons</strong> – an iOS-style shape, with every icon in the same white tile, a subtle hint of its color and a soft shadow under the logo. Apps without an icon show their category symbol in its color.</li>
                   <li><strong>Search in Settings</strong> (also Ctrl+F) – finds an option in every section, highlights the match, and toggles work right in the results. Accents don’t matter.</li>
                   <li>App banners and home page cards take on the app’s color – light in the light theme, dark in the dark theme. App of the Day follows the theme.</li>
+                  <li><strong>Custom app looks</strong> (0.2.1) – on an app’s page, the palette button in the corner of the banner lets you set the banner and card color and your own icon from an image (PNG, JPG, SVG, ICO…). Only you see it – on all your PCs once you’re signed in.</li>
                 </ul>
               </div>
               <div class="changes changes--better">
@@ -186,6 +192,9 @@
                   <li>Operation history now lives in Settings, and older entries load a hundred at a time.</li>
                   <li>A new catalog downloaded in the background is applied once you pause for a moment – the window never freezes while you work. Search results never hold up typing, and HubGet uses less memory.</li>
                   <li>Installation errors show the actual cause from the package manager (such as the installer’s error code), not just “see the log for details”.</li>
+                  <li>A more colorful dark theme (0.2.1): banners and cards have richer colors that are all equally light – purple and blue are no longer darker than teal. The pattern symbols are easier to see.</li>
+                  <li>Chocolatey apps with the generic icon (the blue box) now show their category tile instead.</li>
+                  <li>Sync downloads only what changed since last time, and a problem with one part no longer stops the rest.</li>
                 </ul>
               </div>
               <div class="changes changes--fix">
@@ -194,6 +203,9 @@
                   <li>The ChatGPT update kept being offered over and over – HubGet now says it will finish after a restart and stops offering it until then.</li>
                   <li>Screenshots of some apps (such as KiCad) didn’t load.</li>
                   <li>The banner icon on an app’s page sometimes stayed a placeholder tile.</li>
+                  <li>App names in Top Charts were cut short in the two-column layout (“7…”, “G…”).</li>
+                  <li>An installation canceled while it was being prepared still ran, and an unexpected error could stop the operation queue until a restart.</li>
+                  <li>Escape in search on another page opened an empty search, switching the theme while resizing the window reported an error, and the arrows on collection cards covered the icons.</li>
                 </ul>
               </div>
             </div>

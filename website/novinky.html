@@ -78,7 +78,7 @@
         <div class="page-head__inner reveal">
           <p class="eyebrow" data-t="t1">Novinky</p>
           <h1 data-t="t2">Co je nového v&nbsp;HubGetu</h1>
-          <p class="lead" data-t="t3">Co přinesly jednotlivé řady verzí HubGetu, nejnovější nahoře. Od první veřejné verze 0.1.0 z&nbsp;21.&nbsp;10. vyšlo <!--obsah:updates-words-->čtyřiadvacet<!--/obsah:updates-words--> aktualizací.</p>
+          <p class="lead" data-t="t3">Co přinesly jednotlivé řady verzí HubGetu, nejnovější nahoře. Od první veřejné verze 0.1.0 z&nbsp;21.&nbsp;10. vyšlo <!--obsah:updates-words-->pětadvacet<!--/obsah:updates-words--> aktualizací.</p>
           <nav class="versions-nav" aria-label="Přejít na verzi">
             <!--obsah:versions-->
             <a class="chip" href="#v0-2">0.2</a>
@@ -87,8 +87,8 @@
           </nav>
         </div>
         <dl class="stats reveal">
-          <div><dt data-t="t4">Aktuální verze</dt><dd><!--obsah:version-->0.2.0<!--/obsah:version--></dd></div>
-          <div><dt data-t="t5">Aktualizací od verze 0.1.0</dt><dd><!--obsah:updates-->24<!--/obsah:updates--></dd></div>
+          <div><dt data-t="t4">Aktuální verze</dt><dd><!--obsah:version-->0.2.1<!--/obsah:version--></dd></div>
+          <div><dt data-t="t5">Aktualizací od verze 0.1.0</dt><dd><!--obsah:updates-->25<!--/obsah:updates--></dd></div>
           <div><dt data-t="t6">Aplikací v&nbsp;katalogu</dt><dd data-t="t7">25&nbsp;100+</dd></div>
           <div><dt data-t="t8">Správci naostro</dt><dd data-t="t9">WinGet · Chocolatey · Scoop + 8 pro vývojáře</dd></div>
         </dl>
@@ -141,6 +141,11 @@
           </article>
           <article class="card highlight reveal">
             <span class="highlight__ver">Verze 0.2</span>
+            <h3>Vlastní vzhled aplikací</h3>
+            <p>Barva banneru a&nbsp;vlastní ikona u&nbsp;každé aplikace – jen pro vás a&nbsp;na všech vašich počítačích.</p>
+          </article>
+          <article class="card highlight reveal">
+            <span class="highlight__ver">Verze 0.2</span>
             <h3>Hledání v&nbsp;Nastavení</h3>
             <p>Ctrl+F najde jakoukoli volbu ze všech sekcí – i&nbsp;historii operací, která je nově v&nbsp;Nastavení.</p>
           </article>
@@ -168,16 +173,17 @@
             </div>
             <div class="card release__body">
               <div class="release__head">
-                <h2>Nový vzhled ikon a&nbsp;hledání v&nbsp;Nastavení</h2>
+                <h2>Nový vzhled ikon, vlastní vzhled aplikací a&nbsp;hledání v&nbsp;Nastavení</h2>
                 <span class="badge badge--live">Nejnovější</span>
               </div>
-              <p class="release__lead">Verze 0.2.0.</p>
+              <p class="release__lead">Verze 0.2.0 až 0.2.1 (3. – 5. 11. 2026).</p>
               <div class="changes changes--new">
                 <h3>Nové</h3>
                 <ul>
                   <li><strong>Nový vzhled ikon</strong> – tvar jako na iOS a&nbsp;všechny ikony ve stejné bílé dlaždici s&nbsp;jemným nádechem své barvy a&nbsp;stínem pod logem. Aplikace bez ikony mají symbol kategorie v&nbsp;její barvě.</li>
                   <li><strong>Hledání v&nbsp;Nastavení</strong> (i Ctrl+F) – najde volbu ve všech sekcích, zvýrazní shodu a&nbsp;přepínače fungují přímo ve výsledcích. Diakritika nerozhoduje.</li>
                   <li>Bannery v&nbsp;detailu aplikace a&nbsp;karty na domovské stránce mají odstín barvy aplikace – ve světlém tématu světlý, v&nbsp;tmavém tmavý. Aplikace dne se řídí tématem.</li>
+                  <li><strong>Vlastní vzhled aplikací</strong> (0.2.1) – v&nbsp;detailu aplikace tlačítkem s&nbsp;paletou v&nbsp;rohu banneru nastavíte barvu banneru a&nbsp;karet a&nbsp;vlastní ikonu z&nbsp;obrázku (PNG, JPG, SVG, ICO…). Vidíte ho jen vy – a&nbsp;po přihlášení na všech svých počítačích.</li>
                 </ul>
               </div>
               <div class="changes changes--better">
@@ -186,6 +192,9 @@
                   <li>Historie operací je nově v&nbsp;Nastavení a&nbsp;starší záznamy se načítají po stovkách.</li>
                   <li>Nový katalog stažený za běhu se zpracuje, až chvíli nic neděláte – okno se při práci nezasekne. Výsledky hledání nezdržují psaní a&nbsp;HubGet si bere méně paměti.</li>
                   <li>Chyba instalace ukazuje skutečnou příčinu od správce balíčků (třeba kód chyby instalátoru), ne jen „podrobnosti v&nbsp;protokolu“.</li>
+                  <li>Barevnější tmavé téma (0.2.1): bannery a&nbsp;karty mají sytější barvy, všechny stejně světlé – fialová ani modrá už nejsou tmavší než tyrkysová. Symboly ve vzorku jsou lépe vidět.</li>
+                  <li>Aplikace z&nbsp;Chocolatey s&nbsp;obecnou ikonou (modrá krabice) mají místo ní dlaždici své kategorie.</li>
+                  <li>Synchronizace stahuje jen to, co se od minula změnilo, a&nbsp;chyba jedné části nezastaví ostatní.</li>
                 </ul>
               </div>
               <div class="changes changes--fix">
@@ -194,6 +203,9 @@
                   <li>Aktualizace ChatGPT se nabízela pořád dokola – HubGet teď oznámí, že se dokončí po restartu počítače, a&nbsp;do té doby ji nenabízí.</li>
                   <li>Snímky obrazovky některých aplikací (třeba KiCad) se nenačetly.</li>
                   <li>Ikona v&nbsp;banneru detailu občas zůstala zástupnou dlaždicí.</li>
+                  <li>V&nbsp;žebříčku Nejstahovanější se ve dvou sloupcích zkracovaly názvy aplikací („7…“, „G…“).</li>
+                  <li>Instalace zrušená během přípravy se i&nbsp;tak spustila a&nbsp;nečekaná chyba mohla zastavit frontu operací až do restartu.</li>
+                  <li>Escape ve vyhledávání na jiné stránce otevřel prázdné hledání, přepnutí motivu při změně velikosti okna hlásilo chybu a&nbsp;šipky na kartách kolekcí zakrývaly ikony.</li>
                 </ul>
               </div>
             </div>

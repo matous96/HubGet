@@ -6,8 +6,8 @@ const LINKS = {
   github: "https://github.com/matous96/HubGet",
   releases: "https://github.com/matous96/HubGet/releases",
   // Instalátory z vydání na GitHubu – verzi přepisuje `pnpm website:release` (scripts/website-release.mjs)
-  downloadExe: "https://github.com/matous96/HubGet/releases/download/v0.2.0/HubGet_0.2.0_x64-setup.exe",
-  downloadMsi: "https://github.com/matous96/HubGet/releases/download/v0.2.0/HubGet_0.2.0_x64_en-US.msi",
+  downloadExe: "https://github.com/matous96/HubGet/releases/download/v0.2.1/HubGet_0.2.1_x64-setup.exe",
+  downloadMsi: "https://github.com/matous96/HubGet/releases/download/v0.2.1/HubGet_0.2.1_x64_en-US.msi",
 };
 
 // Kontaktní formulář (stránka Kontakt): stejná služba a přístupový klíč jako formulář
