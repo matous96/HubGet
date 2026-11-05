@@ -1044,7 +1044,9 @@
       "settings": "Preferences",
       "settingsHint": "Theme, accent color, language, mode, view and enabled package managers.",
       "notifications": "Notification preferences",
-      "notificationsHint": "Which events HubGet notifies you about."
+      "notificationsHint": "Which events HubGet notifies you about.",
+      "looks": "App looks",
+      "looksHint": "Banner colors and icons you set for apps. Only you see them."
     },
     "status": "Status",
     "syncing": "Syncing…",
@@ -1233,6 +1235,30 @@
   },
   "banner": {
     "updated": "Updated {{date}}"
+  },
+  "appLook": {
+    "button": "Customize look",
+    "title": "Custom app look",
+    "onlyYou": "Only you will see it – on this PC and, when signed in, on your other PCs.",
+    "color": "Banner color",
+    "colorAuto": "From the icon (default)",
+    "colorCustom": "Custom color",
+    "icon": "Icon",
+    "iconPick": "Choose image…",
+    "iconOriginal": "Original icon",
+    "iconFormats": "PNG, JPG, WebP, SVG or ICO",
+    "iconProblem": {
+      "unreadable": "{{file}} isn't an image that can be loaded.",
+      "empty": "The image {{file}} is empty (fully transparent).",
+      "tooLarge": "The image {{file}} is too complex – try a smaller or simpler one."
+    },
+    "reset": "Restore original look",
+    "settingsLabel": "Custom app looks",
+    "settingsHint": "Banner colors and icons you set for apps on their detail page (button in the top-right corner of the banner). Only you see them; when signed in, they sync between your PCs.",
+    "settingsNone": "No apps",
+    "settingsCount_one": "{{count}} app",
+    "settingsCount_other": "{{count}} apps",
+    "settingsReset": "Reset all"
   },
   "stats": {
     "sidebar": "{{formatted}} apps"

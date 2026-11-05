@@ -29,6 +29,7 @@
 import { useMemo } from "react";
 import { useShallow } from "zustand/react/shallow";
 import { useInstalledEntry, useInstalledIndex } from "@/hooks/usePackages";
+import { useAppLooks } from "@/store/appLooks";
 import { useIconQuality } from "@/store/iconQuality";
 import { usePackageIndex } from "@/store/packageIndex";
 import type { CatalogEntry } from "@/types";
@@ -50,18 +51,27 @@ export const MIN_ICON = 48;
 /** Ikona se nezvětší víc než tolikrát (v pixelech obrazovky). */
 export const MAX_UPSCALE = 2;
 
-/** Ikona z internetu (ne z nabídky Start ani ze seznamu Po spuštění)? */
-export const isRemoteIcon = (src: string) => !src.startsWith(ICON_HOST) || src.startsWith(`${ICON_HOST}/remote`);
+/** Vlastní ikona, kterou si uživatel nastavil (store/appLooks.ts) – uložená jako data: URL. */
+export const isCustomIcon = (src: string) => src.startsWith("data:");
 
-/** Lze ikonu zkoumat v canvasu? (protokol icon:// posílá hlavičku CORS) */
-export const canInspect = (src: string) => src.startsWith(ICON_HOST);
+/** Ikona z internetu (ne z nabídky Start ani ze seznamu Po spuštění, ani vlastní)? */
+export const isRemoteIcon = (src: string) => !isCustomIcon(src) && (!src.startsWith(ICON_HOST) || src.startsWith(`${ICON_HOST}/remote`));
 
-/** Pořadí zdrojů ikony (bez duplicit) – viz popis modulu. */
-function orderSources(iconUrl: string | null | undefined, localAppId: string | undefined, catalogSize: number | undefined): string[] {
+/** Lze ikonu zkoumat v canvasu? (protokol icon:// posílá hlavičku CORS, data: URL je vlastní) */
+export const canInspect = (src: string) => src.startsWith(ICON_HOST) || isCustomIcon(src);
+
+/** Pořadí zdrojů ikony (bez duplicit) – viz popis modulu; vlastní ikona uživatele vždy první. */
+function orderSources(
+  iconUrl: string | null | undefined,
+  localAppId: string | undefined,
+  catalogSize: number | undefined,
+  custom: string | undefined,
+): string[] {
+  const own = custom ? [custom] : [];
   const catalog = iconUrl ? [remoteIconSrc(iconUrl)] : [];
-  if (!localAppId) return catalog;
+  if (!localAppId) return [...own, ...catalog];
   const catalogFirst = catalog.length > 0 && (catalogSize === undefined || catalogSize >= CATALOG_ICON_MIN);
-  return [...new Set(catalogFirst ? [...catalog, appIconSrc(localAppId)] : [appIconSrc(localAppId), ...catalog])];
+  return [...new Set([...own, ...(catalogFirst ? [...catalog, appIconSrc(localAppId)] : [appIconSrc(localAppId), ...catalog])])];
 }
 
 /** Seřazené zdroje ikony aplikace (bez duplicit). */
@@ -73,8 +83,9 @@ export function useIconSources(id: string, name: string, iconUrl: string | null 
   const local = installed && startApps ? startAppFor(startApps, name, installed) : undefined;
   // Rozlišení ikony z katalogu (neznámé = zatím se nezobrazila)
   const catalogSize = useIconQuality((s) => (iconUrl ? s.sizes[iconUrl] : undefined));
+  const custom = useAppLooks((s) => s.looks[id]?.icon);
 
-  return useMemo(() => orderSources(iconUrl, local?.appId, catalogSize), [iconUrl, local, catalogSize]);
+  return useMemo(() => orderSources(iconUrl, local?.appId, catalogSize, custom), [iconUrl, local, catalogSize, custom]);
 }
 
 /** Zdroje ikon pro víc aplikací najednou (karta kolekce – barva podle ikon) – stejné jako useIconSources. */
@@ -82,15 +93,16 @@ export function useIconSourcesOf(entries: Pick<CatalogEntry, "id" | "name" | "ic
   const installedIndex = useInstalledIndex();
   const startApps = usePackageIndex((s) => s.startApps);
   const catalogSizes = useIconQuality(useShallow((s) => entries.map((e) => (e.iconUrl ? s.sizes[e.iconUrl] : undefined))));
+  const customs = useAppLooks(useShallow((s) => entries.map((e) => s.looks[e.id]?.icon)));
 
   return useMemo(
     () =>
       entries.map((e, i) => {
         const installed = installedIndex.get(e.id);
         const local = installed && startApps ? startAppFor(startApps, e.name, installed) : undefined;
-        return orderSources(e.iconUrl, local?.appId, catalogSizes[i]);
+        return orderSources(e.iconUrl, local?.appId, catalogSizes[i], customs[i]);
       }),
-    [entries, installedIndex, startApps, catalogSizes],
+    [entries, installedIndex, startApps, catalogSizes, customs],
   );
 }
 

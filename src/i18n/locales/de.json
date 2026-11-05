@@ -1044,7 +1044,9 @@
       "settings": "Einstellungen",
       "settingsHint": "Design, Akzentfarbe, Sprache, Modus, Ansicht und aktivierte Paketmanager.",
       "notifications": "Benachrichtigungseinstellungen",
-      "notificationsHint": "Über welche Ereignisse HubGet Sie benachrichtigt."
+      "notificationsHint": "Über welche Ereignisse HubGet Sie benachrichtigt.",
+      "looks": "Aussehen von Apps",
+      "looksHint": "Bannerfarben und Symbole, die Sie Apps zugewiesen haben. Nur Sie sehen sie."
     },
     "status": "Status",
     "syncing": "Wird synchronisiert…",
@@ -1140,7 +1142,7 @@
       "point1": "Bei Fehlern die vollständige Meldung – per Klick kopieren",
       "point2": "Ein orangefarbener Punkt am Symbol neben der Uhr zeigt verfügbare Updates an",
       "point3": "Der gesamte Vorgangsverlauf ist nur einen Klick entfernt",
-      "where": "Was gemeldet wird, legen Sie unter Einstellungen → Benachrichtigungseinstellungen fest."
+      "where": "Was gemeldet wird, legen Sie unter Einstellungen → Benachrichtigungen fest."
     },
     "uninstall": {
       "title": "Erweiterte Deinstallation",
@@ -1233,6 +1235,30 @@
   },
   "banner": {
     "updated": "Aktualisiert {{date}}"
+  },
+  "appLook": {
+    "button": "Aussehen anpassen",
+    "title": "Eigenes Aussehen der App",
+    "onlyYou": "Nur Sie sehen es – auf diesem PC und nach der Anmeldung auch auf Ihren anderen PCs.",
+    "color": "Bannerfarbe",
+    "colorAuto": "Nach dem Symbol (Standard)",
+    "colorCustom": "Eigene Farbe",
+    "icon": "Symbol",
+    "iconPick": "Bild auswählen…",
+    "iconOriginal": "Ursprüngliches Symbol",
+    "iconFormats": "PNG, JPG, WebP, SVG oder ICO",
+    "iconProblem": {
+      "unreadable": "{{file}} ist kein Bild, das sich laden lässt.",
+      "empty": "Das Bild {{file}} ist leer (vollständig transparent).",
+      "tooLarge": "Das Bild {{file}} ist zu komplex – versuchen Sie ein kleineres oder einfacheres."
+    },
+    "reset": "Ursprüngliches Aussehen wiederherstellen",
+    "settingsLabel": "Eigenes Aussehen von Apps",
+    "settingsHint": "Bannerfarben und Symbole, die Sie Apps auf ihrer Detailseite zugewiesen haben (Schaltfläche oben rechts im Banner). Nur Sie sehen sie; nach der Anmeldung werden sie zwischen Ihren PCs synchronisiert.",
+    "settingsNone": "Keine App",
+    "settingsCount_one": "{{count}} App",
+    "settingsCount_other": "{{count}} Apps",
+    "settingsReset": "Alle zurücksetzen"
   },
   "stats": {
     "sidebar": "{{formatted}} Apps"
@@ -1921,7 +1947,7 @@
     "general": "Allgemein",
     "appearance": "Darstellung",
     "updates": "Paket-Updates",
-    "notifications": "Benachrichtigungseinstellungen",
+    "notifications": "Benachrichtigungen",
     "history": "Vorgangsverlauf",
     "security": "Administratorrechte und andere riskante Einstellungen",
     "managers": "Paketmanager",

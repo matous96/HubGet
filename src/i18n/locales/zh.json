@@ -1044,7 +1044,9 @@
       "settings": "偏好设置",
       "settingsHint": "主题、强调色、语言、模式、视图和已启用的包管理器。",
       "notifications": "通知偏好",
-      "notificationsHint": "HubGet 会就哪些事件通知你。"
+      "notificationsHint": "HubGet 会就哪些事件通知你。",
+      "looks": "应用外观",
+      "looksHint": "你为应用设置的横幅颜色和图标，仅你本人可见。"
     },
     "status": "状态",
     "syncing": "正在同步…",
@@ -1233,6 +1235,29 @@
   },
   "banner": {
     "updated": "更新于 {{date}}"
+  },
+  "appLook": {
+    "button": "自定义外观",
+    "title": "自定义应用外观",
+    "onlyYou": "仅你本人可见——在这台电脑上，登录后也会出现在你的其他电脑上。",
+    "color": "横幅颜色",
+    "colorAuto": "跟随图标（默认）",
+    "colorCustom": "自定义颜色",
+    "icon": "图标",
+    "iconPick": "选择图片…",
+    "iconOriginal": "原始图标",
+    "iconFormats": "PNG、JPG、WebP、SVG 或 ICO",
+    "iconProblem": {
+      "unreadable": "{{file}} 不是可以加载的图片。",
+      "empty": "图片 {{file}} 是空的（完全透明）。",
+      "tooLarge": "图片 {{file}} 过于复杂，请换一张更小或更简单的图片。"
+    },
+    "reset": "恢复原始外观",
+    "settingsLabel": "自定义应用外观",
+    "settingsHint": "你在应用详情页中设置的横幅颜色和图标（横幅右上角的按钮）。仅你本人可见；登录后会在你的电脑之间同步。",
+    "settingsNone": "没有应用",
+    "settingsCount_other": "{{count}} 个应用",
+    "settingsReset": "全部重置"
   },
   "stats": {
     "sidebar": "{{formatted}} 个应用"

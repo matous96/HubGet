@@ -42,6 +42,7 @@ import { SourceIcon } from "@/components/package/SourceIcon";
 import { ReleaseList } from "@/components/layout/ReleaseList";
 import { formatPinUntil, unpinLabel } from "@/components/package/UpdatePin";
 import { AccentColorRow } from "@/components/settings/AccentColorRow";
+import { AppLooksRow } from "@/components/settings/AppLooksRow";
 import { CommandGuide } from "@/components/settings/CommandGuide";
 import { ContactSection } from "@/components/settings/ContactSection";
 import { HistorySection } from "@/components/settings/HistorySection";
@@ -462,6 +463,7 @@ function AppearanceSection() {
         <Segmented value={theme} onChange={setTheme} options={themes.map((v) => ({ value: v, label: themeLabel[v] }))} />
       </Row>
       <AccentColorRow />
+      <AppLooksRow />
       <Row label={t("settings.language")}>
         {/* Sedm jazyků se do přepínače nevejde – rozbalovací seznam */}
         <select

@@ -1,6 +1,7 @@
 /**
- * Synchronizace mezi počítači: oblíbené, sada balíčků, předvolby a předvolby
- * oznámení přihlášeného uživatele (services/sync.ts – Supabase, bez něj ukázka).
+ * Synchronizace mezi počítači: oblíbené, sada balíčků, předvolby, předvolby
+ * oznámení a vlastní vzhled aplikací přihlášeného uživatele (services/sync.ts –
+ * Supabase, bez něj ukázka).
  *
  * Průběh: načíst data účtu → u každé zapnuté oblasti 3cestně sloučit se stavem
  * tady (základ = stav po poslední synchronizaci tohoto počítače, lib/syncMerge.ts)
@@ -14,7 +15,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { mergeMaps, sameValue, type SyncMap } from "@/lib/syncMerge";
-import { SyncConflict, syncBackend, type SyncKindId } from "@/services/sync";
+import { SyncConflict, syncBackend, type RemoteRecord, type SyncKindId } from "@/services/sync";
 import { useAuth } from "./auth";
 import { SYNC_KIND_LIST, type SyncKind } from "./syncKinds";
 
@@ -38,6 +39,11 @@ interface SyncState {
 /** Stav po poslední synchronizaci tohoto počítače (základ 3cestného sloučení). */
 interface SyncBase {
   kinds: Partial<Record<SyncKindId, SyncMap>>;
+  /**
+   * Revize oblastí v účtu, se kterými se naposledy sloučilo. Stejná revize v účtu = v účtu je
+   * pořád to, co je v `kinds` – data se nestahují znovu (vlastní ikony aplikací mají stovky kB).
+   */
+  revisions?: Partial<Record<SyncKindId, number>>;
   lastSyncedAt: string | null;
 }
 
@@ -73,42 +79,69 @@ function applyQuietly(kind: SyncKind, map: SyncMap) {
 let running: Promise<void> | null = null;
 let again = false;
 
-/** Jeden průběh synchronizace. */
+/**
+ * Data oblastí z účtu: nejdřív jen revize, data se stáhnou jen u oblastí, které se od
+ * poslední synchronizace změnily – u ostatních je v účtu pořád stav ze základu.
+ */
+async function pullChanged(userId: string, base: SyncBase, kinds: SyncKindId[]): Promise<Partial<Record<SyncKindId, RemoteRecord>>> {
+  const revisions = await syncBackend.revisions(userId);
+  const unchanged = (id: SyncKindId) => revisions[id] !== undefined && revisions[id] === base.revisions?.[id] && !!base.kinds[id];
+  const stale = kinds.filter((id) => revisions[id] !== undefined && !unchanged(id));
+  const remote = stale.length ? await syncBackend.pull(userId, stale) : {};
+  for (const id of kinds) if (unchanged(id)) remote[id] = { data: base.kinds[id]!, revision: revisions[id]! };
+  return remote;
+}
+
+/** Jeden průběh synchronizace. Oblast, která se nepovede, nezdrží ostatní. */
 async function run(get: () => SyncState, set: (s: Partial<SyncState>) => void) {
   const user = useAuth.getState().user;
   if (!user || !get().enabled) return;
   set({ status: "syncing" });
+  let failed = false;
   try {
     const base = loadBase(user.id);
-    let remote = await syncBackend.pull(user.id);
-    for (const kind of SYNC_KIND_LIST) {
-      if (!get().kinds[kind.id]) continue;
-      for (let attempt = 0; ; attempt++) {
-        const local = kind.snapshot();
-        const record = remote[kind.id] ?? null;
-        const merged = mergeMaps(base.kinds[kind.id] ?? null, local, record?.data ?? null);
-        if (!sameValue(merged, local)) applyQuietly(kind, merged);
-        if (!record || !sameValue(merged, record.data)) {
-          try {
-            await syncBackend.push(user.id, kind.id, merged, record?.revision ?? null);
-          } catch (error) {
-            // Jiný počítač zapsal mezi načtením a zápisem – načíst a sloučit znovu
-            if (error instanceof SyncConflict && attempt < CONFLICT_RETRIES) {
-              remote = await syncBackend.pull(user.id);
-              continue;
+    base.revisions ??= {};
+    const kinds = SYNC_KIND_LIST.filter((kind) => get().kinds[kind.id]);
+    const remote = await pullChanged(user.id, base, kinds.map((kind) => kind.id));
+    for (const kind of kinds) {
+      try {
+        for (let attempt = 0; ; attempt++) {
+          const local = kind.snapshot();
+          const record = remote[kind.id] ?? null;
+          const merged = mergeMaps(base.kinds[kind.id] ?? null, local, record?.data ?? null);
+          if (!sameValue(merged, local)) applyQuietly(kind, merged);
+          let revision = record?.revision;
+          // Prázdnou oblast (nikdo si ještě nenastavil vzhled aplikací) do účtu nezakládat
+          const nothing = !record && Object.keys(merged).length === 0;
+          if (!nothing && (!record || !sameValue(merged, record.data))) {
+            try {
+              revision = await syncBackend.push(user.id, kind.id, merged, record?.revision ?? null);
+            } catch (error) {
+              // Jiný počítač zapsal mezi načtením a zápisem – načíst a sloučit znovu
+              if (error instanceof SyncConflict && attempt < CONFLICT_RETRIES) {
+                const fresh = (await syncBackend.pull(user.id, [kind.id]))[kind.id];
+                if (fresh) remote[kind.id] = fresh;
+                else delete remote[kind.id];
+                continue;
+              }
+              throw error;
             }
-            throw error;
           }
+          base.kinds[kind.id] = merged;
+          if (revision !== undefined) base.revisions[kind.id] = revision;
+          break;
         }
-        base.kinds[kind.id] = merged;
-        break;
+      } catch (error) {
+        // Např. oblast, kterou databáze ještě nezná (chybí migrace) – ostatní oblasti pokračují
+        console.error(`[HubGet] Synchronizace oblasti ${kind.id} se nepovedla:`, error);
+        failed = true;
       }
     }
     base.lastSyncedAt = new Date().toISOString();
     // Uživatel se mezitím mohl odhlásit nebo přepnout
     if (useAuth.getState().user?.id === user.id) {
       saveBase(user.id, base);
-      set({ status: "idle", lastSyncedAt: base.lastSyncedAt });
+      set({ status: failed ? "error" : "idle", lastSyncedAt: base.lastSyncedAt });
     }
   } catch (error) {
     console.error("[HubGet] Synchronizace se nepovedla:", error);
@@ -120,7 +153,7 @@ export const useSync = create<SyncState>()(
   persist(
     (set, get) => ({
       enabled: true,
-      kinds: { favorites: true, bundle: true, settings: true, notifications: true },
+      kinds: { favorites: true, bundle: true, settings: true, notifications: true, looks: true },
       status: "idle",
       lastSyncedAt: null,
 
@@ -162,6 +195,11 @@ export const useSync = create<SyncState>()(
       name: "unibox-sync",
       // Stav průběhu se neukládá – po startu se zjistí znovu
       partialize: ({ enabled, kinds }) => ({ enabled, kinds }),
+      // Oblast přidaná v novější verzi (vzhled aplikací) je zapnutá jako ostatní výchozí
+      merge: (persisted, current) => {
+        const saved = (persisted ?? {}) as Partial<Pick<SyncState, "enabled" | "kinds">>;
+        return { ...current, ...saved, kinds: { ...current.kinds, ...saved.kinds } };
+      },
     },
   ),
 );

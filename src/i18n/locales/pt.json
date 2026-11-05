@@ -1059,7 +1059,9 @@
       "settings": "Preferências",
       "settingsHint": "Tema, cor de destaque, idioma, modo, visualização e gerenciadores de pacotes ativados.",
       "notifications": "Preferências de notificação",
-      "notificationsHint": "Sobre quais eventos o HubGet avisa você."
+      "notificationsHint": "Sobre quais eventos o HubGet avisa você.",
+      "looks": "Aparência das apps",
+      "looksHint": "Cores do banner e ícones que você definiu para apps. Só você os vê."
     },
     "status": "Status",
     "syncing": "Sincronizando…",
@@ -1250,6 +1252,31 @@
   },
   "banner": {
     "updated": "Atualizado {{date}}"
+  },
+  "appLook": {
+    "button": "Personalizar aparência",
+    "title": "Aparência personalizada da app",
+    "onlyYou": "Só você a verá – neste PC e, com sessão iniciada, nos seus outros PCs.",
+    "color": "Cor do banner",
+    "colorAuto": "Pelo ícone (padrão)",
+    "colorCustom": "Cor personalizada",
+    "icon": "Ícone",
+    "iconPick": "Escolher imagem…",
+    "iconOriginal": "Ícone original",
+    "iconFormats": "PNG, JPG, WebP, SVG ou ICO",
+    "iconProblem": {
+      "unreadable": "{{file}} não é uma imagem que possa ser carregada.",
+      "empty": "A imagem {{file}} está vazia (totalmente transparente).",
+      "tooLarge": "A imagem {{file}} é complexa demais – tente uma menor ou mais simples."
+    },
+    "reset": "Restaurar a aparência original",
+    "settingsLabel": "Aparência personalizada das apps",
+    "settingsHint": "Cores do banner e ícones que você definiu para apps na página de detalhes (botão no canto superior direito do banner). Só você os vê; com sessão iniciada, são sincronizados entre os seus PCs.",
+    "settingsNone": "Nenhuma app",
+    "settingsCount_one": "{{count}} app",
+    "settingsCount_many": "{{count}} apps",
+    "settingsCount_other": "{{count}} apps",
+    "settingsReset": "Restaurar tudo"
   },
   "stats": {
     "sidebar": "{{formatted}} aplicativos"

@@ -7,16 +7,20 @@
  *     černobílá ikona = neutrální břidlicová,
  *  2. ikonu nejde načíst ani prozkoumat: barva značky,
  *  3. jinak tmavší barva vygenerované dlaždice (lib/placeholderIcon.ts).
+ * Barva, kterou si uživatel u aplikace nastavil sám (store/appLooks.ts), má přednost před vším.
  */
 import { brandPalette, paletteFor, type Palette } from "@/lib/color";
 import { NEUTRAL_TONE, useIconColor } from "@/lib/iconColor";
 import { useIconSources } from "@/lib/icons";
 import { placeholderLook } from "@/lib/placeholderIcon";
+import { useCustomColor } from "@/store/appLooks";
 import type { CatalogEntry } from "@/types";
 
 export function useBrandPalette(entry: CatalogEntry): Palette {
   const sources = useIconSources(entry.id, entry.name, entry.iconUrl);
   const { color, pending } = useIconColor(sources, entry.brandColor);
+  const custom = useCustomColor(entry.id);
+  if (custom) return paletteFor(custom);
   if (color) return paletteFor(color);
   // Během výpočtu neutrálně – pak plynulý přechod do barvy ikony
   if (pending) return paletteFor(NEUTRAL_TONE);

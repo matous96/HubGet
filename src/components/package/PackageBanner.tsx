@@ -8,8 +8,10 @@ import { COLOR_TRANSITION } from "@/lib/color";
 import { tintOf } from "@/lib/iconTile";
 import { cn } from "@/lib/utils";
 import { getSource, steamAppId } from "@/services/managers";
+import { useCustomColor } from "@/store/appLooks";
 import { useSettings } from "@/store/settings";
 import type { CatalogEntry } from "@/types";
+import { AppLookEditor } from "./AppLookEditor";
 import { Doodles } from "./Doodles";
 import { PackageIcon } from "./PackageIcon";
 
@@ -17,61 +19,70 @@ import { PackageIcon } from "./PackageIcon";
  * Banner v horní části detailu ve stylu App Store:
  * světlý odstín barvy značky (nebo dominantní barvy ikony) – stejný jako dlaždice
  * ikony (lib/iconTile.ts), dekorativní vzorek ikon podle kategorie v té barvě
- * a uprostřed ikona s názvem aplikace. Pokud katalog dodá `bannerUrl`, použije se obrázek.
+ * a uprostřed ikona s názvem aplikace. Pokud katalog dodá `bannerUrl`, použije se obrázek –
+ * leda by si uživatel u aplikace nastavil vlastní barvu (AppLookEditor vpravo nahoře).
  */
 export function PackageBanner({ entry }: { entry: CatalogEntry }) {
   const { color } = useBrandPalette(entry);
-  const { style: tint, ink, hue } = tintOf(color);
+  const { style: tint, ink, pattern } = tintOf(color);
+  const customColor = useCustomColor(entry.id);
 
-  if (entry.bannerUrl) {
+  if (entry.bannerUrl && !customColor) {
     return (
-      <div className="relative h-72 overflow-hidden rounded-3xl shadow-card">
-        <img src={entry.bannerUrl} alt="" className="size-full object-cover" draggable={false} />
-        {/* Ztmavení spodní části kvůli čitelnosti štítků */}
-        <div aria-hidden className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/70 to-transparent" />
-        <BannerMeta entry={entry} ink="#ffffff" />
+      <div className="relative">
+        <div className="relative h-72 overflow-hidden rounded-3xl shadow-card">
+          <img src={entry.bannerUrl} alt="" className="size-full object-cover" draggable={false} />
+          {/* Ztmavení spodní části kvůli čitelnosti štítků */}
+          <div aria-hidden className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/70 to-transparent" />
+          <BannerMeta entry={entry} ink="#ffffff" />
+        </div>
+        <AppLookEditor entry={entry} ink="#ffffff" />
       </div>
     );
   }
 
+  // Úprava vzhledu je mimo plochu banneru – ta ořezává obsah (overflow-hidden) a nabídka by se do ní nevešla
   return (
-    <div
-      // Zaoblené rohy jako ostatní karty (banner už nesahá až k okrajům okna)
-      className="tint-surface tint-strong relative flex h-72 items-center justify-center overflow-hidden rounded-3xl shadow-card"
-      style={{ ...tint, transition: COLOR_TRANSITION }}
-    >
-      {/* Vzorek ikon */}
-      <Doodles seedKey={entry.id} category={entry.categories[0]} ink={hue} opacity={0.2} />
-
-      {/* Plocha v barvě banneru za logem, aby vzorek nerušil (maska = měkký okraj) */}
+    <div className="relative">
       <div
-        aria-hidden
-        className="tint-surface tint-strong pointer-events-none absolute inset-0"
-        style={{
-          maskImage: "radial-gradient(ellipse 45% 60% at center, black 30%, transparent 100%)",
-          transition: COLOR_TRANSITION,
-        }}
-      />
+        // Zaoblené rohy jako ostatní karty (banner už nesahá až k okrajům okna)
+        className="tint-surface tint-strong relative flex h-72 items-center justify-center overflow-hidden rounded-3xl shadow-card"
+        style={{ ...tint, transition: COLOR_TRANSITION }}
+      >
+        {/* Vzorek ikon */}
+        <Doodles seedKey={entry.id} category={entry.categories[0]} ink={pattern} opacity={0.2} />
 
-      {/* Logo: ikona + název (mírně nad středem, dole jsou štítky s informacemi) */}
-      <div className="relative -mt-8 flex max-w-[80%] items-center gap-6">
-        <PackageIcon
-          id={entry.id}
-          name={entry.name}
-          iconUrl={entry.iconUrl}
-          size={96}
-          className="icon-lifted"
+        {/* Plocha v barvě banneru za logem, aby vzorek nerušil (maska = měkký okraj) */}
+        <div
+          aria-hidden
+          className="tint-surface tint-strong pointer-events-none absolute inset-0"
+          style={{
+            maskImage: "radial-gradient(ellipse 45% 60% at center, black 30%, transparent 100%)",
+            transition: COLOR_TRANSITION,
+          }}
         />
-        <span
-          // Vyšší řádkování + padding, aby truncate neořízl ocásky písmen (p, y, g)
-          className="cursor-text truncate py-2 font-display text-6xl leading-[1.15] font-bold tracking-tight select-text"
-          style={{ color: ink, transition: COLOR_TRANSITION }}
-        >
-          {entry.name}
-        </span>
-      </div>
 
-      <BannerMeta entry={entry} ink={ink} />
+        {/* Logo: ikona + název (mírně nad středem, dole jsou štítky s informacemi) */}
+        <div className="relative -mt-8 flex max-w-[80%] items-center gap-6">
+          <PackageIcon
+            id={entry.id}
+            name={entry.name}
+            iconUrl={entry.iconUrl}
+            size={96}
+            className="icon-lifted"
+          />
+          <span
+            // Vyšší řádkování + padding, aby truncate neořízl ocásky písmen (p, y, g)
+            className="cursor-text truncate py-2 font-display text-6xl leading-[1.15] font-bold tracking-tight select-text"
+            style={{ color: ink, transition: COLOR_TRANSITION }}
+          >
+            {entry.name}
+          </span>
+        </div>
+
+        <BannerMeta entry={entry} ink={ink} />
+      </div>
+      <AppLookEditor entry={entry} ink={ink} />
     </div>
   );
 }

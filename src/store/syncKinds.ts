@@ -13,6 +13,7 @@ import { isSourceId, SOURCE_IDS } from "@/services/managers/sources";
 import type { SyncKindId } from "@/services/sync";
 import type { SyncMap } from "@/lib/syncMerge";
 import type { SortMode, SourceId, ThemeSetting, UserMode, ViewMode } from "@/types";
+import { MAX_ICON_LENGTH, useAppLooks, type AppLook } from "./appLooks";
 import { parseBundleFile, useBundle, type BundleItem } from "./bundle";
 import { useFavorites, type FavoriteItem } from "./favorites";
 import { useNotificationPrefs, type NotificationPrefs } from "./notificationPrefs";
@@ -148,4 +149,31 @@ const notificationsKind: SyncKind = {
   subscribe: (listener) => useNotificationPrefs.subscribe(listener),
 };
 
-export const SYNC_KIND_LIST: SyncKind[] = [favoritesKind, bundleKind, settingsKind, notificationsKind];
+// ── Vlastní vzhled aplikací ──────────────────────────────────────────────
+
+const HEX_COLOR = /^#[0-9a-f]{6}$/i;
+/** Ikona z účtu jen jako obrázek uložený HubGetem (data: URL, rozumná velikost) – žádné adresy ven. */
+const isIcon = (value: unknown): value is string =>
+  isString(value) && /^data:image\/(webp|png);base64,[a-z0-9+/=]+$/i.test(value) && value.length <= MAX_ICON_LENGTH;
+
+const looksKind: SyncKind = {
+  id: "looks",
+  snapshot() {
+    return { ...useAppLooks.getState().looks };
+  },
+  apply(map) {
+    const looks: Record<string, AppLook> = {};
+    for (const [appId, value] of Object.entries(map)) {
+      const v = value as Partial<AppLook> | null;
+      const look: AppLook = {};
+      if (isString(v?.color) && HEX_COLOR.test(v.color)) look.color = v.color;
+      if (isIcon(v?.icon)) look.icon = v.icon;
+      if (look.color || look.icon) looks[appId] = look;
+    }
+    useAppLooks.setState({ looks });
+  },
+  subscribe: (listener) => useAppLooks.subscribe(listener),
+};
+
+// Vzhled aplikací poslední – je největší a databáze bez migrace ho odmítne; ostatní oblasti se tím nezdrží
+export const SYNC_KIND_LIST: SyncKind[] = [favoritesKind, bundleKind, settingsKind, notificationsKind, looksKind];

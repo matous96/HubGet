@@ -1059,7 +1059,9 @@
       "settings": "Préférences",
       "settingsHint": "Thème, couleur d’accentuation, langue, mode, affichage et gestionnaires de paquets activés.",
       "notifications": "Préférences de notification",
-      "notificationsHint": "Les événements pour lesquels HubGet vous avertit."
+      "notificationsHint": "Les événements pour lesquels HubGet vous avertit.",
+      "looks": "Apparence des apps",
+      "looksHint": "Couleurs de bannière et icônes que vous avez attribuées aux apps. Vous seul les voyez."
     },
     "status": "État",
     "syncing": "Synchronisation…",
@@ -1250,6 +1252,31 @@
   },
   "banner": {
     "updated": "Mis à jour {{date}}"
+  },
+  "appLook": {
+    "button": "Personnaliser l’apparence",
+    "title": "Apparence personnalisée de l’app",
+    "onlyYou": "Vous seul la verrez – sur ce PC et, une fois connecté, sur vos autres PC.",
+    "color": "Couleur de la bannière",
+    "colorAuto": "D’après l’icône (par défaut)",
+    "colorCustom": "Couleur personnalisée",
+    "icon": "Icône",
+    "iconPick": "Choisir une image…",
+    "iconOriginal": "Icône d’origine",
+    "iconFormats": "PNG, JPG, WebP, SVG ou ICO",
+    "iconProblem": {
+      "unreadable": "{{file}} n’est pas une image lisible.",
+      "empty": "L’image {{file}} est vide (entièrement transparente).",
+      "tooLarge": "L’image {{file}} est trop complexe – essayez-en une plus petite ou plus simple."
+    },
+    "reset": "Rétablir l’apparence d’origine",
+    "settingsLabel": "Apparence personnalisée des apps",
+    "settingsHint": "Couleurs de bannière et icônes que vous avez attribuées aux apps sur leur page de détail (bouton en haut à droite de la bannière). Vous seul les voyez ; une fois connecté, elles se synchronisent entre vos PC.",
+    "settingsNone": "Aucune app",
+    "settingsCount_one": "{{count}} app",
+    "settingsCount_many": "{{count}} apps",
+    "settingsCount_other": "{{count}} apps",
+    "settingsReset": "Tout réinitialiser"
   },
   "stats": {
     "sidebar": "{{formatted}} applications"

@@ -12,7 +12,8 @@
  */
 import { useQueries, useQuery } from "@tanstack/react-query";
 import { bannerTone, darkTone, isNeutralColor } from "./color";
-import { failedIconSources } from "./icons";
+import { failedIconSources, isCustomIcon } from "./icons";
+import { hashString } from "./utils";
 
 /** Černobílá ikona (GitHub, Notion…) – banner v neutrální břidlicové. */
 export const NEUTRAL_TONE = "#334155";
@@ -203,8 +204,21 @@ function knownColor(sources: string[], brand: string | null | undefined): string
   return undefined;
 }
 
-/** Klíč uložené barvy – s barvou značky se výsledek může lišit. */
-const storageKey = (src: string, brand: string | null | undefined) => (brand ? `${src}|${brand}` : src);
+/**
+ * Klíč uložené barvy – s barvou značky se výsledek může lišit. Vlastní ikona (data: URL, desítky kB)
+ * se do klíče nedává celá, jen její otisk.
+ */
+const storageKey = (src: string, brand: string | null | undefined) => {
+  const key = isCustomIcon(src) ? customKey(src) : src;
+  return brand ? `${key}|${brand}` : key;
+};
+
+const customKeys = new Map<string, string>();
+function customKey(src: string) {
+  let key = customKeys.get(src);
+  if (!key) customKeys.set(src, (key = `custom:${hashString(src).toString(36)}:${src.length}`));
+  return key;
+}
 
 /** Dotaz na barvu ikony – sdílený bannerem (useIconColor) i kartou kolekce (useIconColors). */
 function iconColorQuery(sources: string[], brand: string | null | undefined, known: string | undefined) {

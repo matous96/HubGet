@@ -1074,7 +1074,9 @@
       "settings": "Předvolby",
       "settingsHint": "Motiv, barva zvýraznění, jazyk, režim, zobrazení a zapnutí správci balíčků.",
       "notifications": "Předvolby oznámení",
-      "notificationsHint": "Které události HubGet oznamuje."
+      "notificationsHint": "Které události HubGet oznamuje.",
+      "looks": "Vzhled aplikací",
+      "looksHint": "Barvy banneru a ikony, které jste aplikacím nastavili. Vidíte je jen vy."
     },
     "status": "Stav",
     "syncing": "Synchronizuji…",
@@ -1267,6 +1269,32 @@
   },
   "banner": {
     "updated": "Aktualizováno {{date}}"
+  },
+  "appLook": {
+    "button": "Upravit vzhled",
+    "title": "Vlastní vzhled aplikace",
+    "onlyYou": "Uvidíte ho jen vy – na tomto počítači a po přihlášení i na dalších svých.",
+    "color": "Barva banneru",
+    "colorAuto": "Podle ikony (výchozí)",
+    "colorCustom": "Vlastní barva",
+    "icon": "Ikona",
+    "iconPick": "Vybrat obrázek…",
+    "iconOriginal": "Původní ikona",
+    "iconFormats": "PNG, JPG, WebP, SVG nebo ICO",
+    "iconProblem": {
+      "unreadable": "Soubor {{file}} není obrázek, který jde načíst.",
+      "empty": "Obrázek {{file}} je prázdný (celý průhledný).",
+      "tooLarge": "Obrázek {{file}} je příliš složitý – zkuste menší nebo jednodušší."
+    },
+    "reset": "Obnovit původní vzhled",
+    "settingsLabel": "Vlastní vzhled aplikací",
+    "settingsHint": "Barvy banneru a ikony, které jste aplikacím nastavili v jejich detailu (tlačítko vpravo nahoře v banneru). Vidíte je jen vy; po přihlášení se synchronizují mezi vašimi počítači.",
+    "settingsNone": "Žádná aplikace",
+    "settingsCount_one": "{{count}} aplikace",
+    "settingsCount_few": "{{count}} aplikace",
+    "settingsCount_many": "{{count}} aplikace",
+    "settingsCount_other": "{{count}} aplikací",
+    "settingsReset": "Obnovit vše"
   },
   "stats": {
     "sidebar": "{{formatted}} aplikací"
