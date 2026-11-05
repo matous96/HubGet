@@ -97,7 +97,7 @@ export function AppStoryCard({ story, entry, className, paging }: { story: AppSt
   const language = useSettings((s) => s.language);
   const { color } = useBrandPalette(entry);
   // Odstín barvy ikony podle tématu – stejný jako banner v detailu
-  const { style: tint, to: shade, ink, hue } = tintOf(color);
+  const { style: tint, to: shade, ink, pattern } = tintOf(color);
   const openDetail = useCardClick(entry.id);
 
   return (
@@ -109,7 +109,7 @@ export function AppStoryCard({ story, entry, className, paging }: { story: AppSt
       )}
       style={{ ...tint, transition: `${COLOR_TRANSITION}, box-shadow 300ms, transform 300ms` }}
     >
-      <Doodles seedKey={story.id} category={entry.categories[0]} ink={hue} cols={8} rows={4} opacity={0.12} />
+      <Doodles seedKey={story.id} category={entry.categories[0]} ink={pattern} cols={8} rows={4} opacity={0.12} />
       {paging && <CardPager {...paging} ink={ink} />}
 
       {/* Grafika: velká natočená ikona aplikace (dekorace – klik patří kartě) */}
@@ -199,8 +199,9 @@ export function AppOfTheDayCard({ entry, className }: { entry: CatalogEntry; cla
         style={{ background: `linear-gradient(135deg, ${base}, color-mix(in srgb, ${base} 70%, black))` }}
       />
 
-      {/* Symboly toho, co aplikace dělá (kategorie) – jako na ostatních kartách */}
-      <Doodles seedKey={entry.id} category={entry.categories[0]} ink={hue} cols={8} rows={4} opacity={0.12} />
+      {/* Symboly toho, co aplikace dělá (kategorie) – jako na ostatních kartách; v tmavém tématu
+          leží na vlastním tmavém pozadí, proto barva značky (--tint-lit), ne skoro bílý vzorek */}
+      <Doodles seedKey={entry.id} category={entry.categories[0]} ink="var(--tint-lit)" cols={8} rows={4} opacity={0.12} />
 
       {/* Záře barvy značky za ikonou – ve světlém tématu jen jemná (na světlém odstínu karty
           by výrazná působila jako velká skvrna), šedá (černobílá ikona – Plex) jen v tmavém */}
@@ -257,10 +258,15 @@ export function AppOfTheDayCard({ entry, className }: { entry: CatalogEntry; cla
 const MAX_ICONS = 4;
 const NARROW_ICONS = 2;
 
-/** Rozmístění „plovoucích“ ikon v horní části karty kolekce. */
-const FLOATING: { left: string; top: string; size: number; rotate: number }[] = [
+/**
+ * Rozmístění „plovoucích“ ikon v horní části karty kolekce. Prostřední ikona je nahoře – v úzké
+ * kartě (třetina šířky okna) se posune doleva, ať nezajede pod šipky listování v pravém rohu
+ * (2 × 36 px + mezera + okraj 16 px + natočení); v ještě užší (malé okno) by zakryla první ikonu,
+ * tam se nezobrazí (narrowHidden).
+ */
+const FLOATING: { left: string; top: string; size: number; rotate: number; narrowHidden?: boolean }[] = [
   { left: "8%", top: "16%", size: 104, rotate: -10 },
-  { left: "42%", top: "5%", size: 92, rotate: 8 },
+  { left: "min(42%, 100% - 196px)", top: "5%", size: 92, rotate: 8, narrowHidden: true },
   { left: "58%", top: "42%", size: 84, rotate: -4 },
 ];
 
@@ -287,7 +293,7 @@ export function CollectionCard({
   // Barva podle ikon v sadě (převládající odstín), u pestré sady barva kolekce
   const { color } = useCollectionPalette(entries, story.color);
   // Odstín barvy podle tématu (ve světlém jako dlaždice ikon)
-  const { style: tint, to: shade, ink, hue } = tintOf(color);
+  const { style: tint, to: shade, ink, pattern } = tintOf(color);
   // Skutečná barva spodní lišty (podklad pod textem + 10 % průhledné vrstvy) – kroužek kolem ikon s ní splyne
   const bar = `color-mix(in srgb, ${shade} 90%, ${ink})`;
   const title = localize(story.title, language);
@@ -302,17 +308,17 @@ export function CollectionCard({
       )}
       style={{ ...tint, transition: `${COLOR_TRANSITION}, box-shadow 300ms, transform 300ms` }}
     >
-      <Doodles seedKey={story.id} category={entries[0]?.categories[0]} ink={hue} cols={5} rows={4} opacity={0.12} />
+      <Doodles seedKey={story.id} category={entries[0]?.categories[0]} ink={pattern} cols={5} rows={4} opacity={0.12} />
       {paging && <CardPager {...paging} ink={ink} />}
 
       {/* Grafika: tři plovoucí ikony z kolekce (klik otevře detail kolekce jako zbytek karty) */}
-      <div aria-hidden className="absolute inset-x-0 top-0 h-[58%]">
+      <div aria-hidden className="@container absolute inset-x-0 top-0 h-[58%]">
         {entries.slice(0, FLOATING.length).map((e, i) => {
           const pos = FLOATING[i];
           return (
             <div
               key={e.id}
-              className="absolute transition-transform duration-500 group-hover:-translate-y-1.5"
+              className={cn("absolute transition-transform duration-500 group-hover:-translate-y-1.5", pos.narrowHidden && "@max-[17.75rem]:hidden")}
               style={{ left: pos.left, top: pos.top, transform: `rotate(${pos.rotate}deg)`, transitionDelay: `${i * 60}ms` }}
             >
               <PackageIcon

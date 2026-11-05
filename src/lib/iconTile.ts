@@ -65,7 +65,9 @@ function logoBackground(color: string | null, light: boolean): string {
  *  - style: proměnná --tint pro plochu (nebo pro předka s třídou .tint-vars),
  *  - from / to: barva na začátku a konci přechodu (to = podklad pod textem),
  *  - ink: text – ve světlém tématu tmavý, v tmavém světlý, s nádechem barvy,
- *  - hue: barva upravená pro odstín (tintSource) – pro vzorek ikon.
+ *  - hue: barva upravená pro odstín (tintSource) – záře, test šedé (isNeutralColor),
+ *  - pattern: barva vzorku symbolů – v tmavém tématu skoro bílá s nádechem barvy
+ *    (--tint-pattern), na barevné ploše by barva sama zanikala.
  * Hodnoty jsou proměnné CSS, platí jen uvnitř plochy (nebo .tint-vars).
  */
 export function tintOf(source: string) {
@@ -76,6 +78,7 @@ export function tintOf(source: string) {
     to: "var(--tint-to)",
     ink: "var(--tint-ink)",
     hue: color,
+    pattern: "var(--tint-pattern)",
   };
 }
 

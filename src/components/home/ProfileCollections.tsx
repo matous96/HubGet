@@ -69,7 +69,7 @@ function ProfileCard({ story, entries }: { story: CollectionStory; entries: Cata
   const addToBundle = useBundle((s) => s.add);
   const toast = useToasts((s) => s.push);
   // Odstín barvy kolekce podle tématu (ve světlém jako dlaždice ikon)
-  const { style: tint, ink, hue } = tintOf(story.color);
+  const { style: tint, ink, pattern } = tintOf(story.color);
   const title = localize(story.title, language);
 
   /** Přidá kolekci do sady balíčků – tam si ji jde upravit a sdílet. */
@@ -90,11 +90,12 @@ function ProfileCard({ story, entries }: { story: CollectionStory; entries: Cata
   return (
     <article
       onClick={() => openCollection(story)}
-      className="tint-surface relative flex cursor-pointer flex-col overflow-hidden rounded-3xl shadow-card transition-[box-shadow,transform] duration-300 hover:shadow-card-hover active:scale-[0.99]"
+      className="tint-surface relative flex cursor-pointer flex-col dark:[--pattern-boost:1.5] overflow-hidden rounded-3xl shadow-card transition-[box-shadow,transform] duration-300 hover:shadow-card-hover active:scale-[0.99]"
       style={{ ...tint, color: ink }}
     >
-      {/* Decentní vzorek symbolů podle zaměření (kategorie první aplikace) */}
-      <Doodles seedKey={story.id} category={entries[0]?.categories[0]} ink={hue} cols={6} rows={3} opacity={0.05} />
+      {/* Decentní vzorek symbolů podle zaměření (kategorie první aplikace); v tmavém tématu
+          o polovinu silnější – na středně tmavé ploše by 5 % skoro nebylo vidět */}
+      <Doodles seedKey={story.id} category={entries[0]?.categories[0]} ink={pattern} cols={6} rows={3} opacity={0.05} />
       <div className="relative flex-1 px-5 pt-5">
         {/* Nadpis je tlačítko kvůli klávesnici a čtečkám obrazovky; myší se klikne kamkoli na kartu */}
         <button

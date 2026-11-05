@@ -141,32 +141,41 @@ body,
 /* Plocha v odstínu barvy ikony (tintOf v lib/iconTile.ts – banner v detailu, karty na
    domovské stránce, detail kolekce); barvu dává proměnná --tint. Ve světlém tématu světlý
    odstín 7 → 20 % barvy (přechod 14 % barvy nad 7 % dá na konci 20 %; dlaždice ikon mají
-   jen slabší nádech, TINT_FROM / TINT_TO), v tmavém tmavá plocha s nádechem barvy. .tint-vars jen nastaví
+   jen slabší nádech, TINT_FROM / TINT_TO), v tmavém středně tmavá barevná plocha. .tint-vars jen nastaví
    proměnné (text a „sklo“ mimo plochu). */
 .tint-vars,
 .tint-surface {
+  --tint-lit: var(--tint);
+  --tint-pattern: var(--tint);
   --tint-from: color-mix(in srgb, var(--tint) 7%, white);
   --tint-to: color-mix(in srgb, var(--tint) 20%, white);
   --tint-overlay: color-mix(in srgb, var(--tint) 14%, transparent);
   --tint-ink: color-mix(in srgb, var(--tint) 30%, #111827);
 }
+/* V tmavém tématu barevná plocha se stejnou světlostí OKLCH pro všechny barvy (0,48 → 0,54 pod
+   textem, bílý text má kontrast aspoň 5 : 1) a ¾ sytosti barvy – fialová, vínová a modrá
+   (#6d28d9, #be185d, #1d4ed8) by při míchání s pozadím vyšly tmavší než tyrkysová nebo oranžová.
+   Mezi dřívější plnou barvou značky (příliš výrazná) a tmavou plochou s nádechem (příliš tmavá).
+   --tint-lit = barva se světlostí aspoň 0,7 (lesk přechodu); vzorek symbolů (tintOf → pattern)
+   je skoro bílý s nádechem barvy – barva sama by s plochou splývala. */
 .dark .tint-vars,
 .dark .tint-surface {
-  --tint-from: color-mix(in srgb, var(--tint) 14%, var(--surface));
-  --tint-to: color-mix(in srgb, var(--tint) 24%, var(--surface));
-  --tint-overlay: color-mix(in srgb, var(--tint) 12%, transparent);
+  --tint-lit: oklch(from var(--tint) max(l, 0.7) c h);
+  --tint-pattern: color-mix(in oklab, var(--tint-lit) 40%, white);
+  --tint-from: oklch(from var(--tint-lit) 0.48 calc(c * 0.75) h);
+  --tint-to: oklch(from var(--tint-lit) 0.54 calc(c * 0.8) h);
+  --tint-overlay: color-mix(in oklab, var(--tint-lit) 26%, transparent);
   --tint-ink: color-mix(in srgb, var(--tint) 15%, white);
 }
 .tint-surface {
   background-color: var(--tint-from);
   background-image: linear-gradient(160deg, transparent, var(--tint-overlay));
 }
-/* Banner v detailu (velká plocha s názvem aplikace): v tmavém tématu víc barvy než karty –
-   14–24 % na tmavém podkladu z něj dělalo skoro černou plochu. */
+/* Banner v detailu (velká plocha s názvem aplikace): v tmavém tématu o něco víc barvy než karty. */
 .dark .tint-surface.tint-strong {
-  --tint-from: color-mix(in srgb, var(--tint) 30%, var(--surface));
-  --tint-to: color-mix(in srgb, var(--tint) 44%, var(--surface));
-  --tint-overlay: color-mix(in srgb, var(--tint) 20%, transparent);
+  --tint-from: oklch(from var(--tint-lit) 0.51 calc(c * 0.8) h);
+  --tint-to: oklch(from var(--tint-lit) 0.57 calc(c * 0.85) h);
+  --tint-overlay: color-mix(in oklab, var(--tint-lit) 30%, transparent);
 }
 
 /* Shody hledání v Nastavení (components/settings/SettingsSearch.tsx, CSS Custom Highlight API). */

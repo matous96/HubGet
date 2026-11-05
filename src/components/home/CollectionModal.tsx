@@ -69,7 +69,7 @@ function CollectionPanel({ story, onClose }: { story: CollectionStory; onClose: 
   );
   const { pending, installAll } = useCollectionInstall(entries);
   // Odstín barvy kolekce podle tématu – stejný jako karta
-  const { style: tint, from, ink, hue } = tintOf(story.color);
+  const { style: tint, from, ink, pattern } = tintOf(story.color);
   const closeButton = useRef<HTMLButtonElement>(null);
 
   // Fokus na zavírací tlačítko (klávesnice, čtečky obrazovky); po zavření zpět, odkud přišel
@@ -110,7 +110,7 @@ function CollectionPanel({ story, onClose }: { story: CollectionStory; onClose: 
       <div className="min-h-0 overflow-y-auto">
         {/* Záhlaví v barvě kolekce */}
         <header className="tint-surface relative overflow-hidden px-8 pt-10 pb-8" style={{ color: ink }}>
-          <Doodles seedKey={story.id} category={entries[0]?.categories[0]} ink={hue} cols={8} rows={3} opacity={0.2} />
+          <Doodles seedKey={story.id} category={entries[0]?.categories[0]} ink={pattern} cols={8} rows={3} opacity={0.2} />
           <div className="relative max-w-2xl pr-10">
             <p className="text-xs font-semibold tracking-[0.14em] uppercase opacity-75">{localize(story.eyebrow, language)}</p>
             <h2 className="mt-2 font-display text-4xl leading-[1.08] font-bold tracking-tight">{localize(story.title, language)}</h2>

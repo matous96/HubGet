@@ -61,7 +61,8 @@ export function Doodles({ seedKey, category = "utilities", ink, cols = 9, rows =
             width: size,
             height: size,
             color: ink,
-            opacity,
+            // --pattern-boost: karta může vzorek v jednom tématu zesílit (ProfileCollections)
+            opacity: `calc(${opacity} * var(--pattern-boost, 1))`,
             transform: `translate(-50%, -50%) rotate(${rotate}deg)`,
           }}
         />
