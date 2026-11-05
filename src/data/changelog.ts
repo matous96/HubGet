@@ -28,6 +28,56 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
   {
+    version: "0.2.1",
+    date: "2026-11-05",
+    highlights: [
+      {
+        cs: "Vlastní vzhled aplikací: v detailu aplikace tlačítkem s paletou v rohu banneru nastavíte barvu banneru a karet a vlastní ikonu z obrázku (PNG, JPG, SVG, ICO…). Vidíte ho jen vy – a po přihlášení na všech svých počítačích.",
+        en: "Custom app looks: on an app's page, the palette button in the corner of the banner lets you set the banner and card color and your own icon from an image (PNG, JPG, SVG, ICO…). Only you see it – on all your PCs once you're signed in.",
+      },
+      {
+        cs: "Barevnější tmavé téma: bannery a karty mají sytější barvy, všechny stejně světlé – fialová ani modrá už nejsou tmavší než tyrkysová. Symboly ve vzorku jsou lépe vidět.",
+        en: "A more colorful dark theme: banners and cards have richer colors that are all equally light – purple and blue are no longer darker than teal. The pattern symbols are easier to see.",
+      },
+      {
+        cs: "Aplikace z Chocolatey s obecnou ikonou (modrá krabice) mají místo ní dlaždici své kategorie.",
+        en: "Chocolatey apps with the generic icon (the blue box) now show their category tile instead.",
+      },
+      {
+        cs: "Synchronizace stahuje jen to, co se od minula změnilo, a chyba jedné části nezastaví ostatní.",
+        en: "Sync downloads only what changed since last time, and a problem with one part no longer stops the rest.",
+      },
+      {
+        cs: "Opraveno: v žebříčku Nejstahovanější se ve dvou sloupcích zkracovaly názvy aplikací („7…“, „G…“).",
+        en: "Fixed: app names in Top Charts were cut short in the two-column layout (“7…”, “G…”).",
+      },
+      {
+        cs: "Opraveno: instalace zrušená během přípravy se i tak spustila a nečekaná chyba mohla zastavit frontu operací až do restartu.",
+        en: "Fixed: an installation canceled while it was being prepared still ran, and an unexpected error could stop the operation queue until a restart.",
+      },
+      {
+        cs: "Opraveno: Escape ve vyhledávání na jiné stránce otevřel prázdné hledání, přepnutí motivu při změně velikosti okna hlásilo chybu a šipky na kartách kolekcí zakrývaly ikony.",
+        en: "Fixed: Escape in search on another page opened an empty search, switching the theme while resizing the window reported an error, and the arrows on collection cards covered the icons.",
+      },
+    ],
+    featured: [
+      {
+        title: { cs: "Vlastní vzhled aplikací", en: "Custom app looks" },
+        text: {
+          cs: "Barva banneru a vlastní ikona u každé aplikace – jen pro vás a na všech vašich počítačích.",
+          en: "A banner color and your own icon for any app – just for you, on all your PCs.",
+        },
+      },
+      {
+        title: { cs: "Barevnější tmavé téma", en: "A more colorful dark theme" },
+        text: {
+          cs: "Bannery a karty v sytých barvách, které jsou všechny stejně světlé.",
+          en: "Banners and cards in rich colors that are all equally light.",
+        },
+      },
+    ],
+  },
+  {
     version: "0.2.0",
     date: "2026-11-03",
     highlights: [
