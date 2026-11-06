@@ -105,7 +105,7 @@
     "installedNames": ["^Blackmagic ATEM Switchers$"],
     "alternatives": ["obsproject-obsstudio"]
   },
-  "matous-qrgenerator": {
+  "qrgenerator-qrgenerator": {
     "name": "QR Generator",
     "publisher": "Matous",
     "description": "Creates QR codes for links, contact cards, Wi-Fi, Czech QR payments (SPAYD), events and more – with custom colors, a logo and a header – and checks that each one scans. Includes a QR reader for images and screenshots and a password generator.",
