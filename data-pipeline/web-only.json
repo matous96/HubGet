@@ -104,5 +104,23 @@
     "blackmagic": "atem",
     "installedNames": ["^Blackmagic ATEM Switchers$"],
     "alternatives": ["obsproject-obsstudio"]
+  },
+  "matous96-qrgenerator": {
+    "name": "QR Generator",
+    "publisher": "matous96",
+    "description": "Creates QR codes for links, contact cards, Wi-Fi, Czech QR payments (SPAYD), events and more – with custom colors, a logo and a header – and checks that each one scans. Includes a QR reader for images and screenshots and a password generator.",
+    "categories": ["utilities", "security"],
+    "tags": ["qr-code", "qr-generator", "qr-reader", "password-generator", "vcard", "wifi", "spayd"],
+    "iconUrl": "https://raw.githubusercontent.com/matous96/qr-generator/main/icon.png",
+    "brandColor": "#4f46e5",
+    "homepage": "https://github.com/matous96/qr-generator",
+    "downloadUrl": "https://github.com/matous96/qr-generator/releases/latest",
+    "supportUrl": "https://github.com/matous96/qr-generator/issues",
+    "verified": true,
+    "license": "Freeware",
+    "popularity": 20,
+    "latestVersion": "1.2.0",
+    "installedNames": ["^QR Generator$"],
+    "alternatives": ["choco-qr-code-studio", "vovsoft-qrcodeandbarcodereader", "keepassxcteam-keepassxc"]
   }
 }
