@@ -98,9 +98,22 @@ jobs:
         with:
           node-version: 22
 
-      # Výpis běží v Dockeru s pg_dump stejné verze, jakou má Supabase
+      # Výpis běží v Dockeru s pg_dump stejné verze, jakou má Supabase.
+      # Nejnovější verzi CLI akce zjišťuje přes API GitHubu – při jeho krátkém
+      # výpadku (8. 11. 2026 „Gateway Timeout“) to zkusí po minutě znovu
       - uses: supabase/setup-cli@v1
+        id: cli
         if: steps.check.outputs.enabled == 'true'
+        continue-on-error: true
+        with:
+          version: latest
+
+      - name: Pauza před druhým pokusem o Supabase CLI
+        if: steps.check.outputs.enabled == 'true' && steps.cli.outcome == 'failure'
+        run: sleep 60
+
+      - uses: supabase/setup-cli@v1
+        if: steps.check.outputs.enabled == 'true' && steps.cli.outcome == 'failure'
         with:
           version: latest
 
