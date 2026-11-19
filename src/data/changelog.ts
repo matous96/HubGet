@@ -28,6 +28,68 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
   {
+    version: "0.3.0",
+    date: "2026-11-19",
+    highlights: [
+      {
+        cs: "Přehled počítače (v postranním panelu pod Knihovnou): kolik aplikací máte a kolik zabírají, největší z nich, aplikace spouštěné s Windows, které nepoužíváte, úklid mezipamětí správců balíčků a kontrola digitálních podpisů programů.",
+        en: "PC overview (in the sidebar under Library): how many apps you have and how much space they take, the largest ones, apps that start with Windows but you don't use, cleaning up package manager caches and checking program signatures.",
+      },
+      {
+        cs: "Příkaz hubget v terminálu: hubget install vlc, hubget update, hubget search … v příkazovém řádku i PowerShellu – průběh ukáže HubGet.",
+        en: "The hubget command in the terminal: hubget install vlc, hubget update, hubget search … in Command Prompt and PowerShell – HubGet shows the progress.",
+      },
+      {
+        cs: "Vrácení aktualizace: když nová verze nefunguje, jedním kliknutím zpět na tu předchozí – vadnou verzi automatické aktualizace přeskočí. Ze Starších verzí jde nainstalovat i verzi starší, než máte.",
+        en: "Roll back an update: if a new version doesn't work, go back to the previous one in one click – automatic updates then skip the faulty version. Older versions can now be installed over a newer one too.",
+      },
+      {
+        cs: "Běžící aplikace se před aktualizací zavírají bez dialogu. Když se aplikace ptá na uložení práce (Word, grafické editory), HubGet počká, až ji zavřete.",
+        en: "Running apps are closed before an update without a dialog. If an app asks you to save your work (Word, graphics editors), HubGet waits until you close it.",
+      },
+      {
+        cs: "Nainstalované: nová záložka Nepoužívané (aplikace, které jste 90 dní nespustili, i s hromadnou odinstalací), řazení podle velikosti, upozornění na programy bez bezpečnostních oprav a na aplikace nainstalované dvakrát, u aktualizací Co je nového.",
+        en: "Installed: a new Unused tab (apps you haven't opened for 90 days, with bulk uninstall), sorting by size, warnings about programs without security updates and apps installed twice, and What's new for updates.",
+      },
+      {
+        cs: "Hlídání aplikací: zvonek v detailu aplikace – HubGet dá vědět, až vyjde nová verze nebo až aplikaci z webu výrobce půjde nainstalovat přes HubGet.",
+        en: "Watch apps: the bell on an app's page – HubGet lets you know when a new version comes out or when an app from the developer's website can be installed through HubGet.",
+      },
+      {
+        cs: "Moje počítače (Nastavení): aplikace a čekající aktualizace všech vašich počítačů; co tu chybí, sem nainstalujete jedním kliknutím.",
+        en: "My PCs (Settings): apps and pending updates on all your PCs; install what's missing here in one click.",
+      },
+      {
+        cs: "Ohleduplnější automatické aktualizace: ne během hry, filmu přes celou obrazovku ani prezentace, volitelně jen když u počítače nepracujete, a bod obnovení systému před hromadnou aktualizací.",
+        en: "More considerate automatic updates: not while you play, watch full-screen video or present, optionally only while you're away from the PC, and a system restore point before updating all.",
+      },
+      {
+        cs: "Win+Shift+H otevře HubGet odkudkoli s kurzorem ve vyhledávání, Ctrl+K najde i akce a stránky, jednou týdně souhrn aktualizací a u instalátoru odkaz na kontrolu ve VirusTotalu.",
+        en: "Win+Shift+H opens HubGet from anywhere with the cursor in search, Ctrl+K finds actions and pages too, a weekly summary of updates, and a VirusTotal link for installers.",
+      },
+      {
+        cs: "Opraveno: dvojité položky v Nainstalovaných, některé ikony ve formátu ICO a tlačítko Zpět po hledání.",
+        en: "Fixed: duplicate entries in Installed, some ICO icons and the Back button after a search.",
+      },
+    ],
+    featured: [
+      {
+        title: { cs: "Přehled počítače", en: "PC overview" },
+        text: {
+          cs: "Co zabírá místo, co se zbytečně spouští s Windows, úklid mezipamětí a kontrola podpisů programů.",
+          en: "What takes up space, what starts with Windows for nothing, cache cleanup and program signature checks.",
+        },
+      },
+      {
+        title: { cs: "Vrácení aktualizace", en: "Roll back an update" },
+        text: {
+          cs: "Nová verze nefunguje? Jedním kliknutím zpět na tu předchozí.",
+          en: "New version not working? Go back to the previous one in one click.",
+        },
+      },
+    ],
+  },
+  {
     version: "0.2.1",
     date: "2026-11-05",
     highlights: [
