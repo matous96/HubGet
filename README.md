@@ -23,7 +23,7 @@ for installers on the web, with no ads and no bundled extras.
   <img src="assets/readme/okno-svetle.webp" alt="The HubGet window – the Today page with tips, collections and the App of the Day">
 </picture>
 
-The Today page – tips, collections and the App of the Day. In English and Czech, light and dark theme to match Windows.
+The Today page – tips, collections and the App of the Day. In seven languages (English, Czech, German, Spanish, French, Portuguese, Chinese), light and dark theme to match Windows.
 
 </div>
 
@@ -93,7 +93,24 @@ retries it with administrator rights by itself.
   plus command-line commands ready to copy.
 - ⭐ **Community** – sign in with GitHub, ratings, reviews and current screenshots from
   users; sync your favorites and preferences between computers.
-- 🌙 **A modern window** in the Windows 11 style, light and dark theme, English and Czech;
+- 🛡️ **Security updates first** – updates that fix a security issue get a red badge, come
+  first and skip the minimum update age; developer packages are also checked against OSV.dev.
+- 🔔 **Buttons in Windows notifications** – Update all, Open a newly installed app or see error Details.
+- 💽 **Offline package** – put a bundle of apps on a USB drive with installers and an `install.cmd`
+  script for a PC without internet.
+- 🏷️ **“Install with HubGet” badge** for developers’ READMEs (app details → Share).
+- 🏢 **Company policies** – Group Policy (ADMX template) and Intune: allowed package managers and
+  approved apps, required updates, no sign-in.
+- 👥 **Version reliability from the community** – opt-in and anonymous; automatic updates wait on
+  a version that others roll back.
+- 🔐 **App settings to a new PC** – in one file encrypted with your password.
+- 📂 **What opens this file?** – drop a file onto the window (or search “.psd”) and HubGet offers
+  apps that open it.
+- 💾 **Disk space check** – an install that wouldn’t fit doesn’t start, and HubGet suggests a cleanup.
+- 📜 **What’s new since your version** – release notes for every version an update skips.
+- 🩺 **Diagnostics for support** and **Windows status** in PC overview (end of support, pending
+  restart, disk space, restore points).
+- 🌙 **A modern window** in the Windows 11 style, light and dark theme, seven languages (English, Czech, German, Spanish, French, Portuguese, Chinese);
   close the window and installs finish in the background.
 
 ## Package managers

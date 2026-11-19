@@ -60,6 +60,8 @@ void i18n.use(initReactI18next).init({
 
 // Jazyk dokumentu (čtečky obrazovky, dělení slov) a titulek okna drží krok s jazykem aplikace
 const syncDocument = () => {
+  // Bez okna (testy logiky – pnpm test) není co nastavovat
+  if (typeof document === "undefined") return;
   document.documentElement.lang = i18n.language;
   document.title = i18n.t("app.title");
 };

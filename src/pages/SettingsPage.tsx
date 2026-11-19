@@ -4,6 +4,7 @@ import {
   AlarmClock,
   AlertTriangle,
   Archive,
+  Building2,
   MonitorSmartphone,
   Bell,
   Boxes,
@@ -46,6 +47,7 @@ import { AccentColorRow } from "@/components/settings/AccentColorRow";
 import { AppLooksRow } from "@/components/settings/AppLooksRow";
 import { CommandGuide } from "@/components/settings/CommandGuide";
 import { ContactSection } from "@/components/settings/ContactSection";
+import { DiagnosticsCard } from "@/components/settings/DiagnosticsCard";
 import { HistorySection } from "@/components/settings/HistorySection";
 import { NotificationsSection } from "@/components/settings/NotificationsSection";
 import { PackageUpdatesSection } from "@/components/settings/PackageUpdatesSection";
@@ -64,6 +66,8 @@ import { PROFILE_ACCEPT, useProfileTransfer } from "@/hooks/useProfileTransfer";
 import { LANGUAGES } from "@/i18n";
 import { cn, normalize } from "@/lib/utils";
 import { getSource, isTauri, SOURCES } from "@/services/managers";
+import { isSourceId } from "@/services/managers/sources";
+import { SettingsTransferRow } from "@/components/settings/SettingsTransfer";
 import { forgetTrace, installTraces } from "@/services/tracker";
 import { useAuth } from "@/store/auth";
 import { useOnboarding } from "@/store/onboarding";
@@ -71,6 +75,7 @@ import { SUPPORT_URL } from "@/config";
 import { APP_VERSION } from "@/services/updates";
 import { useAppUpdate } from "@/store/appUpdate";
 import { useSettings } from "@/store/settings";
+import { sourceAllowed, useOrgPolicy } from "@/store/orgPolicy";
 import { useToasts } from "@/store/toasts";
 import { snoozeActive, useUpdatePins, type UpdatePin } from "@/store/updatePins";
 import { useWhatsNewRequest } from "@/store/whatsNew";
@@ -140,7 +145,13 @@ function SectionContent({ id }: { id: SectionId }) {
     case "news":
       return <NewsSection />;
     case "contact":
-      return <ContactSection />;
+      return (
+        <>
+          <ContactSection />
+          {/* Soubor pro podporu: verze, správci, chyby a protokol bez osobních údajů */}
+          <DiagnosticsCard />
+        </>
+      );
   }
 }
 
@@ -176,6 +187,7 @@ export function SettingsPage() {
   return (
     <div>
       <PageHeader title={t("settings.title")} />
+      <ManagedNotice />
       <div className="flex items-start gap-8">
         <nav className="sticky top-2 flex w-60 shrink-0 flex-col gap-0.5" aria-label={t("settings.title")}>
           <div className="relative mb-2">
@@ -656,7 +668,7 @@ function AppUpdateRows() {
  */
 function BackupCard() {
   const { t } = useTranslation();
-  const { portableCount, wingetCount, exportProfile, exportWinget, importFile } = useProfileTransfer();
+  const { portableCount, wingetCount, exportProfile, exportWinget, exportConfiguration, importFile } = useProfileTransfer();
   const fileInput = useRef<HTMLInputElement>(null);
 
   return (
@@ -679,6 +691,15 @@ function BackupCard() {
           {t("settings.exportButton")}
         </Button>
       </Row>
+      {/* winget configure (YAML) – nový počítač jedním příkazem, i ve firmách a Dev Boxu */}
+      <Row label={t("settings.exportConfiguration")} hint={t("settings.exportConfigurationHint")}>
+        <Button variant="secondary" size="sm" disabled={!wingetCount} onClick={() => void exportConfiguration()}>
+          <FileCode2 className="size-3.5" />
+          {t("settings.exportButton")}
+        </Button>
+      </Row>
+      {/* Nastavení aplikací z AppData na nový počítač – šifrovaně heslem (settings_transfer.rs) */}
+      {isTauri() && <SettingsTransferRow />}
       <Row label={t("settings.importApps")} hint={t("settings.importAppsHint")}>
         <Button size="sm" onClick={() => fileInput.current?.click()}>
           <Upload className="size-3.5" />
@@ -755,6 +776,7 @@ function ManagerRow({ source }: { source: SourceId }) {
   const enabled = useSettings((s) => s.enabledSources.includes(source));
   const enabledCount = useSettings((s) => s.enabledSources.length);
   const toggleSource = useSettings((s) => s.toggleSource);
+  const policy = useOrgPolicy();
   const { status, setup, canSetup } = useManagerStatus(source);
 
   return (
@@ -806,8 +828,8 @@ function ManagerRow({ source }: { source: SourceId }) {
         )}
         <Switch
           checked={enabled}
-          // Poslední zapnutého správce nelze vypnout
-          disabled={enabled && enabledCount === 1}
+          // Poslední zapnutého správce nelze vypnout; zakázaného firemními zásadami zapnout
+          disabled={(enabled && enabledCount === 1) || !sourceAllowed(source, policy)}
           label={meta.label}
           onChange={(value) => toggleSource(source, value)}
         />
@@ -816,3 +838,34 @@ function ManagerRow({ source }: { source: SourceId }) {
   );
 }
 
+
+/** Firemní zásady (store/orgPolicy.ts): co organizace nastavila – volby se tu nedají změnit. */
+function ManagedNotice() {
+  const { t } = useTranslation();
+  const policy = useOrgPolicy();
+  if (!policy.managed) return null;
+  const items = [
+    policy.allowedSources && t("orgPolicy.item.sources", { list: policy.allowedSources.map((s) => (isSourceId(s) ? getSource(s).label : s)).join(", ") }),
+    policy.allowedApps && t("orgPolicy.item.apps", { count: policy.allowedApps.length }),
+    policy.disableDeveloperMode && t("orgPolicy.item.developerMode"),
+    policy.disableCustomCommands && t("orgPolicy.item.customCommands"),
+    policy.disableSignIn && t("orgPolicy.item.signIn"),
+    policy.forceAutomaticUpdates && t("orgPolicy.item.autoUpdates"),
+    policy.minimumUpdateAgeDays !== null && t("orgPolicy.item.minAge", { count: policy.minimumUpdateAgeDays }),
+    policy.disableSelfUpdate && t("orgPolicy.item.selfUpdate"),
+  ].filter((i): i is string => !!i);
+  return (
+    <section className="mb-6 flex gap-3 rounded-2xl border border-accent/30 bg-accent/8 px-4 py-3" aria-label={t("orgPolicy.title")}>
+      <Building2 className="mt-0.5 size-5 shrink-0 text-accent" />
+      <div className="min-w-0">
+        <p className="text-sm font-semibold">{t("orgPolicy.title")}</p>
+        <p className="text-xs text-muted">{t("orgPolicy.text")}</p>
+        <ul className="mt-1.5 list-disc pl-4 text-sm">
+          {items.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  );
+}

@@ -1,7 +1,15 @@
 import { create } from "zustand";
 import i18n from "@/i18n";
 import { auth, SignInCancelled, type AuthProvider, type User } from "@/services/auth";
+import { useOrgPolicy } from "./orgPolicy";
 import { useToasts } from "./toasts";
+
+/** Firemní zásady zakázaly přihlášení – místo dialogu jen vysvětlení. */
+const signInBlocked = () => {
+  if (!useOrgPolicy.getState().disableSignIn) return false;
+  useToasts.getState().push("info", i18n.t("orgPolicy.signInBlocked"));
+  return true;
+};
 
 /** Proč se otevírá přihlášení – podle toho se v dialogu zobrazí vysvětlení. */
 export type LoginReason = "general" | "review" | "screenshot";
@@ -30,7 +38,9 @@ export const useAuth = create<AuthState>()((set, get) => ({
   reason: "general",
   afterLogin: null,
 
-  openLogin: (reason = "general") => set({ dialogOpen: true, reason }),
+  openLogin: (reason = "general") => {
+    if (!signInBlocked()) set({ dialogOpen: true, reason });
+  },
   closeLogin: () => {
     // Zavřený dialog = uživatel přihlášení v prohlížeči nedokončí
     if (get().pending) auth.cancelSignIn();
@@ -61,7 +71,7 @@ export const useAuth = create<AuthState>()((set, get) => ({
 
   requireAuth: (action, reason = "general") => {
     if (get().user) action();
-    else set({ dialogOpen: true, reason, afterLogin: action });
+    else if (!signInBlocked()) set({ dialogOpen: true, reason, afterLogin: action });
   },
 }));
 

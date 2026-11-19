@@ -33,11 +33,22 @@ import {
   type InstallRepeat,
   type MissedPolicy,
 } from "@/store/autoUpdates";
+import { reliabilityAvailable } from "@/store/reliability";
 import { activeSources, useSettings } from "@/store/settings";
 import { useToasts } from "@/store/toasts";
 import { pinKey } from "@/store/updatePins";
 import type { SourceId } from "@/types";
 import { Card, Row, SwitchRow } from "./SettingsUi";
+
+/** Záloha nastavení aplikací před aktualizací (settings_backup.rs) – obnoví se při vrácení aktualizace. */
+function BackupSettingsRow() {
+  const { t } = useTranslation();
+  const backupSettings = useSettings((s) => s.backupSettings);
+  const setBackupSettings = useSettings((s) => s.setBackupSettings);
+  return (
+    <SwitchRow label={t("settingsBackup.setting")} hint={t("settingsBackup.settingHint")} checked={backupSettings} onChange={setBackupSettings} />
+  );
+}
 
 const select = "h-9 cursor-pointer rounded-lg border border-line bg-surface-2 px-3 text-sm outline-none focus:border-accent/50";
 
@@ -226,6 +237,7 @@ export function PackageUpdatesSection() {
             onChange={(restorePoint) => auto.set({ restorePoint })}
           />
         )}
+        {isTauri() && <BackupSettingsRow />}
         <p className="px-4 py-3 text-xs text-muted">{t("autoUpdates.trayNote")}</p>
       </Card>
 
@@ -400,6 +412,26 @@ function UpdateSecurityCard() {
           </div>
         )}
       </div>
+      {/* Bezpečnostní aktualizace (lib/securityUpdates.ts) – bez čekání na minimální stáří */}
+      <SwitchRow
+        label={t("security.noWait")}
+        hint={t("security.noWaitHint")}
+        checked={auto.securityNoWait}
+        onChange={(securityNoWait) => auto.set({ securityNoWait })}
+      />
+      {/* Známé zranitelnosti balíčků režimu Vývojář z OSV.dev – posílá názvy a verze, proto jen po zapnutí */}
+      {isTauri() && (
+        <SwitchRow label={t("security.osv")} hint={t("security.osvHint")} checked={auto.osvCheck} onChange={(osvCheck) => auto.set({ osvCheck })} />
+      )}
+      {/* Spolehlivost verzí od komunity – anonymní hlášení výsledků (Supabase), proto jen po zapnutí */}
+      {reliabilityAvailable() && (
+        <SwitchRow
+          label={t("reliability.setting")}
+          hint={t("reliability.settingHint")}
+          checked={auto.communityReliability}
+          onChange={(communityReliability) => auto.set({ communityReliability })}
+        />
+      )}
       <SwitchRow
         label={t("autoUpdates.warnHostChange")}
         hint={t("autoUpdates.warnHostChangeHint")}

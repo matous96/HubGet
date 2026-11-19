@@ -4,8 +4,10 @@ import {
   ClipboardCopy,
   Download,
   FilePlus2,
+  FileCog,
   FileTerminal,
   FolderOpen,
+  HardDriveDownload,
   Info,
   Link2,
   PackagePlus,
@@ -23,6 +25,9 @@ import { useDismiss } from "@/hooks/useDismiss";
 import { fallbackEntry, useCatalogIndex, useInstalledIndex } from "@/hooks/usePackages";
 import { bundleShareLink } from "@/config";
 import { buildBundleScript, bundleCommands } from "@/lib/bundleScript";
+import { buildWingetConfiguration } from "@/lib/profile";
+import { cancelOffline, offlineCandidates, prepareOffline, useOfflineBundle } from "@/lib/offlineBundle";
+import { isTauri } from "@/lib/tauri";
 import { encodeBundle } from "@/lib/bundleShare";
 import { useSaveFile } from "@/hooks/useSaveFile";
 import { safeFileName } from "@/lib/download";
@@ -50,6 +55,8 @@ export function BundlesPage() {
   const saveFile = useSaveFile();
   const [confirmNew, setConfirmNew] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
+  // Offline balíček – průběh stahování instalátorů (lib/offlineBundle.ts)
+  const offline = useOfflineBundle();
 
   const selectedItems = items.filter((i) => selected.includes(i.appId));
   const allSelected = items.length > 0 && selected.length === items.length;
@@ -139,6 +146,20 @@ export function BundlesPage() {
           disabled={empty}
           onClick={() => void saveFile(`${fileBase}.ps1`, buildBundleScript(name, items, language, `${fileBase}.ps1`))}
         />
+        <ToolbarButton
+          icon={FileCog}
+          label={t("bundles.configuration")}
+          disabled={!items.some((i) => i.source === "winget")}
+          onClick={() => void saveFile(`${fileBase}.winget`, buildWingetConfiguration(items, name || t("sharedBundle.untitled")).yaml, "text/yaml")}
+        />
+        {isTauri() && (
+          <ToolbarButton
+            icon={HardDriveDownload}
+            label={t("offline.button")}
+            disabled={offline.running || !offlineCandidates(items).length}
+            onClick={() => void prepareOffline(items, name || t("sharedBundle.untitled"))}
+          />
+        )}
         <ToolbarButton icon={ClipboardCopy} label={t("bundles.copyCommands")} disabled={empty} onClick={() => void copyCommands()} />
         <ToolbarButton icon={Link2} label={t("bundles.shareLink")} disabled={empty} onClick={() => void shareLink()} />
         <Divider />
@@ -170,6 +191,26 @@ export function BundlesPage() {
       </div>
 
       {showInfo && <p className="mb-4 rounded-2xl bg-accent/10 px-4 py-3 text-sm">{t("bundles.infoText")}</p>}
+
+      {/* Offline balíček: stahování instalátorů do vybrané složky */}
+      {offline.running && (
+        <div role="status" className="mb-4 flex flex-wrap items-center gap-3 rounded-2xl border border-line bg-surface px-4 py-3">
+          <HardDriveDownload className="size-5 shrink-0 text-accent" />
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-medium">
+              {offline.total ? t("offline.progress", { done: offline.done + 1, total: offline.total, name: offline.name }) : t("offline.picking")}
+            </p>
+            <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-surface-3">
+              <div className="h-full rounded-full bg-accent transition-[width]" style={{ width: `${offline.total ? (offline.done / offline.total) * 100 : 0}%` }} />
+            </div>
+          </div>
+          {offline.total > 0 && (
+            <button type="button" onClick={cancelOffline} className="cursor-pointer text-sm font-medium text-muted hover:text-fg">
+              {t("common.cancel")}
+            </button>
+          )}
+        </div>
+      )}
 
       {empty ? (
         <div className="flex flex-col items-center rounded-3xl border border-dashed border-line px-6 py-16 text-center">

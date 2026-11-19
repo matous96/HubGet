@@ -11,14 +11,18 @@
  *     správce verzi nabízí dál, se přestane nabízet,
  *  4. aplikace, které se aktualizují samy – po aktualizaci se samy vrátily na
  *     starší verzi (Discord), aktualizace přes správce se jim nenabízejí.
+ * Bezpečnostní aktualizace (lib/securityUpdates.ts) pravidlo 2 obejdou (Nastavení →
+ * Bezpečnostní aktualizace bez čekání).
  * „Nabídnout hned / znovu“ (store/updateHolds.ts → allowed) pravidla 2 a 3 obejde,
  * u pravidla 4 „Nabídnout znovu“ smaže záznam aplikace (releaseSelfUpdating).
  */
 import { queryClient, queryKeys } from "@/app/queryClient";
 import type { LoadedCatalog } from "@/services/catalog";
+import { isSecurityRelease, type OsvFinding } from "@/lib/securityUpdates";
 import type { InstalledPackage, SourceId } from "@/types";
 import { minAgeFor, useAutoUpdates, type AutoUpdatesSettings } from "./autoUpdates";
 import { useUpdateHolds, versionKey, type SelfUpdating } from "./updateHolds";
+import { findingOf, useVulnerabilities } from "./vulnerabilities";
 import { applyPins, pinKey, useUpdatePins, type UpdatePins } from "./updatePins";
 
 const DAY_MS = 24 * 60 * 60_000;
@@ -35,6 +39,10 @@ export interface UpdateRules {
   selfUpdating: Record<string, SelfUpdating>;
   stuckLimit: number;
   now: number;
+  /** Nabízená verze opravuje bezpečnostní chybu (poznámky k verzi, zranitelnost nainstalované verze z OSV.dev). */
+  security: (pkg: InstalledPackage, version: string) => boolean;
+  /** Bezpečnostní aktualizace nečekají na minimální stáří. */
+  securityNoWait: boolean;
 }
 
 /** Datum vydání podle zdroje a id balíčku: verze ve zdroji a datum vydání nejnovější verze. */
@@ -68,6 +76,8 @@ type Inputs = [
   Record<string, SelfUpdating>,
   number,
   LoadedCatalog | undefined,
+  boolean,
+  Record<string, OsvFinding>,
 ];
 
 // Pro stejné vstupy vždy stejný objekt pravidel – všechny komponenty pak sdílí jeden výsledek
@@ -75,7 +85,7 @@ let memo: { inputs: Inputs; rules: UpdateRules } | null = null;
 
 function rulesOf(inputs: Inputs): UpdateRules {
   if (memo && memo.inputs.every((value, i) => value === inputs[i])) return memo.rules;
-  const [pins, minAgeDays, minAgeBySource, stuckLimit, firstSeen, stuck, allowed, selfUpdating, clock, catalog] = inputs;
+  const [pins, minAgeDays, minAgeBySource, stuckLimit, firstSeen, stuck, allowed, selfUpdating, clock, catalog, securityNoWait, vulnerable] = inputs;
   const index = catalog ? releaseIndex(catalog) : undefined;
   const rules: UpdateRules = {
     pins,
@@ -90,6 +100,8 @@ function rulesOf(inputs: Inputs): UpdateRules {
     selfUpdating,
     stuckLimit,
     now: clock,
+    security: (pkg, version) => isSecurityRelease(catalog, pkg, version) || !!findingOf(vulnerable, pkg),
+    securityNoWait,
   };
   memo = { inputs, rules };
   return rules;
@@ -106,15 +118,18 @@ export function useUpdateRules(catalog: LoadedCatalog | undefined): UpdateRules 
   const allowed = useUpdateHolds((s) => s.allowed);
   const selfUpdating = useUpdateHolds((s) => s.selfUpdating);
   const clock = useUpdateHolds((s) => s.clock);
-  return rulesOf([pins, minAgeDays, minAgeBySource, stuckLimit, firstSeen, stuck, allowed, selfUpdating, clock, catalog]);
+  const securityNoWait = useAutoUpdates((s) => s.securityNoWait);
+  const vulnerable = useVulnerabilities((s) => s.found);
+  return rulesOf([pins, minAgeDays, minAgeBySource, stuckLimit, firstSeen, stuck, allowed, selfUpdating, clock, catalog, securityNoWait, vulnerable]);
 }
 
 /** Totéž mimo React (kontrola aktualizací na pozadí). */
 export function currentUpdateRules(): UpdateRules {
-  const { minAgeDays, minAgeBySource, stuckLimit } = useAutoUpdates.getState();
+  const { minAgeDays, minAgeBySource, stuckLimit, securityNoWait } = useAutoUpdates.getState();
   const { firstSeen, stuck, allowed, selfUpdating, clock } = useUpdateHolds.getState();
   const catalog = queryClient.getQueryData<LoadedCatalog>(queryKeys.catalog);
-  return rulesOf([useUpdatePins.getState().pins, minAgeDays, minAgeBySource, stuckLimit, firstSeen, stuck, allowed, selfUpdating, clock, catalog]);
+  const vulnerable = useVulnerabilities.getState().found;
+  return rulesOf([useUpdatePins.getState().pins, minAgeDays, minAgeBySource, stuckLimit, firstSeen, stuck, allowed, selfUpdating, clock, catalog, securityNoWait, vulnerable]);
 }
 
 /**
@@ -138,7 +153,7 @@ export function applyUpdateRules(data: InstalledPackage[], rules: UpdateRules): 
     if (rules.selfUpdating[pinKey(pkg)]) return hold("self");
     if (rules.stuckLimit > 0 && (rules.stuck[key] ?? 0) >= rules.stuckLimit) return hold("stuck");
     const days = rules.minAge(pkg.source);
-    if (days > 0) {
+    if (days > 0 && !(rules.securityNoWait && rules.security(pkg, version))) {
       const seen = rules.firstSeen[key] ? Date.parse(rules.firstSeen[key]) : rules.now;
       const released = Math.min(rules.releasedAt(pkg, version) ?? seen, seen);
       const until = released + days * DAY_MS;

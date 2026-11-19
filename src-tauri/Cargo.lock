@@ -4802,8 +4802,10 @@ name = "unibox"
 version = "0.3.0"
 dependencies = [
  "base64 0.22.1",
+ "flate2",
  "image",
  "reqwest",
+ "ring",
  "rustls",
  "serde",
  "serde_json",

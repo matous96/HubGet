@@ -505,7 +505,8 @@
     "opened_other": "Sammlung geladen ({{count}} Apps)",
     "openFailed": "Die Datei konnte nicht geöffnet werden – es ist keine HubGet-Sammlung.",
     "commandsCopied_one": "{{count}} Befehl kopiert",
-    "commandsCopied_other": "{{count}} Befehle kopiert"
+    "commandsCopied_other": "{{count}} Befehle kopiert",
+    "configuration": "Für winget configure speichern"
   },
   "menu": {
     "more": "Weitere Optionen",
@@ -600,7 +601,8 @@
       "appClosed": "{{name}} lief – geschlossen (Prozesse {{processes}}), damit das Installationsprogramm die Dateien überschreiben kann.",
       "appClosing": "{{name}} fragt beim Schließen nach dem Speichern – warte, bis der Benutzer die App schließt.",
       "appCloseTimeout": "{{name}} blieb 15 Minuten geöffnet – Vorgang abgebrochen.",
-      "needsAdmin": "{{name}} benötigt für das Update Administratorrechte – es wartet auf ein manuelles Update."
+      "needsAdmin": "{{name}} benötigt für das Update Administratorrechte – es wartet auf ein manuelles Update.",
+      "settingsBackupFailed": "Die Einstellungen von {{name}} konnten vor dem Update nicht gesichert werden: {{error}}"
     },
     "notice": {
       "prefetchFailed": "Das Installationsprogramm konnte nicht vorab heruntergeladen werden ({{detail}}) – WinGet lädt es herunter.",
@@ -972,7 +974,8 @@
     "cliVersions": "Versionen",
     "cliPin": "Version fixieren",
     "cliMore": "Weitere Befehle und Erklärungen",
-    "cliUnsupported": "{{manager}} kann das nicht"
+    "cliUnsupported": "{{manager}} kann das nicht",
+    "openSourceAlternatives": "Open-Source-Alternativen zu {{name}}"
   },
   "report": {
     "button": "Problem melden",
@@ -1009,7 +1012,9 @@
     "email": "E-Mail",
     "short": "{{name}} – schau dir diese App an",
     "message": "Ich empfehle {{name}}: {{description}}\n\nIn HubGet öffnen: {{link}}\nOder installieren mit: {{command}}",
-    "messageNoCommand": "Ich empfehle {{name}}: {{description}}\n\nIn HubGet öffnen: {{link}}"
+    "messageNoCommand": "Ich empfehle {{name}}: {{description}}\n\nIn HubGet öffnen: {{link}}",
+    "badge": "Badge für README",
+    "badgeHint": "„Mit HubGet installieren“ für Ihr GitHub-README oder Ihre Website"
   },
   "auth": {
     "signIn": "Anmelden",
@@ -1085,7 +1090,23 @@
   },
   "offline": {
     "title": "Keine Internetverbindung",
-    "text": "Installierte Apps und der gespeicherte Katalog funktionieren weiter; Installationen, Updates, die Suche in den Paketmanagern und Bewertungen brauchen eine Verbindung"
+    "text": "Installierte Apps und der gespeicherte Katalog funktionieren weiter; Installationen, Updates, die Suche in den Paketmanagern und Bewertungen brauchen eine Verbindung",
+    "button": "Für offline vorbereiten",
+    "picking": "Wählen Sie einen Ordner (z. B. einen USB-Stick) für die Installationsprogramme…",
+    "progress": "Lade {{done}}/{{total}} herunter: {{name}}",
+    "scriptAdmin": "Die Apps werden still installiert. Die Installation für alle Benutzer kann Administratorrechte anfordern.",
+    "scriptDone": "Fertig.",
+    "readmeIntro": "App-Installationsprogramme aus HubGet für einen PC ohne Internet. Starten Sie install.cmd – es installiert diese Apps:",
+    "readmeManual": "Diese Apps installiert das Skript nicht (Archiv oder portable App) – entpacken oder kopieren Sie sie selbst:",
+    "done_one": "Offline-Paket bereit ({{count}} App): {{folder}}",
+    "done_other": "Offline-Paket bereit ({{count}} Apps): {{folder}}",
+    "cancelled_one": "Abgebrochen – {{count}} App gespeichert: {{folder}}",
+    "cancelled_other": "Abgebrochen – {{count}} Apps gespeichert: {{folder}}",
+    "manual": "Ohne automatische Installation (Archiv oder portable App): {{names}}",
+    "failed": "Download fehlgeschlagen: {{names}}",
+    "skipped_one": "{{count}} App stammt nicht aus WinGet und passt nicht ins Offline-Paket",
+    "skipped_other": "{{count}} Apps stammen nicht aus WinGet und passen nicht ins Offline-Paket",
+    "error": "Offline-Paket konnte nicht vorbereitet werden: {{error}}"
   },
   "crash": {
     "pageTitle": "Diese Seite konnte nicht angezeigt werden",
@@ -1387,7 +1408,11 @@
     "interactive": "Installationsassistent abschließen",
     "installing": "Wird installiert",
     "uninstalling": "Wird deinstalliert",
-    "estimate": "Schätzung – das Installationsprogramm meldet keinen Fortschritt"
+    "estimate": "Schätzung – das Installationsprogramm meldet keinen Fortschritt",
+    "remainingSeconds_one": "noch {{count}} s",
+    "remainingSeconds_other": "noch {{count}} s",
+    "remainingMinutes_one": "noch {{count}} Min.",
+    "remainingMinutes_other": "noch {{count}} Min."
   },
   "status": {
     "updates": "Updates",
@@ -1416,7 +1441,8 @@
     "importHint": "Die Ausstattung eines anderen PCs installieren",
     "imported_one": "Profil geladen – {{count}} App in den Paketsammlungen",
     "imported_other": "Profil geladen – {{count}} Apps in den Paketsammlungen",
-    "importFailed": "Die Datei konnte nicht geladen werden – sie ist weder ein HubGet-Profil noch ein WinGet-Export."
+    "importFailed": "Die Datei konnte nicht geladen werden – sie ist weder ein HubGet-Profil noch ein WinGet-Export.",
+    "configurationTitle": "Apps für einen neuen PC"
   },
   "profileImport": {
     "title": "Profil importieren",
@@ -1562,7 +1588,11 @@
     "depKind_runtime": "Laufzeit",
     "depKind_feature": "Windows-Feature",
     "virusTotal": "Auf VirusTotal prüfen",
-    "virusTotalHint": "Ergebnisse dutzender Virenscanner für das Installationsprogramm mit diesem Hash. Es wird nichts hochgeladen – VirusTotal sucht die Datei anhand des Hashs."
+    "virusTotalHint": "Ergebnisse dutzender Virenscanner für das Installationsprogramm mit diesem Hash. Es wird nichts hochgeladen – VirusTotal sucht die Datei anhand des Hashs.",
+    "fileTypes_one": "Öffnet {{count}} Dateityp",
+    "fileTypes_other": "Öffnet {{count}} Dateitypen",
+    "fileTypesMore_one": "+ {{count}} weitere",
+    "fileTypesMore_other": "+ {{count}} weitere"
   },
   "installMenu": {
     "install": "Installieren",
@@ -1575,7 +1605,8 @@
     "download": "Installationsprogramm herunterladen",
     "details": "Details",
     "more": "Weitere Installationsoptionen",
-    "unsupported": "Dieser Paketmanager unterstützt das nicht"
+    "unsupported": "Dieser Paketmanager unterstützt das nicht",
+    "sandbox": "In Windows Sandbox ausprobieren"
   },
   "installOptions": {
     "title": "Installationsoptionen – {{name}}",
@@ -1733,7 +1764,9 @@
     "globalShortcutTaken": "Win+Umschalt+H lässt sich nicht aktivieren – vermutlich nutzt ein anderes Programm das Kürzel ({{error}}).",
     "cliCommand": "Befehl hubget im Terminal",
     "cliCommandHint": "Geben Sie in der Eingabeaufforderung oder in PowerShell z. B. hubget install vlc, hubget update oder hubget help ein. HubGet führt den Befehl aus und zeigt den Fortschritt in der App.",
-    "cliCommandFailed": "Der Befehl hubget ließ sich nicht aktivieren: {{error}}"
+    "cliCommandFailed": "Der Befehl hubget ließ sich nicht aktivieren: {{error}}",
+    "exportConfiguration": "Export für winget configure",
+    "exportConfigurationHint": "Eine .winget-Datei (YAML) – auf einem neuen PC genügt winget configure -f Datei. Ein Standardformat, das auch Firmen und Microsoft Dev Box nutzen."
   },
   "files": {
     "saved": "Gespeichert: {{path}}",
@@ -2163,7 +2196,8 @@
     "skipped_busy_other": "{{count}} Updates gefunden – die automatische Installation wartet, bis das Spiel oder die Präsentation endet",
     "skipped_active_one": "{{count}} Update gefunden – die automatische Installation wartet auf eine Pause",
     "skipped_active_other": "{{count}} Updates gefunden – die automatische Installation wartet auf eine Pause",
-    "restorePointName": "HubGet - vor dem Update aller Apps"
+    "restorePointName": "HubGet - vor dem Update aller Apps",
+    "foundSecurity": "Sicherheitsupdates ({{security}} von {{total}}): {{names}}"
   },
   "security": {
     "warningTitle": "Achtung!",
@@ -2197,7 +2231,18 @@
     "importCustomArgs": "Import eigener Kommandozeilenargumente beim Import von Paketen aus einer Sammlung erlauben",
     "importCustomArgsHint": "Sonst werden eigene Argumente aus der Sammlungsdatei (.ubundle) verworfen.",
     "importPrePost": "Import eigener Befehle vor und nach der Installation beim Import von Paketen aus einer Sammlung erlauben",
-    "importPrePostHint": "Sonst werden Befehle aus der Sammlungsdatei verworfen – eine Sammlung von jemand anderem kann nichts ausführen."
+    "importPrePostHint": "Sonst werden Befehle aus der Sammlungsdatei verworfen – eine Sammlung von jemand anderem kann nichts ausführen.",
+    "badge": "Sicherheitsfix",
+    "note": "Sicherheitsfix · {{text}}",
+    "noteShort": "Behebt eine Sicherheitslücke",
+    "panelTitle_one": "{{count}} Update behebt Sicherheitslücken:",
+    "panelTitle_other": "{{count}} Updates beheben Sicherheitslücken:",
+    "updateThese_one": "Jetzt aktualisieren",
+    "updateThese_other": "Jetzt aktualisieren",
+    "noWait": "Sicherheitsupdates ohne Wartezeit",
+    "noWaitHint": "Updates, die laut Versionshinweisen eine Sicherheitslücke beheben (CVE, „security fix“), werden sofort angeboten und installiert – ohne Mindestalter.",
+    "osv": "Bekannte Schwachstellen (OSV.dev)",
+    "osvHint": "Prüft bei Paketen des Entwicklermodus (npm, Bun, pip, Cargo, .NET Tool) die installierten Versionen in der offenen Schwachstellendatenbank OSV.dev. Gesendet werden nur Paketname und Version."
   },
   "fallbackOffer": {
     "title": "{{name}} konnte nicht installiert werden",
@@ -2258,7 +2303,9 @@
     "skipNote": "Automatische Updates überspringen {{current}} und bieten erst eine neuere Version an.",
     "confirm": "Auf {{version}} zurücksetzen",
     "hint": "Verhält sich die App seit dem Update auf {{current}} falsch? Setzen Sie sie auf die Version vor dem Update zurück.",
-    "unavailable": "Version {{version}} ist beim Paketmanager nicht mehr verfügbar – sie lässt sich nicht wiederherstellen."
+    "unavailable": "Version {{version}} ist beim Paketmanager nicht mehr verfügbar – sie lässt sich nicht wiederherstellen.",
+    "settingsNote": "Auch die Einstellungen der App von vor dem Update werden wiederhergestellt (aus der Sicherung). Die aktuellen Einstellungen landen im Papierkorb.",
+    "settingsRestored": "Die Einstellungen von {{name}} wurden aus der Sicherung von {{version}} wiederhergestellt."
   },
   "watch": {
     "start": "Über neue Versionen benachrichtigen",
@@ -2363,7 +2410,9 @@
     "sig_unsigned": "unsigniert",
     "sig_invalid": "ungültige Signatur",
     "sig_unknown": "Programm nicht gefunden",
-    "showUnsigned": "Programme ohne Signatur anzeigen ({{count}})"
+    "showUnsigned": "Programme ohne Signatur anzeigen ({{count}})",
+    "openSource": "Open-Source-Alternativen",
+    "openSourceHint": "Für diese proprietären Apps gibt es kostenlose Open-Source-Alternativen."
   },
   "cli": {
     "installQueued": "Installation aus dem Terminal: {{names}}",
@@ -2375,5 +2424,149 @@
     "updateQueued": "Aktualisierung aus dem Terminal: {{names}}",
     "upToDate": "Bereits aktuell: {{names}}",
     "notInstalled": "„{{names}}“ passt nicht eindeutig zu einer installierten App."
+  },
+  "jumpList": {
+    "updates": "Verfügbare Updates",
+    "updateAll": "Alle aktualisieren"
+  },
+  "sandbox": {
+    "unavailable": "Windows Sandbox ist nicht aktiviert. Aktivieren Sie ihn in der Systemsteuerung → Programme → Windows-Features aktivieren oder deaktivieren → Windows-Sandbox (nur Windows Pro und Enterprise, danach neu starten).",
+    "preparing": "Installer von {{name}} für Windows Sandbox wird heruntergeladen…",
+    "started": "Windows Sandbox startet – der Installer von {{name}} öffnet sich darin automatisch. Nach dem Schließen bleibt nichts zurück.",
+    "failed": "{{name}} ließ sich nicht in Windows Sandbox starten: {{error}}"
+  },
+  "settingsBackup": {
+    "setting": "App-Einstellungen vor dem Update sichern",
+    "settingHint": "Die Ordner der App in AppData (ohne Caches, bis 200 MB). Wenn Sie das Update rückgängig machen, kehren auch die Einstellungen von davor zurück.",
+    "title": "Sicherungen der App-Einstellungen",
+    "summary_one": "Einstellungen von {{count}} App vor dem letzten Update – {{size}}.",
+    "summary_other": "Einstellungen von {{count}} Apps vor dem letzten Update – {{size}}.",
+    "off": "Das Sichern der Einstellungen vor Updates ist ausgeschaltet (Einstellungen → Paket-Updates).",
+    "clear": "Sicherungen löschen",
+    "cleared": "Sicherungen der Einstellungen gelöscht."
+  },
+  "vulnerable": {
+    "title_one": "{{count}} Paket hat eine bekannte Schwachstelle",
+    "title_other": "{{count}} Pakete haben bekannte Schwachstellen",
+    "text": "Laut OSV.dev hat die installierte Version eine Sicherheitslücke. Aktualisieren Sie sie oder deinstallieren Sie das Paket, wenn Sie es nicht brauchen.",
+    "more_one": "und {{count}} weitere",
+    "more_other": "und {{count}} weitere",
+    "update": "Update auf {{version}} verfügbar",
+    "noUpdate": "noch keine korrigierte Version"
+  },
+  "notificationActions": {
+    "updateAll": "Alle aktualisieren",
+    "show": "Anzeigen",
+    "open": "Öffnen",
+    "details": "Details"
+  },
+  "orgPolicy": {
+    "title": "Einige Einstellungen werden von Ihrer Organisation verwaltet",
+    "text": "HubGet-Gruppenrichtlinien (Registrierung HKLM\\SOFTWARE\\Policies\\HubGet). Diese Optionen lassen sich hier nicht ändern:",
+    "item": {
+      "sources": "Erlaubte Paketmanager: {{list}}",
+      "apps_one": "Nur {{count}} genehmigte App kann installiert werden",
+      "apps_other": "Nur {{count}} genehmigte Apps können installiert werden",
+      "developerMode": "Der Entwicklermodus ist aus",
+      "customCommands": "Eigene Argumente und Befehle sind deaktiviert",
+      "signIn": "Anmeldung und Synchronisierung sind deaktiviert",
+      "autoUpdates": "Automatische Updates für alle Apps sind aktiviert",
+      "minAge_one": "Mindestalter von Updates: {{count}} Tag",
+      "minAge_other": "Mindestalter von Updates: {{count}} Tage",
+      "selfUpdate": "HubGet aktualisiert sich nicht selbst – Ihre Organisation verwaltet die Versionen"
+    },
+    "appBlocked": "{{name}}: Ihre Organisation hat diese App nicht genehmigt",
+    "sourceBlocked": "{{name}}: Ihre Organisation hat {{source}} deaktiviert",
+    "signInBlocked": "Ihre Organisation hat die Anmeldung deaktiviert."
+  },
+  "reliability": {
+    "setting": "Zuverlässigkeit von Versionen aus der Community",
+    "settingHint": "Meldet nach einem Update anonym, ob es geklappt hat, fehlgeschlagen ist oder zurückgesetzt wurde (nur Paket, Version und eine zufällige ID dieser Installation). Dafür sehen Sie, mit welchen Versionen andere Probleme haben – automatische Updates warten bei solchen Versionen.",
+    "note_one": "{{percent}} % der Nutzer melden Probleme ({{count}} Meldung) – fehlgeschlagen oder zurückgesetzt",
+    "note_other": "{{percent}} % der Nutzer melden Probleme ({{count}} Meldungen) – fehlgeschlagen oder zurückgesetzt",
+    "skippedAuto": "{{name}} {{version}}: Das automatische Update wartet – andere Nutzer melden Probleme mit dieser Version"
+  },
+  "transfer": {
+    "title": "App-Einstellungen auf einen neuen PC",
+    "hint": "Einstellungen ausgewählter Apps aus AppData in einer mit Ihrem Passwort verschlüsselten Datei – auf dem neuen PC wiederherstellen.",
+    "export": "Speichern…",
+    "import": "Wiederherstellen…",
+    "exportTitle": "App-Einstellungen speichern",
+    "exportText": "Wählen Sie die Apps, deren Einstellungen Sie übertragen möchten. Caches und Protokolle werden nicht gespeichert.",
+    "scanning": "Suche App-Einstellungen…",
+    "nothing": "Keine der installierten Apps hat Einstellungen in AppData zum Übertragen.",
+    "warning": "Einstellungen enthalten oft Anmeldungen und Passwörter – die Datei ist daher mit einem Passwort geschützt. Ohne es kann sie niemand öffnen, auch HubGet nicht; es wird nirgends gespeichert.",
+    "password": "Passwort",
+    "passwordAgain": "Passwort wiederholen",
+    "passwordShort_one": "Das Passwort braucht mindestens {{count}} Zeichen",
+    "passwordShort_other": "Das Passwort braucht mindestens {{count}} Zeichen",
+    "passwordMismatch": "Die Passwörter stimmen nicht überein",
+    "save": "Speichern ({{size}})",
+    "fileName": "App-Einstellungen",
+    "saved_one": "Einstellungen von {{count}} App gespeichert ({{size}}): {{path}}",
+    "saved_other": "Einstellungen von {{count}} Apps gespeichert ({{size}}): {{path}}",
+    "failed": "Übertragung der Einstellungen fehlgeschlagen: {{error}}",
+    "importTitle": "App-Einstellungen wiederherstellen",
+    "importText": "Wählen Sie eine .hubget-settings-Datei und geben Sie das Passwort ein, mit dem sie gespeichert wurde. Die Einstellungen aus der Datei ersetzen die aktuellen – diese kommen in den Papierkorb. Schließen Sie die Apps vor dem Wiederherstellen.",
+    "chooseFile": "Datei wählen und wiederherstellen",
+    "restored_one": "Einstellungen von {{count}} App wiederhergestellt: {{names}}",
+    "restored_other": "Einstellungen von {{count}} Apps wiederhergestellt: {{names}}",
+    "restoredNothing": "Die Datei enthielt keine wiederherstellbaren Einstellungen."
+  },
+  "openWith": {
+    "title": "Womit öffne ich .{{ext}}-Dateien?",
+    "titleEmpty": "Womit öffne ich diese Datei?",
+    "subtitle": "Apps aus dem Katalog, die Dateien mit dieser Endung öffnen – installierte zuerst.",
+    "file": "Datei {{file}}",
+    "placeholder": "Dateiendung, z. B. .psd",
+    "hint": "Geben Sie eine Dateiendung ein oder ziehen Sie eine Datei irgendwo ins HubGet-Fenster.",
+    "none": "Keine App im Katalog gibt an, .{{ext}}-Dateien zu öffnen. Versuchen Sie die Suche nach Dateityp.",
+    "installed_one": "Installiert ({{count}})",
+    "installed_other": "Installiert ({{count}})",
+    "available_one": "Verfügbar ({{count}})",
+    "available_other": "Verfügbar ({{count}})",
+    "searchHint_one": "{{count}} App im Katalog öffnet .{{ext}}-Dateien – anzeigen",
+    "searchHint_other": "{{count}} Apps im Katalog öffnen .{{ext}}-Dateien – anzeigen",
+    "dropTitle": "Womit öffnet man diese Datei?",
+    "dropText": "Datei loslassen – HubGet findet Apps, die sie öffnen. Die Datei wird nirgendwohin gesendet."
+  },
+  "disk": {
+    "shortage": "Auf Laufwerk {{drive}} sind nur {{free}} frei, die Installation braucht etwa {{needed}}. Schaffen Sie Platz – z. B. in der PC-Übersicht (Cache bereinigen, ungenutzte Apps).",
+    "batchShortage": "Auf Laufwerk {{drive}} sind {{free}} frei, alle Updates brauchen etwa {{needed}} – manche laufen evtl. nicht. HubGet prüft den Platz vor jedem Update."
+  },
+  "releaseHistory": {
+    "title": "Neu seit Ihrer Version {{version}}",
+    "subtitle_one": "Das Update auf {{version}} bringt {{count}} Release (von GitHub):",
+    "subtitle_other": "Das Update auf {{version}} bringt {{count}} Releases (von GitHub):",
+    "more_one": "{{count}} weiteres Release anzeigen",
+    "more_other": "{{count}} weitere Releases anzeigen"
+  },
+  "diagnostics": {
+    "title": "Diagnose",
+    "label": "Diagnose für den Support",
+    "hint": "HubGet- und Windows-Version, Status der Paketmanager, wichtige Einstellungen, letzte Fehler und das Protokoll in einem Text – ohne PC-Namen, Benutzernamen und E-Mails. Nichts wird gesendet; hängen Sie ihn an Ihre Fehlermeldung an.",
+    "save": "Speichern…",
+    "copy": "Kopieren",
+    "copied": "Diagnose in die Zwischenablage kopiert."
+  },
+  "windowsHealth": {
+    "title": "Windows-Status",
+    "supported": "{{version}} – Sicherheitsupdates bis {{date}}",
+    "supportedOpen": "{{version}} – erhält Sicherheitsupdates",
+    "ending": "{{version}} erhält Sicherheitsupdates nur bis {{date}}",
+    "endingHint": "Installieren Sie eine neuere Windows-Version (Einstellungen → Windows Update), um geschützt zu bleiben.",
+    "ended": "{{version}} erhält seit {{date}} keine Sicherheitsupdates",
+    "endedHint": "Aktualisieren Sie in Einstellungen → Windows Update auf eine neuere Windows-11-Version.",
+    "endedHint10": "Ohne erweiterte Sicherheitsupdates (ESU) wechseln Sie zu Windows 11 – kostenlos, wenn Ihr PC es unterstützt.",
+    "reboot": "Windows wartet nach Updates auf einen Neustart",
+    "rebootHint": "Ein Neustart schließt die Windows-Updates ab; bis dahin können manche Installationen fehlschlagen.",
+    "uptime_one": "Der PC läuft seit {{count}} Tag ohne Neustart",
+    "uptime_other": "Der PC läuft seit {{count}} Tagen ohne Neustart",
+    "uptimeHint": "Der Windows-Schnellstart startet den PC beim Herunterfahren nicht neu – wählen Sie ab und zu Neu starten.",
+    "disk": "Laufwerk {{drive}} – {{free}} von {{total}} frei",
+    "diskHint": "Der Platz wird knapp – Installationen und Updates können fehlschlagen. Bereinigen Sie unten die Caches und deinstallieren Sie ungenutzte Apps.",
+    "protectionOn": "Der Computerschutz ist aktiv – Wiederherstellungspunkte sind möglich",
+    "protectionOff": "Der Computerschutz ist aus – Wiederherstellungspunkte sind nicht möglich",
+    "protectionHint": "Aktivieren Sie ihn in der Systemsteuerung → System → Computerschutz → Konfigurieren (Laufwerk C:). HubGet kann dann vor Sammelupdates einen Wiederherstellungspunkt erstellen."
   }
 }

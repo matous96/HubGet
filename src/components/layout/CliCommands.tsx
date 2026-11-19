@@ -3,7 +3,8 @@
  * backend je uloží a pošle událost „hubget-cli“, tady se vyzvednou a provedou přes
  * frontu operací (průběh v aplikaci, oznámení na konci). Příkaz napsal uživatel sám
  * na svém počítači, proto se instalace spustí hned – na rozdíl od odkazů z webu
- * (lib/deepLink.ts), které jen otevřou seznam k potvrzení.
+ * (lib/deepLink.ts), které jen otevřou seznam k potvrzení. Stejnou frontou jdou i tlačítka
+ * v oznámeních Windows (NotificationActions.tsx → runAppCommand).
  */
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
@@ -28,8 +29,8 @@ import { useSourceScope } from "@/store/sourceLock";
 import { useToasts } from "@/store/toasts";
 import type { CatalogEntry } from "@/types";
 
-interface CliCommand {
-  command: "install" | "update" | "search" | "show" | "updates" | "open";
+export interface CliCommand {
+  command: "install" | "update" | "search" | "show" | "updates" | "overview" | "open";
   args: string[];
 }
 
@@ -62,9 +63,18 @@ function findApp(text: string, catalog: CatalogEntry[], byId: Map<string, Catalo
 /** Jediný kandidát, jinak nic. */
 const only = <T,>(list: T[]): T | undefined => (list.length === 1 ? list[0] : undefined);
 
+/** Příkaz z HubGetu samotného (tlačítko v oznámení) – provede se jako příkaz z terminálu. */
+let pushLocal: ((command: CliCommand) => void) | null = null;
+export const runAppCommand = (command: CliCommand) => pushLocal?.(command);
+
 export function CliCommands() {
   const [queue, setQueue] = useState<{ id: number; command: CliCommand }[]>([]);
   const nextId = useRef(0);
+
+  useEffect(() => {
+    pushLocal = (command) => setQueue((q) => [...q, { id: nextId.current++, command }]);
+    return () => void (pushLocal = null);
+  }, []);
 
   useEffect(() => {
     if (!isTauri()) return;
@@ -199,6 +209,9 @@ function CliRunner({ command, onDone }: { command: CliCommand; onDone: () => voi
       }
       case "updates":
         navigate("/installed?filter=updates");
+        break;
+      case "overview":
+        navigate("/overview");
         break;
       // „open“: okno už ukázal backend
     }

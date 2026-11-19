@@ -2,6 +2,7 @@ import { Code, User } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { useSettings } from "@/store/settings";
+import { useOrgPolicy } from "@/store/orgPolicy";
 import type { UserMode } from "@/types";
 
 /**
@@ -13,11 +14,14 @@ export function UserModeToggle() {
   const { t } = useTranslation();
   const mode = useSettings((s) => s.userMode);
   const setMode = useSettings((s) => s.setUserMode);
+  // Firemní zásady: režim Vývojář zakázaný – přepínač nemá smysl
+  const locked = useOrgPolicy((p) => p.disableDeveloperMode);
   const options: { id: UserMode; icon: typeof User }[] = [
     { id: "regular", icon: User },
     { id: "developer", icon: Code },
   ];
 
+  if (locked) return null;
   return (
     <div className="flex rounded-full border border-line bg-surface-2 p-0.5" role="group" aria-label={t("userMode.label")}>
       {options.map(({ id, icon: Icon }) => (

@@ -280,6 +280,12 @@ pub fn show_main_window<R: Runtime>(app: &AppHandle<R>) {
     }
 }
 
+/// Ukáže hlavní okno z frontendu (klik na oznámení Windows nebo jeho tlačítko).
+#[tauri::command]
+pub fn show_window<R: Runtime>(app: AppHandle<R>) {
+    show_main_window(&app);
+}
+
 /// Zavření okna: schovat do oznamovací oblasti místo ukončení.
 /// Změna motivu Windows: přebarvit ikonu podle hlavního panelu.
 pub fn on_window_event<R: Runtime>(window: &Window<R>, event: &WindowEvent) {

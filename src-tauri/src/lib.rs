@@ -2,6 +2,9 @@
 //!
 //! - `system` – architektura a verze Windows,
 //! - `cli` – příkaz `hubget` v terminálu (předání příkazu běžícímu HubGetu),
+//! - `settings_backup` – záloha nastavení aplikace (AppData) před aktualizací a obnovení při vrácení,
+//! - `sandbox` – vyzkoušení aplikace ve Windows Sandboxu (instalátor přes winget download),
+//! - `jumplist` – rychlé akce na ikoně v hlavním panelu (Dostupné aktualizace, Aktualizovat vše…),
 //! - `apps` – spouštění nainstalovaných aplikací (položky nabídky Start),
 //! - `arp` – záznamy Programy a funkce: ověření, že program na disku opravdu je,
 //! - `icons` – ikony s mezipamětí na disku (protokol icon://, ikony z EXE),
@@ -38,19 +41,25 @@ mod download;
 mod elevation;
 mod files;
 mod icons;
+mod jumplist;
 mod leftovers;
 mod oauth;
+mod offline;
 mod operations;
+mod org_policy;
 mod powershell;
 mod process;
 mod progress;
 mod publish;
 mod restore;
 mod running;
+mod sandbox;
 mod scoop;
 mod secure_store;
 mod shortcut;
 mod security;
+mod settings_backup;
+mod settings_transfer;
 mod signatures;
 mod startup;
 mod system;
@@ -141,6 +150,7 @@ pub fn run() {
             tray::set_close_to_tray,
             tray::set_tray_labels,
             tray::set_tray_status,
+            tray::show_window,
             operations::cancel_operation,
             operations::elevated_batch_begin,
             operations::elevated_batch_end,
@@ -183,12 +193,28 @@ pub fn run() {
             dev::dev_setup,
             dev::dev_operation,
             security::set_security_policy,
+            org_policy::get_org_policy,
             security::check_manager_path,
             system::power_network_status,
+            system::disk_space,
+            system::windows_health,
             system::devolutions_agent_status,
             caches::cache_info,
             cli::take_cli_commands,
             cli::set_cli_command,
+            jumplist::set_jump_list,
+            sandbox::sandbox_available,
+            sandbox::sandbox_try,
+            offline::offline_bundle,
+            offline::offline_cancel,
+            settings_backup::settings_backup,
+            settings_backup::settings_backup_version,
+            settings_backup::settings_restore,
+            settings_backup::settings_backups_info,
+            settings_backup::settings_backups_clear,
+            settings_transfer::settings_transfer_scan,
+            settings_transfer::settings_transfer_export,
+            settings_transfer::settings_transfer_import,
             caches::clean_cache,
             restore::create_restore_point,
             shortcut::set_global_shortcut,

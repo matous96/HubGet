@@ -513,7 +513,8 @@
     "openFailed": "Impossible d’ouvrir le fichier – ce n’est pas un lot HubGet.",
     "commandsCopied_one": "{{count}} commande copiée",
     "commandsCopied_other": "{{count}} commandes copiées",
-    "commandsCopied_many": "{{count}} commandes copiées"
+    "commandsCopied_many": "{{count}} commandes copiées",
+    "configuration": "Enregistrer pour winget configure"
   },
   "menu": {
     "more": "Plus d’options",
@@ -612,7 +613,8 @@
       "appClosed": "{{name}} était en cours d’exécution – fermée (processus {{processes}}) pour que le programme d’installation puisse le remplacer.",
       "appClosing": "{{name}} demande d’enregistrer le travail à la fermeture – en attente de sa fermeture par l’utilisateur.",
       "appCloseTimeout": "{{name}} est restée ouverte 15 minutes – opération annulée.",
-      "needsAdmin": "{{name}} nécessite des droits d’administrateur pour la mise à jour – elle attendra une mise à jour manuelle."
+      "needsAdmin": "{{name}} nécessite des droits d’administrateur pour la mise à jour – elle attendra une mise à jour manuelle.",
+      "settingsBackupFailed": "Impossible de sauvegarder les paramètres de {{name}} avant la mise à jour : {{error}}"
     },
     "notice": {
       "prefetchFailed": "Impossible de télécharger le programme d’installation à l’avance ({{detail}}) – WinGet le téléchargera.",
@@ -987,7 +989,8 @@
     "cliVersions": "Versions",
     "cliPin": "Épingler la version",
     "cliMore": "Plus de commandes et d’explications",
-    "cliUnsupported": "{{manager}} ne sait pas faire cela"
+    "cliUnsupported": "{{manager}} ne sait pas faire cela",
+    "openSourceAlternatives": "Alternatives open source à {{name}}"
   },
   "report": {
     "button": "Signaler un problème",
@@ -1024,7 +1027,9 @@
     "email": "E-mail",
     "short": "{{name}} – découvrez cette application",
     "message": "Je vous recommande {{name}} : {{description}}\n\nOuvrir dans HubGet : {{link}}\nOu installer avec : {{command}}",
-    "messageNoCommand": "Je recommande {{name}} : {{description}}\n\nOuvrir dans HubGet : {{link}}"
+    "messageNoCommand": "Je recommande {{name}} : {{description}}\n\nOuvrir dans HubGet : {{link}}",
+    "badge": "Badge pour README",
+    "badgeHint": "« Installer avec HubGet » pour votre README GitHub ou votre site"
   },
   "auth": {
     "signIn": "Se connecter",
@@ -1101,7 +1106,26 @@
   },
   "offline": {
     "title": "Pas de connexion Internet",
-    "text": "les applications installées et le catalogue enregistré continuent de fonctionner ; les installations, les mises à jour, la recherche dans les gestionnaires de paquets et les notes nécessitent une connexion"
+    "text": "les applications installées et le catalogue enregistré continuent de fonctionner ; les installations, les mises à jour, la recherche dans les gestionnaires de paquets et les notes nécessitent une connexion",
+    "button": "Préparer hors ligne",
+    "picking": "Choisissez un dossier (une clé USB, par exemple) pour les programmes d’installation…",
+    "progress": "Téléchargement {{done}}/{{total}} : {{name}}",
+    "scriptAdmin": "Les applications s’installent en silence. L’installation pour tous les utilisateurs peut demander des droits d’administrateur.",
+    "scriptDone": "Terminé.",
+    "readmeIntro": "Programmes d’installation d’applications de HubGet pour un PC sans internet. Lancez install.cmd – il installe ces applications :",
+    "readmeManual": "Le script n’installe pas ces applications (archive ou application portable) – extrayez-les ou copiez-les vous-même :",
+    "done_one": "Paquet hors ligne prêt ({{count}} application) : {{folder}}",
+    "done_many": "Paquet hors ligne prêt ({{count}} applications) : {{folder}}",
+    "done_other": "Paquet hors ligne prêt ({{count}} applications) : {{folder}}",
+    "cancelled_one": "Annulé – {{count}} application enregistrée : {{folder}}",
+    "cancelled_many": "Annulé – {{count}} applications enregistrées : {{folder}}",
+    "cancelled_other": "Annulé – {{count}} applications enregistrées : {{folder}}",
+    "manual": "Sans installation automatique (archive ou application portable) : {{names}}",
+    "failed": "Téléchargement impossible : {{names}}",
+    "skipped_one": "{{count}} application ne vient pas de WinGet et ne peut pas aller dans le paquet hors ligne",
+    "skipped_many": "{{count}} applications ne viennent pas de WinGet et ne peuvent pas aller dans le paquet hors ligne",
+    "skipped_other": "{{count}} applications ne viennent pas de WinGet et ne peuvent pas aller dans le paquet hors ligne",
+    "error": "Impossible de préparer le paquet hors ligne : {{error}}"
   },
   "crash": {
     "pageTitle": "Impossible d’afficher cette page",
@@ -1408,7 +1432,13 @@
     "interactive": "Terminez l’assistant d’installation",
     "installing": "Installation",
     "uninstalling": "Désinstallation",
-    "estimate": "Estimation – le programme d’installation n’indique pas sa progression"
+    "estimate": "Estimation – le programme d’installation n’indique pas sa progression",
+    "remainingSeconds_one": "encore {{count}} s",
+    "remainingSeconds_many": "encore {{count}} s",
+    "remainingSeconds_other": "encore {{count}} s",
+    "remainingMinutes_one": "encore {{count}} min",
+    "remainingMinutes_many": "encore {{count}} min",
+    "remainingMinutes_other": "encore {{count}} min"
   },
   "status": {
     "updates": "Mises à jour",
@@ -1441,7 +1471,8 @@
     "imported_one": "Profil chargé – {{count}} application dans les Lots de paquets",
     "imported_other": "Profil chargé – {{count}} applications dans les Lots de paquets",
     "imported_many": "Profil chargé – {{count}} applications dans les Lots de paquets",
-    "importFailed": "Impossible de charger le fichier – ce n’est ni un profil HubGet ni un export WinGet."
+    "importFailed": "Impossible de charger le fichier – ce n’est ni un profil HubGet ni un export WinGet.",
+    "configurationTitle": "Applications pour un nouveau PC"
   },
   "profileImport": {
     "title": "Importer un profil",
@@ -1593,7 +1624,13 @@
     "depKind_runtime": "Environnement d’exécution",
     "depKind_feature": "Fonctionnalité Windows",
     "virusTotal": "Vérifier sur VirusTotal",
-    "virusTotalHint": "Résultats de dizaines d’antivirus pour le programme d’installation avec cette empreinte. Rien n’est envoyé – VirusTotal recherche le fichier par son empreinte."
+    "virusTotalHint": "Résultats de dizaines d’antivirus pour le programme d’installation avec cette empreinte. Rien n’est envoyé – VirusTotal recherche le fichier par son empreinte.",
+    "fileTypes_one": "Ouvre {{count}} type de fichier",
+    "fileTypes_many": "Ouvre {{count}} types de fichiers",
+    "fileTypes_other": "Ouvre {{count}} types de fichiers",
+    "fileTypesMore_one": "+ {{count}} autre",
+    "fileTypesMore_many": "+ {{count}} autres",
+    "fileTypesMore_other": "+ {{count}} autres"
   },
   "installMenu": {
     "install": "Installer",
@@ -1606,7 +1643,8 @@
     "download": "Télécharger le programme d’installation",
     "details": "Détails",
     "more": "Plus d’options d’installation",
-    "unsupported": "Ce gestionnaire de paquets ne le prend pas en charge"
+    "unsupported": "Ce gestionnaire de paquets ne le prend pas en charge",
+    "sandbox": "Essayer dans Windows Sandbox"
   },
   "installOptions": {
     "title": "Options d’installation – {{name}}",
@@ -1765,7 +1803,9 @@
     "globalShortcutTaken": "Impossible d’activer Win+Maj+H – un autre programme l’utilise probablement ({{error}}).",
     "cliCommand": "Commande hubget dans le terminal",
     "cliCommandHint": "Dans l’invite de commandes ou PowerShell, tapez par exemple hubget install vlc, hubget update ou hubget help. HubGet exécute la commande et affiche la progression dans l’application.",
-    "cliCommandFailed": "Impossible d’activer la commande hubget : {{error}}"
+    "cliCommandFailed": "Impossible d’activer la commande hubget : {{error}}",
+    "exportConfiguration": "Exporter pour winget configure",
+    "exportConfigurationHint": "Un fichier .winget (YAML) – sur un nouveau PC, il suffit de lancer winget configure -f fichier. Un format standard utilisé aussi par les entreprises et Microsoft Dev Box."
   },
   "files": {
     "saved": "Enregistré : {{path}}",
@@ -2227,7 +2267,8 @@
     "skipped_active_one": "{{count}} mise à jour trouvée – l’installation automatique attend une pause",
     "skipped_active_many": "{{count}} mises à jour trouvées – l’installation automatique attend une pause",
     "skipped_active_other": "{{count}} mises à jour trouvées – l’installation automatique attend une pause",
-    "restorePointName": "HubGet - avant de tout mettre à jour"
+    "restorePointName": "HubGet - avant de tout mettre à jour",
+    "foundSecurity": "Mises à jour de sécurité ({{security}} sur {{total}}) : {{names}}"
   },
   "security": {
     "warningTitle": "Attention !",
@@ -2261,7 +2302,20 @@
     "importCustomArgs": "Autoriser l’import d’arguments de ligne de commande personnalisés lors de l’import de paquets depuis un lot",
     "importCustomArgsHint": "Sinon, les arguments personnalisés du fichier de lot (.ubundle) sont ignorés.",
     "importPrePost": "Autoriser l’import de commandes personnalisées avant et après installation lors de l’import de paquets depuis un lot",
-    "importPrePostHint": "Sinon, les commandes du fichier de lot sont ignorées – un lot venant de quelqu’un d’autre ne peut rien exécuter."
+    "importPrePostHint": "Sinon, les commandes du fichier de lot sont ignorées – un lot venant de quelqu’un d’autre ne peut rien exécuter.",
+    "badge": "Correctif de sécurité",
+    "note": "Correctif de sécurité · {{text}}",
+    "noteShort": "Corrige une faille de sécurité",
+    "panelTitle_one": "{{count}} mise à jour corrige des failles de sécurité :",
+    "panelTitle_many": "{{count}} mises à jour corrigent des failles de sécurité :",
+    "panelTitle_other": "{{count}} mises à jour corrigent des failles de sécurité :",
+    "updateThese_one": "La mettre à jour",
+    "updateThese_many": "Les mettre à jour",
+    "updateThese_other": "Les mettre à jour",
+    "noWait": "Mises à jour de sécurité sans attendre",
+    "noWaitHint": "Les mises à jour dont les notes de version indiquent un correctif de sécurité (CVE, « security fix ») sont proposées et installées tout de suite, sans attendre l’ancienneté minimale.",
+    "osv": "Vulnérabilités connues (OSV.dev)",
+    "osvHint": "Pour les paquets du mode Développeur (npm, Bun, pip, Cargo, .NET Tool), vérifie les versions installées dans la base ouverte de vulnérabilités OSV.dev. Seuls le nom et la version du paquet sont envoyés."
   },
   "fallbackOffer": {
     "title": "Impossible d’installer {{name}}",
@@ -2322,7 +2376,9 @@
     "skipNote": "Les mises à jour automatiques ignoreront la {{current}} et ne proposeront qu’une version plus récente.",
     "confirm": "Revenir à {{version}}",
     "hint": "L’application fonctionne mal depuis la mise à jour vers la {{current}} ? Revenez à la version d’avant la mise à jour.",
-    "unavailable": "La version {{version}} n’est plus disponible chez le gestionnaire de paquets – impossible de la restaurer."
+    "unavailable": "La version {{version}} n’est plus disponible chez le gestionnaire de paquets – impossible de la restaurer.",
+    "settingsNote": "Les paramètres de l’application d’avant la mise à jour reviennent aussi (depuis la sauvegarde). Les paramètres actuels vont dans la Corbeille.",
+    "settingsRestored": "Les paramètres de {{name}} ont été restaurés depuis la sauvegarde de la version {{version}}."
   },
   "watch": {
     "start": "M’avertir des nouvelles versions",
@@ -2438,7 +2494,9 @@
     "sig_unsigned": "non signé",
     "sig_invalid": "signature invalide",
     "sig_unknown": "programme introuvable",
-    "showUnsigned": "Afficher les programmes non signés ({{count}})"
+    "showUnsigned": "Afficher les programmes non signés ({{count}})",
+    "openSource": "Alternatives open source",
+    "openSourceHint": "Ces applications propriétaires ont des alternatives gratuites et open source."
   },
   "cli": {
     "installQueued": "Installation depuis le terminal : {{names}}",
@@ -2451,5 +2509,164 @@
     "updateQueued": "Mise à jour depuis le terminal : {{names}}",
     "upToDate": "Déjà à jour : {{names}}",
     "notInstalled": "« {{names}} » ne correspond pas à une seule application installée."
+  },
+  "jumpList": {
+    "updates": "Mises à jour disponibles",
+    "updateAll": "Tout mettre à jour"
+  },
+  "sandbox": {
+    "unavailable": "Windows Sandbox n’est pas activé. Activez-le dans Panneau de configuration → Programmes → Activer ou désactiver des fonctionnalités Windows → Bac à sable Windows (Windows Pro et Entreprise uniquement, puis redémarrez).",
+    "preparing": "Téléchargement du programme d’installation de {{name}} pour Windows Sandbox…",
+    "started": "Windows Sandbox démarre – le programme d’installation de {{name}} s’y ouvre automatiquement. Rien n’est conservé à la fermeture.",
+    "failed": "Impossible de lancer {{name}} dans Windows Sandbox : {{error}}"
+  },
+  "settingsBackup": {
+    "setting": "Sauvegarder les paramètres des applications avant la mise à jour",
+    "settingHint": "Les dossiers de l’application dans AppData (sans caches, 200 Mo maximum). Si vous annulez la mise à jour, les paramètres d’avant reviennent aussi.",
+    "title": "Sauvegardes des paramètres des applications",
+    "summary_one": "Paramètres de {{count}} application d’avant sa dernière mise à jour – {{size}}.",
+    "summary_many": "Paramètres de {{count}} applications d’avant leur dernière mise à jour – {{size}}.",
+    "summary_other": "Paramètres de {{count}} applications d’avant leur dernière mise à jour – {{size}}.",
+    "off": "La sauvegarde des paramètres avant les mises à jour est désactivée (Paramètres → Mises à jour des paquets).",
+    "clear": "Supprimer les sauvegardes",
+    "cleared": "Sauvegardes des paramètres supprimées."
+  },
+  "vulnerable": {
+    "title_one": "{{count}} paquet a une vulnérabilité connue",
+    "title_many": "{{count}} paquets ont des vulnérabilités connues",
+    "title_other": "{{count}} paquets ont des vulnérabilités connues",
+    "text": "D’après OSV.dev, la version installée présente une faille de sécurité. Mettez-la à jour ou désinstallez le paquet si vous n’en avez pas besoin.",
+    "more_one": "et {{count}} autre",
+    "more_many": "et {{count}} autres",
+    "more_other": "et {{count}} autres",
+    "update": "mise à jour vers {{version}} disponible",
+    "noUpdate": "pas encore de version corrigée"
+  },
+  "notificationActions": {
+    "updateAll": "Tout mettre à jour",
+    "show": "Afficher",
+    "open": "Ouvrir",
+    "details": "Détails"
+  },
+  "orgPolicy": {
+    "title": "Certains paramètres sont gérés par votre organisation",
+    "text": "Stratégies de groupe HubGet (registre HKLM\\SOFTWARE\\Policies\\HubGet). Ces options ne peuvent pas être modifiées ici :",
+    "item": {
+      "sources": "Gestionnaires de paquets autorisés : {{list}}",
+      "apps_one": "Seule {{count}} application approuvée peut être installée",
+      "apps_many": "Seules {{count}} applications approuvées peuvent être installées",
+      "apps_other": "Seules {{count}} applications approuvées peuvent être installées",
+      "developerMode": "Le mode Développeur est désactivé",
+      "customCommands": "Les arguments et commandes personnalisés sont désactivés",
+      "signIn": "La connexion et la synchronisation sont désactivées",
+      "autoUpdates": "Les mises à jour automatiques de toutes les applications sont activées",
+      "minAge_one": "Ancienneté minimale des mises à jour : {{count}} jour",
+      "minAge_many": "Ancienneté minimale des mises à jour : {{count}} jours",
+      "minAge_other": "Ancienneté minimale des mises à jour : {{count}} jours",
+      "selfUpdate": "HubGet ne se met pas à jour lui-même – votre organisation gère les versions"
+    },
+    "appBlocked": "{{name}} : votre organisation n’a pas approuvé cette application",
+    "sourceBlocked": "{{name}} : votre organisation a désactivé {{source}}",
+    "signInBlocked": "Votre organisation a désactivé la connexion."
+  },
+  "reliability": {
+    "setting": "Fiabilité des versions selon la communauté",
+    "settingHint": "Après une mise à jour, signale anonymement si elle a réussi, échoué ou a été annulée (uniquement le paquet, la version et un identifiant aléatoire de cette installation). En échange, indique les versions qui posent problème aux autres – les mises à jour automatiques attendent pour celles-ci.",
+    "note_one": "{{percent}} % des utilisateurs signalent des problèmes ({{count}} signalement) – échec ou retour en arrière",
+    "note_many": "{{percent}} % des utilisateurs signalent des problèmes ({{count}} signalements) – échec ou retour en arrière",
+    "note_other": "{{percent}} % des utilisateurs signalent des problèmes ({{count}} signalements) – échec ou retour en arrière",
+    "skippedAuto": "{{name}} {{version}} : la mise à jour automatique attend – d’autres utilisateurs signalent des problèmes avec cette version"
+  },
+  "transfer": {
+    "title": "Paramètres des applications vers un nouveau PC",
+    "hint": "Les paramètres des applications choisies, depuis AppData dans un fichier chiffré par votre mot de passe – à restaurer sur le nouveau PC.",
+    "export": "Enregistrer…",
+    "import": "Restaurer…",
+    "exportTitle": "Enregistrer les paramètres des applications",
+    "exportText": "Choisissez les applications dont vous voulez transférer les paramètres. Les caches et journaux ne sont pas enregistrés.",
+    "scanning": "Recherche des paramètres des applications…",
+    "nothing": "Aucune application installée n’a de paramètres à transférer dans AppData.",
+    "warning": "Les paramètres contiennent souvent des connexions et mots de passe : le fichier est donc protégé par un mot de passe. Sans lui, personne ne peut l’ouvrir, pas même HubGet ; il n’est enregistré nulle part.",
+    "password": "Mot de passe",
+    "passwordAgain": "Confirmez le mot de passe",
+    "passwordShort_one": "Le mot de passe doit comporter au moins {{count}} caractère",
+    "passwordShort_many": "Le mot de passe doit comporter au moins {{count}} caractères",
+    "passwordShort_other": "Le mot de passe doit comporter au moins {{count}} caractères",
+    "passwordMismatch": "Les mots de passe ne correspondent pas",
+    "save": "Enregistrer ({{size}})",
+    "fileName": "Paramètres des applications",
+    "saved_one": "Paramètres de {{count}} application enregistrés ({{size}}) : {{path}}",
+    "saved_many": "Paramètres de {{count}} applications enregistrés ({{size}}) : {{path}}",
+    "saved_other": "Paramètres de {{count}} applications enregistrés ({{size}}) : {{path}}",
+    "failed": "Le transfert des paramètres a échoué : {{error}}",
+    "importTitle": "Restaurer les paramètres des applications",
+    "importText": "Choisissez un fichier .hubget-settings et saisissez le mot de passe utilisé pour l’enregistrer. Les paramètres du fichier remplacent les actuels, qui vont dans la Corbeille. Fermez les applications avant la restauration.",
+    "chooseFile": "Choisir le fichier et restaurer",
+    "restored_one": "Paramètres de {{count}} application restaurés : {{names}}",
+    "restored_many": "Paramètres de {{count}} applications restaurés : {{names}}",
+    "restored_other": "Paramètres de {{count}} applications restaurés : {{names}}",
+    "restoredNothing": "Le fichier ne contenait aucun paramètre restaurable."
+  },
+  "openWith": {
+    "title": "Avec quoi ouvrir les fichiers .{{ext}} ?",
+    "titleEmpty": "Avec quoi ouvrir ce fichier ?",
+    "subtitle": "Applications du catalogue qui ouvrent les fichiers avec cette extension – les installées d’abord.",
+    "file": "Fichier {{file}}",
+    "placeholder": "Extension, par ex. .psd",
+    "hint": "Saisissez une extension ou faites glisser un fichier n’importe où dans la fenêtre de HubGet.",
+    "none": "Aucune application du catalogue n’indique ouvrir les fichiers .{{ext}}. Essayez une recherche par type de fichier.",
+    "installed_one": "Installée ({{count}})",
+    "installed_many": "Installées ({{count}})",
+    "installed_other": "Installées ({{count}})",
+    "available_one": "Disponible ({{count}})",
+    "available_many": "Disponibles ({{count}})",
+    "available_other": "Disponibles ({{count}})",
+    "searchHint_one": "{{count}} application du catalogue ouvre les fichiers .{{ext}} – afficher",
+    "searchHint_many": "{{count}} applications du catalogue ouvrent les fichiers .{{ext}} – afficher",
+    "searchHint_other": "{{count}} applications du catalogue ouvrent les fichiers .{{ext}} – afficher",
+    "dropTitle": "Avec quoi ouvrir ce fichier ?",
+    "dropText": "Déposez le fichier – HubGet trouve les applications qui l’ouvrent. Le fichier n’est envoyé nulle part."
+  },
+  "disk": {
+    "shortage": "Il ne reste que {{free}} sur le lecteur {{drive}} ; l’installation a besoin d’environ {{needed}}. Libérez de l’espace – par exemple dans Vue d’ensemble du PC (nettoyage des caches, applications inutilisées).",
+    "batchShortage": "Le lecteur {{drive}} a {{free}} de libre ; toutes les mises à jour ont besoin d’environ {{needed}} – certaines risquent de ne pas passer. HubGet vérifie l’espace avant chacune."
+  },
+  "releaseHistory": {
+    "title": "Nouveautés depuis votre version {{version}}",
+    "subtitle_one": "La mise à jour vers {{version}} apporte {{count}} version (depuis GitHub) :",
+    "subtitle_many": "La mise à jour vers {{version}} apporte {{count}} versions (depuis GitHub) :",
+    "subtitle_other": "La mise à jour vers {{version}} apporte {{count}} versions (depuis GitHub) :",
+    "more_one": "Afficher {{count}} autre version",
+    "more_many": "Afficher {{count}} autres versions",
+    "more_other": "Afficher {{count}} autres versions"
+  },
+  "diagnostics": {
+    "title": "Diagnostic",
+    "label": "Diagnostic pour l’assistance",
+    "hint": "Versions de HubGet et de Windows, état des gestionnaires de paquets, principaux paramètres, erreurs récentes et journal dans un seul texte – sans nom du PC, d’utilisateur ni e-mails. Rien n’est envoyé ; joignez-le à votre signalement.",
+    "save": "Enregistrer…",
+    "copy": "Copier",
+    "copied": "Diagnostic copié dans le presse-papiers."
+  },
+  "windowsHealth": {
+    "title": "État de Windows",
+    "supported": "{{version}} – mises à jour de sécurité jusqu’au {{date}}",
+    "supportedOpen": "{{version}} – reçoit les mises à jour de sécurité",
+    "ending": "{{version}} ne reçoit les mises à jour de sécurité que jusqu’au {{date}}",
+    "endingHint": "Installez une version plus récente de Windows (Paramètres → Windows Update) pour rester protégé.",
+    "ended": "{{version}} ne reçoit plus de mises à jour de sécurité depuis le {{date}}",
+    "endedHint": "Passez à une version plus récente de Windows 11 dans Paramètres → Windows Update.",
+    "endedHint10": "Sans mises à jour de sécurité étendues (ESU), passez à Windows 11 – gratuit si votre PC le prend en charge.",
+    "reboot": "Windows attend un redémarrage après les mises à jour",
+    "rebootHint": "Un redémarrage termine les mises à jour de Windows ; d’ici là, certaines installations peuvent échouer.",
+    "uptime_one": "Le PC tourne sans redémarrage depuis {{count}} jour",
+    "uptime_many": "Le PC tourne sans redémarrage depuis {{count}} jours",
+    "uptime_other": "Le PC tourne sans redémarrage depuis {{count}} jours",
+    "uptimeHint": "Le démarrage rapide de Windows ne redémarre pas le PC à l’arrêt – choisissez Redémarrer de temps en temps.",
+    "disk": "Lecteur {{drive}} – {{free}} libres sur {{total}}",
+    "diskHint": "L’espace se fait rare – installations et mises à jour peuvent échouer. Nettoyez les caches ci-dessous et désinstallez les applications inutilisées.",
+    "protectionOn": "La protection du système est activée – les points de restauration sont possibles",
+    "protectionOff": "La protection du système est désactivée – impossible de créer des points de restauration",
+    "protectionHint": "Activez-la dans Panneau de configuration → Système → Protection du système → Configurer (lecteur C:). HubGet pourra alors créer un point de restauration avant une mise à jour groupée."
   }
 }

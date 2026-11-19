@@ -2,7 +2,7 @@
  * Nabídka možností instalace (po vzoru UniGetUI):
  *  - InstallMenuItems – položky nabídky (Nainstalovat, Možnosti instalace,
  *    Ruční instalace, Jako správce, Interaktivně, Bez kontrolního součtu,
- *    Stáhnout instalátor, Podrobnosti),
+ *    Stáhnout instalátor, Vyzkoušet ve Windows Sandboxu, Podrobnosti),
  *  - InstallSplitMenu – šipka vedle tlačítka Instalovat v detailu aplikace,
  *  - PackageContextMenuHost – kontextová nabídka (pravé tlačítko) na kartách a řádcích,
  *  - usePackageMenuHandlers – pravé tlačítko a klávesové zkratky pro kartu.
@@ -13,6 +13,7 @@ import {
   ChevronDown,
   Download,
   ExternalLink,
+  FlaskConical,
   Hand,
   Hash,
   Info,
@@ -31,6 +32,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent, type MouseEvent } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
+import { trySandbox } from "@/lib/sandbox";
 import { useNavigate } from "react-router";
 import { useDismiss } from "@/hooks/useDismiss";
 import { useInstallActions } from "@/hooks/useInstallActions";
@@ -168,6 +170,10 @@ export function InstallMenuItems({ entry, source, showDetails = true, onClose }:
         hint={!support?.download ? t("installMenu.unsupported") : undefined}
         onClick={run(actions.download)}
       />
+      {/* Vyzkoušet v izolovaném Windows Sandboxu – jen WinGet (instalátor stáhne winget) */}
+      {isTauri() && actions.source?.source === "winget" && (
+        <Item icon={FlaskConical} label={t("installMenu.sandbox")} onClick={run(() => void trySandbox(actions.source!.packageId, entry.name))} />
+      )}
 
       {showDetails && (
         <>

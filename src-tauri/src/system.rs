@@ -212,3 +212,96 @@ fn broker_status() -> BrokerStatus {
 fn broker_status() -> BrokerStatus {
     BrokerStatus { installed: false, running: false, service: None }
 }
+
+/// Místo na systémovém disku (sem stahují a rozbalují instalátory i většina programů).
+#[derive(Serialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct DiskSpace {
+    /// Písmeno disku, např. „C:“.
+    pub drive: String,
+    /// Volné místo dostupné uživateli (bajty).
+    pub free: u64,
+    pub total: u64,
+}
+
+/// Volné místo na systémovém disku – kontrola před instalací a Přehled počítače.
+#[tauri::command]
+pub fn disk_space() -> Option<DiskSpace> {
+    let drive = std::env::var("SystemDrive").ok().filter(|d| d.len() == 2).unwrap_or_else(|| "C:".into());
+    free_space(&format!("{drive}\\")).map(|(free, total)| DiskSpace { drive, free, total })
+}
+
+#[cfg(windows)]
+fn free_space(root: &str) -> Option<(u64, u64)> {
+    use windows_sys::Win32::Storage::FileSystem::GetDiskFreeSpaceExW;
+    let wide: Vec<u16> = root.encode_utf16().chain(Some(0)).collect();
+    let (mut available, mut total, mut total_free) = (0u64, 0u64, 0u64);
+    // SAFETY: řetězec zakončený nulou žije po celé volání, ukazatele na proměnné na zásobníku
+    let ok = unsafe { GetDiskFreeSpaceExW(wide.as_ptr(), &mut available, &mut total, &mut total_free) };
+    (ok != 0).then_some((available, total))
+}
+
+#[cfg(not(windows))]
+fn free_space(_root: &str) -> Option<(u64, u64)> {
+    None
+}
+
+#[cfg(all(test, windows))]
+mod disk_tests {
+    #[test]
+    fn misto_na_systemovem_disku() {
+        let space = super::disk_space().expect("systémový disk");
+        assert!(space.drive.ends_with(':') && space.total > 0 && space.free <= space.total);
+    }
+}
+
+/// Stav Windows pro Přehled počítače: čekající restart po aktualizacích, doba od spuštění
+/// a zapnutá ochrana systému (body obnovení).
+#[derive(Serialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct WindowsHealth {
+    /// Windows Update nebo servis součástí čeká na restart.
+    pub reboot_pending: bool,
+    /// Dní od spuštění počítače.
+    pub uptime_days: u32,
+    /// Ochrana systému (body obnovení) – None, když to registr neříká.
+    pub system_protection: Option<bool>,
+}
+
+#[tauri::command]
+pub async fn windows_health() -> Result<WindowsHealth, String> {
+    crate::process::background(|| Ok(read_windows_health())).await
+}
+
+#[cfg(windows)]
+fn read_windows_health() -> WindowsHealth {
+    use winreg::enums::{HKEY_LOCAL_MACHINE, KEY_READ};
+    use winreg::RegKey;
+    let hklm = RegKey::predef(HKEY_LOCAL_MACHINE);
+    let exists = |path: &str| hklm.open_subkey_with_flags(path, KEY_READ).is_ok();
+    let reboot_pending = exists(r"SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired")
+        || exists(r"SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\RebootPending");
+    // RPSessionInterval: 1 = ochrana systému zapnutá aspoň na jednom disku, 0 = vypnutá
+    let system_protection = hklm
+        .open_subkey_with_flags(r"SOFTWARE\Microsoft\Windows NT\CurrentVersion\SystemRestore", KEY_READ)
+        .ok()
+        .and_then(|key| key.get_value::<u32, _>("RPSessionInterval").ok())
+        .map(|value| value != 0);
+    // SAFETY: bez parametrů, jen čte čítač systému
+    let uptime_ms = unsafe { windows_sys::Win32::System::SystemInformation::GetTickCount64() };
+    WindowsHealth { reboot_pending, uptime_days: (uptime_ms / 86_400_000) as u32, system_protection }
+}
+
+#[cfg(not(windows))]
+fn read_windows_health() -> WindowsHealth {
+    WindowsHealth { reboot_pending: false, uptime_days: 0, system_protection: None }
+}
+
+#[cfg(all(test, windows))]
+mod health_tests {
+    #[test]
+    fn stav_windows() {
+        let health = super::read_windows_health();
+        assert!(health.uptime_days < 10_000);
+    }
+}

@@ -121,6 +121,8 @@ export interface WingetManifest {
   Scope?: string;
   MinimumOSVersion?: string;
   Dependencies?: WingetDependencies;
+  /** Přípony souborů, které aplikace otevírá (i u jednotlivých instalátorů). */
+  FileExtensions?: string[];
   Installers?: WingetInstaller[];
 }
 
@@ -138,6 +140,7 @@ export interface WingetInstaller {
   InstallerSha256?: string;
   MinimumOSVersion?: string;
   Dependencies?: WingetDependencies;
+  FileExtensions?: string[];
 }
 
 const cdnLimiter = new Limiter(16);

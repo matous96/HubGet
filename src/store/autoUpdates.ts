@@ -72,6 +72,12 @@ export interface AutoUpdatesSettings {
   minAgeDays: number;
   /** Jiné minimální stáří pro jednotlivé správce (chybí = podle minAgeDays). */
   minAgeBySource: Partial<Record<SourceId, number>>;
+  /** Bezpečnostní aktualizace (lib/securityUpdates.ts) nabídnout hned, bez minimálního stáří. */
+  securityNoWait: boolean;
+  /** Hledat známé zranitelnosti balíčků režimu Vývojář na OSV.dev (posílá název a verzi balíčku). */
+  osvCheck: boolean;
+  /** Spolehlivost verzí od komunity: anonymně hlásit výsledky aktualizací a ukazovat souhrn (store/reliability.ts). */
+  communityReliability: boolean;
   /** Po kolika „úspěšných“ aktualizacích bez změny verze ji přestat nabízet (0 = nikdy). */
   stuckLimit: number;
   /** Varovat, když se mezi nainstalovanou a novou verzí změní server instalátoru (winget); automaticky takovou aktualizaci neinstalovat. */
@@ -124,6 +130,9 @@ export const useAutoUpdates = create<AutoUpdatesState>()(
       missed: "delay",
       minAgeDays: 0,
       minAgeBySource: {},
+      securityNoWait: true,
+      osvCheck: false,
+      communityReliability: false,
       stuckLimit: 3,
       warnHostChange: true,
       preselectUpdates: false,

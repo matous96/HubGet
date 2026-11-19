@@ -1,9 +1,10 @@
-import { ArrowUpCircle, Heart, Star, TriangleAlert } from "lucide-react";
+import { ArrowUpCircle, Heart, ShieldAlert, Star, TriangleAlert } from "lucide-react";
 import { memo } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { GitHubIcon } from "@/components/ui/BrandIcons";
 import { usePackageState } from "@/hooks/usePackages";
+import { useIsSecurityUpdate } from "@/hooks/useSecurityUpdates";
 import { cn } from "@/lib/utils";
 import { knownGithubStars } from "@/services/github";
 import { useFavorites } from "@/store/favorites";
@@ -29,9 +30,15 @@ interface PackageCardProps {
   className?: string;
   /** Poznámka místo popisu (Nepoužívané: „Naposledy spuštěno před 8 měsíci“). */
   note?: string;
-  /** Vzhled poznámky: upozornění (oranžová), nebo informace (Co je nového). */
-  noteTone?: "warning" | "info";
+  /** Vzhled poznámky: upozornění (oranžová), informace (Co je nového), bezpečnostní oprava (červená). */
+  noteTone?: NoteTone;
 }
+
+export type NoteTone = "warning" | "info" | "danger";
+
+/** Barva poznámky místo popisu – společná pro kartu i řádek. */
+export const noteToneClass = (tone: NoteTone) =>
+  tone === "warning" ? "font-medium text-amber-600 dark:text-amber-400" : tone === "danger" ? "font-medium text-danger" : "text-fg/80";
 
 /**
  * Karta balíčku pro mřížku a police. Celá karta je klikací (odkaz na detail
@@ -48,6 +55,8 @@ export const PackageCard = memo(function PackageCard({ entry, showUninstall, cla
   const { t } = useTranslation();
   const { status, installed, job } = usePackageState(entry.id);
   const hostChange = useInstallerHostChange(installed);
+  // Aktualizace opravuje bezpečnostní chybu (poznámky k verzi, OSV.dev) – červený odznak
+  const security = useIsSecurityUpdate(installed);
   const isFavorite = useFavorites((s) => s.items.some((i) => i.appId === entry.id));
   const selected = useSelection((s) => !!s.items[entry.id]);
   // Pravé tlačítko = nabídka instalace, Ctrl+Enter / Alt+Enter = instalovat / možnosti
@@ -88,14 +97,20 @@ export const PackageCard = memo(function PackageCard({ entry, showUninstall, cla
       <div className="absolute top-4 right-4 flex max-w-[55%] flex-col items-end gap-1.5 transition-opacity group-hover:opacity-0 group-focus-within:opacity-0">
         {status === "updatable" && installed?.availableVersion && (
           <span
-            title={hostChange ? t("hostChange.title", { from: hostChange.from, to: hostChange.to }) : undefined}
+            title={hostChange ? t("hostChange.title", { from: hostChange.from, to: hostChange.to }) : security ? t("security.badge") : undefined}
             className={cn(
               "inline-flex h-6 max-w-full items-center gap-1 rounded-full px-2 text-[11px] font-semibold tabular-nums",
-              // Instalátor nové verze z jiného serveru (winget) – oranžově
-              hostChange ? "bg-amber-500/15 text-amber-700 dark:text-amber-300" : "bg-accent/12 text-accent",
+              // Instalátor nové verze z jiného serveru (winget) – oranžově, bezpečnostní oprava červeně
+              hostChange ? "bg-amber-500/15 text-amber-700 dark:text-amber-300" : security ? "bg-danger/12 text-danger" : "bg-accent/12 text-accent",
             )}
           >
-            {hostChange ? <TriangleAlert className="size-3 shrink-0" /> : <ArrowUpCircle className="size-3 shrink-0" />}
+            {hostChange ? (
+              <TriangleAlert className="size-3 shrink-0" />
+            ) : security ? (
+              <ShieldAlert aria-label={t("security.badge")} className="size-3 shrink-0" />
+            ) : (
+              <ArrowUpCircle className="size-3 shrink-0" />
+            )}
             <span className="truncate">{installed.availableVersion}</span>
           </span>
         )}
@@ -145,7 +160,7 @@ export const PackageCard = memo(function PackageCard({ entry, showUninstall, cla
       <p
         className={cn(
           "mt-2 line-clamp-2 h-10 shrink-0 text-[13px] leading-5 break-words",
-          note ? (noteTone === "warning" ? "font-medium text-amber-600 dark:text-amber-400" : "text-fg/80") : "text-muted",
+          note ? noteToneClass(noteTone) : "text-muted",
         )}
         title={note ?? (entry.description || undefined)}
       >

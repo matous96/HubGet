@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import i18n, { detectLanguage } from "@/i18n";
 import { getSource, isSourceId, SOURCE_IDS } from "@/services/managers/sources";
+import { sourceAllowed } from "./orgPolicy";
 import type { ArchFilterValue } from "@/lib/arch";
 import type { SortMode, SourceId, ThemeSetting, UserMode, ViewMode } from "@/types";
 
@@ -27,6 +28,8 @@ interface SettingsState {
   globalShortcut: boolean;
   /** Desktop: příkaz hubget v terminálu (skript ve složce WindowsApps – cli.rs). */
   cliCommand: boolean;
+  /** Před aktualizací zálohovat nastavení aplikace (AppData) – obnoví se při vrácení aktualizace. */
+  backupSettings: boolean;
   /** Barva zvýraznění (tlačítka, odznaky, aktivní stavy) jako HEX; null = výchozí modrá HubGetu. */
   accentColor: string | null;
   /** Před operací ukončit procesy aplikace běžící na pozadí (bez okna) bez dotazu. */
@@ -56,6 +59,7 @@ interface SettingsState {
   setTrayBadge: (enabled: boolean) => void;
   setGlobalShortcut: (enabled: boolean) => void;
   setCliCommand: (enabled: boolean) => void;
+  setBackupSettings: (enabled: boolean) => void;
   setAccentColor: (color: string | null) => void;
   setCloseBackgroundProcesses: (enabled: boolean) => void;
   setForceCloseRunning: (enabled: boolean) => void;
@@ -81,6 +85,7 @@ export const useSettings = create<SettingsState>()(
       trayBadge: true,
       globalShortcut: true,
       cliCommand: true,
+      backupSettings: true,
       accentColor: null,
       closeBackgroundProcesses: true,
       forceCloseRunning: true,
@@ -107,6 +112,7 @@ export const useSettings = create<SettingsState>()(
       setTrayBadge: (trayBadge) => set({ trayBadge }),
       setGlobalShortcut: (globalShortcut) => set({ globalShortcut }),
       setCliCommand: (cliCommand) => set({ cliCommand }),
+      setBackupSettings: (backupSettings) => set({ backupSettings }),
       setAccentColor: (accentColor) => set({ accentColor: accentColor && /^#[0-9a-f]{6}$/i.test(accentColor) ? accentColor : null }),
       setCloseBackgroundProcesses: (closeBackgroundProcesses) => set({ closeBackgroundProcesses }),
       setForceCloseRunning: (forceCloseRunning) => set({ forceCloseRunning }),
@@ -156,5 +162,7 @@ export function sourcePriority(enabled: SourceId[], preferred: SourceId): Source
  * uživateli by do výsledků přidali knihovny a zpomalili seznam nainstalovaných.
  */
 export function activeSources(enabled: SourceId[], userMode: UserMode): SourceId[] {
-  return userMode === "developer" ? enabled : enabled.filter((id) => getSource(id).group === "apps");
+  // Firemní zásady: jen povolení správci (store/orgPolicy.ts – useOrgPolicySync vrací i nastavení)
+  const allowed = enabled.filter((id) => sourceAllowed(id));
+  return userMode === "developer" ? allowed : allowed.filter((id) => getSource(id).group === "apps");
 }

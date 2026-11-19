@@ -505,7 +505,8 @@
     "opened_other": "已加载合集（{{count}} 个应用）",
     "openFailed": "无法打开该文件——它不是 HubGet 合集。",
     "commandsCopied_one": "已复制 {{count}} 条命令",
-    "commandsCopied_other": "已复制 {{count}} 条命令"
+    "commandsCopied_other": "已复制 {{count}} 条命令",
+    "configuration": "保存为 winget configure"
   },
   "menu": {
     "more": "更多选项",
@@ -600,7 +601,8 @@
       "appClosed": "{{name}} 正在运行——已关闭（进程 {{processes}}），以便安装程序覆盖它。",
       "appClosing": "{{name}} 关闭时询问是否保存工作——正在等待用户关闭它。",
       "appCloseTimeout": "{{name}} 保持打开 15 分钟——操作已取消。",
-      "needsAdmin": "{{name}} 需要管理员权限才能更新——将等待手动更新。"
+      "needsAdmin": "{{name}} 需要管理员权限才能更新——将等待手动更新。",
+      "settingsBackupFailed": "更新前无法备份 {{name}} 的设置：{{error}}"
     },
     "notice": {
       "prefetchFailed": "无法提前下载安装程序（{{detail}}）——将由 WinGet 下载。",
@@ -972,7 +974,8 @@
     "cliVersions": "版本",
     "cliPin": "固定版本",
     "cliMore": "更多命令和说明",
-    "cliUnsupported": "{{manager}} 不支持此操作"
+    "cliUnsupported": "{{manager}} 不支持此操作",
+    "openSourceAlternatives": "{{name}} 的开源替代品"
   },
   "report": {
     "button": "报告问题",
@@ -1009,7 +1012,9 @@
     "email": "电子邮件",
     "short": "{{name}}——来看看这个应用",
     "message": "推荐你试试 {{name}}：{{description}}\n\n在 HubGet 中打开：{{link}}\n或用此命令安装：{{command}}",
-    "messageNoCommand": "推荐 {{name}}：{{description}}\n\n在 HubGet 中打开：{{link}}"
+    "messageNoCommand": "推荐 {{name}}：{{description}}\n\n在 HubGet 中打开：{{link}}",
+    "badge": "README 徽章",
+    "badgeHint": "用于 GitHub README 或网站的“通过 HubGet 安装”"
   },
   "auth": {
     "signIn": "登录",
@@ -1085,7 +1090,20 @@
   },
   "offline": {
     "title": "没有网络连接",
-    "text": "已安装的应用和已保存的目录仍可使用；安装、更新、包管理器搜索和评分需要网络连接"
+    "text": "已安装的应用和已保存的目录仍可使用；安装、更新、包管理器搜索和评分需要网络连接",
+    "button": "准备离线安装",
+    "picking": "选择保存安装程序的文件夹（例如 U 盘）…",
+    "progress": "正在下载 {{done}}/{{total}}：{{name}}",
+    "scriptAdmin": "应用将静默安装。为所有用户安装时可能需要管理员权限。",
+    "scriptDone": "完成。",
+    "readmeIntro": "来自 HubGet 的应用安装程序，适用于无网络的电脑。运行 install.cmd 即可安装以下应用：",
+    "readmeManual": "脚本不会安装以下应用（压缩包或便携版）——请手动解压或复制：",
+    "done_other": "离线包已准备好（{{count}} 个应用）：{{folder}}",
+    "cancelled_other": "已取消——已保存 {{count}} 个应用：{{folder}}",
+    "manual": "无法自动安装（压缩包或便携版）：{{names}}",
+    "failed": "无法下载：{{names}}",
+    "skipped_other": "{{count}} 个应用不是来自 WinGet，无法加入离线包",
+    "error": "无法准备离线包：{{error}}"
   },
   "crash": {
     "pageTitle": "无法显示此页面",
@@ -1386,7 +1404,9 @@
     "interactive": "请完成安装向导",
     "installing": "正在安装",
     "uninstalling": "正在卸载",
-    "estimate": "估计值——安装程序不报告进度"
+    "estimate": "估计值——安装程序不报告进度",
+    "remainingSeconds_other": "剩余 {{count}} 秒",
+    "remainingMinutes_other": "剩余 {{count}} 分钟"
   },
   "status": {
     "updates": "更新",
@@ -1415,7 +1435,8 @@
     "importHint": "安装另一台电脑上的应用配置",
     "imported_one": "配置已载入——{{count}} 个应用已放入软件包合集",
     "imported_other": "配置已载入——{{count}} 个应用已放入软件包合集",
-    "importFailed": "无法载入文件——它既不是 HubGet 配置，也不是 WinGet 导出文件。"
+    "importFailed": "无法载入文件——它既不是 HubGet 配置，也不是 WinGet 导出文件。",
+    "configurationTitle": "新电脑的应用"
   },
   "profileImport": {
     "title": "导入配置",
@@ -1561,7 +1582,9 @@
     "depKind_runtime": "运行时",
     "depKind_feature": "Windows 功能",
     "virusTotal": "在 VirusTotal 上检查",
-    "virusTotalHint": "数十款杀毒引擎对具有此哈希值的安装程序的检测结果。不会上传任何内容——VirusTotal 按哈希值查找文件。"
+    "virusTotalHint": "数十款杀毒引擎对具有此哈希值的安装程序的检测结果。不会上传任何内容——VirusTotal 按哈希值查找文件。",
+    "fileTypes_other": "可打开 {{count}} 种文件类型",
+    "fileTypesMore_other": "+ 另外 {{count}} 种"
   },
   "installMenu": {
     "install": "安装",
@@ -1574,7 +1597,8 @@
     "download": "下载安装程序",
     "details": "详细信息",
     "more": "更多安装选项",
-    "unsupported": "此包管理器不支持该操作"
+    "unsupported": "此包管理器不支持该操作",
+    "sandbox": "在 Windows 沙盒中试用"
   },
   "installOptions": {
     "title": "安装选项——{{name}}",
@@ -1732,7 +1756,9 @@
     "globalShortcutTaken": "无法启用 Win+Shift+H——可能已被其他程序占用（{{error}}）。",
     "cliCommand": "终端中的 hubget 命令",
     "cliCommandHint": "在命令提示符或 PowerShell 中输入如 hubget install vlc、hubget update 或 hubget help。HubGet 会执行命令并在应用中显示进度。",
-    "cliCommandFailed": "无法启用 hubget 命令：{{error}}"
+    "cliCommandFailed": "无法启用 hubget 命令：{{error}}",
+    "exportConfiguration": "导出为 winget configure",
+    "exportConfigurationHint": ".winget 文件（YAML）——在新电脑上运行 winget configure -f 文件 即可。企业和 Microsoft Dev Box 也使用这种标准格式。"
   },
   "files": {
     "saved": "已保存：{{path}}",
@@ -2156,7 +2182,8 @@
     "waiting_active_other": "{{count}} 个更新将在你暂时不使用电脑时安装。",
     "skipped_busy_other": "发现 {{count}} 个更新——自动安装将等到游戏或演示结束",
     "skipped_active_other": "发现 {{count}} 个更新——自动安装将等你暂时不使用电脑时进行",
-    "restorePointName": "HubGet - 全部更新前"
+    "restorePointName": "HubGet - 全部更新前",
+    "foundSecurity": "安全更新（{{total}} 个中的 {{security}} 个）：{{names}}"
   },
   "security": {
     "warningTitle": "警告！",
@@ -2190,7 +2217,16 @@
     "importCustomArgs": "从合集导入软件包时，允许导入自定义命令行参数",
     "importCustomArgsHint": "否则合集文件（.ubundle）中的自定义参数会被丢弃。",
     "importPrePost": "从合集导入软件包时，允许导入自定义的安装前和安装后命令",
-    "importPrePostHint": "否则合集文件中的命令会被丢弃——来自他人的合集无法运行任何东西。"
+    "importPrePostHint": "否则合集文件中的命令会被丢弃——来自他人的合集无法运行任何东西。",
+    "badge": "安全修复",
+    "note": "安全修复 · {{text}}",
+    "noteShort": "修复了安全问题",
+    "panelTitle_other": "{{count}} 个更新修复了安全问题：",
+    "updateThese_other": "立即更新",
+    "noWait": "安全更新无需等待",
+    "noWaitHint": "版本说明中标明修复安全问题（CVE、“security fix”）的更新会立即提供并安装，无需等待最短发布时间。",
+    "osv": "已知漏洞（OSV.dev）",
+    "osvHint": "对开发者模式的包（npm、Bun、pip、Cargo、.NET Tool），在开放漏洞数据库 OSV.dev 中检查已安装的版本。只发送包名和版本。"
   },
   "fallbackOffer": {
     "title": "无法安装 {{name}}",
@@ -2251,7 +2287,9 @@
     "skipNote": "自动更新将跳过 {{current}} 版本，只提供更新的版本。",
     "confirm": "回退到 {{version}}",
     "hint": "更新到 {{current}} 后应用出现问题？将其回退到更新前的版本。",
-    "unavailable": "包管理器已不再提供 {{version}} 版本——无法回退。"
+    "unavailable": "包管理器已不再提供 {{version}} 版本——无法回退。",
+    "settingsNote": "应用在更新前的设置也会从备份中恢复。当前设置将移至回收站。",
+    "settingsRestored": "已从 {{version}} 版本的备份恢复 {{name}} 的设置。"
   },
   "watch": {
     "start": "有新版本时通知我",
@@ -2345,7 +2383,9 @@
     "sig_unsigned": "未签名",
     "sig_invalid": "签名无效",
     "sig_unknown": "未找到程序",
-    "showUnsigned": "显示未签名的程序（{{count}}）"
+    "showUnsigned": "显示未签名的程序（{{count}}）",
+    "openSource": "开源替代品",
+    "openSourceHint": "这些闭源应用有免费的开源替代品。"
   },
   "cli": {
     "installQueued": "正在从终端安装：{{names}}",
@@ -2356,5 +2396,134 @@
     "updateQueued": "正在从终端更新：{{names}}",
     "upToDate": "已是最新：{{names}}",
     "notInstalled": "“{{names}}”无法唯一匹配一个已安装的应用。"
+  },
+  "jumpList": {
+    "updates": "可用更新",
+    "updateAll": "全部更新"
+  },
+  "sandbox": {
+    "unavailable": "Windows 沙盒未启用。请在“控制面板 → 程序 → 启用或关闭 Windows 功能 → Windows 沙盒”中启用（仅限 Windows 专业版和企业版，之后需重启）。",
+    "preparing": "正在为 Windows 沙盒下载 {{name}} 安装程序…",
+    "started": "Windows 沙盒正在启动，{{name}} 安装程序会在其中自动打开。关闭沙盒后不会留下任何内容。",
+    "failed": "无法在 Windows 沙盒中启动 {{name}}：{{error}}"
+  },
+  "settingsBackup": {
+    "setting": "更新前备份应用设置",
+    "settingHint": "应用在 AppData 中的文件夹（不含缓存，最多 200 MB）。回退更新时，更新前的设置也会一并恢复。",
+    "title": "应用设置备份",
+    "summary_other": "{{count}} 个应用在上次更新前的设置备份——{{size}}。",
+    "off": "更新前备份设置已关闭（设置 → 软件包更新）。",
+    "clear": "删除备份",
+    "cleared": "设置备份已删除。"
+  },
+  "vulnerable": {
+    "title_other": "{{count}} 个包存在已知漏洞",
+    "text": "据 OSV.dev 显示，已安装的版本存在安全问题。请更新，或在不需要时卸载该包。",
+    "more_other": "另外 {{count}} 个",
+    "update": "可更新到 {{version}}",
+    "noUpdate": "暂无修复版本"
+  },
+  "notificationActions": {
+    "updateAll": "全部更新",
+    "show": "查看",
+    "open": "打开",
+    "details": "详情"
+  },
+  "orgPolicy": {
+    "title": "部分设置由你的组织管理",
+    "text": "HubGet 组策略（注册表 HKLM\\SOFTWARE\\Policies\\HubGet）。以下选项无法在此更改：",
+    "item": {
+      "sources": "允许的包管理器：{{list}}",
+      "apps_other": "只能安装 {{count}} 个已批准的应用",
+      "developerMode": "开发者模式已关闭",
+      "customCommands": "自定义参数和命令已禁用",
+      "signIn": "登录和同步已关闭",
+      "autoUpdates": "已为所有应用开启自动更新",
+      "minAge_other": "更新最短发布时间：{{count}} 天",
+      "selfUpdate": "HubGet 不会自动更新——版本由你的组织管理"
+    },
+    "appBlocked": "{{name}}：你的组织未批准此应用",
+    "sourceBlocked": "{{name}}：你的组织已禁用 {{source}}",
+    "signInBlocked": "你的组织已关闭登录。"
+  },
+  "reliability": {
+    "setting": "社区版本可靠性",
+    "settingHint": "更新后匿名报告是否成功、失败或被你回退（仅包含包名、版本和本次安装的随机 ID）。作为回报，会显示其他人遇到问题的版本——自动更新会暂缓此类版本。",
+    "note_other": "{{percent}}% 的用户报告了问题（{{count}} 份报告）——更新失败或已回退",
+    "skippedAuto": "{{name}} {{version}}：自动更新暂缓——其他用户报告此版本存在问题"
+  },
+  "transfer": {
+    "title": "将应用设置迁移到新电脑",
+    "hint": "将所选应用在 AppData 中的设置保存到一个用你的密码加密的文件中，在新电脑上恢复即可。",
+    "export": "保存…",
+    "import": "恢复…",
+    "exportTitle": "保存应用设置",
+    "exportText": "选择要迁移设置的应用。缓存和日志不会保存。",
+    "scanning": "正在查找应用设置…",
+    "nothing": "已安装的应用在 AppData 中都没有可迁移的设置。",
+    "warning": "设置中通常包含登录信息和密码，因此文件由密码保护。没有密码任何人都无法打开，包括 HubGet；密码不会被保存。",
+    "password": "密码",
+    "passwordAgain": "再次输入密码",
+    "passwordShort_other": "密码至少需要 {{count}} 个字符",
+    "passwordMismatch": "两次输入的密码不一致",
+    "save": "保存（{{size}}）",
+    "fileName": "应用设置",
+    "saved_other": "已保存 {{count}} 个应用的设置（{{size}}）：{{path}}",
+    "failed": "设置迁移失败：{{error}}",
+    "importTitle": "恢复应用设置",
+    "importText": "选择一个 .hubget-settings 文件并输入保存时使用的密码。文件中的设置会替换当前设置（当前设置将移到回收站）。恢复前请关闭相关应用。",
+    "chooseFile": "选择文件并恢复",
+    "restored_other": "已恢复 {{count}} 个应用的设置：{{names}}",
+    "restoredNothing": "文件中没有可恢复的设置。"
+  },
+  "openWith": {
+    "title": "用什么打开 .{{ext}} 文件？",
+    "titleEmpty": "用什么打开这个文件？",
+    "subtitle": "目录中可打开此扩展名文件的应用——已安装的排在前面。",
+    "file": "文件 {{file}}",
+    "placeholder": "文件扩展名，例如 .psd",
+    "hint": "输入文件扩展名，或将文件拖到 HubGet 窗口任意位置。",
+    "none": "目录中没有应用声明可打开 .{{ext}} 文件。请尝试按文件类型搜索。",
+    "installed_other": "已安装（{{count}}）",
+    "available_other": "可下载（{{count}}）",
+    "searchHint_other": "目录中有 {{count}} 个应用可打开 .{{ext}} 文件——查看",
+    "dropTitle": "用什么打开这个文件？",
+    "dropText": "松开文件——HubGet 会找到能打开它的应用。文件不会被发送到任何地方。"
+  },
+  "disk": {
+    "shortage": "{{drive}} 盘仅剩 {{free}}，安装约需 {{needed}}。请释放空间——例如在“电脑概览”中清理缓存或卸载不用的应用。",
+    "batchShortage": "{{drive}} 盘剩余 {{free}}，全部更新约需 {{needed}}——部分更新可能无法进行。HubGet 会在每次更新前检查空间。"
+  },
+  "releaseHistory": {
+    "title": "自你的版本 {{version}} 以来的新内容",
+    "subtitle_other": "更新到 {{version}} 将带来 {{count}} 个版本（来自 GitHub）：",
+    "more_other": "再显示 {{count}} 个版本"
+  },
+  "diagnostics": {
+    "title": "诊断",
+    "label": "用于支持的诊断信息",
+    "hint": "将 HubGet 与 Windows 版本、包管理器状态、主要设置、最近错误和日志汇总为一段文本——不含电脑名、用户名和电子邮件。不会发送任何内容；请将其附在问题报告中。",
+    "save": "保存…",
+    "copy": "复制",
+    "copied": "诊断信息已复制到剪贴板。"
+  },
+  "windowsHealth": {
+    "title": "Windows 状态",
+    "supported": "{{version}}——安全更新截至 {{date}}",
+    "supportedOpen": "{{version}}——仍在接收安全更新",
+    "ending": "{{version}} 的安全更新仅到 {{date}} 为止",
+    "endingHint": "请安装更新的 Windows 版本（设置 → Windows 更新）以保持受保护。",
+    "ended": "{{version}} 自 {{date}} 起不再接收安全更新",
+    "endedHint": "请在“设置 → Windows 更新”中升级到更新的 Windows 11 版本。",
+    "endedHint10": "如果没有扩展安全更新（ESU），请升级到 Windows 11——电脑支持的话可免费升级。",
+    "reboot": "Windows 更新后等待重启",
+    "rebootHint": "重启后才能完成 Windows 更新；在此之前部分安装可能失败。",
+    "uptime_other": "电脑已连续运行 {{count}} 天未重启",
+    "uptimeHint": "Windows 快速启动在关机时不会真正重启电脑——请不时选择“重启”。",
+    "disk": "{{drive}} 盘：可用 {{free}}，共 {{total}}",
+    "diskHint": "空间不足——安装和更新可能失败。请清理下方的缓存并卸载不用的应用。",
+    "protectionOn": "系统保护已开启——可以创建还原点",
+    "protectionOff": "系统保护已关闭——无法创建还原点",
+    "protectionHint": "在“控制面板 → 系统 → 系统保护 → 配置”（C: 盘）中开启。之后 HubGet 可在批量更新前创建还原点。"
   }
 }

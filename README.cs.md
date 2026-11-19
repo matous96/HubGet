@@ -23,7 +23,7 @@ instalátorů po webu, bez reklam a přibalených doplňků.
   <img src="assets/readme/cs/okno-svetle.webp" alt="Okno HubGetu – domovská stránka Dnes s tipy, kolekcemi a Aplikací dne">
 </picture>
 
-Domovská stránka Dnes – tipy, kolekce a Aplikace dne. Česky i anglicky, světlý i tmavý motiv podle Windows.
+Domovská stránka Dnes – tipy, kolekce a Aplikace dne. V sedmi jazycích (čeština, angličtina, němčina, španělština, francouzština, portugalština, čínština), světlý i tmavý motiv podle Windows.
 
 </div>
 
@@ -104,6 +104,34 @@ s právy správce.
   a kontrola digitálních podpisů programů.
 - ⌨️ **Příkaz `hubget` v terminálu** – `hubget install vlc`, `hubget update`,
   `hubget search …` v příkazovém řádku i PowerShellu; průběh ukáže HubGet.
+- 📶 **Jedno procento za celou instalaci** – stahování i instalace v jednom pruhu se
+  zbývajícím časem; průběh je vidět i na ikoně v hlavním panelu, pravým tlačítkem na ní
+  rychlé akce (Dostupné aktualizace, Aktualizovat vše, Přehled počítače).
+- 🧪 **Vyzkoušet ve Windows Sandboxu** – aplikaci nainstalujete do izolovaných Windows,
+  která se po zavření zahodí; do počítače se nic nedostane.
+- 💼 **Záloha nastavení před aktualizací** – když aktualizaci vrátíte, vrátí se i nastavení.
+- 🔓 **Open-source alternativy** k uzavřeným aplikacím v detailu i v Přehledu počítače.
+- 🗂️ **Export pro `winget configure`** – nový počítač (i ve firmě) jedním příkazem.
+- 🛡️ **Bezpečnostní aktualizace napřed** – aktualizace, které opravují bezpečnostní chybu,
+  mají červený štítek, jsou v seznamu první a nečekají na minimální stáří; u balíčků pro
+  vývojáře i známé zranitelnosti z OSV.dev.
+- 🔔 **Tlačítka v oznámeních Windows** – Aktualizovat vše, Otevřít nově nainstalovanou
+  aplikaci nebo Podrobnosti o chybě rovnou z oznámení.
+- 💽 **Offline balíček** – sada aplikací na USB i s instalátory a skriptem `install.cmd`
+  pro počítač bez internetu.
+- 🏷️ **Odznak „Nainstalovat přes HubGet“** do README vývojářů (detail aplikace → Sdílet).
+- 🏢 **Firemní zásady** – zásady skupiny (šablona ADMX) i Intune: povolení správci
+  a schválené aplikace, vynucené aktualizace, bez přihlášení.
+- 👥 **Spolehlivost verzí od komunity** – dobrovolně a anonymně; verzi, kterou ostatní
+  vracejí, automatické aktualizace počkají.
+- 🔐 **Nastavení aplikací na nový počítač** – v jednom souboru zašifrovaném heslem.
+- 📂 **Čím otevřu tento soubor?** – přetáhněte soubor do okna (nebo hledejte „.psd“)
+  a HubGet nabídne aplikace, které ho otevřou.
+- 💾 **Hlídání místa na disku** – instalace, na kterou by místo nestačilo, se nespustí
+  a HubGet poradí úklid.
+- 📜 **Co je nového od vaší verze** – poznámky ke všem vydáním, která aktualizace přeskočí.
+- 🩺 **Diagnostika pro podporu** a **stav Windows** v Přehledu počítače (konec podpory,
+  čekající restart, místo na disku, body obnovení).
 - ⌨️ **Win+Shift+H** otevře HubGet odkudkoli s kurzorem ve vyhledávání; jednou týdně
   souhrn, co se nainstalovalo a co čeká.
 - 📦 **Sady balíčků a profily** – sdílitelná sada aplikací pro nový počítač, export
@@ -112,7 +140,7 @@ s právy správce.
   a příkazy pro příkazovou řádku ke zkopírování.
 - ⭐ **Komunita** – přihlášení přes GitHub, hodnocení, recenze a aktuální snímky obrazovky
   od uživatelů; synchronizace oblíbených a předvoleb mezi počítači.
-- 🌙 **Moderní okno** ve stylu Windows 11, světlý i tmavý motiv, česky i anglicky; zavřete
+- 🌙 **Moderní okno** ve stylu Windows 11, světlý i tmavý motiv, sedm jazyků (čeština, angličtina, němčina, španělština, francouzština, portugalština, čínština); zavřete
   okno a instalace doběhnou na pozadí.
 
 ## Správci balíčků
@@ -161,6 +189,24 @@ Rychlý start: `pnpm install` a `pnpm desktop` (podrobnosti níže).
 - Katalog (schéma v2) má u každé aplikace pole `sources`
   (`{ source, packageId, version, … }`). Data pipeline páruje balíčky napříč
   repozitáři podle monikeru wingetu, názvu a id – viz [data-pipeline/README.md](data-pipeline/README.md).
+
+### Testy a kontrola
+
+```
+pnpm typecheck        # typy aplikace i data pipeline
+pnpm test             # testy logiky frontendu (Vitest, src/**/*.test.ts)
+cd src-tauri && cargo test && cargo clippy --all-targets
+```
+
+Testy frontendu běží v Node bez okna (`vitest.config.ts`, úložiště v paměti –
+`src/test/setup.ts`) a hlídají logiku, kde se chyba snadno přehlédne: pravidla aktualizací,
+rozpoznání bezpečnostních oprav a dotaz na OSV.dev, alternativy, odhad průběhu, plán úloh,
+odkazy `unibox://`, exporty, firemní zásady, spolehlivost verzí, „Čím otevřu“, místo na disku,
+poznámky k vydáním, diagnostiku a podporu Windows. Workflow **Kontrola**
+(`.github/workflows/checks.yml`) je pouští při každém pushi do main a u pull requestů –
+typy a testy frontendu na Ubuntu, `cargo clippy -D warnings` a `cargo test` na Windows.
+Testy, které stahují nebo mění stav procesu, jsou `#[ignore]` a spouštějí se ručně
+(`cargo test -- --ignored --test-threads=1`).
 
 ## Spuštění (webová verze s ukázkovými daty)
 
@@ -300,6 +346,12 @@ uživatel dostane srozumitelnou hlášku s doporučením jiného zdroje.
 | `restore.rs` | Bod obnovení systému před hromadnou aktualizací (povýšený pomocník) |
 | `shortcut.rs` | Klávesová zkratka Win+Shift+H |
 | `cli.rs` | Příkaz `hubget` v terminálu (skript ve WindowsApps, předání příkazu HubGetu) |
+| `jumplist.rs` | Rychlé akce na ikoně v hlavním panelu (jump list – zástupci s příkazem `--cli`) |
+| `sandbox.rs` | Vyzkoušení aplikace ve Windows Sandboxu (`winget download`, konfigurace .wsb) |
+| `settings_backup.rs` | Záloha nastavení aplikace (AppData) před aktualizací a obnovení při vrácení |
+| `settings_transfer.rs` | Přenos nastavení aplikací na nový počítač (soubor .hubget-settings, AES-256-GCM + PBKDF2) |
+| `offline.rs` | Offline balíček ze sady (`winget download` do vybrané složky, `install.cmd` s tichou instalací) |
+| `org_policy.rs` | Firemní zásady z registru (`HKLM\SOFTWARE\Policies\HubGet`, šablona v `policies/`) |
 | `startup.rs` | Programy po spuštění (registr Run, složky Po spuštění, plánovač úloh, aplikace ze Storu), zapnutí / vypnutí / odstranění, vliv na start (WDI StartupInfo) |
 | `tracker.rs` | Sledování instalace – snímek disku a registru před a po instalaci, záznam pro čisté odinstalování |
 | `oauth.rs` | Přihlášení v systémovém prohlížeči – návrat na 127.0.0.1 (RFC 8252) |
@@ -902,8 +954,10 @@ hlídá to workflow níže, které databázi i zálohuje):
    `supabase/migrations/20261028120000_app_screenshots.sql` (snímky obrazovky od
    uživatelů, bucket `app-screenshots`) a
    `supabase/migrations/20261028160000_author_first_name.sql` (u recenzí a snímků jen
-   křestní jméno nebo přezdívka). Každý soubor v novém dotazu – dva najednou
-   skončí chybou „already exists“.
+   křestní jméno nebo přezdívka) a
+   `supabase/migrations/20261120120000_update_reports.sql` (spolehlivost verzí od komunity:
+   anonymní výsledky aktualizací, funkce `report_update_outcome()` a `update_reliability()`).
+   Každý soubor v novém dotazu – dva najednou skončí chybou „already exists“.
 3. **Authentication → Sign In / Providers**: zapněte GitHub (a Google). Každý potřebuje
    OAuth aplikaci u poskytovatele (GitHub → Settings → Developer settings → OAuth Apps,
    bez Device Flow – to je jiná aplikace než ta pro publikování; Google Cloud Console →
@@ -1157,6 +1211,122 @@ z deps.dev (Google Open Source Insights, čísla pár dní stará), s proměnnou
   odkazy z webu jen otevřou seznam), `update [aplikace…]` (bez názvu všechny; podle názvu
   jen jednoznačná shoda mezi nainstalovanými), `search <text>`, `show <aplikace>`, `updates`, `help`, `version`. Cizí
   soubor `hubget.cmd` HubGet nepřepíše; po přesunutí HubGetu skript zapíše znovu.
+- **Jedno procento a zbývající čas** (`hooks/useJobPercent.ts`, `lib/phaseEstimate.ts`):
+  instalace se stahováním ukazuje jedno procento za obě fáze – stahování vyplní pruh do
+  svého podílu (podle toho, jak dlouho obě fáze u balíčku trvaly minule, jinak podle
+  velikosti instalátoru; 20–80 %), instalace pokračuje od něj; procento nikdy neklesne
+  (víc stahovaných souborů). Bez stahování (instalátor stažený předem) jde instalace od
+  nuly. Zbývající čas: stahování podle dosavadní rychlosti + očekávaná instalace, odhadovaná
+  fáze podle očekávané délky; pod 3 s se nezobrazuje.
+- **Průběh na ikoně v hlavním panelu** (`components/layout/TaskbarProgress.tsx`,
+  `setProgressBar`, oprávnění `core:window:allow-set-progress-bar`): stejné procento jako
+  karta, žlutě (Paused), když se čeká na uživatele, běžící pruh u neurčitého průběhu.
+- **Rychlé akce na ikoně** (`src-tauri/src/jumplist.rs`, `ICustomDestinationList`): zástupci
+  na HubGet s `--cli updates` / `--cli update` / `--cli overview` (projdou cestou příkazu
+  `hubget`), názvy v jazyce aplikace posílá frontend (`set_jump_list`, jen povolené příkazy).
+- **Vyzkoušet ve Windows Sandboxu** (nabídka u Instalovat, jen WinGet; `src-tauri/src/sandbox.rs`,
+  `lib/sandbox.ts`): `winget download` stáhne a ověří instalátor do
+  `%LOCALAPPDATA%\<id aplikace>\sandbox`, konfigurace `.wsb` ho připojí do `C:\HubGet`
+  jen pro čtení a po přihlášení spustí (MSI přes msiexec, MSIX přes Add-AppxPackage, archiv
+  otevře ve Průzkumníku). Bez zapnuté funkce Windows Sandbox (Pro / Enterprise) HubGet poradí,
+  jak ji zapnout. Drží se jen poslední stažený instalátor.
+- **Záloha nastavení před aktualizací** (`src-tauri/src/settings_backup.rs`, Nastavení →
+  Aktualizace balíčků, výchozí zapnuto): před aktualizací se složky aplikace v AppData
+  (podle názvu a vydavatele jako u zbytků; ne složky s programem) zkopírují bez mezipamětí
+  do `settings-backups\<aplikace>` s verzí v `meta.json`; nad 200 MB se nezálohuje. Po
+  úspěšném vrácení aktualizace na tuto verzi se současné složky přesunou do Koše a záloha
+  se vrátí. Na každou aplikaci jen poslední záloha; přehled a smazání v Přehledu počítače.
+- **Open-source alternativy** (`lib/alternatives.ts`): u uzavřené aplikace (Proprietary,
+  Freeware, Shareware…) aplikace s otevřenou licencí ze stejné kategorie podle společných
+  štítků (vzácné štítky váží víc; aspoň 2 společné, nejméně polovina nejlepší shody) –
+  police v detailu a panel v Přehledu počítače; kurátorské `alternatives` mají přednost.
+- **Export pro winget configure** (`buildWingetConfiguration` v `lib/profile.ts`, Nastavení →
+  Záloha, Sady balíčků): soubor `.winget` (WinGet Configuration 0.2, zdroj
+  `Microsoft.WinGet.DSC/WinGetPackage`) s aplikacemi z wingetu a Microsoft Storu; ověřený
+  příkazem `winget configure validate`.
+- **Čím otevřu tento soubor?** (`lib/openWith.ts`, `pages/OpenWithPage.tsx` na `/open-with?ext=…`,
+  `components/layout/FileDropOpenWith.tsx`): data pipeline bere z manifestů wingetu
+  `FileExtensions` (kořen i instalátory, malými písmeny bez tečky, nejvýš 80) do
+  `fileExtensions` v katalogu. Soubor přetažený kamkoli do okna (běžné události prohlížeče –
+  nativní přetahování Tauri je vypnuté; místa, která soubory přijímají sama, mají přednost)
+  otevře stránku s aplikacemi: nainstalované, pak specializované (≤ 12 přípon), pak podle
+  popularity. Hledání „.psd“ ukáže odkaz, detail aplikace kartu „Otevírá N typů souborů“.
+- **Místo na disku** (`lib/diskSpace.ts`, `system.rs` → `disk_space`): fronta před instalací
+  a aktualizací porovná volné místo na systémovém disku s odhadem (instalátor + velikost po
+  instalaci, jinak trojnásobek instalátoru + 500 MB rezerva) a operaci nespustí s chybou
+  `diskFull` a radou; „Aktualizovat vše“ upozorní předem na celkový nedostatek.
+- **Co je nového od vaší verze** (`services/githubReleases.ts`, `components/package/ReleaseHistory.tsx`):
+  u aktualizace přes víc vydání a repozitáře na GitHubu vydání mezi nainstalovanou
+  a nabízenou verzí (`/repos/{repo}/releases`, bez konceptů a předběžných verzí, číslo verze
+  ze značky), Markdown převedený na text, štítek bezpečnostní opravy. Limit GitHub API sdílí
+  s hvězdičkami (`BLOCKED_KEY`).
+- **Diagnostika pro podporu** (Nastavení → Kontaktovat HubGet; `lib/diagnostics.ts`,
+  `components/settings/DiagnosticsCard.tsx`): verze, správci, disk, nastavení, firemní
+  zásady, posledních 30 neúspěšných operací a 300 řádků protokolu do souboru nebo schránky;
+  `redact()` nahradí cesty k profilu, e-maily a jméno počítače.
+- **Stav Windows** (Přehled počítače; `components/home/WindowsHealthPanel.tsx`,
+  `lib/windowsSupport.ts`, `system.rs` → `windows_health`): podpora verze Windows podle
+  endoflife.date (řada podle sestavení a edice – W / E / LTSC / IoT), čekající restart
+  (klíče `RebootRequired` a `RebootPending`), doba od spuštění, místo na disku a ochrana
+  systému (`RPSessionInterval`).
+- **Bezpečnostní aktualizace** (`lib/securityUpdates.ts`, `hooks/useSecurityUpdates.ts`): verze,
+  jejíž poznámky z katalogu mluví o CVE, GHSA, „security fix“ nebo opravené zranitelnosti
+  (jen jednoznačné obraty – nástroje pro audit mají „vulnerability“ i v popisu funkcí), má
+  červený štítek na kartě, v Co je nového a v Dostupných aktualizacích (nahoře, s tlačítkem
+  „Aktualizovat je“); oznámení o nalezených aktualizacích je jmenuje první. S Nastavení →
+  Bezpečnostní aktualizace bez čekání (výchozí zapnuto) je pravidla aktualizací
+  (`store/updateRules.ts`) nepozdrží minimálním stářím.
+- **Známé zranitelnosti** (Nastavení → Aktualizace balíčků, výchozí vypnuto;
+  `components/package/VulnerabilityWatcher.tsx`, `store/vulnerabilities.ts`): balíčky npm, Bun,
+  pip, Cargo a .NET Tool s nainstalovanou verzí jdou dávkou do `api.osv.dev/v1/querybatch`
+  (po startu, po změně verzí, nejvýš jednou za 12 h). Nález = panel v Nainstalovaných
+  s odkazy na osv.dev a aktualizace se počítá jako bezpečnostní.
+- **Tlačítka v oznámeních Windows** (`components/layout/NotificationActions.tsx`,
+  `services/notify.ts` → `actions`): typy akcí pluginu notification (`registerActionTypes`
+  v jazyce aplikace, `onAction`) – nalezené aktualizace: Aktualizovat vše (stejná fronta jako
+  příkaz `hubget update`, `runAppCommand` v `CliCommands.tsx`) a Zobrazit, hotová instalace:
+  Otevřít (položka nabídky Start), chyba: Podrobnosti. Windows klik ohlásí jen, dokud je
+  oznámení na obrazovce; okno ukáže příkaz `show_window` (`tray.rs`).
+- **Offline balíček** (Sady balíčků → Připravit pro offline; `src-tauri/src/offline.rs`,
+  `lib/offlineBundle.ts`): výběr složky v dialogu, pak `winget download` každé aplikace
+  z WinGetu (ne Store) do podsložky – winget instalátor ověří kontrolním součtem a vedle
+  uloží manifest. Z něj se vezme typ instalátoru a přepínače tiché instalace (jinak
+  výchozí jako winget: MSI `/quiet`, Inno `/VERYSILENT`, NSIS `/S`…) do `install.cmd`
+  (UTF-8, `start /wait`, `%` a znaky cmd ošetřené); archivy a přenosné aplikace vypíše
+  `README.txt` k ruční instalaci. Průběh na stránce Sad, zrušit jde po aktuální aplikaci.
+- **Odznak „Nainstalovat přes HubGet“** (`appBadge` v `config.ts`, detail → Sdílet → Odznak
+  pro README): Markdown s obrázkem `website/img/badge/hubget-<cs|en>-<dark|light>.svg`
+  a odkazem na `website/aplikace.html?id=…&name=…` (anglicky `en/app.html`) – stránka
+  ukáže název a otevře `unibox://app/<id>` (GitHub odkaz unibox:// v README nepustí),
+  bez HubGetu nabídne stažení.
+- **Firemní zásady** (`src-tauri/src/org_policy.rs`, `store/orgPolicy.ts`,
+  `hooks/useOrgPolicySync.ts`, šablona `policies/HubGet.admx` + `cs-CZ`/`en-US` ADML ze
+  `scripts/policy-templates.mjs`): hodnoty v `HKLM\SOFTWARE\Policies\HubGet` (přednost)
+  nebo `HKCU\…` se čtou při startu – `AllowedSources` (REG_SZ se středníky / MULTI_SZ),
+  `AllowedApps` (podklíč seznamu z ADMX, REG_SZ, MULTI_SZ; id balíčku nebo `zdroj:id`),
+  DWORD `DisableDeveloperMode`, `DisableCustomCommands`, `DisableSignIn`,
+  `ForceAutomaticUpdates`, `MinimumUpdateAgeDays`, `DisableSelfUpdate`. Frontend nastavení
+  srovná a drží (Nastavení ukáže „Spravuje vaše organizace“), backend instalaci mimo
+  povolené zdroje a aplikace odmítne v každém `*_operation` a vlastní argumenty a příkazy
+  zahodí (`security::policy()`). Šablonu zkopírujte do `C:\Windows\PolicyDefinitions`
+  (nebo centrálního úložiště domény); v Intune jako importovanou ADMX.
+- **Spolehlivost verzí od komunity** (Nastavení → Aktualizace balíčků, výchozí vypnuto;
+  `store/reliability.ts`, `components/package/ReliabilityWatcher.tsx`, migrace
+  `20261120120000_update_reports.sql`): po aktualizaci (`store/jobs.ts`) se anonymně nahlásí
+  výsledek – povedla se, selhala chybou, která vypovídá o verzi (vadný instalátor, odkaz,
+  kontrolní součet), nebo ji uživatel vrátil – s náhodným id instalace. Souhrn nabízených
+  verzí (od 5 hlášení) ukáže v Dostupných aktualizacích varování od 10 % problémů;
+  automatické aktualizace verzi s aspoň 10 hlášeními a 25 % problémů přeskočí (bezpečnostní
+  nikdy, ručně jde vždy).
+- **Nastavení aplikací na nový počítač** (Nastavení → Záloha a katalog;
+  `src-tauri/src/settings_transfer.rs`, `components/settings/SettingsTransfer.tsx`): složky
+  nastavení vybraných aplikací (hledání jako u zálohy před aktualizací, bez mezipamětí, logů
+  a spustitelných souborů, dohromady nejvýš 256 MB) do souboru `.hubget-settings`:
+  hlavička `HUBGETS1`, PBKDF2-HMAC-SHA256 (600 000 opakování, sůl 16 B), AES-256-GCM
+  (hlavička ověřená jako AAD), uvnitř manifest a soubory zkomprimované deflate (knihovny
+  `ring` a `flate2` už byly v sestavení). Obnovení přesune současnou složku do Koše; cesty
+  ze souboru se ověří a nezapíše nic do `Microsoft` (nabídka Start, Po spuštění),
+  `Programs`, dat HubGetu ani spustitelné soubory.
 - **Automatické aktualizace ohleduplně** (`system.rs` `power_network_status`): během
   hry, videa přes celou obrazovku a prezentace (`SHQueryUserNotificationState`) se
   nainstalují až potom; volitelně jen když se 10 minut nesáhne na klávesnici a myš

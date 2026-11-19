@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Otevřít v HubGetu – HubGet</title>
+  <meta name="description" content="Otevřete aplikaci v HubGetu – zdarma a open source obchodě s aplikacemi pro Windows. Instalaci vždy potvrdíte vy.">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#f4f5f8" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0d0f14" media="(prefers-color-scheme: dark)">
+  <link vite-ignore rel="alternate" hreflang="cs" href="aplikace.html">
+  <link vite-ignore rel="alternate" hreflang="en" href="en/app.html">
+  <link rel="icon" href="assets/unibox-mark.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    try { const t = localStorage.getItem("unibox-theme"); if (t) document.documentElement.dataset.theme = t; } catch {}
+  </script>
+</head>
+<body>
+  <a class="skip" href="#obsah" data-t="s1">Přeskočit na obsah</a>
+
+  <header class="nav" id="nav">
+    <div class="wrap nav__inner">
+      <a class="brand" href="index.html" aria-label="HubGet – úvod">
+        <img src="assets/unibox-logo.svg" alt="" width="32" height="32">
+        <span data-t="s2">HubGet</span>
+      </a>
+      <nav class="nav__links" aria-label="Hlavní navigace">
+        <a href="funkce.html" data-t="s3">Funkce</a>
+        <a href="spravci.html" data-t="s4">Správci balíčků</a>
+        <a href="novinky.html" data-t="s5">Novinky</a>
+        <a href="srovnani.html" data-t="s6">Srovnání</a>
+        <a href="co-chystame.html" data-t="s7">Co chystáme</a>
+        <a href="otazky.html" data-t="s8">Otázky</a>
+        <a class="nav__menu-only" href="kontakt.html" data-t="s9">Kontakt</a>
+      </nav>
+      <div class="nav__actions">
+        <a class="lang-switch" href="en/app.html" hreflang="en" lang="en" data-lang-switch title="English" aria-label="Switch to English" data-t="s10">EN</a>
+        <a class="icon-btn nav__mail" href="kontakt.html" aria-label="Napište nám" title="Kontakt"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="4.5" width="19" height="15" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m3 7 9 6 9-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        <a class="btn btn--primary btn--sm" href="index.html#stahnout" data-t="s11">Stáhnout</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="obsah">
+    <section class="page-head">
+      <div class="wrap">
+        <div class="page-head__inner">
+          <p class="eyebrow" data-t="t1">Otevřít v&nbsp;HubGetu</p>
+          <h1 data-app-name data-t="t8">Aplikace z&nbsp;HubGetu</h1>
+          <p class="lead" data-t="t2">Odkaz otevře aplikaci v&nbsp;HubGetu – obchodě s&nbsp;aplikacemi pro Windows. Nic se neinstaluje samo: instalaci potvrdíte v&nbsp;HubGetu.</p>
+          <div class="app-open__actions">
+            <a class="btn btn--primary btn--lg" data-app-link href="index.html" data-t="t3">Otevřít v&nbsp;HubGetu</a>
+            <a class="btn btn--ghost btn--lg" data-link="downloadExe" href="#" data-t="t4">Stáhnout HubGet</a>
+          </div>
+          <p class="app-open__hint" data-t="t5">Nemáte HubGet? Stáhněte ho zdarma, nainstalujte a&nbsp;klikněte na Otevřít v&nbsp;HubGetu znovu.</p>
+        </div>
+      </div>
+    </section>
+
+    <article class="wrap legal">
+      <h2 data-t="t6">Odznak pro váš projekt</h2>
+      <p data-t="t7">Je vaše aplikace ve WinGetu? Přidejte do README nebo na web odznak, který ji otevře v&nbsp;HubGetu. Kód odznaku zkopírujete v&nbsp;HubGetu: detail aplikace → Sdílet → Odznak pro README.</p>
+      <p class="app-open__badges"><img src="img/badge/hubget-cs-dark.svg" alt="Nainstalovat přes HubGet" width="150" height="48" data-t="i1"> <img src="img/badge/hubget-cs-light.svg" alt="Nainstalovat přes HubGet" width="150" height="48" data-t="i2"> <img src="img/badge/hubget-en-dark.svg" alt="Install with HubGet" width="130" height="48" data-t="i3"> <img src="img/badge/hubget-en-light.svg" alt="Install with HubGet" width="130" height="48" data-t="i4"></p>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer__inner">
+      <div class="footer__brand">
+        <a class="brand" href="index.html"><img src="assets/unibox-logo.svg" alt="" width="28" height="28"><span data-t="s2">HubGet</span></a>
+        <p data-t="s12">Obchod s&nbsp;aplikacemi pro Windows. Open source, licence MIT.</p>
+      </div>
+      <nav class="footer__links" aria-label="Odkazy">
+        <a data-link="github" href="#" data-t="s13">GitHub</a>
+        <a href="novinky.html" data-t="s5">Novinky</a>
+        <a href="soukromi.html" data-t="s15">Ochrana soukromí</a>
+        <a href="podpis-kodu.html" data-t="s16">Podepisování kódu</a>
+        <a href="en/app.html" hreflang="en" lang="en" data-lang-switch data-t="s17">English</a>
+      </nav>
+    </div>
+    <div class="wrap footer__note">
+      <p data-t="s18">HubGet není spojen se společností Microsoft ani s&nbsp;projekty WinGet, Chocolatey a&nbsp;Scoop. Windows je ochranná známka společnosti Microsoft.</p>
+    </div>
+  </footer>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>

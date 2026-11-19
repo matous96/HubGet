@@ -493,6 +493,94 @@ content:
                   - name: alt
                     label: "Popis obrázku (pro nevidomé a vyhledávače)"
                     type: text
+      - name: texty-cs-aplikace
+        label: "Otevřít v HubGetu"
+        type: file
+        path: website/content/texty/cs/aplikace.json
+        format: json
+        fields:
+          - name: seo
+            label: "Vyhledávače a sdílení"
+            type: object
+            fields:
+              - name: title
+                label: "Titulek stránky (záložka prohlížeče, výsledky hledání)"
+                type: string
+              - name: description
+                label: "Popis pro vyhledávače"
+                type: text
+          - name: texty
+            label: "Texty stránky (v pořadí na stránce)"
+            type: object
+            fields:
+              - name: t1
+                label: "Štítek nad nadpisem"
+                type: string
+              - name: t8
+                label: "Hlavní nadpis"
+                type: string
+              - name: t2
+                label: "Úvodní text · Aplikace z HubGetu"
+                type: text
+              - name: t3
+                label: "Tlačítko · Aplikace z HubGetu"
+                type: string
+              - name: t4
+                label: "Tlačítko · Aplikace z HubGetu"
+                type: string
+              - name: t5
+                label: "Odstavec · Aplikace z HubGetu"
+                type: text
+              - name: t6
+                label: "Nadpis sekce"
+                type: string
+              - name: t7
+                label: "Odstavec · Odznak pro váš projekt"
+                type: text
+          - name: obrazky
+            label: "Snímky obrazovky"
+            type: object
+            fields:
+              - name: i1
+                label: "Snímek obrazovky · Odznak pro váš projekt"
+                type: object
+                fields:
+                  - name: src
+                    label: "Obrázek"
+                    type: image
+                  - name: alt
+                    label: "Popis obrázku (pro nevidomé a vyhledávače)"
+                    type: text
+              - name: i2
+                label: "Snímek obrazovky · Odznak pro váš projekt"
+                type: object
+                fields:
+                  - name: src
+                    label: "Obrázek"
+                    type: image
+                  - name: alt
+                    label: "Popis obrázku (pro nevidomé a vyhledávače)"
+                    type: text
+              - name: i3
+                label: "Snímek obrazovky · Odznak pro váš projekt"
+                type: object
+                fields:
+                  - name: src
+                    label: "Obrázek"
+                    type: image
+                  - name: alt
+                    label: "Popis obrázku (pro nevidomé a vyhledávače)"
+                    type: text
+              - name: i4
+                label: "Snímek obrazovky · Odznak pro váš projekt"
+                type: object
+                fields:
+                  - name: src
+                    label: "Obrázek"
+                    type: image
+                  - name: alt
+                    label: "Popis obrázku (pro nevidomé a vyhledávače)"
+                    type: text
       - name: texty-cs-co-chystame
         label: "Co chystáme"
         type: file
@@ -1367,6 +1455,12 @@ content:
                 label: "Bod seznamu · Bez přihlášení"
                 type: text
               - name: t10
+                label: "Bod seznamu · Bez přihlášení"
+                type: text
+              - name: t27
+                label: "Bod seznamu · Bez přihlášení"
+                type: text
+              - name: t28
                 label: "Bod seznamu · Bez přihlášení"
                 type: text
               - name: t11
@@ -3062,6 +3156,94 @@ content:
                     type: text
               - name: i2
                 label: "Snímek obrazovky – tmavý motiv · One store for every app on Windows."
+                type: object
+                fields:
+                  - name: src
+                    label: "Obrázek"
+                    type: image
+                  - name: alt
+                    label: "Popis obrázku (pro nevidomé a vyhledávače)"
+                    type: text
+      - name: texty-en-app
+        label: "Open in HubGet"
+        type: file
+        path: website/content/texty/en/app.json
+        format: json
+        fields:
+          - name: seo
+            label: "Vyhledávače a sdílení"
+            type: object
+            fields:
+              - name: title
+                label: "Titulek stránky (záložka prohlížeče, výsledky hledání)"
+                type: string
+              - name: description
+                label: "Popis pro vyhledávače"
+                type: text
+          - name: texty
+            label: "Texty stránky (v pořadí na stránce)"
+            type: object
+            fields:
+              - name: t1
+                label: "Štítek nad nadpisem"
+                type: string
+              - name: t8
+                label: "Hlavní nadpis"
+                type: string
+              - name: t2
+                label: "Úvodní text · An app from HubGet"
+                type: text
+              - name: t3
+                label: "Tlačítko · An app from HubGet"
+                type: string
+              - name: t4
+                label: "Tlačítko · An app from HubGet"
+                type: string
+              - name: t5
+                label: "Odstavec · An app from HubGet"
+                type: text
+              - name: t6
+                label: "Nadpis sekce"
+                type: string
+              - name: t7
+                label: "Odstavec · A badge for your project"
+                type: text
+          - name: obrazky
+            label: "Snímky obrazovky"
+            type: object
+            fields:
+              - name: i1
+                label: "Snímek obrazovky · A badge for your project"
+                type: object
+                fields:
+                  - name: src
+                    label: "Obrázek"
+                    type: image
+                  - name: alt
+                    label: "Popis obrázku (pro nevidomé a vyhledávače)"
+                    type: text
+              - name: i2
+                label: "Snímek obrazovky · A badge for your project"
+                type: object
+                fields:
+                  - name: src
+                    label: "Obrázek"
+                    type: image
+                  - name: alt
+                    label: "Popis obrázku (pro nevidomé a vyhledávače)"
+                    type: text
+              - name: i3
+                label: "Snímek obrazovky · A badge for your project"
+                type: object
+                fields:
+                  - name: src
+                    label: "Obrázek"
+                    type: image
+                  - name: alt
+                    label: "Popis obrázku (pro nevidomé a vyhledávače)"
+                    type: text
+              - name: i4
+                label: "Snímek obrazovky · A badge for your project"
                 type: object
                 fields:
                   - name: src
@@ -5233,6 +5415,12 @@ content:
                 label: "Bod seznamu · Without signing in"
                 type: text
               - name: t10
+                label: "Bod seznamu · Without signing in"
+                type: text
+              - name: t27
+                label: "Bod seznamu · Without signing in"
+                type: text
+              - name: t28
                 label: "Bod seznamu · Without signing in"
                 type: text
               - name: t11

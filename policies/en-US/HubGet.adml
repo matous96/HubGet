@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<policyDefinitionResources xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" revision="1.0" schemaVersion="1.0" xmlns="http://schemas.microsoft.com/GroupPolicy/2006/07/PolicyDefinitions">
+  <displayName>HubGet</displayName>
+  <description>Group Policy settings for HubGet – an app store for Windows.</description>
+  <resources>
+    <stringTable>
+      <string id="HubGet">HubGet</string>
+      <string id="SUPPORTED_HubGet">HubGet with Group Policy support</string>
+      <string id="AllowedSources">Allowed package managers</string>
+      <string id="AllowedSources_Help">Package managers HubGet may use, separated by semicolons: winget, chocolatey, scoop, npm, bun, pip, cargo, vcpkg, dotnet, pwsh, powershell.
+
+For example “winget;scoop”. HubGet refuses to install or update through any other manager, and it can’t be turned on in Settings.
+
+If this policy isn’t configured, all package managers can be used.</string>
+      <string id="AllowedApps">Approved apps</string>
+      <string id="AllowedApps_Help">Only these apps can be installed in HubGet. Enter the package id (VideoLAN.VLC) or the source and id (scoop:extras/vlc), one per line.
+
+Updating and uninstalling apps that are already installed stays possible. Useful in companies and as parental control.
+
+If this policy isn’t configured, any app can be installed.</string>
+      <string id="DisableDeveloperMode">Turn off Developer mode</string>
+      <string id="DisableDeveloperMode_Help">HubGet won’t offer Developer mode and won’t install through npm, Bun, pip, Cargo, vcpkg, .NET Tool and PowerShell.</string>
+      <string id="DisableCustomCommands">Turn off custom arguments and commands</string>
+      <string id="DisableCustomCommands_Help">Custom installer arguments and commands before and after installation can’t be turned on or taken over from an imported bundle; HubGet discards them.</string>
+      <string id="DisableSignIn">Turn off sign-in and sync</string>
+      <string id="DisableSignIn_Help">HubGet won’t offer GitHub sign-in, sync between PCs, reviews or user screenshots. A signed-in user is signed out.</string>
+      <string id="ForceAutomaticUpdates">Require automatic updates</string>
+      <string id="ForceAutomaticUpdates_Help">HubGet checks for and installs updates automatically for all apps (on the schedule in Settings); the user can’t turn this off.</string>
+      <string id="MinimumUpdateAgeDays">Minimum update age</string>
+      <string id="MinimumUpdateAgeDays_Help">A new version is offered only after the given number of days since its release (0–365). Security updates don’t wait, depending on Settings.</string>
+      <string id="DisableSelfUpdate">Turn off HubGet updates</string>
+      <string id="DisableSelfUpdate_Help">HubGet won’t look for or install its own new versions – useful when you deploy HubGet as an MSI and manage versions yourself.</string>
+    </stringTable>
+    <presentationTable>
+      <presentation id="AllowedSources">
+        <textBox refId="AllowedSourcesValue"><label>Package managers (separated by semicolons):</label><defaultValue>winget</defaultValue></textBox>
+      </presentation>
+      <presentation id="AllowedApps">
+        <listBox refId="AllowedAppsValue">Allowed apps:</listBox>
+      </presentation>
+      <presentation id="MinimumUpdateAgeDays">
+        <decimalTextBox refId="MinimumUpdateAgeDaysValue" defaultValue="7">Number of days:</decimalTextBox>
+      </presentation>
+    </presentationTable>
+  </resources>
+</policyDefinitionResources>

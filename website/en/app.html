@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Open in HubGet – HubGet</title>
+  <meta name="description" content="Open an app in HubGet – the free, open-source app store for Windows. You always confirm the installation.">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#f4f5f8" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0d0f14" media="(prefers-color-scheme: dark)">
+  <link vite-ignore rel="alternate" hreflang="cs" href="../aplikace.html">
+  <link vite-ignore rel="alternate" hreflang="en" href="app.html">
+  <link rel="icon" href="../assets/unibox-mark.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="../styles.css">
+  <script>
+    try { const t = localStorage.getItem("unibox-theme"); if (t) document.documentElement.dataset.theme = t; } catch {}
+  </script>
+</head>
+<body>
+  <a class="skip" href="#obsah" data-t="s1">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="wrap nav__inner">
+      <a class="brand" href="index.html" aria-label="HubGet – home">
+        <img src="../assets/unibox-logo.svg" alt="" width="32" height="32">
+        <span data-t="s2">HubGet</span>
+      </a>
+      <nav class="nav__links" aria-label="Main navigation">
+        <a href="features.html" data-t="s3">Features</a>
+        <a href="package-managers.html" data-t="s4">Package managers</a>
+        <a href="changelog.html" data-t="s5">What’s new</a>
+        <a href="compare.html" data-t="s6">Compare</a>
+        <a href="roadmap.html" data-t="s7">Roadmap</a>
+        <a href="faq.html" data-t="s8">FAQ</a>
+        <a class="nav__menu-only" href="contact.html" data-t="s9">Contact</a>
+      </nav>
+      <div class="nav__actions">
+        <a class="lang-switch" href="../aplikace.html" hreflang="cs" lang="cs" data-lang-switch title="Česky" aria-label="Přepnout do češtiny" data-t="s10">CZ</a>
+        <a class="icon-btn nav__mail" href="contact.html" aria-label="Write to us" title="Contact"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="4.5" width="19" height="15" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m3 7 9 6 9-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        <a class="btn btn--primary btn--sm" href="index.html#stahnout" data-t="s11">Download</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="obsah">
+    <section class="page-head">
+      <div class="wrap">
+        <div class="page-head__inner">
+          <p class="eyebrow" data-t="t1">Open in HubGet</p>
+          <h1 data-app-name data-t="t8">An app from HubGet</h1>
+          <p class="lead" data-t="t2">This link opens the app in HubGet – an app store for Windows. Nothing installs on its own: you confirm the installation in HubGet.</p>
+          <div class="app-open__actions">
+            <a class="btn btn--primary btn--lg" data-app-link href="index.html" data-t="t3">Open in HubGet</a>
+            <a class="btn btn--ghost btn--lg" data-link="downloadExe" href="#" data-t="t4">Download HubGet</a>
+          </div>
+          <p class="app-open__hint" data-t="t5">Don’t have HubGet? Download it for free, install it and click Open in HubGet again.</p>
+        </div>
+      </div>
+    </section>
+
+    <article class="wrap legal">
+      <h2 data-t="t6">A badge for your project</h2>
+      <p data-t="t7">Is your app in WinGet? Add a badge to your README or website that opens it in HubGet. Copy the badge code in HubGet: app details → Share → Badge for README.</p>
+      <p class="app-open__badges"><img src="../img/badge/hubget-en-dark.svg" alt="Install with HubGet" width="130" height="48" data-t="i1"> <img src="../img/badge/hubget-en-light.svg" alt="Install with HubGet" width="130" height="48" data-t="i2"> <img src="../img/badge/hubget-cs-dark.svg" alt="Nainstalovat přes HubGet" width="150" height="48" data-t="i3"> <img src="../img/badge/hubget-cs-light.svg" alt="Nainstalovat přes HubGet" width="150" height="48" data-t="i4"></p>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer__inner">
+      <div class="footer__brand">
+        <a class="brand" href="index.html"><img src="../assets/unibox-logo.svg" alt="" width="28" height="28"><span data-t="s2">HubGet</span></a>
+        <p data-t="s19">An app store for Windows. Open source, MIT license.</p>
+      </div>
+      <nav class="footer__links" aria-label="Links">
+        <a data-link="github" href="#" data-t="s13">GitHub</a>
+        <a href="changelog.html" data-t="s5">What’s new</a>
+        <a href="privacy.html" data-t="s15">Privacy</a>
+        <a href="code-signing.html" data-t="s16">Code signing</a>
+        <a href="../aplikace.html" hreflang="cs" lang="cs" data-lang-switch data-t="s17">Česky</a>
+      </nav>
+    </div>
+    <div class="wrap footer__note">
+      <p data-t="s18">HubGet is not affiliated with Microsoft or with the WinGet, Chocolatey and Scoop projects. Windows is a trademark of Microsoft Corporation.</p>
+    </div>
+  </footer>
+
+  <script type="module" src="../main.js"></script>
+</body>
+</html>

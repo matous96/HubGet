@@ -7,6 +7,7 @@ import { useDismiss } from "@/hooks/useDismiss";
 import { cn, formatRelative } from "@/lib/utils";
 import { auth } from "@/services/auth";
 import { useAuth } from "@/store/auth";
+import { useOrgPolicy } from "@/store/orgPolicy";
 import { useSync } from "@/store/sync";
 import { Avatar } from "./Avatar";
 
@@ -19,6 +20,7 @@ const PROVIDER_LABEL = { github: "GitHub", microsoft: "Microsoft", google: "Goog
 export function AccountButton() {
   const { t, i18n } = useTranslation();
   const { user, openLogin, signOut } = useAuth();
+  const signInDisabled = useOrgPolicy((p) => p.disableSignIn);
   const [open, setOpen] = useState(false);
   const root = useRef<HTMLDivElement>(null);
   useDismiss(root, open, () => setOpen(false));
@@ -35,6 +37,8 @@ export function AccountButton() {
           ? t("sync.lastSynced", { when: formatRelative(lastSyncedAt, i18n.language) })
           : t("sync.never");
 
+  // Firemní zásady: bez přihlášení a synchronizace
+  if (signInDisabled) return null;
   if (!user) {
     return (
       <button

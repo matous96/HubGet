@@ -521,7 +521,8 @@
     "commandsCopied_one": "Zkopírován {{count}} příkaz",
     "commandsCopied_few": "Zkopírovány {{count}} příkazy",
     "commandsCopied_many": "Zkopírováno {{count}} příkazu",
-    "commandsCopied_other": "Zkopírováno {{count}} příkazů"
+    "commandsCopied_other": "Zkopírováno {{count}} příkazů",
+    "configuration": "Uložit pro winget configure"
   },
   "menu": {
     "more": "Další možnosti",
@@ -624,7 +625,8 @@
       "appClosed": "{{name}} běžela – zavřena (procesy {{processes}}), aby ji instalátor mohl přepsat.",
       "appClosing": "{{name}} se při zavírání ptá na uložení práce – čekám, až ji uživatel zavře.",
       "appCloseTimeout": "{{name}} zůstala 15 minut otevřená – operace zrušena.",
-      "needsAdmin": "{{name}} potřebuje k aktualizaci práva správce – počká na ruční aktualizaci."
+      "needsAdmin": "{{name}} potřebuje k aktualizaci práva správce – počká na ruční aktualizaci.",
+      "settingsBackupFailed": "Nastavení aplikace {{name}} se před aktualizací nepodařilo zálohovat: {{error}}"
     },
     "notice": {
       "prefetchFailed": "Instalátor se nepodařilo stáhnout předem ({{detail}}) – stáhne ho WinGet.",
@@ -1002,7 +1004,8 @@
     "cliVersions": "Verze",
     "cliPin": "Zamknout verzi",
     "cliMore": "Další příkazy a vysvětlení",
-    "cliUnsupported": "{{manager}} tohle neumí"
+    "cliUnsupported": "{{manager}} tohle neumí",
+    "openSourceAlternatives": "Open-source alternativy k aplikaci {{name}}"
   },
   "report": {
     "button": "Nahlásit problém",
@@ -1039,7 +1042,9 @@
     "email": "E-mail",
     "short": "{{name}} – mrkněte na tuhle aplikaci",
     "message": "Doporučuji {{name}}: {{description}}\n\nOtevřete v HubGetu: {{link}}\nNebo nainstalujte příkazem: {{command}}",
-    "messageNoCommand": "Doporučuji {{name}}: {{description}}\n\nOtevřete v HubGetu: {{link}}"
+    "messageNoCommand": "Doporučuji {{name}}: {{description}}\n\nOtevřete v HubGetu: {{link}}",
+    "badge": "Odznak pro README",
+    "badgeHint": "„Nainstalovat přes HubGet“ do README na GitHubu nebo na web"
   },
   "auth": {
     "signIn": "Přihlásit se",
@@ -1117,7 +1122,29 @@
   },
   "offline": {
     "title": "Bez připojení k internetu",
-    "text": "nainstalované aplikace a uložený katalog fungují dál; instalace, aktualizace, hledání ve správcích a hodnocení počkají na připojení"
+    "text": "nainstalované aplikace a uložený katalog fungují dál; instalace, aktualizace, hledání ve správcích a hodnocení počkají na připojení",
+    "button": "Připravit pro offline",
+    "picking": "Vyberte složku (třeba USB disk), kam se instalátory uloží…",
+    "progress": "Stahuji {{done}}/{{total}}: {{name}}",
+    "scriptAdmin": "Aplikace se nainstalují potichu. Instalace pro všechny uživatele si může vyžádat práva správce.",
+    "scriptDone": "Hotovo.",
+    "readmeIntro": "Instalátory aplikací z HubGetu pro počítač bez internetu. Spusťte install.cmd – nainstaluje tyto aplikace:",
+    "readmeManual": "Tyto aplikace skript neinstaluje (archiv nebo přenosná aplikace) – rozbalte nebo zkopírujte je ručně:",
+    "done_one": "Offline balíček je připravený ({{count}} aplikace): {{folder}}",
+    "done_few": "Offline balíček je připravený ({{count}} aplikace): {{folder}}",
+    "done_many": "Offline balíček je připravený ({{count}} aplikace): {{folder}}",
+    "done_other": "Offline balíček je připravený ({{count}} aplikací): {{folder}}",
+    "cancelled_one": "Příprava zrušena – uloženo {{count}} aplikace: {{folder}}",
+    "cancelled_few": "Příprava zrušena – uloženy {{count}} aplikace: {{folder}}",
+    "cancelled_many": "Příprava zrušena – uloženo {{count}} aplikace: {{folder}}",
+    "cancelled_other": "Příprava zrušena – uloženo {{count}} aplikací: {{folder}}",
+    "manual": "Bez automatické instalace (archiv nebo přenosná aplikace): {{names}}",
+    "failed": "Nepodařilo se stáhnout: {{names}}",
+    "skipped_one": "{{count}} aplikace není z WinGetu – do offline balíčku nejde",
+    "skipped_few": "{{count}} aplikace nejsou z WinGetu – do offline balíčku nejdou",
+    "skipped_many": "{{count}} aplikace není z WinGetu – do offline balíčku nejde",
+    "skipped_other": "{{count}} aplikací není z WinGetu – do offline balíčku nejdou",
+    "error": "Offline balíček se nepodařilo připravit: {{error}}"
   },
   "crash": {
     "pageTitle": "Tuhle stránku se nepodařilo zobrazit",
@@ -1429,7 +1456,15 @@
     "interactive": "Dokončete průvodce instalací",
     "installing": "Instalace",
     "uninstalling": "Odinstalace",
-    "estimate": "Odhad – instalátor průběh nehlásí"
+    "estimate": "Odhad – instalátor průběh nehlásí",
+    "remainingSeconds_one": "zbývá {{count}} s",
+    "remainingSeconds_few": "zbývá {{count}} s",
+    "remainingSeconds_many": "zbývá {{count}} s",
+    "remainingSeconds_other": "zbývá {{count}} s",
+    "remainingMinutes_one": "zbývá {{count}} min",
+    "remainingMinutes_few": "zbývají {{count}} min",
+    "remainingMinutes_many": "zbývá {{count}} min",
+    "remainingMinutes_other": "zbývá {{count}} min"
   },
   "status": {
     "updates": "Aktualizace",
@@ -1466,7 +1501,8 @@
     "imported_few": "Profil načten – {{count}} aplikace v Sadách balíčků",
     "imported_many": "Profil načten – {{count}} aplikace v Sadách balíčků",
     "imported_other": "Profil načten – {{count}} aplikací v Sadách balíčků",
-    "importFailed": "Soubor se nepodařilo načíst – nejde o profil HubGetu ani export WinGetu."
+    "importFailed": "Soubor se nepodařilo načíst – nejde o profil HubGetu ani export WinGetu.",
+    "configurationTitle": "Aplikace pro nový počítač"
   },
   "profileImport": {
     "title": "Importovat profil",
@@ -1624,7 +1660,15 @@
     "depKind_runtime": "Běhové prostředí",
     "depKind_feature": "Funkce Windows",
     "virusTotal": "Ověřit na VirusTotalu",
-    "virusTotalHint": "Výsledky desítek antivirů pro instalátor s tímto otiskem. Nic se nenahrává – VirusTotal soubor hledá podle otisku."
+    "virusTotalHint": "Výsledky desítek antivirů pro instalátor s tímto otiskem. Nic se nenahrává – VirusTotal soubor hledá podle otisku.",
+    "fileTypes_one": "Otevírá {{count}} typ souborů",
+    "fileTypes_few": "Otevírá {{count}} typy souborů",
+    "fileTypes_many": "Otevírá {{count}} typu souborů",
+    "fileTypes_other": "Otevírá {{count}} typů souborů",
+    "fileTypesMore_one": "+ {{count}} další",
+    "fileTypesMore_few": "+ {{count}} další",
+    "fileTypesMore_many": "+ {{count}} dalších",
+    "fileTypesMore_other": "+ {{count}} dalších"
   },
   "installMenu": {
     "install": "Nainstalovat",
@@ -1637,7 +1681,8 @@
     "download": "Stáhnout instalátor",
     "details": "Podrobnosti",
     "more": "Další možnosti instalace",
-    "unsupported": "Tento správce balíčků to nepodporuje"
+    "unsupported": "Tento správce balíčků to nepodporuje",
+    "sandbox": "Vyzkoušet ve Windows Sandboxu"
   },
   "installOptions": {
     "title": "Možnosti instalace – {{name}}",
@@ -1797,7 +1842,9 @@
     "globalShortcutTaken": "Zkratku Win+Shift+H nejde zapnout – nejspíš ji používá jiný program ({{error}}).",
     "cliCommand": "Příkaz hubget v terminálu",
     "cliCommandHint": "V příkazovém řádku nebo PowerShellu napište třeba hubget install vlc, hubget update nebo hubget help. Příkaz provede HubGet a průběh ukáže v aplikaci.",
-    "cliCommandFailed": "Příkaz hubget se nepodařilo zapnout: {{error}}"
+    "cliCommandFailed": "Příkaz hubget se nepodařilo zapnout: {{error}}",
+    "exportConfiguration": "Export pro winget configure",
+    "exportConfigurationHint": "Soubor .winget (YAML) – na novém počítači stačí příkaz winget configure -f soubor. Standardní formát, se kterým pracují i firmy a Microsoft Dev Box."
   },
   "files": {
     "saved": "Uloženo: {{path}}",
@@ -2291,7 +2338,8 @@
     "skipped_active_few": "Nalezeny {{count}} aktualizace – automatická instalace počká, až na počítači nebudete pracovat",
     "skipped_active_many": "Nalezeno {{count}} aktualizace – automatická instalace počká, až na počítači nebudete pracovat",
     "skipped_active_other": "Nalezeno {{count}} aktualizací – automatická instalace počká, až na počítači nebudete pracovat",
-    "restorePointName": "HubGet - před hromadnou aktualizací"
+    "restorePointName": "HubGet - před hromadnou aktualizací",
+    "foundSecurity": "Bezpečnostní aktualizace ({{security}} z {{total}}): {{names}}"
   },
   "security": {
     "warningTitle": "Upozornění!",
@@ -2325,7 +2373,22 @@
     "importCustomArgs": "Povolit import vlastních argumentů příkazového řádku při importování balíčků ze sady",
     "importCustomArgsHint": "Jinak se vlastní argumenty ze souboru sady (.ubundle) zahodí.",
     "importPrePost": "Povolit import vlastních předinstalačních a poinstalačních příkazů při importu balíčků ze sady",
-    "importPrePostHint": "Jinak se příkazy ze souboru sady zahodí – sada od někoho jiného tak nemůže nic spustit."
+    "importPrePostHint": "Jinak se příkazy ze souboru sady zahodí – sada od někoho jiného tak nemůže nic spustit.",
+    "badge": "Bezpečnostní oprava",
+    "note": "Bezpečnostní oprava · {{text}}",
+    "noteShort": "Opravuje bezpečnostní chybu",
+    "panelTitle_one": "{{count}} aktualizace opravuje bezpečnostní chyby:",
+    "panelTitle_few": "{{count}} aktualizace opravují bezpečnostní chyby:",
+    "panelTitle_many": "{{count}} aktualizace opravuje bezpečnostní chyby:",
+    "panelTitle_other": "{{count}} aktualizací opravuje bezpečnostní chyby:",
+    "updateThese_one": "Aktualizovat ji",
+    "updateThese_few": "Aktualizovat je",
+    "updateThese_many": "Aktualizovat je",
+    "updateThese_other": "Aktualizovat je",
+    "noWait": "Bezpečnostní aktualizace bez čekání",
+    "noWaitHint": "Aktualizace, které podle poznámek k verzi opravují bezpečnostní chybu (CVE, „security fix“), se nabídnou a nainstalují hned – nečekají na minimální stáří.",
+    "osv": "Známé zranitelnosti (OSV.dev)",
+    "osvHint": "U balíčků režimu Vývojář (npm, Bun, pip, Cargo, .NET Tool) zkontroluje nainstalované verze v otevřené databázi zranitelností OSV.dev. Posílá se tam název a verze balíčku, nic dalšího."
   },
   "fallbackOffer": {
     "title": "{{name}} se nepodařilo nainstalovat",
@@ -2386,7 +2449,9 @@
     "skipNote": "Automatické aktualizace verzi {{current}} přeskočí – nabídnou až novější.",
     "confirm": "Vrátit na {{version}}",
     "hint": "Aplikace se po aktualizaci na {{current}} chová špatně? Vraťte ji na verzi před aktualizací.",
-    "unavailable": "Verze {{version}} už u správce balíčků není ke stažení – vrátit ji nejde."
+    "unavailable": "Verze {{version}} už u správce balíčků není ke stažení – vrátit ji nejde.",
+    "settingsNote": "Vrátí se i nastavení aplikace z doby před aktualizací (ze zálohy). Současné nastavení půjde do Koše.",
+    "settingsRestored": "Nastavení aplikace {{name}} je obnovené ze zálohy verze {{version}}."
   },
   "watch": {
     "start": "Hlídat novou verzi",
@@ -2513,7 +2578,9 @@
     "sig_unsigned": "bez podpisu",
     "sig_invalid": "neplatný podpis",
     "sig_unknown": "program nenalezen",
-    "showUnsigned": "Zobrazit programy bez podpisu ({{count}})"
+    "showUnsigned": "Zobrazit programy bez podpisu ({{count}})",
+    "openSource": "Open-source náhrady",
+    "openSourceHint": "Za tyto uzavřené aplikace existují zdarma dostupné aplikace s otevřeným kódem."
   },
   "cli": {
     "installQueued": "Z terminálu se instaluje: {{names}}",
@@ -2527,5 +2594,179 @@
     "updateQueued": "Z terminálu se aktualizuje: {{names}}",
     "upToDate": "Bez aktualizace: {{names}}",
     "notInstalled": "„{{names}}“ mezi nainstalovanými jednoznačně není."
+  },
+  "jumpList": {
+    "updates": "Dostupné aktualizace",
+    "updateAll": "Aktualizovat vše"
+  },
+  "sandbox": {
+    "unavailable": "Windows Sandbox není zapnutý. Zapnete ho v Ovládacích panelech → Programy → Zapnout nebo vypnout funkce systému Windows → Windows Sandbox (jen Windows Pro a Enterprise, pak restart).",
+    "preparing": "Stahuji instalátor {{name}} pro Windows Sandbox…",
+    "started": "Windows Sandbox se spouští – instalátor {{name}} se v něm otevře sám. Po zavření Sandboxu z něj nic nezůstane.",
+    "failed": "{{name}} se nepodařilo spustit ve Windows Sandboxu: {{error}}"
+  },
+  "settingsBackup": {
+    "setting": "Zálohovat nastavení aplikací před aktualizací",
+    "settingHint": "Složky aplikace v AppData (bez mezipamětí, nejvýš 200 MB). Když aktualizaci vrátíte, vrátí se i nastavení z doby před ní.",
+    "title": "Zálohy nastavení aplikací",
+    "summary_one": "Záloha nastavení {{count}} aplikace z doby před poslední aktualizací – {{size}}.",
+    "summary_few": "Zálohy nastavení {{count}} aplikací z doby před poslední aktualizací – {{size}}.",
+    "summary_many": "Zálohy nastavení {{count}} aplikace z doby před poslední aktualizací – {{size}}.",
+    "summary_other": "Zálohy nastavení {{count}} aplikací z doby před poslední aktualizací – {{size}}.",
+    "off": "Zálohování nastavení před aktualizací je vypnuté (Nastavení → Aktualizace balíčků).",
+    "clear": "Smazat zálohy",
+    "cleared": "Zálohy nastavení jsou smazané."
+  },
+  "vulnerable": {
+    "title_one": "{{count}} balíček má známou zranitelnost",
+    "title_few": "{{count}} balíčky mají známou zranitelnost",
+    "title_many": "{{count}} balíčku má známou zranitelnost",
+    "title_other": "{{count}} balíčků má známou zranitelnost",
+    "text": "Podle databáze OSV.dev má nainstalovaná verze bezpečnostní chybu. Aktualizujte ji, nebo balíček odinstalujte, pokud ho nepotřebujete.",
+    "more_one": "a {{count}} další",
+    "more_few": "a {{count}} další",
+    "more_many": "a {{count}} dalších",
+    "more_other": "a {{count}} dalších",
+    "update": "aktualizace na {{version}} je k dispozici",
+    "noUpdate": "zatím bez opravené verze"
+  },
+  "notificationActions": {
+    "updateAll": "Aktualizovat vše",
+    "show": "Zobrazit",
+    "open": "Otevřít",
+    "details": "Podrobnosti"
+  },
+  "orgPolicy": {
+    "title": "Některá nastavení spravuje vaše organizace",
+    "text": "Zásady skupiny HubGetu (registr HKLM\\SOFTWARE\\Policies\\HubGet). Tyto volby tu nejde změnit:",
+    "item": {
+      "sources": "Povolení správci balíčků: {{list}}",
+      "apps_one": "Instalovat jde jen {{count}} schválenou aplikaci",
+      "apps_few": "Instalovat jdou jen {{count}} schválené aplikace",
+      "apps_many": "Instalovat jde jen {{count}} schválené aplikace",
+      "apps_other": "Instalovat jde jen {{count}} schválených aplikací",
+      "developerMode": "Režim Vývojář je vypnutý",
+      "customCommands": "Vlastní argumenty a příkazy jsou zakázané",
+      "signIn": "Přihlášení a synchronizace jsou vypnuté",
+      "autoUpdates": "Automatické aktualizace všech aplikací jsou zapnuté",
+      "minAge_one": "Minimální stáří aktualizací: {{count}} den",
+      "minAge_few": "Minimální stáří aktualizací: {{count}} dny",
+      "minAge_many": "Minimální stáří aktualizací: {{count}} dne",
+      "minAge_other": "Minimální stáří aktualizací: {{count}} dní",
+      "selfUpdate": "HubGet se neaktualizuje sám – verze spravuje organizace"
+    },
+    "appBlocked": "{{name}}: aplikaci vaše organizace neschválila",
+    "sourceBlocked": "{{name}}: správce {{source}} vaše organizace zakázala",
+    "signInBlocked": "Přihlášení vypnula vaše organizace."
+  },
+  "reliability": {
+    "setting": "Spolehlivost verzí od komunity",
+    "settingHint": "Po aktualizaci anonymně nahlásí, jestli se povedla, selhala nebo jste ji vrátili (jen balíček, verze a náhodné id této instalace). Na oplátku ukáže, se kterými verzemi mají problém ostatní – a automatické aktualizace takovou verzi počkají.",
+    "note_one": "Potíže hlásí {{percent}} % uživatelů ({{count}} hlášení) – selhala nebo ji vrátili",
+    "note_few": "Potíže hlásí {{percent}} % uživatelů ({{count}} hlášení) – selhala nebo ji vrátili",
+    "note_many": "Potíže hlásí {{percent}} % uživatelů ({{count}} hlášení) – selhala nebo ji vrátili",
+    "note_other": "Potíže hlásí {{percent}} % uživatelů ({{count}} hlášení) – selhala nebo ji vrátili",
+    "skippedAuto": "{{name}} {{version}}: automatická aktualizace počká – s touto verzí hlásí problémy ostatní uživatelé"
+  },
+  "transfer": {
+    "title": "Nastavení aplikací na nový počítač",
+    "hint": "Nastavení vybraných aplikací z AppData do jednoho souboru zašifrovaného vaším heslem – na novém počítači ho zase obnovíte.",
+    "export": "Uložit…",
+    "import": "Obnovit…",
+    "exportTitle": "Uložit nastavení aplikací",
+    "exportText": "Vyberte aplikace, jejichž nastavení chcete přenést. Mezipaměti a logy se neukládají.",
+    "scanning": "Hledám nastavení aplikací…",
+    "nothing": "Žádná z nainstalovaných aplikací nemá v AppData nastavení k přenesení.",
+    "warning": "V nastavení bývají i přihlášení a hesla – soubor proto chrání heslo. Bez něj ho nikdo neotevře, ani HubGet; nikam se neukládá.",
+    "password": "Heslo",
+    "passwordAgain": "Heslo znovu",
+    "passwordShort_one": "Heslo musí mít aspoň {{count}} znak",
+    "passwordShort_few": "Heslo musí mít aspoň {{count}} znaky",
+    "passwordShort_many": "Heslo musí mít aspoň {{count}} znaku",
+    "passwordShort_other": "Heslo musí mít aspoň {{count}} znaků",
+    "passwordMismatch": "Hesla se neshodují",
+    "save": "Uložit ({{size}})",
+    "fileName": "Nastavení aplikací",
+    "saved_one": "Nastavení {{count}} aplikace uloženo ({{size}}): {{path}}",
+    "saved_few": "Nastavení {{count}} aplikací uloženo ({{size}}): {{path}}",
+    "saved_many": "Nastavení {{count}} aplikace uloženo ({{size}}): {{path}}",
+    "saved_other": "Nastavení {{count}} aplikací uloženo ({{size}}): {{path}}",
+    "failed": "Přenos nastavení se nepovedl: {{error}}",
+    "importTitle": "Obnovit nastavení aplikací",
+    "importText": "Vyberte soubor .hubget-settings a zadejte heslo, se kterým byl uložený. Nastavení aplikací ze souboru nahradí současné – to se přesune do Koše. Aplikace před obnovením zavřete.",
+    "chooseFile": "Vybrat soubor a obnovit",
+    "restored_one": "Obnoveno nastavení {{count}} aplikace: {{names}}",
+    "restored_few": "Obnoveno nastavení {{count}} aplikací: {{names}}",
+    "restored_many": "Obnoveno nastavení {{count}} aplikace: {{names}}",
+    "restored_other": "Obnoveno nastavení {{count}} aplikací: {{names}}",
+    "restoredNothing": "Soubor neobsahoval žádné nastavení, které by šlo obnovit."
+  },
+  "openWith": {
+    "title": "Čím otevřu soubor .{{ext}}?",
+    "titleEmpty": "Čím otevřu tento soubor?",
+    "subtitle": "Aplikace z katalogu, které soubory s touto příponou otevírají – nainstalované první.",
+    "file": "Soubor {{file}}",
+    "placeholder": "Přípona souboru, např. .psd",
+    "hint": "Napište příponu souboru, nebo soubor přetáhněte kamkoli do okna HubGetu.",
+    "none": "Žádná aplikace v katalogu neuvádí, že otevírá soubory .{{ext}}. Zkuste hledání podle typu souboru.",
+    "installed_one": "Nainstalovaná ({{count}})",
+    "installed_few": "Nainstalované ({{count}})",
+    "installed_many": "Nainstalované ({{count}})",
+    "installed_other": "Nainstalované ({{count}})",
+    "available_one": "Ke stažení ({{count}})",
+    "available_few": "Ke stažení ({{count}})",
+    "available_many": "Ke stažení ({{count}})",
+    "available_other": "Ke stažení ({{count}})",
+    "searchHint_one": "Soubory .{{ext}} otevře {{count}} aplikace z katalogu – zobrazit",
+    "searchHint_few": "Soubory .{{ext}} otevřou {{count}} aplikace z katalogu – zobrazit",
+    "searchHint_many": "Soubory .{{ext}} otevře {{count}} aplikace z katalogu – zobrazit",
+    "searchHint_other": "Soubory .{{ext}} otevře {{count}} aplikací z katalogu – zobrazit",
+    "dropTitle": "Čím ten soubor otevřít?",
+    "dropText": "Pusťte soubor – HubGet najde aplikace, které ho otevřou. Soubor se nikam neposílá."
+  },
+  "disk": {
+    "shortage": "Na disku {{drive}} je volných jen {{free}}, instalace potřebuje asi {{needed}}. Uvolněte místo – třeba v Přehledu počítače (úklid mezipamětí, nepoužívané aplikace).",
+    "batchShortage": "Na disku {{drive}} je volných {{free}}, všechny aktualizace potřebují asi {{needed}} – některé nemusí proběhnout. Před každou HubGet místo zkontroluje."
+  },
+  "releaseHistory": {
+    "title": "Co je nového od vaší verze {{version}}",
+    "subtitle_one": "Aktualizace na {{version}} přinese {{count}} vydání (z GitHubu):",
+    "subtitle_few": "Aktualizace na {{version}} přinese {{count}} vydání (z GitHubu):",
+    "subtitle_many": "Aktualizace na {{version}} přinese {{count}} vydání (z GitHubu):",
+    "subtitle_other": "Aktualizace na {{version}} přinese {{count}} vydání (z GitHubu):",
+    "more_one": "Zobrazit ještě {{count}} vydání",
+    "more_few": "Zobrazit ještě {{count}} vydání",
+    "more_many": "Zobrazit ještě {{count}} vydání",
+    "more_other": "Zobrazit ještě {{count}} vydání"
+  },
+  "diagnostics": {
+    "title": "Diagnostika",
+    "label": "Diagnostika pro podporu",
+    "hint": "Verze HubGetu a Windows, stav správců balíčků, hlavní nastavení, nedávné chyby a protokol v jednom textu – bez jména počítače, uživatele a e-mailů. Nic se neodesílá; přiložte ho k hlášení problému.",
+    "save": "Uložit…",
+    "copy": "Kopírovat",
+    "copied": "Diagnostika je ve schránce."
+  },
+  "windowsHealth": {
+    "title": "Stav Windows",
+    "supported": "{{version}} – bezpečnostní aktualizace do {{date}}",
+    "supportedOpen": "{{version}} – dostává bezpečnostní aktualizace",
+    "ending": "{{version}} dostává bezpečnostní aktualizace jen do {{date}}",
+    "endingHint": "Nainstalujte novější verzi Windows (Nastavení → Windows Update), ať zůstanete chránění.",
+    "ended": "{{version}} od {{date}} nedostává bezpečnostní aktualizace",
+    "endedHint": "Aktualizujte na novější verzi Windows 11 v Nastavení → Windows Update.",
+    "endedHint10": "Pokud nemáte rozšířenou podporu (ESU), přejděte na Windows 11 – zdarma, pokud ho počítač podporuje.",
+    "reboot": "Windows čeká na restart po aktualizacích",
+    "rebootHint": "Restart dokončí aktualizace Windows; některé instalace do té doby nemusí projít.",
+    "uptime_one": "Počítač běží bez restartu {{count}} den",
+    "uptime_few": "Počítač běží bez restartu {{count}} dny",
+    "uptime_many": "Počítač běží bez restartu {{count}} dne",
+    "uptime_other": "Počítač běží bez restartu {{count}} dní",
+    "uptimeHint": "Rychlé spuštění Windows počítač po vypnutí nerestartuje – občas zvolte Restartovat.",
+    "disk": "Disk {{drive}} – volno {{free}} z {{total}}",
+    "diskHint": "Dochází místo – instalace a aktualizace můžou selhat. Pomůže úklid mezipamětí níže a odinstalace nepoužívaných aplikací.",
+    "protectionOn": "Ochrana systému je zapnutá – jde vytvářet body obnovení",
+    "protectionOff": "Ochrana systému je vypnutá – body obnovení nejde vytvořit",
+    "protectionHint": "Zapnete ji v Ovládacích panelech → Systém → Ochrana systému → Konfigurovat (disk C:). HubGet pak může před hromadnou aktualizací vytvořit bod obnovení."
   }
 }

@@ -1180,3 +1180,8 @@ legend.field__label { margin-bottom: 8px; }
   .compare-card { padding: 24px 20px; }
   .vs-visual { padding: 16px; }
 }
+
+/* ---------- Otevřít v HubGetu (aplikace.html) ---------- */
+.app-open__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 6px; }
+.app-open__hint { font-size: 0.95rem; color: var(--muted); max-width: 34em; }
+.app-open__badges { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }

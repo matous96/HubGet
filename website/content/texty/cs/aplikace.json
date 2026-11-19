@@ -1,0 +1,34 @@
+{
+  "seo": {
+    "title": "Otevřít v HubGetu – HubGet",
+    "description": "Otevřete aplikaci v HubGetu – zdarma a open source obchodě s aplikacemi pro Windows. Instalaci vždy potvrdíte vy."
+  },
+  "texty": {
+    "t1": "Otevřít v HubGetu",
+    "t8": "Aplikace z HubGetu",
+    "t2": "Odkaz otevře aplikaci v HubGetu – obchodě s aplikacemi pro Windows. Nic se neinstaluje samo: instalaci potvrdíte v HubGetu.",
+    "t3": "Otevřít v HubGetu",
+    "t4": "Stáhnout HubGet",
+    "t5": "Nemáte HubGet? Stáhněte ho zdarma, nainstalujte a klikněte na Otevřít v HubGetu znovu.",
+    "t6": "Odznak pro váš projekt",
+    "t7": "Je vaše aplikace ve WinGetu? Přidejte do README nebo na web odznak, který ji otevře v HubGetu. Kód odznaku zkopírujete v HubGetu: detail aplikace → Sdílet → Odznak pro README."
+  },
+  "obrazky": {
+    "i1": {
+      "src": "img/badge/hubget-cs-dark.svg",
+      "alt": "Nainstalovat přes HubGet"
+    },
+    "i2": {
+      "src": "img/badge/hubget-cs-light.svg",
+      "alt": "Nainstalovat přes HubGet"
+    },
+    "i3": {
+      "src": "img/badge/hubget-en-dark.svg",
+      "alt": "Install with HubGet"
+    },
+    "i4": {
+      "src": "img/badge/hubget-en-light.svg",
+      "alt": "Install with HubGet"
+    }
+  }
+}

@@ -24,6 +24,7 @@
  * disku a registru před instalací a po ní (services/tracker.ts) – po
  * odinstalaci se zaznamenané položky nabídnou ke smazání se zbytky.
  */
+import { invoke } from "@tauri-apps/api/core";
 import { useMemo } from "react";
 import { create } from "zustand";
 import { queryClient, queryKeys } from "@/app/queryClient";
@@ -45,10 +46,16 @@ import { recordPhaseDuration } from "@/lib/phaseEstimate";
 import { isTauri } from "@/lib/tauri";
 import type { InstalledPackage, InstallOptions, Job, OperationKind, OperationOutcome, OperationPhase, PackageSource, SourceId } from "@/types";
 import { refreshAfterOperation } from "./afterOperation";
+import { appAllowed, sourceAllowed } from "./orgPolicy";
+import { usePackageIndex } from "./packageIndex";
+import { reportJobOutcome } from "./reliability";
+import { useToasts } from "./toasts";
 import { useHistory } from "./history";
 import { useLeftovers } from "./leftovers";
 import { skipBadVersion } from "./rollback";
 import { writeLog } from "./logs";
+import { diskShortage } from "@/lib/diskSpace";
+import { formatSizeText } from "@/lib/utils";
 import { useAppInUse } from "./appInUse";
 import { useFallbackOffer } from "./fallbackOffer";
 import { useInstalledVia } from "./installedVia";
@@ -194,6 +201,29 @@ function installedPackageOf(job: Pick<Job, "source" | "packageId">): InstalledPa
     if (found) return found;
   }
   return undefined;
+}
+
+/**
+ * Záloha nastavení aplikace (AppData) před aktualizací – při vrácení aktualizace se obnoví
+ * i ono (settings_backup.rs). Nastavení „Zálohovat nastavení aplikací“; chyba aktualizaci nezastaví.
+ */
+async function backupSettings(job: Job) {
+  const version = installedPackageOf(job)?.installedVersion;
+  if (!isTauri() || !version || !useSettings.getState().backupSettings) return;
+  await invoke("settings_backup", { appId: job.appId, name: job.appName, packageId: job.packageId, version }).catch((error) =>
+    writeLog(job.source, "warning", i18n.t("logs.msg.settingsBackupFailed", { name: job.appName, error: String(error) })),
+  );
+}
+
+/** Po vrácení aktualizace obnoví nastavení zálohované před ní (je-li záloha k této verzi). */
+async function restoreSettings(job: Job, version: string) {
+  if (!isTauri()) return;
+  const restored = await invoke<boolean>("settings_restore", { appId: job.appId, version }).catch(() => false);
+  if (restored) {
+    const message = i18n.t("rollback.settingsRestored", { name: job.appName, version });
+    writeLog(job.source, "info", message);
+    notifyEvent({ type: "info", tone: "success", title: job.appName, message, toast: message, record: { kind: job.kind, source: job.source, appId: job.appId } });
+  }
 }
 
 /** Operace na pozadí, kterou backend nespustil (nebo nezopakoval), protože by potřebovala dialog UAC. */
@@ -383,6 +413,8 @@ export const useJobs = create<JobsState>()((set, get) => {
     // (bez zúžení typu na null – mění se v callbacku)
     let phase = null as OperationPhase | null;
     let phaseSince = Date.now();
+    // Stahovalo se – instalace na kartě pokračuje v jednom procentu za stahováním
+    let downloaded = false;
     const handle = managers[job.source].startOperation(
       // Vlastní argumenty, příkazy před / po instalaci a „jako správce“ jen podle Nastavení → Oprávnění správce
       {
@@ -395,10 +427,13 @@ export const useJobs = create<JobsState>()((set, get) => {
       },
       (progress) => {
         if (progress.phase !== phase) {
+          // Délka stahování pro příště – podíl stahování na celkovém procentu
+          if (phase === "downloading") recordPhaseDuration(job, phase, Date.now() - phaseSince);
           phase = progress.phase;
           phaseSince = Date.now();
         }
-        patch(job.appId, { progress: { ...progress, since: phaseSince } });
+        if (progress.phase === "downloading") downloaded = true;
+        patch(job.appId, { progress: { ...progress, since: phaseSince, downloaded } });
       },
     );
     handles.set(job.appId, handle);
@@ -464,6 +499,8 @@ export const useJobs = create<JobsState>()((set, get) => {
       return processNext();
     }
     const first = job;
+    // Verze, na kterou se aktualizuje – pro hlášení spolehlivosti verzí (store/reliability.ts)
+    const updateTarget = job.kind === "update" ? (job.targetVersion ?? usePackageIndex.getState().installed.get(job.appId)?.availableVersion ?? undefined) : undefined;
     // Chybějící správce (Chocolatey, Scoop) – nejdřív výzva k jeho instalaci;
     // běžící aplikaci zavřít (nebo se zeptat), ať ji instalátor může přepsat
     let result: OperationResult = { outcome: "cancelled" };
@@ -471,7 +508,17 @@ export const useJobs = create<JobsState>()((set, get) => {
     let trace: number | null = null;
     // Čekání, až uživatel uloží práci a zavře běžící aplikaci – fáze na kartě (zrušit jde křížkem)
     const waitingForApp = () => patch(appId, { progress: { phase: "closingApp", percent: null, since: Date.now() } });
-    if ((await managerReady(job.source, job.background)) && (await prepareProcesses(job, waitingForApp))) {
+    // Málo místa na disku: operaci nespustit (instalátor by spadl v polovině) a poradit úklid
+    const shortage = await diskShortage(job);
+    if (shortage) {
+      const size = (bytes: number) => formatSizeText(bytes, i18n.language);
+      result = {
+        outcome: "error",
+        errorKey: "diskFull",
+        error: i18n.t("disk.shortage", { drive: shortage.drive, free: size(shortage.free), needed: size(shortage.needed) }),
+      };
+      writeLog(job.source, "warning", `${job.appName}: ${result.error}`);
+    } else if ((await managerReady(job.source, job.background)) && (await prepareProcesses(job, waitingForApp))) {
       // Aplikace je zavřená – do hlášení průběhu od správce zase „ve frontě“
       if (get().jobs[appId]?.progress.phase === "closingApp") patch(appId, { progress: { phase: "queued", percent: null } });
       if (shouldTrack(job)) trace = await traceBegin().catch(() => null);
@@ -497,11 +544,18 @@ export const useJobs = create<JobsState>()((set, get) => {
             await attempt({ ...job, id: crypto.randomUUID(), version: undefined, replaceInstalled: undefined, skipVersion: undefined });
           }
         }
-        if (result.outcome === "success" && job.skipVersion) skipBadVersion(job, job.skipVersion, job.appName);
+        if (result.outcome === "success" && job.skipVersion) {
+          skipBadVersion(job, job.skipVersion, job.appName);
+          // Vrácená aktualizace: i nastavení z doby před ní (záloha před aktualizací)
+          if (job.version) await restoreSettings(job, job.version);
+        }
       } else {
+        if (job.kind === "update") await backupSettings(job);
         result = await attempt(job);
       }
     }
+    // Spolehlivost verzí od komunity (jen se zapnutým sdílením): výsledek aktualizace, vrácená verze
+    reportJobOutcome(job, result, updateTarget);
 
     // Úloha na pozadí (nikdo se nedívá): instalátor ze zdroje nejde stáhnout → stejná
     // aplikace u dalších nainstalovaných správců, dokud se instalace nepovede.
@@ -629,6 +683,9 @@ export const useJobs = create<JobsState>()((set, get) => {
       toast: alternatives.length ? false : i18n.t(toastKey, params),
       record: { kind: job.kind, source: job.source, appId },
       popup: !(summarize && outcome === "success") && !quietFailure,
+      // Tlačítka v oznámení Windows: po instalaci či aktualizaci Otevřít, po chybě Podrobnosti
+      actions: outcome === "success" ? (job.kind === "install" || job.kind === "update" ? "installed" : undefined) : outcome === "error" ? "failed" : undefined,
+      appId,
     });
     if (alternatives.length) void offerFallback(job, error ?? "", alternatives);
     if (!more) {
@@ -667,6 +724,11 @@ export const useJobs = create<JobsState>()((set, get) => {
 
     enqueue: ({ appId, appName, source, packageId, kind, version, replaceInstalled, skipVersion, options, background, track, targetVersion }) => {
       if (get().jobs[appId]) return; // už ve frontě nebo běží
+      // Firemní zásady: neschválená aplikace / zakázaný správce (backend ji odmítne i sám)
+      if ((kind === "install" || kind === "update") && (!sourceAllowed(source) || (kind === "install" && !appAllowed(source, packageId)))) {
+        useToasts.getState().push("error", i18n.t(sourceAllowed(source) ? "orgPolicy.appBlocked" : "orgPolicy.sourceBlocked", { name: appName, source: getSource(source).label }));
+        return;
+      }
       set({
         jobs: {
           ...get().jobs,

@@ -29,6 +29,7 @@ import { RatingsSection, ratingsEnabled, useRatingFormat, useRatingSummary } fro
 import { AppScreenshots } from "@/components/package/AppScreenshots";
 import { TechnicalDetails } from "@/components/package/TechnicalDetails";
 import { WhatsNew } from "@/components/package/WhatsNew";
+import { ReleaseHistory } from "@/components/package/ReleaseHistory";
 import { DetailLibraryButtons } from "@/components/package/QuickActions";
 import { SafeInstallNote } from "@/components/package/SafeInstallNote";
 import { ReportButton } from "@/components/package/ReportButton";
@@ -38,6 +39,7 @@ import { UninstallButton } from "@/components/package/UninstallButton";
 import { AutoUpdateToggle, InstallerHostWarning, UpdatePinBar } from "@/components/package/UpdatePin";
 import { NameWithBadge, VerifiedBadge } from "@/components/package/VerifiedBadge";
 import { isVerified } from "@/lib/verified";
+import { isClosed, licenseKind, openSourceAlternatives } from "@/lib/alternatives";
 import { VersionPicker } from "@/components/package/VersionPicker";
 import { GitHubIcon } from "@/components/ui/BrandIcons";
 import { Shelf, ShelfItem } from "@/components/ui/Shelf";
@@ -75,14 +77,6 @@ function useSourceLockView() {
 }
 
 /** Hrubé rozlišení licence pro pruh s údaji. */
-function licenseKind(license: string | null): "licenseOpen" | "licenseProprietary" | "licenseFree" | null {
-  if (!license) return null;
-  if (/proprietary/i.test(license)) return "licenseProprietary";
-  if (/freeware/i.test(license)) return "licenseFree";
-  if (/MIT|GPL|MPL|Apache|BSD|PSF|ISC|Unlicense/i.test(license)) return "licenseOpen";
-  return null;
-}
-
 /** Stránka detailu: dohledá profil aplikace a předá ho zobrazení. */
 export function PackageDetailPage() {
   const { t } = useTranslation();
@@ -193,20 +187,23 @@ function PackageDetailView({ entry: fullEntry, inCatalog }: { entry: CatalogEntr
   }, [canInstall, actions, openOptions, entry, effective?.source]);
 
   // Pořadí v hlavní kategorii, alternativy a podobné aplikace (podle popularity).
-  const { rank, similar, alternatives } = useMemo(() => {
+  const { rank, similar, alternatives, openSource } = useMemo(() => {
     const all = catalogData?.catalog.packages ?? [];
     const alternatives = (entry.alternatives ?? [])
       .map((id) => catalogIndex.get(id))
       .filter((p): p is CatalogEntry => !!p);
+    // U uzavřené aplikace open-source náhrady (bez těch, které už jsou mezi alternativami)
+    const openSource = isClosed(entry) ? openSourceAlternatives(entry, all, catalogIndex).filter((p) => !alternatives.includes(p)) : [];
     const main = entry.categories[0];
-    if (!main) return { rank: null, similar: [] as CatalogEntry[], alternatives };
+    if (!main) return { rank: null, similar: [] as CatalogEntry[], alternatives, openSource };
     const inCategory = all.filter((p) => p.categories.includes(main)).sort((a, b) => b.popularity - a.popularity);
     const position = inCategory.findIndex((p) => p.id === entry.id);
     return {
       rank: position >= 0 ? position + 1 : null,
       // Alternativy už mají vlastní polici – v „Mohlo by se vám také líbit“ je neopakovat
-      similar: inCategory.filter((p) => p.id !== entry.id && !alternatives.includes(p)).slice(0, 10),
+      similar: inCategory.filter((p) => p.id !== entry.id && !alternatives.includes(p) && !openSource.includes(p)).slice(0, 10),
       alternatives,
+      openSource,
     };
   }, [catalogData, catalogIndex, entry]);
 
@@ -495,6 +492,9 @@ function PackageDetailView({ entry: fullEntry, inCatalog }: { entry: CatalogEntr
       {/* ── Co je nového v aktuální verzi ────────────────────────── */}
       {inCatalog && <WhatsNew entry={entry} />}
 
+      {/* ── Co je nového od nainstalované verze (aktualizace přes víc vydání, GitHub) ── */}
+      {inCatalog && <ReleaseHistory entry={entry} installed={installed} />}
+
       {/* ── Hodnocení hvězdičkami (Supabase; bez něj se nezobrazuje) ── */}
       {ratingsEnabled && inCatalog && <RatingsSection entry={entry} />}
 
@@ -628,6 +628,17 @@ function PackageDetailView({ entry: fullEntry, inCatalog }: { entry: CatalogEntr
       {alternatives.length > 0 && (
         <Shelf title={t("package.alternatives", { name: entry.name })} large>
           {alternatives.map((p) => (
+            <ShelfItem key={p.id}>
+              <PackageCard entry={p} />
+            </ShelfItem>
+          ))}
+        </Shelf>
+      )}
+
+      {/* ── Open-source alternativy k uzavřené aplikaci (lib/alternatives) ── */}
+      {openSource.length > 0 && (
+        <Shelf title={t("package.openSourceAlternatives", { name: entry.name })} large>
+          {openSource.map((p) => (
             <ShelfItem key={p.id}>
               <PackageCard entry={p} />
             </ShelfItem>

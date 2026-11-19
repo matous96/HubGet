@@ -1,9 +1,10 @@
-import { Check, Link2, Mail, MessageCircle, MessagesSquare, Share, Share2, Terminal } from "lucide-react";
+import { BadgeCheck, Check, Link2, Mail, MessageCircle, MessagesSquare, Share, Share2, Terminal } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState, type ComponentType, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { XIcon } from "@/components/ui/BrandIcons";
-import { appDeepLink, appWebLink } from "@/config";
+import { appBadge, appDeepLink, appWebLink } from "@/config";
+import { useSettings } from "@/store/settings";
 import { useDismiss } from "@/hooks/useDismiss";
 import { cn } from "@/lib/utils";
 import { sourceCommand } from "@/services/managers";
@@ -25,7 +26,8 @@ export function ShareButton({ entry, pkg }: ShareButtonProps) {
   const { t } = useTranslation();
   const toast = useToasts((s) => s.push);
   const [open, setOpen] = useState(false);
-  const [copied, setCopied] = useState<"link" | "command" | null>(null);
+  const [copied, setCopied] = useState<"link" | "command" | "badge" | null>(null);
+  const language = useSettings((s) => s.language);
   const root = useRef<HTMLDivElement>(null);
   useDismiss(root, open, () => setOpen(false));
 
@@ -45,9 +47,12 @@ export function ShareButton({ entry, pkg }: ShareButtonProps) {
     ? t("share.message", { name: entry.name, description, link, command })
     : t("share.messageNoCommand", { name: entry.name, description, link });
 
-  const copy = async (kind: "link" | "command") => {
+  // Odznak pro README vývojářů – jen u aplikací ze správců (z webu výrobce nejde nainstalovat)
+  const badge = pkg ? appBadge(entry.id, entry.name, language) : null;
+
+  const copy = async (kind: "link" | "command" | "badge") => {
     try {
-      await navigator.clipboard.writeText(kind === "link" ? link : (command ?? ""));
+      await navigator.clipboard.writeText(kind === "link" ? link : kind === "badge" ? (badge?.markdown ?? "") : (command ?? ""));
       setCopied(kind);
     } catch {
       toast("error", t("common.error"));
@@ -121,6 +126,15 @@ export function ShareButton({ entry, pkg }: ShareButtonProps) {
                   title={copied === "command" ? t("share.copied") : t("share.copyCommand")}
                   hint={<span className="font-mono">{command}</span>}
                   onClick={() => void copy("command")}
+                />
+              )}
+              {badge && (
+                <MenuItem
+                  icon={copied === "badge" ? Check : BadgeCheck}
+                  done={copied === "badge"}
+                  title={copied === "badge" ? t("share.copied") : t("share.badge")}
+                  hint={t("share.badgeHint")}
+                  onClick={() => void copy("badge")}
                 />
               )}
               {canNativeShare && (

@@ -5,7 +5,9 @@
 import { invoke } from "@tauri-apps/api/core";
 import { useMemo } from "react";
 import i18n from "@/i18n";
+import { diskSpace, requiredSpace, RESERVE_BYTES, shortageOf } from "@/lib/diskSpace";
 import { isTauri } from "@/lib/tauri";
+import { formatSizeText } from "@/lib/utils";
 import { useAutoUpdates } from "@/store/autoUpdates";
 import { useHistory } from "@/store/history";
 import { useToasts } from "@/store/toasts";
@@ -100,11 +102,12 @@ export function useUpdates(source?: SourceId) {
   const running = updatable.length - pending.length;
 
   /**
-   * Zařadí do fronty všechny aktualizace, každou přes správce, kterým byla aplikace nainstalována.
-   * S nastavením „bod obnovení“ (aspoň 2 aplikace) nejdřív vytvoří bod obnovení systému.
+   * Zařadí do fronty aktualizace (výchozí všechny čekající), každou přes správce, kterým byla
+   * aplikace nainstalována. S nastavením „bod obnovení“ (aspoň 2 aplikace) nejdřív vytvoří bod
+   * obnovení systému.
    */
-  const updateAll = async () => {
-    const batch = [...pending];
+  const updateItems = async (chosen: InstalledItem[]) => {
+    const batch = chosen.filter((i) => !busy.has(i.entry.id));
     if (batch.length >= 2 && isTauri() && useAutoUpdates.getState().restorePoint) {
       const { push } = useToasts.getState();
       push("info", i18n.t("autoUpdates.restorePointCreating"));
@@ -112,6 +115,16 @@ export function useUpdates(source?: SourceId) {
         () => "failed",
       );
       push(result === "created" || result === "recent" ? "success" : "info", i18n.t(`autoUpdates.restorePoint_${result}`));
+    }
+    // Hromadná aktualizace: když místo na disku nebude stačit na všechny, říct to předem
+    // (každá operace se před spuštěním zkontroluje i sama – lib/diskSpace.ts)
+    if (batch.length >= 2 && isTauri()) {
+      const needed = batch.reduce((sum, { pkg, entry }) => sum + requiredSpace({ appId: entry.id, source: pkg.source, packageId: pkg.packageId }) - RESERVE_BYTES, RESERVE_BYTES);
+      const lack = shortageOf(await diskSpace(), needed);
+      if (lack) {
+        const size = (bytes: number) => formatSizeText(bytes, i18n.language);
+        useToasts.getState().push("info", i18n.t("disk.batchShortage", { drive: lack.drive, free: size(lack.free), needed: size(lack.needed) }), { record: true });
+      }
     }
     for (const { pkg, entry } of batch) {
       enqueue({
@@ -125,7 +138,9 @@ export function useUpdates(source?: SourceId) {
     }
   };
 
-  return { updatable, pending: pending.length, running, updateAll, isLoading };
+  const updateAll = () => updateItems(pending);
+
+  return { updatable, pending: pending.length, running, updateAll, updateItems, isLoading };
 }
 
 /**

@@ -4,12 +4,14 @@
  * automatické aktualizace přeskočí (připnutí „skip“), dokud nevyjde novější.
  */
 import { Undo2 } from "lucide-react";
+import { invoke } from "@tauri-apps/api/core";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { queryKeys } from "@/app/queryClient";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { Spinner } from "@/components/ui/States";
+import { isTauri } from "@/lib/tauri";
 import { compareVersions } from "@/lib/version";
 import { managers } from "@/services/managers";
 import { useRollback } from "@/hooks/useRollback";
@@ -50,6 +52,14 @@ export function RollbackDialog() {
     staleTime: 10 * 60_000,
   });
   const unavailable = !!request && !!versions && !versions.some((v) => compareVersions(v, request.toVersion) === 0);
+  // Záloha nastavení z doby před aktualizací – obnoví se spolu s verzí (settings_backup.rs)
+  const { data: backupVersion } = useQuery({
+    queryKey: ["settings-backup", request?.entry.id],
+    queryFn: () => invoke<string | null>("settings_backup_version", { appId: request!.entry.id }),
+    enabled: !!request && isTauri(),
+    staleTime: 0,
+  });
+  const restoresSettings = !!request && backupVersion === request.toVersion;
 
   const confirm = () => {
     if (!request || unavailable) return;
@@ -87,6 +97,7 @@ export function RollbackDialog() {
     >
       <p className="text-sm">{t("rollback.text", { name: request?.entry.name ?? "", current: request?.currentVersion ?? "", version: request?.toVersion ?? "" })}</p>
       <p className="mt-3 text-xs text-muted">{t("rollback.skipNote", { current: request?.currentVersion ?? "" })}</p>
+      {restoresSettings && <p className="mt-2 text-xs text-muted">{t("rollback.settingsNote")}</p>}
       {unavailable && <p className="mt-3 text-sm text-danger">{t("rollback.unavailable", { version: request?.toVersion ?? "" })}</p>}
     </Modal>
   );

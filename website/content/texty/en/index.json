@@ -60,7 +60,7 @@
     "t52": "Download HubGet",
     "t53": "Version {auto:version} · preview · free and open source · [what’s new](changelog.html)",
     "t54": "EXE installer",
-    "t55": "{auto:exe-size} · no admin rights needed · English / Czech",
+    "t55": "{auto:exe-size} · no admin rights needed · 7 languages",
     "t56": "MSI installer",
     "t57": "{auto:msi-size} · for company-wide deployment",
     "t58": "Requirements: Windows 10 / 11, 64-bit, WebView2 (preinstalled on Windows).\nThe installer isn’t digitally signed yet – what to do about the [Edge](faq.html#faq-edge) and [SmartScreen](faq.html#faq-smartscreen) warnings.\n[Code signing policy](code-signing.html) · [Privacy](privacy.html)"

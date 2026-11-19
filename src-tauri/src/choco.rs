@@ -335,6 +335,8 @@ fn interpret(_kind: Kind, code: i32) -> Verdict {
 /// Spustí operaci; `id` přidělí frontend (pro zrušení přes cancel_operation).
 #[tauri::command]
 pub async fn choco_operation(id: String, request: OperationRequest, on_event: Channel<OpEvent>) -> Result<OperationResult, String> {
+    // Firemní zásady: povolené zdroje a aplikace (org_policy.rs)
+    crate::org_policy::check("chocolatey", &request)?;
     let root = root().ok_or("Chocolatey není nainstalovaný")?;
     let args = operation_args(&request)?;
     let options = request.options.as_ref();

@@ -1114,6 +1114,8 @@ pub async fn dev_operation(
     request: OperationRequest,
     on_event: Channel<OpEvent>,
 ) -> Result<OperationResult, String> {
+    // Firemní zásady: povolené zdroje a aplikace (org_policy.rs)
+    crate::org_policy::check(&format!("{source:?}").to_lowercase(), &request)?;
     if !valid_id(source, &request.package_id) {
         return Err(format!("Neplatné id balíčku: {}", request.package_id));
     }

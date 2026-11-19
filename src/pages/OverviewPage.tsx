@@ -9,6 +9,8 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   AlertTriangle,
   Archive,
+  DatabaseBackup,
+  GitFork,
   CheckCircle2,
   Clock,
   Copy,
@@ -26,10 +28,13 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { Button } from "@/components/ui/Button";
 import { EmptyState, PageHeader, Spinner } from "@/components/ui/States";
+import { WindowsHealthPanel } from "@/components/home/WindowsHealthPanel";
 import { useDuplicates } from "@/components/package/InstalledNotices";
 import { UNUSED_DAYS, useUnusedApps } from "@/hooks/useAppUsage";
 import { useEndOfLife } from "@/hooks/useEndOfLife";
 import { isUnmanagedOrigin, useInstalledItems, useUpdates } from "@/hooks/useInstalledItems";
+import { useCatalog, useCatalogIndex } from "@/hooks/usePackages";
+import { isClosed, openSourceAlternatives } from "@/lib/alternatives";
 import { isTauri } from "@/lib/tauri";
 import { cn, formatRelative, formatSizeText } from "@/lib/utils";
 import { useHistory } from "@/store/history";
@@ -145,6 +150,9 @@ export function OverviewPage() {
             <Stat icon={Copy} label={t("overview.duplicates")} value={String(duplicates.length)} to="/installed" tone={duplicates.length ? "warn" : undefined} />
           </div>
 
+          {/* Podpora Windows, čekající restart, místo na disku, ochrana systému */}
+          <WindowsHealthPanel />
+
           {oldest && (
             <p className="-mt-2 mb-6 text-xs text-muted">
               {t("overview.oldest", { name: oldest.entry.name, when: formatRelative(new Date(oldest.pkg.installedAt!).toISOString(), language) })}
@@ -174,9 +182,11 @@ export function OverviewPage() {
                 </Panel>
               )}
               <IdleAutostart apps={usage.idleAutostart} />
+              <OpenSourcePanel items={items} />
             </div>
             <div>
               <CachesPanel busy={busy} />
+              <BackupsPanel />
               <SignaturesPanel items={items} />
             </div>
           </div>
@@ -214,6 +224,89 @@ function IdleAutostart({ apps }: { apps: ReturnType<typeof useUnusedApps>["idleA
           </li>
         ))}
       </ul>
+    </Panel>
+  );
+}
+
+/** Nainstalované uzavřené aplikace s open-source náhradou z katalogu (lib/alternatives). */
+function OpenSourcePanel({ items }: { items: ReturnType<typeof useInstalledItems>["items"] }) {
+  const { t } = useTranslation();
+  const { data } = useCatalog();
+  const byId = useCatalogIndex();
+  const rows = useMemo(() => {
+    const catalog = data?.catalog.packages ?? [];
+    if (!catalog.length) return [];
+    const installed = new Set(items.map((i) => i.entry.id));
+    return items
+      .filter((i) => !isUnmanagedOrigin(i.pkg.origin) && isClosed(i.entry))
+      .map((i) => ({ item: i, alternatives: openSourceAlternatives(i.entry, catalog, byId).filter((a) => !installed.has(a.id)).slice(0, 3) }))
+      .filter((r) => r.alternatives.length > 0)
+      .sort((a, b) => b.item.entry.popularity - a.item.entry.popularity)
+      .slice(0, 6);
+  }, [data, byId, items]);
+  if (!rows.length) return null;
+  return (
+    <Panel title={t("overview.openSource")} icon={GitFork}>
+      <p className="mb-3 text-sm text-muted">{t("overview.openSourceHint")}</p>
+      <ul className="flex flex-col gap-2 text-sm">
+        {rows.map(({ item, alternatives }) => (
+          <li key={item.entry.id} className="min-w-0">
+            <Link to={detailUrl(item.entry.id)} className="font-medium hover:underline">
+              {item.entry.name}
+            </Link>
+            <span className="text-muted"> → </span>
+            {alternatives.map((a, i) => (
+              <span key={a.id}>
+                {i > 0 && <span className="text-muted">, </span>}
+                <Link to={detailUrl(a.id)} className="text-accent hover:underline">
+                  {a.name}
+                </Link>
+              </span>
+            ))}
+          </li>
+        ))}
+      </ul>
+    </Panel>
+  );
+}
+
+/** Zálohy nastavení aplikací před aktualizací (settings_backup.rs) – kolik zabírají a smazání. */
+function BackupsPanel() {
+  const { t } = useTranslation();
+  const language = useSettings((s) => s.language);
+  const enabled = useSettings((s) => s.backupSettings);
+  const toast = useToasts((s) => s.push);
+  const { data, refetch } = useQuery({
+    queryKey: ["settings-backups"],
+    queryFn: () => invoke<{ count: number; bytes: number }>("settings_backups_info"),
+    staleTime: 10 * 60_000,
+  });
+  const clear = useMutation({
+    mutationFn: () => invoke("settings_backups_clear"),
+    onSuccess: () => {
+      toast("success", t("settingsBackup.cleared"));
+      void refetch();
+    },
+  });
+  if (!data || (!data.count && enabled)) return null;
+  return (
+    <Panel
+      title={t("settingsBackup.title")}
+      icon={DatabaseBackup}
+      action={
+        data.count > 0 && (
+          <Button variant="secondary" onClick={() => clear.mutate()} disabled={clear.isPending}>
+            <Trash2 className="size-4" />
+            {t("settingsBackup.clear")}
+          </Button>
+        )
+      }
+    >
+      <p className="text-sm text-muted">
+        {data.count
+          ? t("settingsBackup.summary", { count: data.count, size: formatSizeText(data.bytes, language) })
+          : t("settingsBackup.off")}
+      </p>
     </Panel>
   );
 }

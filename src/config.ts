@@ -32,6 +32,22 @@ export const SHARE_WEB_URL: string | null = import.meta.env.VITE_SHARE_URL ?? nu
  */
 export const appDeepLink = (appId: string) => `unibox://app/${encodeURIComponent(appId)}`;
 
+/** Web HubGetu (stránka Otevřít v HubGetu a odznaky pro vývojáře – website/aplikace.html, website/img/badge/). */
+export const WEBSITE_URL = "https://hubget.eu";
+
+/**
+ * Odznak „Nainstalovat přes HubGet“ do README / na web projektu: obrázek z webu a odkaz
+ * na stránku, která aplikaci otevře v HubGetu (GitHub v README odkaz unibox:// nepustí).
+ */
+export function appBadge(appId: string, name: string, language: string) {
+  const lang = language === "cs" ? "cs" : "en";
+  const page = lang === "cs" ? "aplikace.html" : "en/app.html";
+  const url = `${WEBSITE_URL}/${page}?id=${encodeURIComponent(appId)}&name=${encodeURIComponent(name)}`;
+  const image = `${WEBSITE_URL}/img/badge/hubget-${lang}-dark.svg`;
+  const alt = lang === "cs" ? "Nainstalovat přes HubGet" : "Install with HubGet";
+  return { url, image, markdown: `[![${alt}](${image})](${url})`, html: `<a href="${url}"><img src="${image}" alt="${alt}" height="48"></a>` };
+}
+
 /** Webový odkaz na aplikaci, pokud je nastavený web projektu. */
 export const appWebLink = (appId: string) =>
   SHARE_WEB_URL ? `${SHARE_WEB_URL.replace(/\/$/, "")}/app/${encodeURIComponent(appId)}` : null;

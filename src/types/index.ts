@@ -204,6 +204,11 @@ export interface CatalogEntry {
   /** Poznámky k nejnovější verzi (ReleaseNotes z manifestu wingetu). */
   releaseNotes?: string | null;
   releaseNotesUrl?: string | null;
+  /**
+   * Přípony souborů, které aplikace otevírá (FileExtensions z manifestu wingetu; malými
+   * písmeny bez tečky) – „Čím otevřu tento soubor?“ (lib/openWith.ts).
+   */
+  fileExtensions?: string[];
   /** Datum vydání nejnovější verze (ISO 8601). */
   releaseDate?: string | null;
   /** Odkaz na podporu vydavatele. */
@@ -401,6 +406,8 @@ export interface OperationProgress {
   percent: number | null;
   /** Začátek fáze (Date.now()) – pro odhad procent u fází, které je nehlásí (lib/phaseEstimate). */
   since?: number;
+  /** Operace už stahovala – instalace pokračuje v celkovém procentu za stahováním (JobProgress). */
+  downloaded?: boolean;
 }
 
 /** Výsledný stav dokončené operace. */

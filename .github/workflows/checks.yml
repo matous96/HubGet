@@ -1,0 +1,72 @@
+# Kontrola při každém pushi do main a u pull requestů: typy (aplikace i data pipeline),
+# testy logiky frontendu (Vitest – pnpm test), testy a clippy backendu (Rust). Zdarma na
+# GitHub Actions. Samotné vydání kontroluje a sestavuje workflow Vydání (release.yml).
+
+name: Kontrola
+
+on:
+  push:
+    branches: [main]
+    # Jen web, texty a dokumentace – aplikace se nemění
+    paths-ignore: ["website/**", ".pages.yml", "**/*.md", "docs/**"]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: kontrola-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  frontend:
+    name: Frontend (typy a testy)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Typy
+        run: pnpm typecheck
+
+      - name: Testy logiky
+        run: pnpm test
+
+  backend:
+    name: Backend (testy a clippy)
+    runs-on: windows-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      # tauri::generate_context! vkládá sestavený frontend – pro testy stačí prázdná stránka
+      - name: Zástupný frontend
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force dist | Out-Null
+          Set-Content dist/index.html "<!doctype html><title>HubGet</title>"
+
+      - name: Clippy
+        working-directory: src-tauri
+        run: cargo clippy --all-targets -- -D warnings
+
+      - name: Testy
+        working-directory: src-tauri
+        run: cargo test

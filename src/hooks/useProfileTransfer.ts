@@ -14,7 +14,7 @@ import { useTranslation } from "react-i18next";
 import { useInstalledItems } from "@/hooks/useInstalledItems";
 import { sourceKey, useSourceIndex } from "@/hooks/usePackages";
 import { safeFileName } from "@/lib/download";
-import { buildProfile, buildProfileHtml, buildWingetExport, parseProfileFile, portableItems, profileConfig } from "@/lib/profile";
+import { buildProfile, buildProfileHtml, buildWingetConfiguration, buildWingetExport, parseProfileFile, portableItems, profileConfig } from "@/lib/profile";
 import { APP_VERSION } from "@/services/updates";
 import { useAutoUpdates } from "@/store/autoUpdates";
 import { useBundle } from "@/store/bundle";
@@ -70,6 +70,12 @@ export function useProfileTransfer() {
     );
   };
 
+  /** Konfigurace pro `winget configure` (YAML) – nový počítač jedním příkazem, i ve firmách. */
+  const exportConfiguration = async () => {
+    const { yaml, count } = buildWingetConfiguration(portableItems(items), t("profile.configurationTitle"));
+    await saveFile("hubget.winget", yaml, "text/yaml", (path) => t("profile.exportedTo", { count, path }));
+  };
+
   /**
    * Načte soubor profilu (.json, .html, .ubundle nebo export wingetu): ukáže
    * dialog s instalací všeho, nebo (ze Sad balíčků) soubor rovnou otevře v seznamu.
@@ -91,5 +97,5 @@ export function useProfileTransfer() {
     }
   };
 
-  return { portableCount, wingetCount, exportProfile, exportWinget, importFile };
+  return { portableCount, wingetCount, exportProfile, exportWinget, exportConfiguration, importFile };
 }

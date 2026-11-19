@@ -96,6 +96,20 @@ const INSTALLER_TYPE: Record<string, InstallerType> = {
 };
 
 /** Preferovaný instalátor pro údaje na kartě: x64, pak neutrální, x86, ARM64. */
+/** Nejvíc přípon u jedné aplikace (archivátory jich mají desítky). */
+const MAX_EXTENSIONS = 80;
+
+/**
+ * Přípony souborů, které aplikace otevírá: FileExtensions z manifestu (kořen i instalátory),
+ * malými písmeny bez tečky, jen rozumné tvary (manifesty občas obsahují „*.txt“ nebo mezery).
+ */
+export function fileExtensionsOf(m: WingetManifest | null): string[] | undefined {
+  if (!m) return undefined;
+  const all = [...(m.FileExtensions ?? []), ...(m.Installers ?? []).flatMap((i) => i.FileExtensions ?? [])];
+  const clean = [...new Set(all.map((e) => String(e).trim().toLowerCase().replace(/^\*?\./, "")).filter((e) => /^[a-z0-9][a-z0-9_+-]{0,14}$/.test(e)))];
+  return clean.length ? clean.sort().slice(0, MAX_EXTENSIONS) : undefined;
+}
+
 function preferredInstaller(installers: WingetInstaller[]): WingetInstaller | undefined {
   const order = ["x64", "neutral", "x86", "arm64"];
   return [...installers].sort((a, b) => order.indexOf(a.Architecture ?? "") - order.indexOf(b.Architecture ?? ""))[0];
@@ -326,6 +340,7 @@ export async function buildCatalog(
       sources: sourcesOf(r, m, sizes.get(id)),
       releaseNotes: m?.ReleaseNotes ? truncate(plainText(m.ReleaseNotes), 600) : undefined,
       releaseNotesUrl: m?.ReleaseNotesUrl,
+      fileExtensions: fileExtensionsOf(m),
       releaseDate: isoDate(m?.ReleaseDate) ?? isoDate(r.choco?.published),
       supportUrl: support,
       privacyUrl: m?.PrivacyUrl,

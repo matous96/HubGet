@@ -71,6 +71,44 @@ export function buildWingetExport(items: InstalledItem[], wingetVersion = "1.11.
   };
 }
 
+/** Id aplikace z Microsoft Storu (12 znaků, bez tečky – „9NKSQGP7F2NH“). */
+export const isStoreId = (id: string) => /^[0-9A-Z]{12}$/i.test(id) && !id.includes(".");
+
+/**
+ * Konfigurace pro `winget configure` (WinGet Configuration / DSC, YAML): standardní formát
+ * pro přípravu nového počítače, se kterým pracují i firmy a Microsoft Dev Box. Jen aplikace
+ * z wingetu a Microsoft Storu – ostatní správci zdroj DSC nemají. Hodnoty jsou v JSON zápisu
+ * (platný řetězec YAML, ať název s dvojtečkou nebo uvozovkami soubor nerozbije).
+ */
+export function buildWingetConfiguration(packages: Pick<BundleItem, "source" | "packageId" | "name">[], title: string): { yaml: string; count: number } {
+  const winget = packages.filter((p) => p.source === "winget");
+  const seen = new Set<string>();
+  const lines = [
+    "# yaml-language-server: $schema=https://aka.ms/configuration-dsc-schema/0.2",
+    `# ${title.replace(/[\r\n]+/g, " ")} – HubGet`,
+    "# winget configure -f <tento soubor>",
+    "properties:",
+    "  configurationVersion: 0.2.0",
+    "  resources:",
+  ];
+  for (const p of winget) {
+    if (seen.has(p.packageId.toLowerCase())) continue;
+    seen.add(p.packageId.toLowerCase());
+    const id = JSON.stringify(p.packageId);
+    lines.push(
+      "    - resource: Microsoft.WinGet.DSC/WinGetPackage",
+      `      id: ${id}`,
+      "      directives:",
+      `        description: ${JSON.stringify(p.name)}`,
+      "        allowPrerelease: true",
+      "      settings:",
+      `        id: ${id}`,
+      `        source: ${isStoreId(p.packageId) ? "msstore" : "winget"}`,
+    );
+  }
+  return { yaml: lines.join("\n") + "\n", count: seen.size };
+}
+
 interface WingetExport {
   Sources?: { Packages?: { PackageIdentifier?: string; Version?: string }[] }[];
 }

@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="130" height="48" viewBox="0 0 130 48" role="img" aria-label="Install with HubGet">
+  <title>Install with HubGet</title>
+  <defs>
+    <linearGradient id="hg-bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5b77ff"/>
+      <stop offset="1" stop-color="#4560f5"/>
+    </linearGradient>
+  </defs>
+  <rect x="0.5" y="0.5" width="129" height="47" rx="10" fill="#ffffff" stroke="#d6d9e0"/>
+  <g transform="translate(10 8) scale(0.5)">
+    <rect width="64" height="64" rx="15" fill="url(#hg-bg)"/>
+    <rect x="19" y="17" width="10" height="10" rx="2.5" fill="#f59e0b" transform="rotate(-12 24 22)"/>
+    <rect x="27" y="10" width="10" height="10" rx="2.5" fill="#38bdf8"/>
+    <rect x="35" y="17" width="10" height="10" rx="2.5" fill="#10b981" transform="rotate(12 40 22)"/>
+    <path d="M15 31 H32 L27 24 H9 Z" fill="#fff" fill-opacity="0.7"/>
+    <path d="M32 31 H49 L55 24 H37 Z" fill="#fff" fill-opacity="0.7"/>
+    <rect x="15" y="31" width="34" height="21" rx="3" fill="#fff"/>
+  </g>
+  <text x="52" y="20" fill="#5b6170" font-family="'Segoe UI', Inter, Arial, sans-serif" font-size="11" font-weight="500">Install with</text>
+  <text x="52" y="37" fill="#0d0f14" font-family="'Segoe UI', Inter, Arial, sans-serif" font-size="17" font-weight="700">HubGet</text>
+</svg>

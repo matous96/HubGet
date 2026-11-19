@@ -60,7 +60,7 @@
     "t52": "Stáhněte si HubGet",
     "t53": "Verze {auto:version} · preview · zdarma a open source · [co je nového](novinky.html)",
     "t54": "Instalátor EXE",
-    "t55": "{auto:exe-size} · bez práv správce · čeština / angličtina",
+    "t55": "{auto:exe-size} · bez práv správce · 7 jazyků včetně češtiny",
     "t56": "Instalátor MSI",
     "t57": "{auto:msi-size} · pro nasazení ve firmách",
     "t58": "Požadavky: Windows 10 / 11, 64bit, WebView2 (ve Windows je předinstalovaný).\nInstalátor zatím není digitálně podepsaný – co dělat s varováním [Edge](otazky.html#faq-edge) a [SmartScreenu](otazky.html#faq-smartscreen).\n[Zásady podepisování kódu](podpis-kodu.html) · [Ochrana soukromí](soukromi.html)"

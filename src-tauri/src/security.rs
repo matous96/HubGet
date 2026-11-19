@@ -34,9 +34,15 @@ pub fn set_security_policy(policy: SecurityPolicy) {
     *POLICY.write().unwrap_or_else(|e| e.into_inner()) = policy;
 }
 
-/// Aktuální nastavení (kopie – zámek se nedrží během operace).
+/// Aktuální nastavení (kopie – zámek se nedrží během operace). Firemní zásady
+/// (org_policy.rs) vlastní argumenty a příkazy zakážou i proti volbě ve frontendu.
 pub fn policy() -> SecurityPolicy {
-    POLICY.read().unwrap_or_else(|e| e.into_inner()).clone()
+    let mut policy = POLICY.read().unwrap_or_else(|e| e.into_inner()).clone();
+    if crate::org_policy::get().disable_custom_commands {
+        policy.allow_custom_args = false;
+        policy.allow_pre_post_commands = false;
+    }
+    policy
 }
 
 /// Vlastní cesta ke správci, pokud ji uživatel nastavil a soubor má očekávaný

@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import {
+  FileType,
   ArrowRight,
   Check,
   CircleAlert,
@@ -16,7 +17,7 @@ import {
   Users,
   type LucideIcon,
 } from "lucide-react";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { queryKeys } from "@/app/queryClient";
@@ -76,10 +77,41 @@ export function TechnicalDetails({ entry, pkg }: { entry: CatalogEntry; pkg: Pac
         <Scope entry={entry} pkg={pkg} />
         <Sizes pkg={pkg} language={language} />
         <Uninstall pkg={pkg} language={language} />
+        <FileTypes entry={entry} />
       </div>
 
       <Dependencies entry={entry} pkg={pkg} />
     </section>
+  );
+}
+
+/** Soubory, které aplikace otevírá (přípony z manifestu wingetu) – odkazy na „Čím otevřu“. */
+function FileTypes({ entry }: { entry: CatalogEntry }) {
+  const { t } = useTranslation();
+  const [all, setAll] = useState(false);
+  const extensions = entry.fileExtensions ?? [];
+  if (!extensions.length) return null;
+  const shown = all ? extensions : extensions.slice(0, 24);
+  return (
+    <Card icon={FileType} title={t("tech.fileTypes", { count: extensions.length })}>
+      <div className="flex flex-wrap gap-1.5">
+        {shown.map((ext) => (
+          <Link
+            key={ext}
+            to={`/open-with?ext=${encodeURIComponent(ext)}`}
+            title={t("openWith.title", { ext })}
+            className="rounded-md bg-surface-2 px-1.5 py-0.5 font-mono text-xs transition-colors hover:bg-surface-3 hover:text-accent"
+          >
+            .{ext}
+          </Link>
+        ))}
+        {extensions.length > shown.length && (
+          <button type="button" onClick={() => setAll(true)} className="cursor-pointer px-1 text-xs font-semibold text-accent hover:underline">
+            {t("tech.fileTypesMore", { count: extensions.length - shown.length })}
+          </button>
+        )}
+      </div>
+    </Card>
   );
 }
 

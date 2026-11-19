@@ -23,6 +23,11 @@ import { WatchlistWatcher } from "@/components/package/WatchlistWatcher";
 import { DeviceReporter } from "@/components/settings/DevicesSection";
 import { WeeklySummary } from "@/components/layout/WeeklySummary";
 import { CliCommands } from "@/components/layout/CliCommands";
+import { TaskbarProgress } from "@/components/layout/TaskbarProgress";
+import { NotificationActions } from "@/components/layout/NotificationActions";
+import { FileDropOpenWith } from "@/components/layout/FileDropOpenWith";
+import { VulnerabilityWatcher } from "@/components/package/VulnerabilityWatcher";
+import { ReliabilityWatcher } from "@/components/package/ReliabilityWatcher";
 import { FallbackOfferDialog } from "@/components/package/FallbackOfferDialog";
 import { LeftoversDialog } from "@/components/package/LeftoversDialog";
 import { ManagerSetupDialog } from "@/components/package/ManagerSetupDialog";
@@ -32,6 +37,7 @@ import { useAutoUpdateScheduler } from "@/hooks/useAutoUpdates";
 import { useDeepLinks } from "@/hooks/useDeepLinks";
 import { useDesktopIntegration } from "@/hooks/useDesktopIntegration";
 import { useSecurityPolicySync } from "@/hooks/useSecurityPolicySync";
+import { useOrgPolicySync } from "@/hooks/useOrgPolicySync";
 import { useExternalLinks } from "@/hooks/useExternalLinks";
 import { usePackageIndexSync } from "@/hooks/usePackageIndexSync";
 import { ScrollContainerContext, scrollRestore } from "@/hooks/useScrollContainer";
@@ -49,6 +55,8 @@ function BackgroundServices() {
   useDesktopIntegration();
   // Oprávnění správce a nebezpečná nastavení → backend; kontrola a instalace aktualizací na pozadí
   useSecurityPolicySync();
+  // Firemní zásady z registru (zásady skupiny) – zamčená nastavení
+  useOrgPolicySync();
   useAutoUpdateScheduler();
   // Odkazy unibox:// z webu a sdílených sad
   useDeepLinks();
@@ -140,6 +148,10 @@ export function Layout() {
         <BackgroundServices />
         {/* Příkazy z terminálu (hubget install …) */}
         <CliCommands />
+        {/* Průběh operace na ikoně v hlavním panelu */}
+        <TaskbarProgress />
+        {/* Tlačítka v oznámeních Windows (Aktualizovat vše, Otevřít…) */}
+        <NotificationActions />
       </Isolated>
       {/* Desktop: okno bez systémových dekorací má vlastní titulkovou lištu */}
       {desktop && <TitleBar />}
@@ -208,6 +220,8 @@ const OVERLAYS: [string, ComponentType][] = [
   ["AppInUseDialog", AppInUseDialog],
   ["RollbackDialog", RollbackDialog],
   ["WatchlistWatcher", WatchlistWatcher],
+  ["VulnerabilityWatcher", VulnerabilityWatcher],
+  ["ReliabilityWatcher", ReliabilityWatcher],
   ["DeviceReporter", DeviceReporter],
   ["WeeklySummary", WeeklySummary],
   ["AppRunningDialog", AppRunningDialog],
@@ -215,6 +229,7 @@ const OVERLAYS: [string, ComponentType][] = [
   ["UpdateDialog", UpdateDialog],
   ["WhatsNewDialog", WhatsNewDialog],
   ["OnboardingDialog", OnboardingDialog],
+  ["FileDropOpenWith", FileDropOpenWith],
 ];
 
 /** Část okna, jejíž chyba se zapíše a nic dalšího neshodí (bez náhradního obsahu). */

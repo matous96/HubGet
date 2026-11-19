@@ -1,8 +1,9 @@
-import { ArrowRight, TriangleAlert } from "lucide-react";
+import { ArrowRight, ShieldAlert, TriangleAlert } from "lucide-react";
 import { memo } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { usePackageState } from "@/hooks/usePackages";
+import { useIsSecurityUpdate } from "@/hooks/useSecurityUpdates";
 import { cn } from "@/lib/utils";
 import { useInstallerHostChange } from "@/store/installerUrls";
 import { useSelection } from "@/store/selection";
@@ -10,6 +11,7 @@ import type { CatalogEntry } from "@/types";
 import { usePackageMenuHandlers } from "./InstallMenu";
 import { SelectCheckbox } from "./SelectCheckbox";
 import { PackageAction } from "./PackageAction";
+import { noteToneClass, type NoteTone } from "./PackageCard";
 import { PackageIcon } from "./PackageIcon";
 import { QuickActions } from "./QuickActions";
 import { CategoryBadge } from "./CategoryBadge";
@@ -26,8 +28,8 @@ interface PackageRowProps {
   compact?: boolean;
   /** Poznámka místo popisu (Nepoužívané: „Naposledy spuštěno před 8 měsíci“). */
   note?: string;
-  /** Vzhled poznámky: upozornění (oranžová), nebo informace (Co je nového). */
-  noteTone?: "warning" | "info";
+  /** Vzhled poznámky: upozornění (oranžová), informace (Co je nového), bezpečnostní oprava (červená). */
+  noteTone?: NoteTone;
 }
 
 /**
@@ -38,6 +40,7 @@ export const PackageRow = memo(function PackageRow({ entry, showUninstall, compa
   const { t } = useTranslation();
   const { installed, job } = usePackageState(entry.id);
   const hostChange = useInstallerHostChange(installed);
+  const security = useIsSecurityUpdate(installed);
   // Pravé tlačítko = nabídka instalace, Ctrl+Enter / Alt+Enter = instalovat / možnosti
   const menuHandlers = usePackageMenuHandlers(entry);
   const selected = useSelection((s) => !!s.items[entry.id]);
@@ -85,7 +88,7 @@ export const PackageRow = memo(function PackageRow({ entry, showUninstall, compa
         </div>
         {note ? (
           <p
-            className={cn("truncate text-[13px]", noteTone === "warning" ? "font-medium text-amber-600 dark:text-amber-400" : "text-fg/80")}
+            className={cn("truncate text-[13px]", noteToneClass(noteTone))}
             title={note}
           >
             {note}
@@ -111,6 +114,11 @@ export const PackageRow = memo(function PackageRow({ entry, showUninstall, compa
                   className="inline-flex items-center gap-1 font-semibold text-amber-700 dark:text-amber-300"
                 >
                   <TriangleAlert className="size-3.5" />
+                  {installed.availableVersion}
+                </span>
+              ) : security ? (
+                <span title={t("security.badge")} className="inline-flex items-center gap-1 font-semibold text-danger">
+                  <ShieldAlert className="size-3.5" />
                   {installed.availableVersion}
                 </span>
               ) : (

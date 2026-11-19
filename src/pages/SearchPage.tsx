@@ -1,8 +1,8 @@
 import { useQueries, type UseQueryResult } from "@tanstack/react-query";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, FileQuestion } from "lucide-react";
 import { useDeferredValue, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { useSearchParams } from "react-router";
+import { Link, useSearchParams } from "react-router";
 import { queryKeys } from "@/app/queryClient";
 import { DevSourceOverview } from "@/components/home/DevSourceOverview";
 import { ArchFilter, ArchHiddenNote } from "@/components/package/ArchFilter";
@@ -23,6 +23,7 @@ import {
   type SearchRecord,
 } from "@/hooks/usePackages";
 import { ARCH_LABEL } from "@/lib/arch";
+import { countForExtension, extensionQuery } from "@/lib/openWith";
 import { normalize } from "@/lib/utils";
 import { isVerified } from "@/lib/verified";
 import { isWebOnly } from "@/lib/webOnly";
@@ -172,6 +173,8 @@ export function SearchPage() {
       <PageHeader title={t("search.resultsFor", { query })} actions={<ArchFilter />} />
       {/* Akce HubGetu („aktual“ → Aktualizovat vše, „proto“ → Protokoly…) */}
       <CommandResults query={query} />
+      {/* „.psd“ – aplikace, které soubor otevřou */}
+      <OpenWithHint query={query} />
       {failedNote}
       {!nothing && <ArchHiddenNote hidden={hiddenByArch} />}
       {nothing ? (
@@ -204,5 +207,23 @@ export function SearchPage() {
         </>
       )}
     </>
+  );
+}
+
+/** Hledání přípony souboru („.psd“): odkaz na aplikace, které takový soubor otevřou. */
+function OpenWithHint({ query }: { query: string }) {
+  const { t } = useTranslation();
+  const { data } = useCatalog();
+  const ext = extensionQuery(query);
+  const count = ext && data ? countForExtension(data.catalog.packages, ext) : 0;
+  if (!ext || !count) return null;
+  return (
+    <Link
+      to={`/open-with?ext=${encodeURIComponent(ext)}`}
+      className="mb-5 flex items-center gap-3 rounded-2xl border border-accent/30 bg-accent/8 px-4 py-3 text-sm transition-colors hover:bg-accent/12"
+    >
+      <FileQuestion className="size-5 shrink-0 text-accent" />
+      <span className="min-w-0 flex-1">{t("openWith.searchHint", { ext, count })}</span>
+    </Link>
   );
 }

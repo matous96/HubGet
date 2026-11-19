@@ -5,7 +5,8 @@
  *    vypínačem, ať o chybě nepřijdete,
  *  - vyskakovací oznámení: hlavní vypínač + typ události. V okně HubGetu
  *    v rohu vpravo dole; když okno nemá fokus (je v pozadí nebo schované
- *    u hodin), i jako oznámení Windows.
+ *    u hodin), i jako oznámení Windows – s tlačítky (Aktualizovat vše, Otevřít…,
+ *    components/layout/NotificationActions.tsx).
  */
 import { isPermissionGranted, requestPermission, sendNotification } from "@tauri-apps/plugin-notification";
 import { isTauri } from "@/lib/tauri";
@@ -29,7 +30,16 @@ export interface NotifyEvent {
   record?: Pick<AppNotification, "kind" | "source" | "appId"> | true;
   /** Vyskakovací oznámení vynechat (např. jednotlivé výsledky během dávky – přijde souhrn). */
   popup?: boolean;
+  /**
+   * Tlačítka v oznámení Windows (NotificationActions.tsx): „updates“ – Aktualizovat vše
+   * a Zobrazit, „installed“ – Otevřít aplikaci (appId), „failed“ – Podrobnosti (appId).
+   */
+  actions?: NotificationActionType;
+  /** Aplikace, ke které tlačítka patří (id karty). */
+  appId?: string;
 }
+
+export type NotificationActionType = "updates" | "installed" | "failed";
 
 /** Předvolba, která daný druh události povoluje. */
 const TYPE_PREF: Partial<Record<NotifyEventType, keyof NotificationPrefs>> = {
@@ -55,17 +65,18 @@ export function notifyEvent(event: NotifyEvent) {
   if (event.toast !== false) useToasts.getState().push(event.tone, event.toast ?? event.message, { record: false });
   // Okno je v pozadí nebo schované u hodin → oznámení Windows (průběh tiše)
   if (isTauri() && (!document.hasFocus() || event.type === "test")) {
-    void systemNotification(event.title ?? "HubGet", event.message, event.type === "progress");
+    void systemNotification(event.title ?? "HubGet", event.message, event.type === "progress", event.actions, event.appId);
   }
 }
 
 let permission: Promise<boolean> | null = null;
 
 /** Oznámení Windows (plugin notification); oprávnění se zjistí jednou. */
-async function systemNotification(title: string, body: string, silent: boolean) {
+async function systemNotification(title: string, body: string, silent: boolean, actions?: NotificationActionType, appId?: string) {
   permission ??= isPermissionGranted().then(async (granted) => granted || (await requestPermission()) === "granted");
   try {
-    if (await permission) sendNotification({ title, body, silent });
+    // Klik na oznámení i na tlačítko zpracuje NotificationActions (typ a aplikace v extra)
+    if (await permission) sendNotification({ title, body, silent, actionTypeId: actions, extra: { type: actions ?? "", appId: appId ?? "" } });
   } catch {
     // Oznámení Windows jsou jen doplněk – historie a oznámení v okně fungují dál
   }

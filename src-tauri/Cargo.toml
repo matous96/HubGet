@@ -29,6 +29,10 @@ serde_json = "1"
 base64 = "0.22"
 # Ověření předem staženého instalátoru (SHA-256 z manifestu wingetu)
 sha2 = "0.10"
+# Přenos nastavení aplikací (settings_transfer.rs): AES-256-GCM a PBKDF2 z ring, komprese
+# deflate – obě knihovny už přibaluje rustls / png, žádná nová závislost
+ring = "0.17"
+flate2 = "1"
 # Ikony: převod ICO → PNG, rozpoznání prázdných obrázků (icons.rs)
 image = { version = "0.25", default-features = false, features = ["ico", "png"] }
 # Stahování ikon (icons.rs) se sdílenými spojeními místo nového curl.exe pro každou ikonu.
@@ -79,6 +83,12 @@ windows-sys = { version = "0.61", features = [
 # měřené připojení (NetworkInformation) pro automatické aktualizace;
 # cíl zástupců ve složce Po spuštění (IShellLink – GetPath potřebuje Storage_FileSystem)
 windows = { version = "0.62", features = [
+  # Rychlé akce na ikoně v hlavním panelu (ICustomDestinationList, název přes PKEY_Title) – jumplist.rs
+  "Win32_Storage_EnhancedStorage",
+  "Win32_System_Com_StructuredStorage",
+  "Win32_System_Variant",
+  "Win32_UI_Shell_Common",
+  "Win32_UI_Shell_PropertiesSystem",
   "Foundation",
   "Networking_Connectivity",
   "Win32_Foundation",

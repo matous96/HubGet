@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Zásady skupiny pro HubGet (src-tauri/src/org_policy.rs). HubGet.admx a složky jazyků
+     zkopírujte do C:\Windows\PolicyDefinitions (nebo do centrálního úložiště domény). -->
+<policyDefinitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" revision="1.0" schemaVersion="1.0" xmlns="http://schemas.microsoft.com/GroupPolicy/2006/07/PolicyDefinitions">
+  <policyNamespaces>
+    <target prefix="hubget" namespace="HubGet.Policies.HubGet" />
+    <using prefix="windows" namespace="Microsoft.Policies.Windows" />
+  </policyNamespaces>
+  <resources minRequiredRevision="1.0" />
+  <supportedOn>
+    <definitions>
+      <definition name="SUPPORTED_HubGet" displayName="$(string.SUPPORTED_HubGet)" />
+    </definitions>
+  </supportedOn>
+  <categories>
+    <category name="HubGet" displayName="$(string.HubGet)" />
+  </categories>
+  <policies>
+    <policy name="AllowedSources" class="Both" displayName="$(string.AllowedSources)" explainText="$(string.AllowedSources_Help)" presentation="$(presentation.AllowedSources)" key="Software\Policies\HubGet">
+      <parentCategory ref="HubGet" />
+      <supportedOn ref="SUPPORTED_HubGet" />
+      <elements>
+        <text id="AllowedSourcesValue" valueName="AllowedSources" required="true" />
+      </elements>
+    </policy>
+    <policy name="AllowedApps" class="Both" displayName="$(string.AllowedApps)" explainText="$(string.AllowedApps_Help)" presentation="$(presentation.AllowedApps)" key="Software\Policies\HubGet">
+      <parentCategory ref="HubGet" />
+      <supportedOn ref="SUPPORTED_HubGet" />
+      <elements>
+        <list id="AllowedAppsValue" key="Software\Policies\HubGet\AllowedApps" valuePrefix="" />
+      </elements>
+    </policy>
+    <policy name="DisableDeveloperMode" class="Both" displayName="$(string.DisableDeveloperMode)" explainText="$(string.DisableDeveloperMode_Help)" key="Software\Policies\HubGet" valueName="DisableDeveloperMode">
+      <parentCategory ref="HubGet" />
+      <supportedOn ref="SUPPORTED_HubGet" />
+      <enabledValue><decimal value="1" /></enabledValue>
+      <disabledValue><decimal value="0" /></disabledValue>
+    </policy>
+    <policy name="DisableCustomCommands" class="Both" displayName="$(string.DisableCustomCommands)" explainText="$(string.DisableCustomCommands_Help)" key="Software\Policies\HubGet" valueName="DisableCustomCommands">
+      <parentCategory ref="HubGet" />
+      <supportedOn ref="SUPPORTED_HubGet" />
+      <enabledValue><decimal value="1" /></enabledValue>
+      <disabledValue><decimal value="0" /></disabledValue>
+    </policy>
+    <policy name="DisableSignIn" class="Both" displayName="$(string.DisableSignIn)" explainText="$(string.DisableSignIn_Help)" key="Software\Policies\HubGet" valueName="DisableSignIn">
+      <parentCategory ref="HubGet" />
+      <supportedOn ref="SUPPORTED_HubGet" />
+      <enabledValue><decimal value="1" /></enabledValue>
+      <disabledValue><decimal value="0" /></disabledValue>
+    </policy>
+    <policy name="ForceAutomaticUpdates" class="Both" displayName="$(string.ForceAutomaticUpdates)" explainText="$(string.ForceAutomaticUpdates_Help)" key="Software\Policies\HubGet" valueName="ForceAutomaticUpdates">
+      <parentCategory ref="HubGet" />
+      <supportedOn ref="SUPPORTED_HubGet" />
+      <enabledValue><decimal value="1" /></enabledValue>
+      <disabledValue><decimal value="0" /></disabledValue>
+    </policy>
+    <policy name="MinimumUpdateAgeDays" class="Both" displayName="$(string.MinimumUpdateAgeDays)" explainText="$(string.MinimumUpdateAgeDays_Help)" presentation="$(presentation.MinimumUpdateAgeDays)" key="Software\Policies\HubGet">
+      <parentCategory ref="HubGet" />
+      <supportedOn ref="SUPPORTED_HubGet" />
+      <elements>
+        <decimal id="MinimumUpdateAgeDaysValue" valueName="MinimumUpdateAgeDays" minValue="0" maxValue="365" required="true" />
+      </elements>
+    </policy>
+    <policy name="DisableSelfUpdate" class="Both" displayName="$(string.DisableSelfUpdate)" explainText="$(string.DisableSelfUpdate_Help)" key="Software\Policies\HubGet" valueName="DisableSelfUpdate">
+      <parentCategory ref="HubGet" />
+      <supportedOn ref="SUPPORTED_HubGet" />
+      <enabledValue><decimal value="1" /></enabledValue>
+      <disabledValue><decimal value="0" /></disabledValue>
+    </policy>
+  </policies>
+</policyDefinitions>

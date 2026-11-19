@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<policyDefinitionResources xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" revision="1.0" schemaVersion="1.0" xmlns="http://schemas.microsoft.com/GroupPolicy/2006/07/PolicyDefinitions">
+  <displayName>HubGet</displayName>
+  <description>Zásady skupiny pro HubGet – obchod s aplikacemi pro Windows.</description>
+  <resources>
+    <stringTable>
+      <string id="HubGet">HubGet</string>
+      <string id="SUPPORTED_HubGet">HubGet se zásadami skupiny</string>
+      <string id="AllowedSources">Povolení správci balíčků</string>
+      <string id="AllowedSources_Help">Správce balíčků, které HubGet smí používat, oddělené středníkem: winget, chocolatey, scoop, npm, bun, pip, cargo, vcpkg, dotnet, pwsh, powershell.
+
+Například „winget;scoop“. Instalaci a aktualizaci přes jiného správce HubGet odmítne a v Nastavení ho nejde zapnout.
+
+Není-li zásada nastavená, uživatel může používat všechny správce.</string>
+      <string id="AllowedApps">Schválené aplikace</string>
+      <string id="AllowedApps_Help">Jen tyto aplikace půjde v HubGetu nainstalovat. Zadejte id balíčku (VideoLAN.VLC) nebo zdroj a id (scoop:extras/vlc), každé zvlášť.
+
+Aktualizace a odinstalace už nainstalovaných aplikací zůstanou možné. Hodí se pro firmy i jako rodičovská kontrola.
+
+Není-li zásada nastavená, lze instalovat jakoukoli aplikaci.</string>
+      <string id="DisableDeveloperMode">Zakázat režim Vývojář</string>
+      <string id="DisableDeveloperMode_Help">HubGet nebude nabízet režim Vývojář ani instalovat přes npm, Bun, pip, Cargo, vcpkg, .NET Tool a PowerShell.</string>
+      <string id="DisableCustomCommands">Zakázat vlastní argumenty a příkazy</string>
+      <string id="DisableCustomCommands_Help">Vlastní argumenty instalátoru a příkazy před instalací a po ní nepůjde zapnout ani převzít z importované sady; HubGet je zahodí.</string>
+      <string id="DisableSignIn">Zakázat přihlášení a synchronizaci</string>
+      <string id="DisableSignIn_Help">HubGet nenabídne přihlášení přes GitHub, synchronizaci mezi počítači, hodnocení ani snímky od uživatelů. Přihlášený uživatel se odhlásí.</string>
+      <string id="ForceAutomaticUpdates">Vynutit automatické aktualizace</string>
+      <string id="ForceAutomaticUpdates_Help">HubGet bude aktualizace kontrolovat a instalovat automaticky u všech aplikací (podle plánu v Nastavení); uživatel je nemůže vypnout.</string>
+      <string id="MinimumUpdateAgeDays">Minimální stáří aktualizací</string>
+      <string id="MinimumUpdateAgeDays_Help">Nová verze se nabídne až po zadaném počtu dní od vydání (0–365). Bezpečnostní aktualizace podle Nastavení nečekají.</string>
+      <string id="DisableSelfUpdate">Zakázat aktualizace HubGetu</string>
+      <string id="DisableSelfUpdate_Help">HubGet nebude hledat ani instalovat své nové verze – hodí se, když HubGet nasazujete jako MSI a verze spravujete sami.</string>
+    </stringTable>
+    <presentationTable>
+      <presentation id="AllowedSources">
+        <textBox refId="AllowedSourcesValue"><label>Správci (oddělte středníkem):</label><defaultValue>winget</defaultValue></textBox>
+      </presentation>
+      <presentation id="AllowedApps">
+        <listBox refId="AllowedAppsValue">Povolené aplikace:</listBox>
+      </presentation>
+      <presentation id="MinimumUpdateAgeDays">
+        <decimalTextBox refId="MinimumUpdateAgeDaysValue" defaultValue="7">Počet dní:</decimalTextBox>
+      </presentation>
+    </presentationTable>
+  </resources>
+</policyDefinitionResources>

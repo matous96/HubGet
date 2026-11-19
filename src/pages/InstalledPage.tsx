@@ -1,4 +1,4 @@
-import { Clock, RefreshCw, Search } from "lucide-react";
+import { Clock, RefreshCw, Search, ShieldAlert } from "lucide-react";
 import { useEffect, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { PackageCollection } from "@/components/package/PackageCollection";
@@ -8,6 +8,7 @@ import { CardSkeletons, EmptyState, ErrorState, PageHeader } from "@/components/
 import { UNUSED_DAYS, useUnusedApps } from "@/hooks/useAppUsage";
 import { useInstallOrder, useInstalledItems, useUpdates } from "@/hooks/useInstalledItems";
 import { useSortedPackages } from "@/hooks/usePackages";
+import { useSecurityUpdateIds } from "@/hooks/useSecurityUpdates";
 import { useUrlState } from "@/hooks/useUrlState";
 import { isTauri } from "@/lib/tauri";
 import { cn, formatSizeText, normalize } from "@/lib/utils";
@@ -16,8 +17,11 @@ import { ORIGINS } from "@/services/managers";
 import { AdminPendingPanel } from "@/components/package/AdminPendingPanel";
 import { ListFailurePanel } from "@/components/package/ListFailurePanel";
 import { DuplicatesPanel, EndOfLifePanel } from "@/components/package/InstalledNotices";
+import type { NoteTone } from "@/components/package/PackageCard";
+import { VulnerablePanel } from "@/components/package/VulnerabilityWatcher";
 import { OriginFilter, type OriginFilterValue } from "@/components/package/SourceFilter";
 import { useAutoUpdates } from "@/store/autoUpdates";
+import { problemShare, reliabilityWarning, useReliability } from "@/store/reliability";
 import { useSelection } from "@/store/selection";
 import { useSettings } from "@/store/settings";
 import type { InstallOrigin } from "@/types";
@@ -28,7 +32,13 @@ type Filter = "all" | "updates" | "unused";
 export function InstalledPage() {
   const { t } = useTranslation();
   const { items, isLoading, isError, refetch, isFetching } = useInstalledItems();
-  const { updatable, pending: pendingUpdates, updateAll } = useUpdates();
+  const { updatable, pending: pendingUpdates, updateAll, updateItems } = useUpdates();
+  // Aktualizace, které opravují bezpečnostní chybu – první v seznamu, se štítkem a vlastním tlačítkem
+  const securityIds = useSecurityUpdateIds(updatable);
+  const securityItems = useMemo(() => updatable.filter((i) => securityIds.has(i.entry.id)), [updatable, securityIds]);
+  // Spolehlivost verzí od komunity (store/reliability.ts) – jen se zapnutým sdílením
+  const community = useAutoUpdates((s) => s.communityReliability);
+  const reliability = useReliability((s) => s.data);
   // Filtry jsou v adrese (?filter=updates&origin=steam&q=…): na záložku aktualizací odkazuje
   // postranní panel a po otevření detailu a návratu zpět zůstanou
   const [filter, setFilter] = useUrlState<Filter>("filter", "all", (v) => v === "updates" || v === "unused");
@@ -45,12 +55,21 @@ export function InstalledPage() {
   const whatsNew = useMemo(() => {
     const notes = new Map<string, string>();
     for (const { pkg, entry } of updatable) {
-      if (!entry.releaseNotes || !pkg.availableVersion || !entry.latestVersion) continue;
-      if (compareVersions(entry.latestVersion, pkg.availableVersion) !== 0) continue;
-      notes.set(entry.id, t("updates.whatsNew", { text: entry.releaseNotes.replace(/\s+/g, " ").trim().slice(0, 240) }));
+      const current = !!entry.releaseNotes && !!pkg.availableVersion && !!entry.latestVersion && compareVersions(entry.latestVersion, pkg.availableVersion) === 0;
+      const text = current ? entry.releaseNotes!.replace(/\s+/g, " ").trim().slice(0, 240) : "";
+      const warning = community ? reliabilityWarning(reliability, pkg) : undefined;
+      if (securityIds.has(entry.id)) notes.set(entry.id, text ? t("security.note", { text }) : t("security.noteShort"));
+      else if (warning) notes.set(entry.id, t("reliability.note", { percent: Math.round(problemShare(warning) * 100), count: warning.reports }));
+      else if (text) notes.set(entry.id, t("updates.whatsNew", { text }));
     }
     return notes;
-  }, [updatable, t]);
+  }, [updatable, securityIds, community, reliability, t]);
+  // Bezpečnostní oprava červeně, problémy hlášené komunitou oranžově, ostatní poznámky jako informace
+  const noteTones = useMemo(() => {
+    const tones = new Map<string, NoteTone>([...securityIds].map((id) => [id, "danger"]));
+    if (community) for (const { pkg, entry } of updatable) if (!tones.has(entry.id) && reliabilityWarning(reliability, pkg)) tones.set(entry.id, "warning");
+    return tones;
+  }, [securityIds, community, reliability, updatable]);
   const list = filter === "updates" ? updatable : filter === "unused" ? unusedItems : items;
   const [text, setText] = useUrlState<string>("q", "");
   const [originFilter, setOriginFilter] = useUrlState<OriginFilterValue>("origin", "all", (v) => ORIGINS.some((o) => o.id === v));
@@ -93,7 +112,12 @@ export function InstalledPage() {
     () => (largestFirst ? [...entries].sort((a, b) => (sizes.get(b.id) ?? -1) - (sizes.get(a.id) ?? -1)) : entries),
     [largestFirst, entries, sizes],
   );
-  const sorted = largestFirst ? bySize : recentFirst || filter === "unused" ? entries : sortedByMode;
+  const ordered = largestFirst ? bySize : recentFirst || filter === "unused" ? entries : sortedByMode;
+  // Dostupné aktualizace: bezpečnostní nahoře (jinak v pořadí podle řazení)
+  const sorted = useMemo(
+    () => (filter === "updates" && securityIds.size ? [...ordered.filter((e) => securityIds.has(e.id)), ...ordered.filter((e) => !securityIds.has(e.id))] : ordered),
+    [filter, ordered, securityIds],
+  );
 
   const tabs: { id: Filter; label: string; count: number }[] = [
     // Jen zobrazené položky (bez programů nalezených jen na disku) – stejně jako filtr zdrojů a postranní panel
@@ -178,11 +202,26 @@ export function InstalledPage() {
         <>
           <EndOfLifePanel items={items} />
           <DuplicatesPanel items={items} />
+          <VulnerablePanel items={items} />
         </>
       )}
 
       {/* Aktualizace odložené kvůli právům správce – jedním potvrzením UAC */}
       {filter === "updates" && <AdminPendingPanel />}
+
+      {/* Bezpečnostní aktualizace – opravují známé chyby, vyplatí se nainstalovat hned */}
+      {filter === "updates" && securityItems.length > 0 && (
+        <div className="mb-5 flex flex-wrap items-center gap-3 rounded-2xl border border-danger/30 bg-danger/8 px-4 py-3">
+          <ShieldAlert className="size-5 shrink-0 text-danger" />
+          <p className="min-w-0 flex-1 text-sm">
+            <strong>{t("security.panelTitle", { count: securityItems.length })}</strong>
+            <span className="text-muted"> {securityItems.slice(0, 4).map((i) => i.entry.name).join(", ")}{securityItems.length > 4 ? "…" : ""}</span>
+          </p>
+          <Button variant="secondary" onClick={() => void updateItems(securityItems)}>
+            {t("security.updateThese", { count: securityItems.length })}
+          </Button>
+        </div>
+      )}
 
       {/* Nepoužívané: co to znamená a výběr všech k hromadné odinstalaci (lišta dole) */}
       {filter === "unused" && sorted.length > 0 && (
@@ -212,6 +251,7 @@ export function InstalledPage() {
           showUninstall
           notes={filter === "unused" ? notes : filter === "updates" ? whatsNew : undefined}
           noteTone={filter === "updates" ? "info" : "warning"}
+          noteTones={filter === "updates" ? noteTones : undefined}
         />
       )}
     </>

@@ -94,6 +94,16 @@ export function useDesktopIntegration() {
       else useToasts.getState().push("info", i18n.t("settings.cliCommandFailed", { error: String(error) }));
     });
   }, [cliCommand]);
+  // Rychlé akce na ikoně v hlavním panelu (pravé tlačítko) v jazyce aplikace – jumplist.rs
+  useEffect(() => {
+    if (!isTauri()) return;
+    const tasks = [
+      { title: t("jumpList.updates"), command: "updates" },
+      { title: t("jumpList.updateAll"), command: "update" },
+      { title: t("nav.overview"), command: "overview" },
+    ];
+    invoke("set_jump_list", { tasks }).catch((error) => console.warn("[HubGet] Rychlé akce na ikoně:", error));
+  }, [t, i18n.language]);
   useEffect(() => {
     if (!isTauri()) return;
     const unlisten = listen("focus-search", () => window.dispatchEvent(new Event("hubget:focus-search")));

@@ -13,6 +13,7 @@ import { relaunch } from "@tauri-apps/plugin-process";
 import { check, type Update } from "@tauri-apps/plugin-updater";
 import { isTauri } from "@/lib/tauri";
 import pkgJson from "../../package.json";
+import { loadOrgPolicy } from "@/store/orgPolicy";
 
 export type { Update };
 
@@ -21,6 +22,8 @@ export const APP_VERSION: string = pkgJson.version;
 /** Novější verze HubGetu, nebo null (aktuální verze / webová verze). */
 export async function findUpdate(): Promise<Update | null> {
   if (!isTauri()) return null;
+  // Firemní zásady: HubGet aktualizuje organizace (nasazení MSI)
+  if ((await loadOrgPolicy()).disableSelfUpdate) return null;
   return check({ timeout: 20_000 });
 }
 

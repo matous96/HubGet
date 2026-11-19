@@ -70,6 +70,26 @@ for (const el of document.querySelectorAll("[data-lang-switch]")) {
   });
 }
 
+// ---------- Otevřít v HubGetu (aplikace.html?id=…&name=…, odznak „Nainstalovat přes HubGet“) ----------
+// Odkaz unibox://app/<id> otevře detail aplikace v HubGetu – nic se neinstaluje bez potvrzení.
+const appLink = document.querySelector("[data-app-link]");
+if (appLink) {
+  const params = new URLSearchParams(location.search);
+  const id = params.get("id") ?? "";
+  const name = (params.get("name") ?? "").trim().slice(0, 100);
+  // Id z katalogu („videolan-vlc“) nebo balíček se zdrojem („winget:VideoLAN.VLC“)
+  if (/^[A-Za-z0-9][\w.+:\/-]{0,199}$/.test(id)) {
+    appLink.href = `unibox://app/${encodeURIComponent(id)}`;
+    const heading = document.querySelector("[data-app-name]");
+    if (heading) heading.textContent = name || id;
+    if (name) document.title = `${name} – HubGet`;
+    // Jazyk přepnout i s aplikací
+    for (const el of document.querySelectorAll("[data-lang-switch]")) el.href = el.href.split("?")[0] + location.search;
+    // Rovnou zkusit otevřít (bez HubGetu prohlížeč nic neudělá – zůstanou tlačítka)
+    setTimeout(() => { location.href = appLink.href; }, 300);
+  }
+}
+
 // ---------- Motiv: světlý / tmavý ----------
 const root = document.documentElement;
 const media = matchMedia("(prefers-color-scheme: dark)");

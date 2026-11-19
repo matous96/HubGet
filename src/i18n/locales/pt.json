@@ -513,7 +513,8 @@
     "openFailed": "Não foi possível abrir o arquivo – não é um pacote do HubGet.",
     "commandsCopied_one": "{{count}} comando copiado",
     "commandsCopied_other": "{{count}} comandos copiados",
-    "commandsCopied_many": "{{count}} comandos copiados"
+    "commandsCopied_many": "{{count}} comandos copiados",
+    "configuration": "Salvar para winget configure"
   },
   "menu": {
     "more": "Mais opções",
@@ -612,7 +613,8 @@
       "appClosed": "{{name}} estava em execução – fechado (processos {{processes}}) para que o instalador possa substituí-lo.",
       "appClosing": "{{name}} pergunta se quer salvar o trabalho ao fechar – aguardando o usuário fechá-lo.",
       "appCloseTimeout": "{{name}} ficou aberto por 15 minutos – operação cancelada.",
-      "needsAdmin": "{{name}} precisa de direitos de administrador para atualizar – vai aguardar uma atualização manual."
+      "needsAdmin": "{{name}} precisa de direitos de administrador para atualizar – vai aguardar uma atualização manual.",
+      "settingsBackupFailed": "Não foi possível fazer backup das configurações de {{name}} antes da atualização: {{error}}"
     },
     "notice": {
       "prefetchFailed": "Não foi possível baixar o instalador com antecedência ({{detail}}) – o WinGet vai baixá-lo.",
@@ -987,7 +989,8 @@
     "cliVersions": "Versões",
     "cliPin": "Fixar a versão",
     "cliMore": "Mais comandos e explicações",
-    "cliUnsupported": "O {{manager}} não faz isso"
+    "cliUnsupported": "O {{manager}} não faz isso",
+    "openSourceAlternatives": "Alternativas de código aberto ao {{name}}"
   },
   "report": {
     "button": "Relatar um problema",
@@ -1024,7 +1027,9 @@
     "email": "E-mail",
     "short": "{{name}} – dê uma olhada neste aplicativo",
     "message": "Recomendo o {{name}}: {{description}}\n\nAbra no HubGet: {{link}}\nOu instale com: {{command}}",
-    "messageNoCommand": "Recomendo {{name}}: {{description}}\n\nAbra no HubGet: {{link}}"
+    "messageNoCommand": "Recomendo {{name}}: {{description}}\n\nAbra no HubGet: {{link}}",
+    "badge": "Selo para README",
+    "badgeHint": "“Instalar com o HubGet” para o seu README do GitHub ou site"
   },
   "auth": {
     "signIn": "Entrar",
@@ -1101,7 +1106,26 @@
   },
   "offline": {
     "title": "Sem conexão com a internet",
-    "text": "os aplicativos instalados e o catálogo salvo continuam funcionando; instalações, atualizações, a busca nos gerenciadores de pacotes e as avaliações precisam de conexão"
+    "text": "os aplicativos instalados e o catálogo salvo continuam funcionando; instalações, atualizações, a busca nos gerenciadores de pacotes e as avaliações precisam de conexão",
+    "button": "Preparar para offline",
+    "picking": "Escolha uma pasta (um pen drive, por exemplo) para os instaladores…",
+    "progress": "Baixando {{done}}/{{total}}: {{name}}",
+    "scriptAdmin": "Os aplicativos são instalados silenciosamente. A instalação para todos os usuários pode pedir permissões de administrador.",
+    "scriptDone": "Concluído.",
+    "readmeIntro": "Instaladores de aplicativos do HubGet para um PC sem internet. Execute install.cmd – ele instala estes aplicativos:",
+    "readmeManual": "O script não instala estes aplicativos (arquivo compactado ou portátil) – extraia ou copie-os você mesmo:",
+    "done_one": "Pacote offline pronto ({{count}} aplicativo): {{folder}}",
+    "done_many": "Pacote offline pronto ({{count}} aplicativos): {{folder}}",
+    "done_other": "Pacote offline pronto ({{count}} aplicativos): {{folder}}",
+    "cancelled_one": "Cancelado – {{count}} aplicativo salvo: {{folder}}",
+    "cancelled_many": "Cancelado – {{count}} aplicativos salvos: {{folder}}",
+    "cancelled_other": "Cancelado – {{count}} aplicativos salvos: {{folder}}",
+    "manual": "Sem instalação automática (arquivo compactado ou portátil): {{names}}",
+    "failed": "Não foi possível baixar: {{names}}",
+    "skipped_one": "{{count}} aplicativo não é do WinGet e não pode entrar no pacote offline",
+    "skipped_many": "{{count}} aplicativos não são do WinGet e não podem entrar no pacote offline",
+    "skipped_other": "{{count}} aplicativos não são do WinGet e não podem entrar no pacote offline",
+    "error": "Não foi possível preparar o pacote offline: {{error}}"
   },
   "crash": {
     "pageTitle": "Não foi possível exibir esta página",
@@ -1408,7 +1432,13 @@
     "interactive": "Conclua o assistente de instalação",
     "installing": "Instalando",
     "uninstalling": "Desinstalando",
-    "estimate": "Estimativa – o instalador não informa o progresso"
+    "estimate": "Estimativa – o instalador não informa o progresso",
+    "remainingSeconds_one": "faltam {{count}} s",
+    "remainingSeconds_many": "faltam {{count}} s",
+    "remainingSeconds_other": "faltam {{count}} s",
+    "remainingMinutes_one": "falta {{count}} min",
+    "remainingMinutes_many": "faltam {{count}} min",
+    "remainingMinutes_other": "faltam {{count}} min"
   },
   "status": {
     "updates": "Atualizações",
@@ -1441,7 +1471,8 @@
     "imported_one": "Perfil carregado – {{count}} aplicativo em Pacotes de apps",
     "imported_other": "Perfil carregado – {{count}} aplicativos em Pacotes de apps",
     "imported_many": "Perfil carregado – {{count}} aplicativos em Pacotes de apps",
-    "importFailed": "Não foi possível carregar o arquivo – ele não é um perfil do HubGet nem uma exportação do WinGet."
+    "importFailed": "Não foi possível carregar o arquivo – ele não é um perfil do HubGet nem uma exportação do WinGet.",
+    "configurationTitle": "Aplicativos para um novo PC"
   },
   "profileImport": {
     "title": "Importar perfil",
@@ -1593,7 +1624,13 @@
     "depKind_runtime": "Runtime",
     "depKind_feature": "Recurso do Windows",
     "virusTotal": "Verificar no VirusTotal",
-    "virusTotalHint": "Resultados de dezenas de antivírus para o instalador com este hash. Nada é enviado – o VirusTotal procura o arquivo pelo hash."
+    "virusTotalHint": "Resultados de dezenas de antivírus para o instalador com este hash. Nada é enviado – o VirusTotal procura o arquivo pelo hash.",
+    "fileTypes_one": "Abre {{count}} tipo de arquivo",
+    "fileTypes_many": "Abre {{count}} tipos de arquivo",
+    "fileTypes_other": "Abre {{count}} tipos de arquivo",
+    "fileTypesMore_one": "+ mais {{count}}",
+    "fileTypesMore_many": "+ mais {{count}}",
+    "fileTypesMore_other": "+ mais {{count}}"
   },
   "installMenu": {
     "install": "Instalar",
@@ -1606,7 +1643,8 @@
     "download": "Baixar o instalador",
     "details": "Detalhes",
     "more": "Mais opções de instalação",
-    "unsupported": "Este gerenciador de pacotes não oferece suporte a isso"
+    "unsupported": "Este gerenciador de pacotes não oferece suporte a isso",
+    "sandbox": "Experimentar no Windows Sandbox"
   },
   "installOptions": {
     "title": "Opções de instalação – {{name}}",
@@ -1765,7 +1803,9 @@
     "globalShortcutTaken": "Não foi possível ativar Win+Shift+H – provavelmente outro programa o usa ({{error}}).",
     "cliCommand": "Comando hubget no terminal",
     "cliCommandHint": "No Prompt de Comando ou no PowerShell, digite por exemplo hubget install vlc, hubget update ou hubget help. O HubGet executa o comando e mostra o progresso no aplicativo.",
-    "cliCommandFailed": "Não foi possível ativar o comando hubget: {{error}}"
+    "cliCommandFailed": "Não foi possível ativar o comando hubget: {{error}}",
+    "exportConfiguration": "Exportar para winget configure",
+    "exportConfigurationHint": "Um arquivo .winget (YAML) – num PC novo basta executar winget configure -f arquivo. Um formato padrão usado também por empresas e pelo Microsoft Dev Box."
   },
   "files": {
     "saved": "Salvo: {{path}}",
@@ -2227,7 +2267,8 @@
     "skipped_active_one": "{{count}} atualização encontrada – a instalação automática espera uma pausa",
     "skipped_active_many": "{{count}} atualizações encontradas – a instalação automática espera uma pausa",
     "skipped_active_other": "{{count}} atualizações encontradas – a instalação automática espera uma pausa",
-    "restorePointName": "HubGet - antes de atualizar tudo"
+    "restorePointName": "HubGet - antes de atualizar tudo",
+    "foundSecurity": "Atualizações de segurança ({{security}} de {{total}}): {{names}}"
   },
   "security": {
     "warningTitle": "Atenção!",
@@ -2261,7 +2302,20 @@
     "importCustomArgs": "Permitir importar argumentos de linha de comando personalizados ao importar pacotes de um pacote de apps",
     "importCustomArgsHint": "Caso contrário, os argumentos personalizados do arquivo do pacote (.ubundle) são descartados.",
     "importPrePost": "Permitir importar comandos personalizados de antes e depois da instalação ao importar pacotes de um pacote de apps",
-    "importPrePostHint": "Caso contrário, os comandos do arquivo do pacote são descartados – um pacote de outra pessoa não pode executar nada."
+    "importPrePostHint": "Caso contrário, os comandos do arquivo do pacote são descartados – um pacote de outra pessoa não pode executar nada.",
+    "badge": "Correção de segurança",
+    "note": "Correção de segurança · {{text}}",
+    "noteShort": "Corrige um problema de segurança",
+    "panelTitle_one": "{{count}} atualização corrige problemas de segurança:",
+    "panelTitle_many": "{{count}} atualizações corrigem problemas de segurança:",
+    "panelTitle_other": "{{count}} atualizações corrigem problemas de segurança:",
+    "updateThese_one": "Atualizá-la",
+    "updateThese_many": "Atualizá-las",
+    "updateThese_other": "Atualizá-las",
+    "noWait": "Atualizações de segurança sem esperar",
+    "noWaitHint": "Atualizações cujas notas de versão indicam correção de segurança (CVE, “security fix”) são oferecidas e instaladas na hora, sem esperar a idade mínima.",
+    "osv": "Vulnerabilidades conhecidas (OSV.dev)",
+    "osvHint": "Nos pacotes do modo Desenvolvedor (npm, Bun, pip, Cargo, .NET Tool), verifica as versões instaladas na base aberta de vulnerabilidades OSV.dev. Só o nome e a versão do pacote são enviados."
   },
   "fallbackOffer": {
     "title": "Não foi possível instalar {{name}}",
@@ -2322,7 +2376,9 @@
     "skipNote": "As atualizações automáticas vão pular a {{current}} e só oferecer uma versão mais nova.",
     "confirm": "Voltar para {{version}}",
     "hint": "O aplicativo está com problemas desde a atualização para a {{current}}? Volte para a versão anterior à atualização.",
-    "unavailable": "A versão {{version}} não está mais disponível no gerenciador de pacotes – não é possível restaurá-la."
+    "unavailable": "A versão {{version}} não está mais disponível no gerenciador de pacotes – não é possível restaurá-la.",
+    "settingsNote": "As configurações do aplicativo de antes da atualização também voltam (do backup). As atuais vão para a Lixeira.",
+    "settingsRestored": "As configurações de {{name}} foram restauradas do backup da versão {{version}}."
   },
   "watch": {
     "start": "Avisar sobre novas versões",
@@ -2438,7 +2494,9 @@
     "sig_unsigned": "sem assinatura",
     "sig_invalid": "assinatura inválida",
     "sig_unknown": "programa não encontrado",
-    "showUnsigned": "Mostrar programas sem assinatura ({{count}})"
+    "showUnsigned": "Mostrar programas sem assinatura ({{count}})",
+    "openSource": "Alternativas de código aberto",
+    "openSourceHint": "Estes aplicativos de código fechado têm alternativas gratuitas de código aberto."
   },
   "cli": {
     "installQueued": "Instalando pelo terminal: {{names}}",
@@ -2451,5 +2509,164 @@
     "updateQueued": "Atualizando pelo terminal: {{names}}",
     "upToDate": "Já atualizado: {{names}}",
     "notInstalled": "“{{names}}” não corresponde a um único aplicativo instalado."
+  },
+  "jumpList": {
+    "updates": "Atualizações disponíveis",
+    "updateAll": "Atualizar tudo"
+  },
+  "sandbox": {
+    "unavailable": "O Windows Sandbox não está ativado. Ative-o em Painel de Controle → Programas → Ativar ou desativar recursos do Windows → Área Restrita do Windows (só Windows Pro e Enterprise; depois reinicie).",
+    "preparing": "Baixando o instalador de {{name}} para o Windows Sandbox…",
+    "started": "O Windows Sandbox está iniciando – o instalador de {{name}} abre nele automaticamente. Nada fica depois que você fecha o Sandbox.",
+    "failed": "Não foi possível iniciar {{name}} no Windows Sandbox: {{error}}"
+  },
+  "settingsBackup": {
+    "setting": "Fazer backup das configurações dos aplicativos antes de atualizar",
+    "settingHint": "As pastas do aplicativo em AppData (sem caches, até 200 MB). Se você reverter a atualização, as configurações de antes também voltam.",
+    "title": "Backups das configurações dos aplicativos",
+    "summary_one": "Configurações de {{count}} aplicativo de antes da última atualização – {{size}}.",
+    "summary_many": "Configurações de {{count}} aplicativos de antes da última atualização – {{size}}.",
+    "summary_other": "Configurações de {{count}} aplicativos de antes da última atualização – {{size}}.",
+    "off": "O backup das configurações antes das atualizações está desativado (Configurações → Atualizações de pacotes).",
+    "clear": "Excluir backups",
+    "cleared": "Backups das configurações excluídos."
+  },
+  "vulnerable": {
+    "title_one": "{{count}} pacote tem uma vulnerabilidade conhecida",
+    "title_many": "{{count}} pacotes têm vulnerabilidades conhecidas",
+    "title_other": "{{count}} pacotes têm vulnerabilidades conhecidas",
+    "text": "Segundo o OSV.dev, a versão instalada tem um problema de segurança. Atualize-a ou desinstale o pacote se não precisar dele.",
+    "more_one": "e mais {{count}}",
+    "more_many": "e mais {{count}}",
+    "more_other": "e mais {{count}}",
+    "update": "atualização para {{version}} disponível",
+    "noUpdate": "ainda sem versão corrigida"
+  },
+  "notificationActions": {
+    "updateAll": "Atualizar tudo",
+    "show": "Ver",
+    "open": "Abrir",
+    "details": "Detalhes"
+  },
+  "orgPolicy": {
+    "title": "Algumas configurações são gerenciadas pela sua organização",
+    "text": "Políticas de grupo do HubGet (registro HKLM\\SOFTWARE\\Policies\\HubGet). Estas opções não podem ser alteradas aqui:",
+    "item": {
+      "sources": "Gerenciadores de pacotes permitidos: {{list}}",
+      "apps_one": "Só {{count}} aplicativo aprovado pode ser instalado",
+      "apps_many": "Só {{count}} aplicativos aprovados podem ser instalados",
+      "apps_other": "Só {{count}} aplicativos aprovados podem ser instalados",
+      "developerMode": "O modo Desenvolvedor está desativado",
+      "customCommands": "Argumentos e comandos personalizados estão desativados",
+      "signIn": "O login e a sincronização estão desativados",
+      "autoUpdates": "As atualizações automáticas de todos os aplicativos estão ativadas",
+      "minAge_one": "Idade mínima das atualizações: {{count}} dia",
+      "minAge_many": "Idade mínima das atualizações: {{count}} dias",
+      "minAge_other": "Idade mínima das atualizações: {{count}} dias",
+      "selfUpdate": "O HubGet não se atualiza sozinho – sua organização gerencia as versões"
+    },
+    "appBlocked": "{{name}}: sua organização não aprovou este aplicativo",
+    "sourceBlocked": "{{name}}: sua organização desativou o {{source}}",
+    "signInBlocked": "Sua organização desativou o login."
+  },
+  "reliability": {
+    "setting": "Confiabilidade das versões pela comunidade",
+    "settingHint": "Após uma atualização, informa anonimamente se deu certo, falhou ou foi revertida (só o pacote, a versão e um id aleatório desta instalação). Em troca, mostra com quais versões outras pessoas têm problemas – e as atualizações automáticas esperam nessas versões.",
+    "note_one": "{{percent}}% dos usuários relatam problemas ({{count}} relato) – falhou ou foi revertida",
+    "note_many": "{{percent}}% dos usuários relatam problemas ({{count}} relatos) – falhou ou foi revertida",
+    "note_other": "{{percent}}% dos usuários relatam problemas ({{count}} relatos) – falhou ou foi revertida",
+    "skippedAuto": "{{name}} {{version}}: a atualização automática vai esperar – outros usuários relatam problemas com esta versão"
+  },
+  "transfer": {
+    "title": "Configurações dos aplicativos para um novo PC",
+    "hint": "As configurações dos aplicativos escolhidos, do AppData para um arquivo criptografado com sua senha – restaure-o no novo PC.",
+    "export": "Salvar…",
+    "import": "Restaurar…",
+    "exportTitle": "Salvar configurações dos aplicativos",
+    "exportText": "Escolha os aplicativos cujas configurações quer transferir. Caches e logs não são salvos.",
+    "scanning": "Procurando configurações dos aplicativos…",
+    "nothing": "Nenhum aplicativo instalado tem configurações no AppData para transferir.",
+    "warning": "As configurações costumam incluir logins e senhas, por isso o arquivo é protegido por senha. Sem ela ninguém o abre, nem o HubGet; ela não é guardada em lugar nenhum.",
+    "password": "Senha",
+    "passwordAgain": "Repita a senha",
+    "passwordShort_one": "A senha precisa de pelo menos {{count}} caractere",
+    "passwordShort_many": "A senha precisa de pelo menos {{count}} caracteres",
+    "passwordShort_other": "A senha precisa de pelo menos {{count}} caracteres",
+    "passwordMismatch": "As senhas não coincidem",
+    "save": "Salvar ({{size}})",
+    "fileName": "Configurações dos aplicativos",
+    "saved_one": "Configurações de {{count}} aplicativo salvas ({{size}}): {{path}}",
+    "saved_many": "Configurações de {{count}} aplicativos salvas ({{size}}): {{path}}",
+    "saved_other": "Configurações de {{count}} aplicativos salvas ({{size}}): {{path}}",
+    "failed": "A transferência das configurações falhou: {{error}}",
+    "importTitle": "Restaurar configurações dos aplicativos",
+    "importText": "Escolha um arquivo .hubget-settings e digite a senha com que foi salvo. As configurações do arquivo substituem as atuais, que vão para a Lixeira. Feche os aplicativos antes de restaurar.",
+    "chooseFile": "Escolher arquivo e restaurar",
+    "restored_one": "Configurações de {{count}} aplicativo restauradas: {{names}}",
+    "restored_many": "Configurações de {{count}} aplicativos restauradas: {{names}}",
+    "restored_other": "Configurações de {{count}} aplicativos restauradas: {{names}}",
+    "restoredNothing": "O arquivo não continha configurações que pudessem ser restauradas."
+  },
+  "openWith": {
+    "title": "Com o que abro arquivos .{{ext}}?",
+    "titleEmpty": "Com o que abro este arquivo?",
+    "subtitle": "Aplicativos do catálogo que abrem arquivos com esta extensão – os instalados primeiro.",
+    "file": "Arquivo {{file}}",
+    "placeholder": "Extensão, ex.: .psd",
+    "hint": "Digite uma extensão ou arraste um arquivo para qualquer lugar da janela do HubGet.",
+    "none": "Nenhum aplicativo do catálogo informa que abre arquivos .{{ext}}. Tente buscar pelo tipo de arquivo.",
+    "installed_one": "Instalado ({{count}})",
+    "installed_many": "Instalados ({{count}})",
+    "installed_other": "Instalados ({{count}})",
+    "available_one": "Disponível ({{count}})",
+    "available_many": "Disponíveis ({{count}})",
+    "available_other": "Disponíveis ({{count}})",
+    "searchHint_one": "{{count}} aplicativo do catálogo abre arquivos .{{ext}} – ver",
+    "searchHint_many": "{{count}} aplicativos do catálogo abrem arquivos .{{ext}} – ver",
+    "searchHint_other": "{{count}} aplicativos do catálogo abrem arquivos .{{ext}} – ver",
+    "dropTitle": "Com o que abrir este arquivo?",
+    "dropText": "Solte o arquivo – o HubGet encontra aplicativos que o abrem. O arquivo não é enviado a lugar nenhum."
+  },
+  "disk": {
+    "shortage": "Há só {{free}} livres na unidade {{drive}}; a instalação precisa de cerca de {{needed}}. Libere espaço – por exemplo em Visão geral do PC (limpeza de caches, aplicativos sem uso).",
+    "batchShortage": "A unidade {{drive}} tem {{free}} livres; todas as atualizações precisam de cerca de {{needed}} – algumas podem não ser instaladas. O HubGet verifica o espaço antes de cada uma."
+  },
+  "releaseHistory": {
+    "title": "Novidades desde a sua versão {{version}}",
+    "subtitle_one": "Atualizar para {{version}} traz {{count}} versão (do GitHub):",
+    "subtitle_many": "Atualizar para {{version}} traz {{count}} versões (do GitHub):",
+    "subtitle_other": "Atualizar para {{version}} traz {{count}} versões (do GitHub):",
+    "more_one": "Ver mais {{count}} versão",
+    "more_many": "Ver mais {{count}} versões",
+    "more_other": "Ver mais {{count}} versões"
+  },
+  "diagnostics": {
+    "title": "Diagnóstico",
+    "label": "Diagnóstico para suporte",
+    "hint": "Versões do HubGet e do Windows, estado dos gerenciadores de pacotes, configurações principais, erros recentes e o log num só texto – sem nome do PC, usuário ou e-mails. Nada é enviado; anexe-o ao seu relato do problema.",
+    "save": "Salvar…",
+    "copy": "Copiar",
+    "copied": "Diagnóstico copiado para a área de transferência."
+  },
+  "windowsHealth": {
+    "title": "Estado do Windows",
+    "supported": "{{version}} – atualizações de segurança até {{date}}",
+    "supportedOpen": "{{version}} – recebe atualizações de segurança",
+    "ending": "{{version}} recebe atualizações de segurança só até {{date}}",
+    "endingHint": "Instale uma versão mais nova do Windows (Configurações → Windows Update) para continuar protegido.",
+    "ended": "{{version}} não recebe atualizações de segurança desde {{date}}",
+    "endedHint": "Atualize para uma versão mais nova do Windows 11 em Configurações → Windows Update.",
+    "endedHint10": "Se não tiver Atualizações de Segurança Estendidas (ESU), migre para o Windows 11 – grátis se o PC for compatível.",
+    "reboot": "O Windows aguarda reinicialização após atualizações",
+    "rebootHint": "Uma reinicialização conclui as atualizações do Windows; até lá, algumas instalações podem falhar.",
+    "uptime_one": "O PC está há {{count}} dia sem reiniciar",
+    "uptime_many": "O PC está há {{count}} dias sem reiniciar",
+    "uptime_other": "O PC está há {{count}} dias sem reiniciar",
+    "uptimeHint": "A inicialização rápida do Windows não reinicia o PC ao desligar – escolha Reiniciar de vez em quando.",
+    "disk": "Unidade {{drive}} – {{free}} livres de {{total}}",
+    "diskHint": "O espaço está acabando – instalações e atualizações podem falhar. Limpe os caches abaixo e desinstale os aplicativos sem uso.",
+    "protectionOn": "A proteção do sistema está ativada – é possível criar pontos de restauração",
+    "protectionOff": "A proteção do sistema está desativada – não é possível criar pontos de restauração",
+    "protectionHint": "Ative-a em Painel de Controle → Sistema → Proteção do Sistema → Configurar (unidade C:). Assim o HubGet pode criar um ponto de restauração antes de uma atualização em massa."
   }
 }

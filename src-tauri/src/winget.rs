@@ -751,6 +751,8 @@ pub async fn winget_operation(
     request: OperationRequest,
     on_event: Channel<OpEvent>,
 ) -> Result<OperationResult, String> {
+    // Firemní zásady: povolené zdroje a aplikace (org_policy.rs)
+    crate::org_policy::check("winget", &request)?;
     // Program rozbalený na ploše (Tor Browser) winget po instalaci nevidí: aktualizace
     // = instalace nové verze (instalátor ji rozbalí do stejné složky), odinstalace =
     // jeho složka do Koše (obnovitelná). Složku najde backend sám podle názvu.
@@ -942,7 +944,7 @@ fn resolve_installer(show_args: &[String]) -> Option<Prefetch> {
 }
 
 /// Id nebo verze pro `winget show` – nic, co by winget četl jako přepínač.
-fn safe_show_arg(value: &str) -> bool {
+pub(crate) fn safe_show_arg(value: &str) -> bool {
     !value.is_empty() && !value.starts_with('-') && value.chars().all(|c| c.is_alphanumeric() || "._-+".contains(c))
 }
 

@@ -10,6 +10,7 @@ import { HelpPage } from "@/pages/HelpPage";
 import { HomePage } from "@/pages/HomePage";
 import { InstalledPage } from "@/pages/InstalledPage";
 import { OverviewPage } from "@/pages/OverviewPage";
+import { OpenWithPage } from "@/pages/OpenWithPage";
 import { LogsPage } from "@/pages/LogsPage";
 import { PackageDetailPage } from "@/pages/PackageDetailPage";
 import { PublishPage } from "@/pages/PublishPage";
@@ -56,6 +57,8 @@ export function App() {
             <Route path="import" element={<SharedBundlePage />} />
             <Route path="startup" element={<StartupPage />} />
             <Route path="search" element={<SearchPage />} />
+            {/* Čím otevřu tento soubor? (přetažení souboru na okno, hledání „.psd“) */}
+            <Route path="open-with" element={<OpenWithPage />} />
             <Route path="settings" element={<SettingsPage />} />
             <Route path="publish" element={<PublishPage />} />
             <Route path="publish/winget" element={<PublishWingetPage />} />

@@ -33,6 +33,9 @@ import { useSettings } from "@/store/settings";
 import { AUTO_FAILURE_LIMIT, useUpdateHolds, versionKey } from "@/store/updateHolds";
 import { pinKey, useUpdatePins } from "@/store/updatePins";
 import { applyUpdateRules, currentUpdateRules } from "@/store/updateRules";
+import { isSecurityUpdate } from "./useSecurityUpdates";
+import { holdByCommunity } from "@/store/reliability";
+import { writeLog } from "@/store/logs";
 import type { InstalledPackage } from "@/types";
 import { isUnmanagedOrigin, useInstalledItems, type InstalledItem } from "./useInstalledItems";
 
@@ -67,6 +70,8 @@ const catchUpAt: Record<Task, number | null> = { check: null, install: null };
 let retryAt: number | null = null;
 /** Verze, u kterých už zaznělo varování o jiném serveru instalátoru („zdroj:id@verze“). */
 const hostWarned = new Set<string>();
+/** Verze, které automatické aktualizace přeskočily kvůli hlášením komunity (zápis do protokolu jednou). */
+const communityWarned = new Set<string>();
 
 /** Aktualizace k instalaci z posledního načtení (s pravidly: zámky, minimální stáří…). */
 function currentUpdatable(): InstalledPackage[] {
@@ -110,12 +115,19 @@ export async function runUpdateCheck(): Promise<CheckResult> {
     const signature = announced.map((p) => `${pinKey(p)}@${p.availableVersion}`).sort().join("|");
     if (announced.length && signature !== useAutoUpdates.getState().lastNotified) {
       useAutoUpdates.getState().set({ lastNotified: signature });
+      // Bezpečnostní aktualizace v oznámení první a zvlášť spočítané
+      const security = announced.filter((p) => isSecurityUpdate(p));
+      const names = [...security, ...announced.filter((p) => !security.includes(p))].slice(0, 3).map((p) => p.name).join(", ");
       notifyEvent({
         type: "updates",
-        tone: "info",
+        tone: security.length ? "error" : "info",
         title: null,
-        message: i18n.t("autoUpdates.found", { count: announced.length, names: announced.slice(0, 3).map((p) => p.name).join(", ") }),
+        message: security.length
+          ? i18n.t("autoUpdates.foundSecurity", { total: announced.length, security: security.length, names })
+          : i18n.t("autoUpdates.found", { count: announced.length, names }),
         record: true,
+        // Tlačítka v oznámení Windows: Aktualizovat vše, Zobrazit
+        actions: "updates",
       });
     }
     // Instalace po každé kontrole; jinak má vlastní plán
@@ -141,6 +153,14 @@ async function installUpdates(updatable: InstalledPackage[]): Promise<Omit<Check
   const { failed, needsAdmin } = useUpdateHolds.getState();
   const chosen = (autoInstall === "all" ? updatable : updatable.filter((p) => selected.includes(pinKey(p)))).filter((p) => {
     const key = versionKey(p, p.availableVersion!);
+    // Verze, se kterou má komunita problémy (store/reliability.ts), počká – bezpečnostní ne
+    if (holdByCommunity(p) && !isSecurityUpdate(p)) {
+      if (!communityWarned.has(key)) {
+        communityWarned.add(key);
+        writeLog(p.source, "info", i18n.t("reliability.skippedAuto", { name: p.name, version: p.availableVersion }));
+      }
+      return false;
+    }
     return (failed[key] ?? 0) < AUTO_FAILURE_LIMIT && !needsAdmin[key];
   });
   if (autoInstall === "off" || !chosen.length || !isTauri()) {

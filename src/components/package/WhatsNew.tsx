@@ -1,6 +1,7 @@
-import { ExternalLink, Sparkles } from "lucide-react";
+import { ExternalLink, ShieldAlert, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { isSecurityNote } from "@/lib/securityUpdates";
 import { formatRelative } from "@/lib/utils";
 import { useSettings } from "@/store/settings";
 import type { CatalogEntry } from "@/types";
@@ -27,6 +28,13 @@ export function WhatsNew({ entry }: { entry: CatalogEntry }) {
           {t("whatsNew.version", { version: entry.latestVersion })}
           {entry.releaseDate && ` · ${formatRelative(entry.releaseDate, language)}`}
         </span>
+        {/* Verze opravuje bezpečnostní chybu (CVE, „security fix“…) */}
+        {isSecurityNote(entry.releaseNotes) && (
+          <span className="inline-flex items-center gap-1 rounded-full bg-danger/12 px-2 py-0.5 text-xs font-semibold text-danger">
+            <ShieldAlert className="size-3.5" />
+            {t("security.badge")}
+          </span>
+        )}
         {entry.releaseNotesUrl && (
           <a
             href={entry.releaseNotesUrl}

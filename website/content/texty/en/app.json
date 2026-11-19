@@ -1,0 +1,34 @@
+{
+  "seo": {
+    "title": "Open in HubGet – HubGet",
+    "description": "Open an app in HubGet – the free, open-source app store for Windows. You always confirm the installation."
+  },
+  "texty": {
+    "t1": "Open in HubGet",
+    "t8": "An app from HubGet",
+    "t2": "This link opens the app in HubGet – an app store for Windows. Nothing installs on its own: you confirm the installation in HubGet.",
+    "t3": "Open in HubGet",
+    "t4": "Download HubGet",
+    "t5": "Don’t have HubGet? Download it for free, install it and click Open in HubGet again.",
+    "t6": "A badge for your project",
+    "t7": "Is your app in WinGet? Add a badge to your README or website that opens it in HubGet. Copy the badge code in HubGet: app details → Share → Badge for README."
+  },
+  "obrazky": {
+    "i1": {
+      "src": "img/badge/hubget-en-dark.svg",
+      "alt": "Install with HubGet"
+    },
+    "i2": {
+      "src": "img/badge/hubget-en-light.svg",
+      "alt": "Install with HubGet"
+    },
+    "i3": {
+      "src": "img/badge/hubget-cs-dark.svg",
+      "alt": "Nainstalovat přes HubGet"
+    },
+    "i4": {
+      "src": "img/badge/hubget-cs-light.svg",
+      "alt": "Nainstalovat přes HubGet"
+    }
+  }
+}

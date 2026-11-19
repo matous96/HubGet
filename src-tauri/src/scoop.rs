@@ -392,6 +392,8 @@ pub async fn scoop_operation(
     request: OperationRequest,
     on_event: Channel<OpEvent>,
 ) -> Result<OperationResult, String> {
+    // Firemní zásady: povolené zdroje a aplikace (org_policy.rs)
+    crate::org_policy::check("scoop", &request)?;
     let root = root();
     if !script(&root).is_file() {
         return Err("Scoop není nainstalovaný".into());

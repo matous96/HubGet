@@ -26,7 +26,7 @@ const EVENT: &str = "hubget-cli";
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct CliCommand {
-    /// install | update | search | show | updates | open
+    /// install | update | search | show | updates | overview | open
     pub command: String,
     pub args: Vec<String>,
 }
@@ -75,6 +75,7 @@ fn parse(args: &[String]) -> Parsed {
             None => forward("open", vec![]),
         },
         "updates" | "outdated" | "list" => forward("updates", vec![]),
+        "overview" | "pc" => forward("overview", vec![]),
         other => Parsed::Error(other.to_string()),
     }
 }
@@ -98,12 +99,13 @@ impl Texts {
     }
 
     fn usage(&self) -> String {
-        let rows: [(&str, &str, &str); 7] = [
+        let rows: [(&str, &str, &str); 8] = [
             ("hubget install <aplikace…>", "Nainstaluje aplikace (název, id z katalogu nebo balíček WinGetu)", "Installs apps (name, catalog id or WinGet package)"),
             ("hubget update [aplikace…]", "Aktualizuje aplikace, bez názvu všechny s aktualizací", "Updates apps; without a name all with an update"),
             ("hubget search <text>", "Vyhledá aplikace v HubGetu", "Searches for apps in HubGet"),
             ("hubget show <aplikace>", "Otevře detail aplikace", "Opens the app's details"),
             ("hubget updates", "Ukáže dostupné aktualizace", "Shows available updates"),
+            ("hubget overview", "Otevře Přehled počítače", "Opens the PC overview"),
             ("hubget", "Otevře HubGet", "Opens HubGet"),
             ("hubget version", "Verze HubGetu", "HubGet version"),
         ];
@@ -134,6 +136,7 @@ impl Texts {
             "search" => format!("{} {list}", self.pick("HubGet hledá:", "HubGet is searching for:")),
             "show" => format!("{} {list}", self.pick("HubGet otevírá:", "HubGet is opening:")),
             "updates" => self.pick("HubGet ukazuje dostupné aktualizace.", "HubGet is showing available updates.").into(),
+            "overview" => self.pick("HubGet ukazuje Přehled počítače.", "HubGet is showing the PC overview.").into(),
             _ => self.pick("HubGet se otevírá.", "HubGet is opening.").into(),
         }
     }
@@ -334,6 +337,7 @@ mod tests {
         assert_eq!(forwarded("show vlc").unwrap().command, "show");
         assert_eq!(forwarded("").unwrap().command, "open");
         assert_eq!(forwarded("UPDATES").unwrap().command, "updates");
+        assert_eq!(forwarded("overview").unwrap().command, "overview");
         assert!(matches!(parse(&args("--help")), Parsed::Help));
         assert!(matches!(parse(&args("-v")), Parsed::Version));
         assert!(matches!(parse(&args("smazat vse")), Parsed::Error(_)));

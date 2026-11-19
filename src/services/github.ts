@@ -18,7 +18,8 @@ import type { CatalogEntry } from "@/types";
 export { githubRepoOf };
 
 const CACHE_KEY = "unibox-github-stars";
-const BLOCKED_KEY = "unibox-github-blocked-until";
+/** Do kdy GitHub API neodpovídá (vyčerpaný limit) – sdílí hvězdičky i poznámky k vydáním. */
+export const BLOCKED_KEY = "unibox-github-blocked-until";
 const TTL = 24 * 3600_000;
 const MAX_CACHED = 2000;
 
