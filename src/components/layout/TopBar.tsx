@@ -65,8 +65,12 @@ export function TopBar() {
 
   const update = (next: string) => {
     setValue(next);
-    // Na stránce hledání nahrazujeme historii, ať „Zpět“ neprochází každé písmeno.
-    navigate(`/search?q=${encodeURIComponent(next)}`, { replace: onSearchPage });
+    // Na stránce hledání nahrazujeme historii, ať „Zpět“ neprochází každé písmeno. Podle adresy
+    // v okamžiku stisku (HashRouter ji mění hned), ne podle posledního vykreslení – při rychlém
+    // psaní by druhé písmeno přišlo dřív, než se lišta překreslí, a „Zpět“ by vedlo na „v“ místo
+    // na stránku před hledáním
+    const onSearchNow = window.location.hash.split("?")[0] === "#/search";
+    navigate(`/search?q=${encodeURIComponent(next)}`, { replace: onSearchNow });
   };
 
   return (

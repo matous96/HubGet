@@ -320,20 +320,67 @@ const ICO_MAX: u32 = 256;
 /// Cooking Simulator, Subnautica: Below Zero). Záznamy BMP dekóduje crate image jako dřív.
 fn ico_image(bytes: &[u8]) -> Option<image::RgbaImage> {
     let count = bytes.get(4..6).map_or(0, |b| u16::from_le_bytes([b[0], b[1]]) as usize);
-    let png = (0..count)
+    let entries = (0..count)
         .filter_map(|i| {
             let entry = bytes.get(6 + i * 16..6 + i * 16 + 16)?;
             let size = u32::from_le_bytes(entry[8..12].try_into().ok()?) as usize;
             let offset = u32::from_le_bytes(entry[12..16].try_into().ok()?) as usize;
-            let data = bytes.get(offset..offset.checked_add(size)?)?;
-            if !data.starts_with(b"\x89PNG") {
-                return None;
+            let data = bytes.get(offset..)?;
+            if data.starts_with(b"\x89PNG") {
+                // Velikost v adresáři bývá u posledního záznamu delší než soubor – stačí, co v něm je
+                let png = &data[..size.min(data.len())];
+                Some(image::load_from_memory_with_format(png, image::ImageFormat::Png).ok()?.to_rgba8())
+            } else {
+                // Délku záznamu BMP určí jeho hlavička – velikost v adresáři nemusí sedět (ikony
+                // z CDN wingetu ji mají u 256 px oříznutou na 16 bitů: 8 232 místo 270 376 B)
+                bmp32_entry(data)
             }
-            Some(image::load_from_memory_with_format(data, image::ImageFormat::Png).ok()?.to_rgba8())
         })
         .max_by_key(|image| image.width() * image.height());
     let whole = image::load_from_memory_with_format(bytes, image::ImageFormat::Ico).ok().map(|image| image.to_rgba8());
-    [png, whole].into_iter().flatten().max_by_key(|image| image.width() * image.height())
+    [entries, whole].into_iter().flatten().max_by_key(|image| image.width() * image.height())
+}
+
+/// 32bitový záznam BMP z ICO (BITMAPINFOHEADER bez hlavičky souboru, výška dvojnásobná –
+/// barvy a pod nimi maska průhlednosti). Crate image odmítne celé ICO, když velikost dat
+/// záznamu nesedí přesně (chybějící maska – ikony z CDN wingetu: Figma, DBeaver, Blitz);
+/// barevná data jsou ale úplná. Jiné bitové hloubky dekóduje crate image jako dřív.
+fn bmp32_entry(data: &[u8]) -> Option<image::RgbaImage> {
+    let read_u32 = |at: usize| data.get(at..at + 4).map(|b| u32::from_le_bytes([b[0], b[1], b[2], b[3]]));
+    let read_u16 = |at: usize| data.get(at..at + 2).map(|b| u16::from_le_bytes([b[0], b[1]]));
+    let header = read_u32(0)? as usize;
+    let width = read_u32(4)? as i32;
+    let doubled = read_u32(8)? as i32;
+    // 32 bitů na pixel, bez komprese (BI_RGB)
+    if header < 40 || read_u16(14)? != 32 || read_u32(16)? != 0 {
+        return None;
+    }
+    let (width, height) = (width.unsigned_abs(), doubled.unsigned_abs() / 2);
+    if width == 0 || height == 0 || width > 1024 || height > 1024 {
+        return None;
+    }
+    let (w, h) = (width as usize, height as usize);
+    let pixels = data.get(header..header + w * h * 4)?;
+    // Maska průhlednosti (1 bit na pixel, řádky zarovnané na 4 bajty) – jen když chybí alfa
+    let mask_stride = w.div_ceil(32) * 4;
+    let mask = data.get(header + w * h * 4..header + w * h * 4 + mask_stride * h);
+    let has_alpha = pixels.chunks_exact(4).any(|p| p[3] != 0);
+    let mut rgba = vec![0u8; w * h * 4];
+    for y in 0..h {
+        // Řádky odspodu nahoru (kladná výška)
+        let row = if doubled > 0 { h - 1 - y } else { y };
+        for x in 0..w {
+            let source = &pixels[(row * w + x) * 4..(row * w + x) * 4 + 4];
+            let alpha = if has_alpha {
+                source[3]
+            } else {
+                let transparent = mask.is_some_and(|mask| mask[row * mask_stride + x / 8] & (0x80 >> (x % 8)) != 0);
+                if transparent { 0 } else { 255 }
+            };
+            rgba[(y * w + x) * 4..(y * w + x) * 4 + 4].copy_from_slice(&[source[2], source[1], source[0], alpha]);
+        }
+    }
+    image::RgbaImage::from_raw(width, height, rgba)
 }
 
 fn is_blank_png(bytes: &[u8]) -> bool {
@@ -756,5 +803,31 @@ mod tests {
         // Ikona s plným pozadím ani velká ikona se neořezává
         assert_eq!(trim_padding(64, 64, plate(64, [220, 40, 40, 255], 16, [255, 255, 255, 255])).0, 64);
         assert_eq!(trim_padding(64, 64, plate(64, [0, 0, 0, 0], 56, [220, 40, 40, 255])).0, 64);
+    }
+
+    #[test]
+    fn ico_s_bmp_bez_masky() {
+        // ICO s jedním 32bitovým záznamem BMP 2×2 bez masky průhlednosti (jako ikony z CDN
+        // wingetu) – crate image ho odmítne, ico_image ho přečte
+        let mut dib = Vec::new();
+        dib.extend_from_slice(&40u32.to_le_bytes());
+        dib.extend_from_slice(&2i32.to_le_bytes());
+        dib.extend_from_slice(&4i32.to_le_bytes()); // dvojnásobná výška
+        dib.extend_from_slice(&1u16.to_le_bytes());
+        dib.extend_from_slice(&32u16.to_le_bytes());
+        dib.extend_from_slice(&[0u8; 24]);
+        // Spodní řádek (BGRA): modrá, zelená; horní: červená, průhledná
+        dib.extend_from_slice(&[255, 0, 0, 255, 0, 255, 0, 255, 0, 0, 255, 255, 0, 0, 0, 0]);
+        let mut ico = vec![0, 0, 1, 0, 1, 0, 2, 2, 0, 0, 1, 0, 32, 0];
+        ico.extend_from_slice(&((dib.len() + 8) as u32).to_le_bytes()); // velikost nesedí
+        ico.extend_from_slice(&22u32.to_le_bytes());
+        ico.extend_from_slice(&dib);
+        assert!(image::load_from_memory_with_format(&ico, image::ImageFormat::Ico).is_err());
+        let image = ico_image(&ico).expect("ICO se přečte");
+        assert_eq!((image.width(), image.height()), (2, 2));
+        assert_eq!(image.get_pixel(0, 0).0, [255, 0, 0, 255]); // horní levý = červená
+        assert_eq!(image.get_pixel(1, 0).0[3], 0); // průhledný
+        assert_eq!(image.get_pixel(0, 1).0, [0, 0, 255, 255]); // spodní levý = modrá
+        assert_eq!(image.get_pixel(1, 1).0, [0, 255, 0, 255]);
     }
 }

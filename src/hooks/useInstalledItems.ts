@@ -9,7 +9,7 @@ import { updateOptionsFor } from "@/store/installOptions";
 import { useBusyAppIds, useJobs } from "@/store/jobs";
 import { useUpdateHolds, versionKey } from "@/store/updateHolds";
 import type { CatalogEntry, InstalledPackage, InstallOrigin, SourceId } from "@/types";
-import { fallbackEntry, isListedInstalled, useInstalled, useInstalledEntries } from "./usePackages";
+import { fallbackEntry, isListedInstalled, nameKey, useInstalled, useInstalledEntries } from "./usePackages";
 
 export interface InstalledItem {
   pkg: InstalledPackage;
@@ -42,14 +42,27 @@ export function useInstallOrder(): (items: InstalledItem[]) => InstalledItem[] {
 /** Původ, u kterého aplikaci HubGet nespravuje (hry ze Steamu, programy mimo správce). */
 export const isUnmanagedOrigin = (origin: InstallOrigin) => origin === "steam" || origin === "ea" || origin === "local";
 
+/** Balíček MSIX ve výpisu wingetu („MSIX\Výrobce.Aplikace_verze_…“). */
+const isMsix = (p: InstalledPackage) => p.packageId.startsWith("MSIX\\");
+
 export function useInstalledItems() {
   const query = useInstalled();
   // Profil z katalogu podle id balíčku, jinak podle názvu (programy, které winget vidí jen v registru)
   const links = useInstalledEntries();
   const items = useMemo<InstalledItem[]>(() => {
     const seen = new Set<string>();
-    return (query.data ?? [])
-      .filter((p) => isListedInstalled(p, links))
+    const listed = (query.data ?? []).filter((p) => isListedInstalled(p, links));
+    // Aplikace s klasickou instalací (registr): balíček MSIX téhož správce se stejným názvem či
+    // profilem je jen její doplněk – rozšíření Průzkumníka (WinRAR, Mp3tag), „Core App“ Acrobat
+    // Readeru, systémový Edge, webová aplikace Gemini – ne druhá instalace; jinak by aplikace byla
+    // v Nainstalovaných dvakrát (doplněk se s katalogem většinou nespáruje a má vlastní kartu)
+    const keys = (p: InstalledPackage) => {
+      const linked = links.get(p);
+      return [`${p.source}:${nameKey(p.name)}`, ...(linked ? [`${p.source}:${linked.id}`, `${p.source}:${nameKey(linked.name)}`] : [])];
+    };
+    const classic = new Set(listed.filter((p) => !isMsix(p)).flatMap(keys));
+    return listed
+      .filter((p) => !(isMsix(p) && keys(p).some((key) => classic.has(key))))
       .map((p) => {
         const linked = links.get(p);
         if (linked && !seen.has(linked.id)) {
