@@ -78,7 +78,7 @@
         <div class="page-head__inner reveal">
           <p class="eyebrow" data-t="t1">Novinky</p>
           <h1 data-t="t2">Co je nového v&nbsp;HubGetu</h1>
-          <p class="lead" data-t="t3">Co přinesly jednotlivé řady verzí HubGetu, nejnovější nahoře. Od první veřejné verze 0.1.0 z&nbsp;21.&nbsp;10. vyšlo <!--obsah:updates-words-->šestadvacet<!--/obsah:updates-words--> aktualizací.</p>
+          <p class="lead" data-t="t3">Co přinesly jednotlivé řady verzí HubGetu, nejnovější nahoře. Od první veřejné verze 0.1.0 z&nbsp;21.&nbsp;10. vyšlo <!--obsah:updates-words-->sedmadvacet<!--/obsah:updates-words--> aktualizací.</p>
           <nav class="versions-nav" aria-label="Přejít na verzi">
             <!--obsah:versions-->
             <a class="chip" href="#v0-3">0.3</a>
@@ -88,8 +88,8 @@
           </nav>
         </div>
         <dl class="stats reveal">
-          <div><dt data-t="t4">Aktuální verze</dt><dd><!--obsah:version-->0.3.0<!--/obsah:version--></dd></div>
-          <div><dt data-t="t5">Aktualizací od verze 0.1.0</dt><dd><!--obsah:updates-->26<!--/obsah:updates--></dd></div>
+          <div><dt data-t="t4">Aktuální verze</dt><dd><!--obsah:version-->0.3.1<!--/obsah:version--></dd></div>
+          <div><dt data-t="t5">Aktualizací od verze 0.1.0</dt><dd><!--obsah:updates-->27<!--/obsah:updates--></dd></div>
           <div><dt data-t="t6">Aplikací v&nbsp;katalogu</dt><dd data-t="t7">25&nbsp;100+</dd></div>
           <div><dt data-t="t8">Správci naostro</dt><dd data-t="t9">WinGet · Chocolatey · Scoop + 8 pro vývojáře</dd></div>
         </dl>
@@ -157,13 +157,13 @@
           </article>
           <article class="card highlight reveal">
             <span class="highlight__ver">Verze 0.3</span>
-            <h3>Vrácení aktualizace</h3>
-            <p>Nová verze nefunguje? Jedním kliknutím zpět na tu předchozí.</p>
+            <h3>Bezpečnostní aktualizace napřed</h3>
+            <p>Aktualizace, které opravují bezpečnostní chybu, jsou vidět první a&nbsp;nečekají.</p>
           </article>
           <article class="card highlight reveal">
             <span class="highlight__ver">Verze 0.3</span>
-            <h3>Příkaz hubget v&nbsp;terminálu</h3>
-            <p>hubget install vlc, hubget update a&nbsp;další přímo v&nbsp;příkazovém řádku i&nbsp;PowerShellu.</p>
+            <h3>Čím otevřu tento soubor?</h3>
+            <p>Přetáhněte soubor do okna a&nbsp;HubGet nabídne aplikace, které ho otevřou.</p>
           </article>
           <!--/obsah:highlights-->
         </div>
@@ -189,13 +189,20 @@
             </div>
             <div class="card release__body">
               <div class="release__head">
-                <h2>Přehled počítače, příkaz hubget a&nbsp;vrácení aktualizace</h2>
+                <h2>Přehled počítače, bezpečnostní aktualizace napřed a&nbsp;příkaz hubget</h2>
                 <span class="badge badge--live">Nejnovější</span>
               </div>
-              <p class="release__lead">Verze 0.3.0 (19. 11. 2026).</p>
+              <p class="release__lead">Verze 0.3.0 až 0.3.1 (19. 11. 2026).</p>
               <div class="changes changes--new">
                 <h3>Nové</h3>
                 <ul>
+                  <li><strong>Bezpečnostní aktualizace napřed</strong> (0.3.1) – aktualizace, které opravují bezpečnostní chybu, mají červený štítek, jsou v&nbsp;seznamu první a&nbsp;nečekají na minimální stáří; u&nbsp;balíčků pro vývojáře volitelně známé zranitelnosti z&nbsp;OSV.dev.</li>
+                  <li><strong>Čím otevřu tento soubor?</strong> (0.3.1) – přetáhněte soubor do okna HubGetu nebo hledejte „.psd“ a&nbsp;HubGet nabídne aplikace, které ho otevřou.</li>
+                  <li><strong>Vyzkoušet ve Windows Sandboxu</strong> (0.3.1) – aplikace se nainstaluje do izolovaných Windows, která se po zavření zahodí.</li>
+                  <li><strong>Nastavení aplikací</strong> (0.3.1) – záloha před aktualizací (při vrácení se vrátí i&nbsp;nastavení) a&nbsp;přenos na nový počítač v&nbsp;souboru zašifrovaném heslem.</li>
+                  <li><strong>Offline balíček</strong> (0.3.1) – sada aplikací na USB s&nbsp;instalátory a&nbsp;skriptem install.cmd pro počítač bez internetu; export pro winget configure.</li>
+                  <li><strong>Stav Windows</strong> v&nbsp;Přehledu počítače (0.3.1) – konec podpory, čekající restart, místo na disku a&nbsp;body obnovení; open-source náhrady za uzavřené aplikace.</li>
+                  <li><strong>Pro firmy</strong> (0.3.1) – zásady skupiny (šablona ADMX, Intune): povolení správci a&nbsp;schválené aplikace, vynucené aktualizace, bez přihlášení.</li>
                   <li><strong>Přehled počítače</strong> (v postranním panelu pod Knihovnou) – kolik aplikací máte a&nbsp;kolik zabírají, největší z&nbsp;nich, aplikace spouštěné s&nbsp;Windows, které nepoužíváte, úklid mezipamětí správců balíčků (WinGet, Chocolatey, Scoop, npm, pip) a&nbsp;kontrola digitálních podpisů programů.</li>
                   <li><strong>Příkaz hubget v&nbsp;terminálu</strong> – hubget install, update, search, show a&nbsp;updates v&nbsp;příkazovém řádku i&nbsp;PowerShellu; průběh ukáže HubGet. Zapíná se v&nbsp;Nastavení → Desktopová aplikace.</li>
                   <li><strong>Vrácení aktualizace</strong> – když nová verze nefunguje, jedním kliknutím zpět na tu předchozí; vadnou verzi pak automatické aktualizace přeskočí. Ze Starších verzí jde nainstalovat i&nbsp;verzi starší, než máte.</li>
@@ -209,6 +216,10 @@
               <div class="changes changes--better">
                 <h3>Vylepšeno</h3>
                 <ul>
+                  <li>Instalace ukazuje jedno procento za stahování i&nbsp;instalaci se zbývajícím časem; průběh je vidět i&nbsp;na ikoně v&nbsp;hlavním panelu a&nbsp;pravým tlačítkem na ní jsou rychlé akce (0.3.1).</li>
+                  <li>Oznámení Windows mají tlačítka Aktualizovat vše, Otevřít a&nbsp;Podrobnosti (0.3.1).</li>
+                  <li>U&nbsp;aktualizace přes víc verzí jsou poznámky ke všem vydáním, která přeskočí; instalace, na kterou by nestačilo místo na disku, se nespustí a&nbsp;HubGet poradí úklid (0.3.1).</li>
+                  <li>Volitelně spolehlivost verzí od komunity (verzi, kterou ostatní vracejí, automatické aktualizace počkají), diagnostika pro podporu a&nbsp;odznak „Nainstalovat přes HubGet“ pro vývojáře (0.3.1).</li>
                   <li>Běžící aplikace se před aktualizací zavírají bez dialogu. Když se aplikace ptá na uložení práce (Word, grafické editory), HubGet počká, až ji zavřete.</li>
                   <li>Automatické aktualizace se neinstalují během hry, filmu přes celou obrazovku ani prezentace a&nbsp;volitelně jen tehdy, když u&nbsp;počítače nepracujete.</li>
                   <li>Před hromadnou aktualizací může HubGet vytvořit bod obnovení systému.</li>

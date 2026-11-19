@@ -78,7 +78,7 @@
         <div class="page-head__inner reveal">
           <p class="eyebrow" data-t="t1">What’s new</p>
           <h1 data-t="t2">What’s new in&nbsp;HubGet</h1>
-          <p class="lead" data-t="t3">What each series of HubGet versions brought, newest first. <!--obsah:updates-words-capital-->Twenty-six<!--/obsah:updates-words-capital--> updates have shipped since the first version 0.1.0 came out on October&nbsp;21.</p>
+          <p class="lead" data-t="t3">What each series of HubGet versions brought, newest first. <!--obsah:updates-words-capital-->Twenty-seven<!--/obsah:updates-words-capital--> updates have shipped since the first version 0.1.0 came out on October&nbsp;21.</p>
           <nav class="versions-nav" aria-label="Jump to version">
             <!--obsah:versions-->
             <a class="chip" href="#v0-3">0.3</a>
@@ -88,8 +88,8 @@
           </nav>
         </div>
         <dl class="stats reveal">
-          <div><dt data-t="t4">Current version</dt><dd><!--obsah:version-->0.3.0<!--/obsah:version--></dd></div>
-          <div><dt data-t="t5">Updates since 0.1.0</dt><dd><!--obsah:updates-->26<!--/obsah:updates--></dd></div>
+          <div><dt data-t="t4">Current version</dt><dd><!--obsah:version-->0.3.1<!--/obsah:version--></dd></div>
+          <div><dt data-t="t5">Updates since 0.1.0</dt><dd><!--obsah:updates-->27<!--/obsah:updates--></dd></div>
           <div><dt data-t="t6">Apps in the catalog</dt><dd data-t="t7">25,100+</dd></div>
           <div><dt data-t="t8">Package managers for real</dt><dd data-t="t9">WinGet · Chocolatey · Scoop + 8 for developers</dd></div>
         </dl>
@@ -157,13 +157,13 @@
           </article>
           <article class="card highlight reveal">
             <span class="highlight__ver">Version 0.3</span>
-            <h3>Roll back an update</h3>
-            <p>New version not working? Go back to the previous one in one click.</p>
+            <h3>Security updates first</h3>
+            <p>Updates that fix a security issue show first and don’t wait.</p>
           </article>
           <article class="card highlight reveal">
             <span class="highlight__ver">Version 0.3</span>
-            <h3>The hubget command</h3>
-            <p>hubget install vlc, hubget update and more right in Command Prompt and PowerShell.</p>
+            <h3>What opens this file?</h3>
+            <p>Drop a file onto the window and HubGet offers apps that open it.</p>
           </article>
           <!--/obsah:highlights-->
         </div>
@@ -189,13 +189,20 @@
             </div>
             <div class="card release__body">
               <div class="release__head">
-                <h2>PC overview, the hubget command and rolling back updates</h2>
+                <h2>PC overview, security updates first and the hubget command</h2>
                 <span class="badge badge--live">Latest</span>
               </div>
-              <p class="release__lead">Version 0.3.0 (Nov 19, 2026).</p>
+              <p class="release__lead">Versions 0.3.0 to 0.3.1 (Nov 19, 2026).</p>
               <div class="changes changes--new">
                 <h3>New</h3>
                 <ul>
+                  <li><strong>Security updates first</strong> (0.3.1) – updates that fix a security issue get a red badge, come first in the list and don’t wait for the minimum age; developer packages can optionally be checked for known vulnerabilities on OSV.dev.</li>
+                  <li><strong>What opens this file?</strong> (0.3.1) – drop a file onto the HubGet window or search for “.psd” and HubGet offers apps that open it.</li>
+                  <li><strong>Try in Windows Sandbox</strong> (0.3.1) – the app installs into isolated Windows that are thrown away when closed.</li>
+                  <li><strong>App settings</strong> (0.3.1) – a backup before each update (rolling back restores the settings too) and moving them to a new PC in a password-encrypted file.</li>
+                  <li><strong>Offline package</strong> (0.3.1) – a bundle of apps on a USB drive with installers and an install.cmd script for a PC without internet; export for winget configure.</li>
+                  <li><strong>Windows status</strong> in PC overview (0.3.1) – end of support, pending restart, disk space and restore points; open-source replacements for closed-source apps.</li>
+                  <li><strong>For companies</strong> (0.3.1) – Group Policy (ADMX template, Intune): allowed package managers and approved apps, required updates, no sign-in.</li>
                   <li><strong>PC overview</strong> (in the sidebar under Library) – how many apps you have and how much space they take, the largest ones, apps that start with Windows but you don’t use, cleaning up package manager caches (WinGet, Chocolatey, Scoop, npm, pip) and checking program signatures.</li>
                   <li><strong>The hubget command</strong> – hubget install, update, search, show and updates in Command Prompt and PowerShell; HubGet shows the progress. Turn it on in Settings → Desktop app.</li>
                   <li><strong>Roll back an update</strong> – if a new version doesn’t work, go back to the previous one in one click; automatic updates then skip the faulty version. Older versions can now be installed over a newer one too.</li>
@@ -209,6 +216,10 @@
               <div class="changes changes--better">
                 <h3>Improved</h3>
                 <ul>
+                  <li>Installs show one percentage for download and install with time remaining; progress shows on the taskbar icon too, and right-clicking it offers quick actions (0.3.1).</li>
+                  <li>Windows notifications have Update all, Open and Details buttons (0.3.1).</li>
+                  <li>For an update that skips several versions, you see release notes for all of them; an install that wouldn’t fit on the disk doesn’t start and HubGet suggests a cleanup (0.3.1).</li>
+                  <li>Optional version reliability from the community (automatic updates wait on a version others roll back), diagnostics for support and an “Install with HubGet” badge for developers (0.3.1).</li>
                   <li>Running apps are closed before an update without a dialog. If an app asks you to save your work (Word, graphics editors), HubGet waits until you close it.</li>
                   <li>Automatic updates don’t install while you play, watch full-screen video or present, and optionally only while you’re away from the PC.</li>
                   <li>HubGet can create a system restore point before updating all apps.</li>
