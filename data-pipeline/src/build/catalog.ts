@@ -218,7 +218,7 @@ export async function buildCatalog(
   const briefs = new Map<string, Brief>();
   await mapLimit(briefTargets, 16, async (x) => {
     const m = await loadWingetManifest(x.r.winget!);
-    if (m) briefs.set(x.id, { ShortDescription: m.ShortDescription, Tags: m.Tags, Publisher: m.Publisher, Icons: m.Icons });
+    if (m) briefs.set(x.id, { ShortDescription: m.ShortDescription, Tags: m.Tags, Publisher: m.Publisher, Icons: m.Icons, fileExtensions: fileExtensionsOf(m) });
     tickBrief();
   });
 
@@ -340,7 +340,7 @@ export async function buildCatalog(
       sources: sourcesOf(r, m, sizes.get(id)),
       releaseNotes: m?.ReleaseNotes ? truncate(plainText(m.ReleaseNotes), 600) : undefined,
       releaseNotesUrl: m?.ReleaseNotesUrl,
-      fileExtensions: fileExtensionsOf(m),
+      fileExtensions: fileExtensionsOf(m) ?? brief?.fileExtensions,
       releaseDate: isoDate(m?.ReleaseDate) ?? isoDate(r.choco?.published),
       supportUrl: support,
       privacyUrl: m?.PrivacyUrl,
@@ -483,7 +483,10 @@ function displayName(r: AppRecord, m: WingetManifest | null): string {
   return fromIndex ?? r.choco?.title ?? capitalize(r.scoop!.name);
 }
 
-type Brief = Pick<WingetManifest, "ShortDescription" | "Tags" | "Publisher" | "Icons">;
+type Brief = Pick<WingetManifest, "ShortDescription" | "Tags" | "Publisher" | "Icons"> & {
+  /** Přípony souborů (Čím otevřu tento soubor) – i u aplikací bez plných údajů z manifestu. */
+  fileExtensions?: string[];
+};
 
 const homepageOf = (r: AppRecord, m: WingetManifest | null) => m?.PackageUrl ?? m?.PublisherUrl ?? r.choco?.projectUrl ?? r.scoop?.homepage ?? null;
 
