@@ -28,6 +28,68 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
   {
+    version: "0.3.1",
+    date: "2026-11-19",
+    highlights: [
+      {
+        cs: "Bezpečnostní aktualizace napřed: aktualizace, které opravují bezpečnostní chybu, mají červený štítek, jsou v seznamu první a nečekají na minimální stáří. U balíčků pro vývojáře volitelně i známé zranitelnosti z OSV.dev.",
+        en: "Security updates first: updates that fix a security issue get a red badge, come first in the list and don't wait for the minimum age. Developer packages can optionally be checked for known vulnerabilities on OSV.dev.",
+      },
+      {
+        cs: "Jedno procento za stahování i instalaci se zbývajícím časem, průběh na ikoně v hlavním panelu a rychlé akce po kliknutí pravým tlačítkem na ikonu (Dostupné aktualizace, Aktualizovat vše, Přehled počítače).",
+        en: "One percentage for download and install with time remaining, progress on the taskbar icon and quick actions when you right-click the icon (Available updates, Update all, PC overview).",
+      },
+      {
+        cs: "Čím otevřu tento soubor? Přetáhněte soubor do okna HubGetu (nebo hledejte „.psd“) a HubGet nabídne aplikace, které ho otevřou.",
+        en: "What opens this file? Drop a file onto the HubGet window (or search for “.psd”) and HubGet offers apps that open it.",
+      },
+      {
+        cs: "Vyzkoušet ve Windows Sandboxu (nabídka u Instalovat): aplikace se nainstaluje do izolovaných Windows, která se po zavření zahodí.",
+        en: "Try in Windows Sandbox (in the Install menu): the app installs into isolated Windows that are thrown away when closed.",
+      },
+      {
+        cs: "Nastavení aplikací: záloha před aktualizací (při vrácení aktualizace se vrátí i nastavení) a přenos na nový počítač v jednom souboru zašifrovaném heslem.",
+        en: "App settings: a backup before each update (rolling back restores the settings too) and moving them to a new PC in one password-encrypted file.",
+      },
+      {
+        cs: "Sady balíčků: offline balíček s instalátory a skriptem install.cmd pro počítač bez internetu a export pro winget configure.",
+        en: "Bundles: an offline package with installers and an install.cmd script for a PC without internet, and an export for winget configure.",
+      },
+      {
+        cs: "Přehled počítače: stav Windows (konec podpory, čekající restart, místo na disku, body obnovení) a open-source náhrady za uzavřené aplikace.",
+        en: "PC overview: Windows status (end of support, pending restart, disk space, restore points) and open-source replacements for closed-source apps.",
+      },
+      {
+        cs: "U aktualizace přes víc verzí poznámky ke všem vydáním, která přeskočí; instalace, na kterou by nestačilo místo na disku, se nespustí.",
+        en: "For an update that skips several versions, release notes for all of them; an installation that wouldn't fit on the disk doesn't start.",
+      },
+      {
+        cs: "Tlačítka v oznámeních Windows: Aktualizovat vše, Otevřít nově nainstalovanou aplikaci, Podrobnosti o chybě.",
+        en: "Buttons in Windows notifications: Update all, Open a newly installed app, error Details.",
+      },
+      {
+        cs: "Pro firmy zásady skupiny (šablona ADMX, Intune): povolení správci a schválené aplikace, vynucené aktualizace, bez přihlášení. Volitelně spolehlivost verzí od komunity a diagnostika pro podporu.",
+        en: "For companies, Group Policy (ADMX template, Intune): allowed package managers and approved apps, required updates, no sign-in. Optional version reliability from the community and diagnostics for support.",
+      },
+    ],
+    featured: [
+      {
+        title: { cs: "Bezpečnostní aktualizace napřed", en: "Security updates first" },
+        text: {
+          cs: "Aktualizace, které opravují bezpečnostní chybu, jsou vidět první a nečekají.",
+          en: "Updates that fix a security issue show first and don't wait.",
+        },
+      },
+      {
+        title: { cs: "Čím otevřu tento soubor?", en: "What opens this file?" },
+        text: {
+          cs: "Přetáhněte soubor do okna a HubGet nabídne aplikace, které ho otevřou.",
+          en: "Drop a file onto the window and HubGet offers apps that open it.",
+        },
+      },
+    ],
+  },
+  {
     version: "0.3.0",
     date: "2026-11-19",
     highlights: [
