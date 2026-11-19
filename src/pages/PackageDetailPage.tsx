@@ -20,6 +20,9 @@ import { PackageIcon } from "@/components/package/PackageIcon";
 import { ArchitectureInfo } from "@/components/package/ArchitectureInfo";
 import { PrivacySection } from "@/components/package/PrivacySection";
 import { InstallSplitMenu } from "@/components/package/InstallMenu";
+import { RollbackButton } from "@/components/package/RollbackDialog";
+import { WatchButton } from "@/components/package/WatchlistWatcher";
+import { EndOfLifeNote } from "@/components/package/InstalledNotices";
 import { InlineInstallParameters } from "@/components/package/InstallParameters";
 import { QuickLinks } from "@/components/package/QuickLinks";
 import { RatingsSection, ratingsEnabled, useRatingFormat, useRatingSummary } from "@/components/package/RatingsSection";
@@ -274,8 +277,13 @@ function PackageDetailView({ entry: fullEntry, inCatalog }: { entry: CatalogEntr
               {effective && getSource(effective.source).supportsVersions && !unmanaged && !web && !job && (
                 <VersionPicker entry={entry} pkg={effective} installed={installed} />
               )}
+              {/* Poslední aktualizace se nepovedla – zpět na verzi před ní */}
+              {!web && !job && <RollbackButton entry={entry} installed={installed} />}
               <UninstallButton entry={entry} variant="full" />
             </div>
+
+            {/* Nainstalovaná verze už nedostává bezpečnostní opravy (endoflife.date) */}
+            <EndOfLifeNote pkg={installed} />
 
             {/* Aplikace jen z webu výrobce: proč ji HubGet nespravuje */}
             {web && (
@@ -326,6 +334,7 @@ function PackageDetailView({ entry: fullEntry, inCatalog }: { entry: CatalogEntr
         {/* Oblíbené, sada balíčků, nahlášení problému a sdílení vpravo nahoře (jako v App Store) */}
         <div className="col-start-3 row-start-1 flex justify-end gap-2 pt-3">
           <DetailLibraryButtons entry={entry} pkg={shownSource} />
+          <WatchButton entry={entry} />
           <ReportButton entry={entry} pkg={shownSource} installedVersion={installed?.installedVersion} />
           <ShareButton entry={entry} pkg={shownSource} />
         </div>

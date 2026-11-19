@@ -21,6 +21,8 @@ export interface SystemInfo {
   osDisplayVersion: string | null;
   /** Číslo sestavení Windows, např. 26100. */
   osBuild: number;
+  /** Název počítače (proměnná COMPUTERNAME). */
+  computerName?: string | null;
   appVersion: string;
 }
 

@@ -4,6 +4,7 @@ import {
   AlarmClock,
   AlertTriangle,
   Archive,
+  MonitorSmartphone,
   Bell,
   Boxes,
   CheckCircle2,
@@ -48,6 +49,7 @@ import { ContactSection } from "@/components/settings/ContactSection";
 import { HistorySection } from "@/components/settings/HistorySection";
 import { NotificationsSection } from "@/components/settings/NotificationsSection";
 import { PackageUpdatesSection } from "@/components/settings/PackageUpdatesSection";
+import { DevicesSection } from "@/components/settings/DevicesSection";
 import { SecuritySection } from "@/components/settings/SecuritySection";
 import { SettingsSearch } from "@/components/settings/SettingsSearch";
 import { SyncCard } from "@/components/settings/SyncCard";
@@ -87,6 +89,7 @@ const SECTIONS = [
   { id: "history", icon: History },
   { id: "security", icon: ShieldAlert },
   { id: "managers", icon: Boxes },
+  { id: "devices", icon: MonitorSmartphone },
   { id: "backup", icon: Archive },
   { id: "commands", icon: Terminal },
   { id: "news", icon: Sparkles },
@@ -123,6 +126,8 @@ function SectionContent({ id }: { id: SectionId }) {
       return <SecuritySection />;
     case "managers":
       return <ManagersSection />;
+    case "devices":
+      return <DevicesSection />;
     case "backup":
       return (
         <>
@@ -286,7 +291,7 @@ function NewsSection() {
 /** Obecné: upozornění na režim, účet a chování desktopové aplikace. */
 function GeneralSection() {
   const { t } = useTranslation();
-  const { closeToTray, setCloseToTray, trayBadge, setTrayBadge } = useSettings();
+  const { closeToTray, setCloseToTray, trayBadge, setTrayBadge, globalShortcut, setGlobalShortcut, cliCommand, setCliCommand } = useSettings();
   const showOnboarding = useOnboarding((s) => s.show);
 
   return (
@@ -323,6 +328,12 @@ function GeneralSection() {
           </Row>
           <Row label={t("settings.trayBadge")} hint={t("settings.trayBadgeHint")}>
             <Switch checked={trayBadge} onChange={setTrayBadge} label={t("settings.trayBadge")} />
+          </Row>
+          <Row label={t("settings.globalShortcut")} hint={t("settings.globalShortcutHint")}>
+            <Switch checked={globalShortcut} onChange={setGlobalShortcut} label={t("settings.globalShortcut")} />
+          </Row>
+          <Row label={t("settings.cliCommand")} hint={t("settings.cliCommandHint")}>
+            <Switch checked={cliCommand} onChange={setCliCommand} label={t("settings.cliCommand")} />
           </Row>
           <AppUpdateRows />
         </Card>

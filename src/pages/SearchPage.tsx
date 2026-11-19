@@ -7,6 +7,7 @@ import { queryKeys } from "@/app/queryClient";
 import { DevSourceOverview } from "@/components/home/DevSourceOverview";
 import { ArchFilter, ArchHiddenNote } from "@/components/package/ArchFilter";
 import { PackageCollection } from "@/components/package/PackageCollection";
+import { CommandResults } from "@/components/search/CommandResults";
 import { CollectionToolbar } from "@/components/ui/CollectionToolbar";
 import { EmptyState, PageHeader, Spinner } from "@/components/ui/States";
 import { useDebounce } from "@/hooks/useDebounce";
@@ -169,6 +170,8 @@ export function SearchPage() {
   return (
     <>
       <PageHeader title={t("search.resultsFor", { query })} actions={<ArchFilter />} />
+      {/* Akce HubGetu („aktual“ → Aktualizovat vše, „proto“ → Protokoly…) */}
+      <CommandResults query={query} />
       {failedNote}
       {!nothing && <ArchHiddenNote hidden={hiddenByArch} />}
       {nothing ? (

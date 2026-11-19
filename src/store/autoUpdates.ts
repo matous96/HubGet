@@ -12,6 +12,9 @@ import type { SourceId } from "@/types";
 export type UpdateInterval = "30min" | "hourly" | "2h" | "4h" | "8h" | "12h" | "daily" | "weekly";
 
 const HOUR = 60 * 60_000;
+/** Kolik minut bez klávesnice a myši znamená „na počítači se nepracuje“. */
+export const IDLE_MINUTES = 10;
+
 export const INTERVAL_MS: Record<UpdateInterval, number> = {
   "30min": HOUR / 2,
   hourly: HOUR,
@@ -58,6 +61,12 @@ export interface AutoUpdatesSettings {
   skipOnBattery: boolean;
   /** Neinstalovat, když je zapnutá úspora baterie. */
   skipOnSaver: boolean;
+  /** Neinstalovat během hry, videa přes celou obrazovku nebo prezentace. */
+  skipWhileBusy: boolean;
+  /** Instalovat jen, když uživatel aspoň IDLE_MINUTES nepracuje (klávesnice, myš). */
+  onlyWhenIdle: boolean;
+  /** Před ruční hromadnou aktualizací (Aktualizovat vše) vytvořit bod obnovení systému. */
+  restorePoint: boolean;
   missed: MissedPolicy;
   /** Minimální stáří aktualizací ve dnech (0 = nabídnout hned). */
   minAgeDays: number;
@@ -109,6 +118,9 @@ export const useAutoUpdates = create<AutoUpdatesState>()(
       skipOnMetered: true,
       skipOnBattery: true,
       skipOnSaver: true,
+      skipWhileBusy: true,
+      onlyWhenIdle: false,
+      restorePoint: false,
       missed: "delay",
       minAgeDays: 0,
       minAgeBySource: {},

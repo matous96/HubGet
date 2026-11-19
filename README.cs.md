@@ -86,7 +86,26 @@ s právy správce.
 - 🚀 **Po spuštění** – programy spouštěné po přihlášení do Windows na jednom místě,
   s vlivem na rychlost startu.
 - ⏰ **Aktualizace pod kontrolou** – plán kontrol i instalací, minimální stáří
-  aktualizací, výjimky pro baterii a varování, když instalátor přijde z jiného serveru.
+  aktualizací, výjimky pro baterii, hry a prezentace, instalace jen mimo práci, bod
+  obnovení před hromadnou aktualizací a varování, když instalátor přijde z jiného serveru.
+- ↩️ **Vrácení aktualizace** – když nová verze nefunguje, jedním kliknutím zpět na tu
+  předchozí; vadnou verzi automatické aktualizace přeskočí.
+- 🕰️ **Nepoužívané aplikace** – co jste měsíce nespustili (podle záznamů Windows),
+  i s hromadnou odinstalací.
+- 🔔 **Hlídání aplikací** – zpráva, až vyjde nová verze nebo až aplikace z webu výrobce
+  půjde nainstalovat přes HubGet.
+- 🖥️ **Moje počítače** – aplikace a čekající aktualizace všech vašich počítačů;
+  z jiného počítače sem nainstalujete, co tu chybí.
+- 🛡️ **Konec podpory** – upozornění na Python, Node.js, .NET, Javu a další verze, které
+  už nedostávají bezpečnostní opravy; i aplikace nainstalované dvakrát.
+- 💾 **Velikost na disku** – řazení podle velikosti a kolik místa zabírají nepoužívané aplikace.
+- 📊 **Přehled počítače** – kolik aplikací máte a kolik zabírají, největší z nich,
+  aplikace spouštěné s Windows, které nepoužíváte, úklid mezipamětí správců balíčků
+  a kontrola digitálních podpisů programů.
+- ⌨️ **Příkaz `hubget` v terminálu** – `hubget install vlc`, `hubget update`,
+  `hubget search …` v příkazovém řádku i PowerShellu; průběh ukáže HubGet.
+- ⌨️ **Win+Shift+H** otevře HubGet odkudkoli s kurzorem ve vyhledávání; jednou týdně
+  souhrn, co se nainstalovalo a co čeká.
 - 📦 **Sady balíčků a profily** – sdílitelná sada aplikací pro nový počítač, export
   pro WinGet i jako skript PowerShellu.
 - 💻 **Režim Vývojář** – npm, Bun, pip, Cargo, vcpkg, .NET Tool a PowerShell naostro
@@ -227,13 +246,27 @@ viditelné okno a jestli je okenní program (hlavička PE):
 - proces bez okna, který aplikaci jistě patří (ikona u hodin, proces visící v paměti),
   ukončí bez dotazu – nejdřív slušně, kdo nereaguje, natvrdo – a zapíše to do protokolu
   (vypínač Nastavení → Obecné → Odinstalace a běžící aplikace),
-- aplikaci s oknem, konzolový program a proces nalezený jen podle názvu nechá na
-  uživateli: `AppRunningDialog` – Zavřít a pokračovat / Pokračovat bez zavření / Zrušit,
+- aplikaci s oknem, konzolový program a proces nalezený jen podle názvu ve výchozím
+  stavu zavře bez dotazu s ohledem na neuloženou práci (`closeRunningApp`, backend
+  `close_app`): oknům pošle žádost o zavření (jako křížek) a sleduje její okna. Když
+  aplikace ukáže nové okno nebo má hlavní okno zablokované modálním dialogem, ptá se na
+  uložení práce (Word, grafický editor): natvrdo ji neukončí, karta ukazuje „Čeká na
+  zavření aplikace“ a operace pokračuje, až ji uživatel zavře – i když dotaz zruší
+  a pracuje dál, čeká se, dokud má hlavní okno (nejvýš 15 minut, pak se operace zruší;
+  zrušit jde i křížkem na kartě). Jinak zbytek ukončí natvrdo: aplikaci, která se
+  zavřela jen zčásti, schovala se k hodinám (Discord) nebo zamrzla (`IsHungAppWindow`),
+  po 3 s; aplikaci, která žádost ignoruje a okno nechá, jak bylo (ChatGPT), po 5 s. Vypínač Nastavení → Obecné → „Zavírat
+  běžící aplikace bez dotazu“ (výchozí od 0.2.2; nastavení uložená dřív se jednou
+  přepnou na zapnuto). Vypnutý = `AppRunningDialog` – Zavřít a pokračovat / Pokračovat
+  bez zavření / Zrušit,
 - po odinstalaci ukončí procesy, které z její složky dál běží (složku si backend
   pamatuje z doby před odinstalací), ať nedrží soubory.
 
-Když operace i tak selže s „inUse“, `AppInUseDialog` nabídne aplikaci zavřít a operaci
-zopakovat. Automatické aktualizace na pozadí aplikace nezavírají. Obecná slova
+Když operace i tak selže s „inUse“ (aplikace naběhla během operace), se zavíráním bez
+dotazu ji fronta stejně zavře a operaci jednou zopakuje bez dialogu (`retryAfterClosing`);
+teprve když selže i to, nebo se aplikace ptá na uložení práce, `AppInUseDialog` nabídne
+aplikaci zavřít a operaci zopakovat.
+Automatické aktualizace na pozadí aplikace nezavírají. Obecná slova
 („app“, „client“, „launcher“…) se jako název aplikace nepoužijí – „NVIDIA App“
 tak nechytí cizí složku `app`.
 
@@ -261,6 +294,12 @@ uživatel dostane srozumitelnou hlášku s doporučením jiného zdroje.
 | `disk.rs` | Programy nalezené jen podle složky na disku (Program Files, %LocalAppData%, %AppData%) se zástupcem v nabídce Start |
 | `leftovers.rs` | Zbytky po odinstalaci (AppData; s pokročilou odinstalací i Program Files, ProgramData, zástupci a registr), Koš a záloha registru, povýšený úklid |
 | `running.rs` | Procesy aplikace (složka instalace, název, okno, GUI/konzole), zavření a ukončení |
+| `usage.rs` | Poslední spuštění aplikací (UserAssist), spouštění s Windows, velikost na disku |
+| `caches.rs` | Mezipaměti správců balíčků (winget, Chocolatey, Scoop, npm, pip) – velikost a úklid |
+| `signatures.rs` | Digitální podpisy hlavních programů aplikací (WinVerifyTrust) |
+| `restore.rs` | Bod obnovení systému před hromadnou aktualizací (povýšený pomocník) |
+| `shortcut.rs` | Klávesová zkratka Win+Shift+H |
+| `cli.rs` | Příkaz `hubget` v terminálu (skript ve WindowsApps, předání příkazu HubGetu) |
 | `startup.rs` | Programy po spuštění (registr Run, složky Po spuštění, plánovač úloh, aplikace ze Storu), zapnutí / vypnutí / odstranění, vliv na start (WDI StartupInfo) |
 | `tracker.rs` | Sledování instalace – snímek disku a registru před a po instalaci, záznam pro čisté odinstalování |
 | `oauth.rs` | Přihlášení v systémovém prohlížeči – návrat na 127.0.0.1 (RFC 8252) |
@@ -834,7 +873,7 @@ Bez nastaveného Supabase se hodnocení nezobrazuje a přihlášení je jen uká
 
 **Synchronizace mezi počítači** (Nastavení → Obecné → Synchronizace, `store/sync.ts`):
 oblíbené, sada balíčků, předvolby (motiv, barva zvýraznění, jazyk, režim, zobrazení,
-zapnutí správci) a předvolby oznámení – každá oblast jde vypnout. Spouští se po
+zapnutí správci), předvolby oznámení, vzhled aplikací a Moje počítače – každá oblast jde vypnout. Spouští se po
 přihlášení, 3 s po změně, při návratu do okna (nejvýš jednou za minutu) a každých
 10 minut. Data jsou v tabulce `user_data` (1 řádek = 1 oblast jako JSON, vidí je jen
 vlastník – RLS). Slučuje se 3cestně podle stavu po poslední synchronizaci tohoto
@@ -1021,6 +1060,107 @@ z deps.dev (Google Open Source Insights, čísla pár dní stará), s proměnnou
 
 ### Správa aplikací
 
+- **Akce ve vyhledávání** (`components/search/CommandResults.tsx`): Ctrl+K kromě aplikací
+  nabídne akce a stránky – „aktual“ → Aktualizovat vše / Zkontrolovat aktualizace,
+  „proto“ → Protokoly, „motiv“ → přepnutí režimu, „nast ozn“ → sekce Nastavení. Hledá
+  se v názvu akce v jazyce aplikace i v angličtině (začátky slov).
+- **Ověřit na VirusTotalu** (Technické údaje, karta SHA-256): odkaz na výsledky antivirů
+  pro instalátor s tímto otiskem – nic se nenahrává, VirusTotal soubor hledá podle otisku.
+- **Vrácení aktualizace** (`hooks/useRollback.ts`, `components/package/RollbackDialog.tsx`):
+  fronta si u aktualizace zapíše do historie verzi před ní (`fromVersion`). Když je
+  nainstalovaná novější, detail a kontextová nabídka nabídnou „Vrátit na verzi X“.
+  Správci downgrade odmítají (winget „Už je nainstalovaná novější verze“), proto úloha
+  s `replaceInstalled` aplikaci nejdřív odinstaluje a pak nainstaluje zvolenou verzi –
+  stejně se teď instaluje i starší verze z „Starší verze“. Dialog předem ověří, že správce
+  verzi ještě nabízí (jinak vrácení nejde potvrdit); když instalace po odinstalaci přesto
+  selže, fronta vrátí aspoň nejnovější verzi, ať aplikace nezůstane odinstalovaná. Po
+  úspěšném vrácení (`skipVersion`) vadnou verzi přeskočí připnutí „skip“ (nabídne se až
+  novější) a nehlídá se jako „aplikace se vrátila sama“.
+- **Hlídané aplikace** (`store/watchlist.ts`, `components/package/WatchlistWatcher.tsx`):
+  zvonek v detailu nenainstalované aplikace; po načtení katalogu HubGet oznámí novou
+  verzi, nebo že aplikace z webu výrobce (web-only) jde nainstalovat přes správce.
+  Seznam je v Oblíbených; nainstalovaná aplikace se přestane hlídat.
+- **Nepoužívané aplikace** (Nainstalované → Nepoužívané, `src-tauri/src/usage.rs`,
+  `hooks/useAppUsage.ts`): poslední spuštění ze záznamu Windows UserAssist (programy
+  a zástupce spuštěné z nabídky Start, hlavního panelu, plochy, Průzkumníka; názvy
+  v ROT13, FILETIME). Za používanou se počítá i aplikace, která běží, spouští se po
+  přihlášení (klíče Run) nebo má rozšíření kontextové nabídky Průzkumníka (HKCR
+  ContextMenuHandlers, ve Windows 11 balíček MSIX „…ShellExtension“ – WinRAR, Mp3tag).
+  Nepoužívaná = spustitelná (zástupce v nabídce Start nebo záznam spuštění), 90 dní
+  nespuštěná (bez záznamu podle data instalace). Lišta výběru umí hromadnou odinstalaci.
+- **Moje počítače** (Nastavení → Moje počítače, `store/devices.ts`,
+  `components/settings/DevicesSection.tsx`): každý počítač zapisuje do synchronizace
+  (oblast `devices`, klíč = náhodné id počítače) název, Windows, verzi HubGetu a spravované
+  aplikace s verzemi; ostatní ukážou počet aplikací a aktualizací a „Nainstalovat sem“
+  (dialog importu profilu s aplikacemi, které tu chybí). Po 180 dnech bez ozvání se
+  počítač vyřadí. Potřebuje migraci `20261119120000_user_data_devices.sql`.
+- **Bod obnovení před hromadnou aktualizací** (Nastavení → Aktualizace balíčků,
+  `src-tauri/src/restore.rs`): u ručního „Aktualizovat vše“ (aspoň 2 aplikace) HubGet
+  spustí sám sebe s právy správce v pomocném režimu `--unibox-elevated-restore-point`
+  a pevným příkazem `Checkpoint-Computer` (z okna jde jen popis, pomocník ho znovu
+  ověří). Windows vytvoří nejvýš jeden bod za 24 hodin; s vypnutou Ochranou systému
+  žádný – obojí HubGet oznámí a aktualizuje dál.
+- **Velikost na disku** (`arp.rs` `estimated_size`, stejný dotaz `app_last_used`): údaj
+  EstimatedSize, který o sobě zapisuje instalátor (kB → bajty; u aplikací bez záznamu
+  v registru – Store, Scoop – chybí). Nainstalované → Řadit → Velikost, u nepoužívaných
+  velikost každé a součet.
+- **Konec podpory** (`lib/endOfLife.ts`, `hooks/useEndOfLife.ts`, `components/package/InstalledNotices.tsx`):
+  balíček wingetu se převede na produkt a řadu z otevřené databáze endoflife.date
+  (Python, Node.js, .NET, Java Temurin / Microsoft / Oracle, PostgreSQL, Go, PHP,
+  PowerShell, MySQL, Ruby; API je zdarma a povoluje dotazy z prohlížeče, výsledek se
+  drží den). Řada po datu `eol` → panel nad Nainstalovanými a upozornění v detailu
+  s nejnovější podporovanou řadou.
+- **Nainstalováno dvakrát** (`DuplicatesPanel`): stejný název u balíčků od dvou různých
+  zdrojů (správce + původ: WinGet a Scoop, WinGet a Microsoft Store). Dva balíčky téhož
+  správce se nehlásí – bývají to potřebné varianty (Visual C++ x86 a x64).
+- **Co je nového u aktualizací** (Dostupné aktualizace): poznámky k verzi z katalogu místo
+  popisu, jen když patří k nabízené verzi (`latestVersion` = `availableVersion`).
+- **Týdenní souhrn** (`components/layout/WeeklySummary.tsx`, Nastavení → Předvolby
+  oznámení): jednou za 7 dní (první týden po zapnutí, nejdřív 10 minut po spuštění)
+  nainstalované aktualizace a aplikace z historie, čekající aktualizace, čekající na
+  oprávnění správce a nepoužívané aplikace; když je všechno nula, nic nepřijde.
+- **Klávesová zkratka Win+Shift+H** (`src-tauri/src/shortcut.rs`, plugin
+  `tauri-plugin-global-shortcut`, Nastavení → Obecné): zapíná ji frontend podle
+  nastavení (`set_global_shortcut`); po stisku backend ukáže okno (i schované u hodin)
+  a pošle událost `focus-search` – kurzor do vyhledávání (TopBar). Obsazenou zkratku
+  HubGet oznámí.
+- **Přehled počítače** (`pages/OverviewPage.tsx`, postranní panel → Knihovna, jen desktop):
+  dlaždice z dat, která HubGet už má (nainstalované, velikost podle EstimatedSize,
+  aktualizace a kolik jich za 30 dní proběhlo podle historie, nepoužívané, konec podpory,
+  nainstalováno dvakrát), největší aplikace a nejdéle nainstalovaná. Dál:
+  - **Spouští se s Windows, ale nepoužíváte je** (`usage.rs` příznak `autostart`,
+    `useUnusedApps` → `idleAutostart`): zapnutý klíč Run (vypnuté ve StartupApproved se
+    nepočítají) aplikace, kterou nikdo 90 dní ručně nespustil – odkaz na Po spuštění. Vynechají se kategorie, které
+    pracují na pozadí bez ručního otevření (cloud, zabezpečení, systém, síť, přizpůsobení).
+  - **Mezipaměti správců** (`src-tauri/src/caches.rs`, `cache_info` / `clean_cache`):
+    stažené instalátory wingetu (`%TEMP%\WinGet`) a Chocolatey (`%TEMP%\chocolatey`),
+    mezipaměť Scoopu a staré verze aplikací (kromě aktuální, na kterou ukazuje `current`),
+    `npm-cache\_cacache` a mezipaměť pipu. Maže se jen obsah známých složek (nikdy
+    složka nad nimi, odkazy se nenásledují); během operací ve frontě je úklid vypnutý.
+  - **Kontrola podpisů** (`src-tauri/src/signatures.rs`, `check_signatures`): hlavní
+    program aplikace (`arp.rs` `main_executable` – DisplayIcon, jinak EXE v InstallLocation
+    pojmenovaný podle aplikace, nebo největší) se ověří přes `WinVerifyTrust` bez kontroly
+    odvolání po síti. Výsledek: podepsaný / bez podpisu / neplatný podpis (soubor změněný po podpisu,
+    nedůvěryhodný certifikát) / program nenalezen. Spouští se jen na požádání.
+- **Příkaz `hubget` v terminálu** (`src-tauri/src/cli.rs`, `components/layout/CliCommands.tsx`,
+  Nastavení → Desktopová aplikace, výchozí zapnuto): HubGet zapíše do
+  `%LOCALAPPDATA%\Microsoft\WindowsApps` (je v PATH každého uživatele) skript
+  `hubget.cmd`, který spustí HubGet s příznakem `--cli`; testovací verze má
+  `hubget-test.cmd`. Takové spuštění okno neotevře: připojí se ke konzoli terminálu
+  (`AttachConsole`), vypíše nápovědu nebo potvrzení v jazyce Windows a příkaz předá
+  HubGetu – spustí ho znovu s `--hubget-cli=<JSON>` (běžící HubGet ho dostane přes
+  single-instance, jinak se tím spustí) bez zděděných rukojetí, takže terminál nečeká.
+  Frontend příkaz vyzvedne (`take_cli_commands`, událost `hubget-cli`) a provede přes
+  frontu operací: `install <aplikace…>` (id z katalogu, `zdroj:balíček`, id balíčku
+  – „VideoLAN.VLC“, „vlc“, „firefox“ – nebo přesný název; instaluje hned, protože příkaz
+  napsal uživatel sám, a proto jen při jednoznačné shodě – jinak otevře výsledky hledání;
+  odkazy z webu jen otevřou seznam), `update [aplikace…]` (bez názvu všechny; podle názvu
+  jen jednoznačná shoda mezi nainstalovanými), `search <text>`, `show <aplikace>`, `updates`, `help`, `version`. Cizí
+  soubor `hubget.cmd` HubGet nepřepíše; po přesunutí HubGetu skript zapíše znovu.
+- **Automatické aktualizace ohleduplně** (`system.rs` `power_network_status`): během
+  hry, videa přes celou obrazovku a prezentace (`SHQueryUserNotificationState`) se
+  nainstalují až potom; volitelně jen když se 10 minut nesáhne na klávesnici a myš
+  (`GetLastInputInfo`).
 - **Volby instalace v detailu** (pod tlačítkem Instalovat schované pod odkazem
   „Volby instalace“, změněné volby jsou vidět v souhrnu vedle něj; ukládají se k aplikaci):
   tichá instalace (vypnutím se ukáže průvodce), jako správce, části instalátoru

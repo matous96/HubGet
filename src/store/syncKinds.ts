@@ -15,6 +15,7 @@ import type { SyncMap } from "@/lib/syncMerge";
 import type { SortMode, SourceId, ThemeSetting, UserMode, ViewMode } from "@/types";
 import { MAX_ICON_LENGTH, useAppLooks, type AppLook } from "./appLooks";
 import { parseBundleFile, useBundle, type BundleItem } from "./bundle";
+import { freshDevices, useDevices, type DeviceApp, type DeviceRecord } from "./devices";
 import { useFavorites, type FavoriteItem } from "./favorites";
 import { useNotificationPrefs, type NotificationPrefs } from "./notificationPrefs";
 import { useSettings } from "./settings";
@@ -49,7 +50,7 @@ const settingsKind: SyncKind = {
     if (oneOf(map.language, LANGUAGES.map((l) => l.code)) && map.language !== s.language) s.setLanguage(map.language);
     if (oneOf<UserMode>(map.userMode, ["regular", "developer"])) s.setUserMode(map.userMode);
     if (oneOf<ViewMode>(map.viewMode, ["grid", "list"])) s.setViewMode(map.viewMode);
-    if (oneOf<SortMode>(map.sortMode, ["popularity", "name", "recent"])) s.setSortMode(map.sortMode);
+    if (oneOf<SortMode>(map.sortMode, ["popularity", "name", "recent", "size"])) s.setSortMode(map.sortMode);
     if (map.accentColor === null || isString(map.accentColor)) s.setAccentColor(map.accentColor);
     const enabled = sources(map.enabledSources);
     // Aspoň jeden správce musí zůstat zapnutý
@@ -132,7 +133,7 @@ const bundleKind: SyncKind = {
 
 // ── Předvolby oznámení ───────────────────────────────────────────────────
 
-const NOTIFICATION_FLAGS = ["enabled", "batchSummary", "updatesAvailable", "progress", "failure", "success"] as const;
+const NOTIFICATION_FLAGS = ["enabled", "batchSummary", "updatesAvailable", "progress", "failure", "success", "weeklySummary"] as const;
 
 const notificationsKind: SyncKind = {
   id: "notifications",
@@ -175,5 +176,55 @@ const looksKind: SyncKind = {
   subscribe: (listener) => useAppLooks.subscribe(listener),
 };
 
+// ── Moje počítače (přehled nainstalovaných aplikací každého počítače) ────
+
+/** Nejvíc aplikací v přehledu jednoho počítače (záznam má v databázi limit velikosti). */
+const MAX_DEVICE_APPS = 1500;
+
+function parseDevice(value: unknown): DeviceRecord | null {
+  const v = value as Partial<DeviceRecord> | null;
+  if (!v || !isString(v.name) || !isString(v.seen) || Number.isNaN(Date.parse(v.seen)) || !Array.isArray(v.apps)) return null;
+  const apps = v.apps
+    .filter(
+      (a): a is DeviceApp =>
+        Array.isArray(a) &&
+        isSourceId(a[0]) &&
+        isString(a[1]) &&
+        isString(a[2]) &&
+        isString(a[3]) &&
+        (a[4] === null || isString(a[4])) &&
+        a[1].length <= 300 &&
+        a[2].length <= 300,
+    )
+    .slice(0, MAX_DEVICE_APPS);
+  return {
+    name: v.name.slice(0, 80),
+    seen: v.seen,
+    ...(isString(v.os) && { os: v.os.slice(0, 80) }),
+    ...(isString(v.version) && { version: v.version.slice(0, 20) }),
+    apps,
+  };
+}
+
+const devicesKind: SyncKind = {
+  id: "devices",
+  snapshot() {
+    // Počítače, které se dlouho neozvaly, vypadnou (sloučení je smaže i v účtu)
+    return { ...freshDevices(useDevices.getState().devices) };
+  },
+  apply(map) {
+    const { deviceId, devices } = useDevices.getState();
+    const next: Record<string, DeviceRecord> = {};
+    for (const [id, value] of Object.entries(map)) {
+      const record = parseDevice(value);
+      if (record) next[id] = record;
+    }
+    // Vlastní záznam vždy podle tohoto počítače
+    if (devices[deviceId]) next[deviceId] = devices[deviceId];
+    useDevices.setState({ devices: next });
+  },
+  subscribe: (listener) => useDevices.subscribe(listener),
+};
+
 // Vzhled aplikací poslední – je největší a databáze bez migrace ho odmítne; ostatní oblasti se tím nezdrží
-export const SYNC_KIND_LIST: SyncKind[] = [favoritesKind, bundleKind, settingsKind, notificationsKind, looksKind];
+export const SYNC_KIND_LIST: SyncKind[] = [favoritesKind, bundleKind, settingsKind, notificationsKind, devicesKind, looksKind];

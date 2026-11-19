@@ -25,6 +25,10 @@ export interface NotificationPrefs {
   failure: boolean;
   /** Oznámit úspěšné dokončení operace. */
   success: boolean;
+  /** Jednou týdně souhrn: nainstalované a čekající aktualizace, nepoužívané aplikace. */
+  weeklySummary: boolean;
+  /** Kdy přišel poslední týdenní souhrn (ISO); null = ještě nikdy (první za týden). */
+  lastWeeklySummary: string | null;
 }
 
 interface NotificationPrefsState extends NotificationPrefs {
@@ -41,6 +45,8 @@ export const useNotificationPrefs = create<NotificationPrefsState>()(
       progress: false,
       failure: true,
       success: true,
+      weeklySummary: true,
+      lastWeeklySummary: null,
       set: (changes) => set(changes),
     }),
     { name: "unibox-notification-prefs" },

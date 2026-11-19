@@ -57,7 +57,7 @@ fn too_broad(dir: &Path) -> bool {
 }
 
 /// Složky instalace k záznamu programu.
-fn install_dirs(entry: &arp::ArpEntry) -> Vec<PathBuf> {
+pub(crate) fn install_dirs(entry: &arp::ArpEntry) -> Vec<PathBuf> {
     let mut dirs = Vec::new();
     for path in arp::referenced_paths(entry) {
         let mut dir = if path.extension().is_some() { path.parent().map(Path::to_path_buf) } else { Some(path) };
@@ -83,7 +83,7 @@ fn inside(path: &str, dir: &str) -> bool {
 }
 
 /// Jmenuje se proces nebo některá jeho složka jako aplikace (klíče názvu aplikace)?
-fn named_like_app(path: &str, apps: &HashSet<String>) -> bool {
+pub(crate) fn named_like_app(path: &str, apps: &HashSet<String>) -> bool {
     let path = Path::new(path);
     let stem = path.file_stem().map(|s| arp::name_key(&s.to_string_lossy())).unwrap_or_default();
     apps.contains(&stem)
@@ -101,15 +101,15 @@ fn in_windows(path: &str) -> bool {
 }
 
 /// Běžící proces: id, název a cesta ke spustitelnému souboru.
-struct Process {
+pub(crate) struct Process {
     pid: u32,
     name: String,
-    path: String,
+    pub(crate) path: String,
 }
 
 /// Běžící procesy (id, název, cesta ke spustitelnému souboru).
 #[cfg(windows)]
-fn processes() -> Vec<Process> {
+pub(crate) fn processes() -> Vec<Process> {
     use windows_sys::Win32::Foundation::{CloseHandle, INVALID_HANDLE_VALUE};
     use windows_sys::Win32::System::Diagnostics::ToolHelp::{
         CreateToolhelp32Snapshot, Process32FirstW, Process32NextW, PROCESSENTRY32W, TH32CS_SNAPPROCESS,
@@ -147,40 +147,64 @@ fn processes() -> Vec<Process> {
 }
 
 #[cfg(not(windows))]
-fn processes() -> Vec<Process> {
+pub(crate) fn processes() -> Vec<Process> {
     Vec::new()
 }
 
-/// Procesy, které mají viditelné okno nejvyšší úrovně s titulkem (i minimalizované).
+/// Viditelné okno nejvyšší úrovně (i minimalizované).
+#[derive(Clone, Copy, Debug)]
+struct TopWindow {
+    hwnd: isize,
+    pid: u32,
+    /// Hlavní okno aplikace: bez vlastníka a s titulkem (dialogy a panely vlastníka mají).
+    main: bool,
+    /// Přijímá vstup – modální dialog (třeba „Uložit změny?“) hlavní okno zablokuje.
+    enabled: bool,
+    /// Reaguje (zamrzlé = Windows u něj píše „Neodpovídá“).
+    responsive: bool,
+}
+
 #[cfg(windows)]
-fn visible_window_pids() -> HashSet<u32> {
+fn top_windows() -> Vec<TopWindow> {
     use windows_sys::core::BOOL;
     use windows_sys::Win32::Foundation::{HWND, LPARAM};
     use windows_sys::Win32::UI::WindowsAndMessaging::{
-        EnumWindows, GetWindow, GetWindowTextLengthW, GetWindowThreadProcessId, IsWindowVisible, GW_OWNER,
+        EnumWindows, GetWindow, GetWindowLongW, GetWindowTextLengthW, GetWindowThreadProcessId, IsHungAppWindow, IsWindowVisible, GWL_STYLE,
+        GW_OWNER, WS_DISABLED,
     };
 
-    // SAFETY: lparam je ukazatel na množinu z volající funkce, která žije po celý
+    // SAFETY: lparam je ukazatel na seznam z volající funkce, který žije po celý
     // výčet; handle okna předává systém během výčtu
     unsafe extern "system" fn collect(hwnd: HWND, lparam: LPARAM) -> BOOL {
-        let pids = &mut *(lparam as *mut HashSet<u32>);
-        if IsWindowVisible(hwnd) != 0 && GetWindow(hwnd, GW_OWNER).is_null() && GetWindowTextLengthW(hwnd) > 0 {
+        let windows = &mut *(lparam as *mut Vec<TopWindow>);
+        if IsWindowVisible(hwnd) != 0 {
             let mut pid = 0u32;
             GetWindowThreadProcessId(hwnd, &mut pid);
-            pids.insert(pid);
+            windows.push(TopWindow {
+                hwnd: hwnd as isize,
+                pid,
+                main: GetWindow(hwnd, GW_OWNER).is_null() && GetWindowTextLengthW(hwnd) > 0,
+                enabled: GetWindowLongW(hwnd, GWL_STYLE) as u32 & WS_DISABLED == 0,
+                responsive: IsHungAppWindow(hwnd) == 0,
+            });
         }
         1
     }
 
-    let mut pids = HashSet::new();
-    // SAFETY: zpětné volání dostane jen ukazatel na `pids`, který přežije celé volání
-    unsafe { EnumWindows(Some(collect), &mut pids as *mut HashSet<u32> as LPARAM) };
-    pids
+    let mut windows = Vec::new();
+    // SAFETY: zpětné volání dostane jen ukazatel na `windows`, který přežije celé volání
+    unsafe { EnumWindows(Some(collect), &mut windows as *mut Vec<TopWindow> as LPARAM) };
+    windows
 }
 
 #[cfg(not(windows))]
+fn top_windows() -> Vec<TopWindow> {
+    Vec::new()
+}
+
+/// Procesy, které mají viditelné hlavní okno (i minimalizované).
 fn visible_window_pids() -> HashSet<u32> {
-    HashSet::new()
+    top_windows().into_iter().filter(|w| w.main).map(|w| w.pid).collect()
 }
 
 /// Běží nějaký program ze složky `dir` (nebo jejích podsložek)?
@@ -288,6 +312,116 @@ pub async fn close_processes(pids: Vec<u32>, force: bool) -> Result<Vec<u32>, St
     background(move || Ok(terminate(&pids, force, Duration::from_secs(if force { 5 } else { 10 })))).await
 }
 
+/// Výsledek zavírání aplikace (`close_app`) a její stav při čekání (`app_close_state`).
+#[derive(Serialize, Debug, PartialEq)]
+#[serde(rename_all = "camelCase")]
+pub struct CloseState {
+    /// Procesy, které běží dál.
+    alive: Vec<u32>,
+    /// Procesy, na které se čeká: aplikace se ptá na uložení práce, nebo s ní uživatel
+    /// dál pracuje (má reagující hlavní okno) – natvrdo se neukončují.
+    waiting: Vec<u32>,
+}
+
+/// Jak dlouho po žádosti o zavření čekat na aplikaci, které nezůstalo žádné reagující
+/// okno (schovala se k hodinám, ukládá nastavení, zamrzla), než se ukončí natvrdo.
+const HIDDEN_GRACE: Duration = Duration::from_secs(3);
+/// Jak dlouho čekat na aplikaci, která po žádosti o zavření nechala okno, jak bylo –
+/// žádost ignoruje (ChatGPT), nebo se ještě zavírá – než se ukončí natvrdo.
+const IGNORED_WAIT: Duration = Duration::from_secs(5);
+
+/// Okna aplikace po žádosti o zavření.
+#[derive(Debug, Default, PartialEq)]
+struct AfterRequest {
+    /// Procesy, které běží dál.
+    alive: Vec<u32>,
+    /// Z nich procesy s viditelným, reagujícím hlavním oknem.
+    windowed: Vec<u32>,
+    /// Aplikace se ptá na uložení práce: ukázala nové okno (dialog „Uložit změny?“),
+    /// nebo má hlavní okno zablokované modálním dialogem.
+    asking: bool,
+}
+
+/// Stav procesů `pids`; `before` = okna aplikace před žádostí o zavření (nová okna po ní
+/// jsou dotaz na uložení), `None` = okna se neporovnávají.
+fn after_request(pids: &[u32], before: Option<&HashSet<isize>>) -> AfterRequest {
+    let running: HashSet<u32> = processes().iter().map(|p| p.pid).collect();
+    let alive: Vec<u32> = pids.iter().copied().filter(|p| running.contains(p)).collect();
+    let windows: Vec<TopWindow> = top_windows().into_iter().filter(|w| alive.contains(&w.pid)).collect();
+    let mut windowed: Vec<u32> = windows.iter().filter(|w| w.main && w.responsive).map(|w| w.pid).collect();
+    windowed.sort_unstable();
+    windowed.dedup();
+    let asking = before.is_some_and(|before| {
+        windows.iter().any(|w| w.responsive && (!before.contains(&w.hwnd) || (w.main && !w.enabled)))
+    });
+    AfterRequest { alive, windowed, asking }
+}
+
+/// Další krok po žádosti o zavření.
+#[derive(Debug, PartialEq)]
+enum NextStep {
+    /// Ještě chvíli počkat.
+    Wait,
+    /// Aplikace se zavřela.
+    Closed,
+    /// Ptá se na uložení práce – nechat běžet, rozhodne uživatel.
+    Ask,
+    /// Zavření ignoruje, schovala se k hodinám, nebo zamrzla – zbytek natvrdo.
+    Force,
+}
+
+fn next_step(state: &AfterRequest, elapsed: Duration) -> NextStep {
+    if state.alive.is_empty() {
+        NextStep::Closed
+    } else if state.asking {
+        NextStep::Ask
+    } else if (state.windowed.is_empty() && elapsed >= HIDDEN_GRACE) || elapsed >= IGNORED_WAIT {
+        NextStep::Force
+    } else {
+        NextStep::Wait
+    }
+}
+
+/// Zavře aplikaci bez ztráty rozdělané práce: oknům pošle žádost o zavření (jako
+/// křížek) a chvíli počká.
+///  - Ukáže-li aplikace dotaz na uložení (nové okno, zablokované hlavní okno), nic
+///    neukončí a vrátí procesy, na které se čeká (`waiting`) – zavře je uživatel.
+///  - Jinak – zavřela se, schovala se k hodinám, zamrzla, nebo žádost ignoruje
+///    a okno nechá, jak bylo (ChatGPT) – zbylé procesy ukončí natvrdo.
+#[tauri::command]
+pub async fn close_app(pids: Vec<u32>) -> Result<CloseState, String> {
+    background(move || {
+        let own = std::process::id();
+        let pids: Vec<u32> = pids.into_iter().filter(|&p| p != own).collect();
+        let before: HashSet<isize> = top_windows().iter().filter(|w| pids.contains(&w.pid)).map(|w| w.hwnd).collect();
+        // Jen žádost o zavření, bez čekání
+        terminate(&pids, false, Duration::ZERO);
+        let start = Instant::now();
+        loop {
+            let state = after_request(&pids, Some(&before));
+            match next_step(&state, start.elapsed()) {
+                NextStep::Wait => std::thread::sleep(Duration::from_millis(300)),
+                NextStep::Closed => return Ok(CloseState { alive: Vec::new(), waiting: Vec::new() }),
+                NextStep::Ask => return Ok(CloseState { waiting: if state.windowed.is_empty() { state.alive.clone() } else { state.windowed }, alive: state.alive }),
+                NextStep::Force => return Ok(CloseState { alive: terminate(&state.alive, true, Duration::from_secs(5)), waiting: Vec::new() }),
+            }
+        }
+    })
+    .await
+}
+
+/// Stav aplikace, na jejíž zavření se čeká (ptala se na uložení práce): které procesy
+/// běží a které mají viditelné, reagující hlavní okno – dokud ho mají, uživatel s ní
+/// pracuje (i když dotaz na uložení zrušil). Nic neukončuje.
+#[tauri::command]
+pub async fn app_close_state(pids: Vec<u32>) -> Result<CloseState, String> {
+    background(move || {
+        let state = after_request(&pids, None);
+        Ok(CloseState { alive: state.alive, waiting: state.windowed })
+    })
+    .await
+}
+
 /// Ukončí procesy bez dotazu (procesy na pozadí před operací, pozůstatky po
 /// odinstalaci): nejdřív slušně s krátkým čekáním, kdo nereaguje, natvrdo.
 /// Vrátí procesy, které ukončit nešlo (běží s právy správce).
@@ -334,5 +468,22 @@ mod tests {
         assert!(is_gui_program(&format!(r"{windows}\explorer.exe")));
         assert!(!is_gui_program(&format!(r"{windows}\System32\cmd.exe")));
         assert!(!is_gui_program(r"C:\Neexistujici HubGet\app.exe"));
+    }
+
+    #[test]
+    fn rozhodnuti_po_zadosti_o_zavreni() {
+        let state = |alive: &[u32], windowed: &[u32], asking: bool| AfterRequest { alive: alive.to_vec(), windowed: windowed.to_vec(), asking };
+        let s = Duration::from_secs;
+        // Zavřela se – hotovo, nic natvrdo
+        assert_eq!(next_step(&state(&[], &[], false), s(0)), NextStep::Closed);
+        // Bez okna (schovaná k hodinám, zamrzlá): chvíli počkat, pak natvrdo
+        assert_eq!(next_step(&state(&[1, 2], &[], false), s(1)), NextStep::Wait);
+        assert_eq!(next_step(&state(&[1, 2], &[], false), HIDDEN_GRACE), NextStep::Force);
+        // Okno zůstalo beze změny – žádost ignoruje (ChatGPT): chvíli počkat, pak natvrdo
+        assert_eq!(next_step(&state(&[1, 2], &[1], false), s(4)), NextStep::Wait);
+        assert_eq!(next_step(&state(&[1, 2], &[1], false), IGNORED_WAIT), NextStep::Force);
+        // Dotaz na uložení: hned nechat na uživateli – nikdy natvrdo
+        assert_eq!(next_step(&state(&[1, 2], &[1], true), s(0)), NextStep::Ask);
+        assert_eq!(next_step(&state(&[1, 2], &[1], true), s(60)), NextStep::Ask);
     }
 }

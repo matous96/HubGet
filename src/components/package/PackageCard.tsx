@@ -27,6 +27,10 @@ interface PackageCardProps {
   entry: CatalogEntry;
   showUninstall?: boolean;
   className?: string;
+  /** Poznámka místo popisu (Nepoužívané: „Naposledy spuštěno před 8 měsíci“). */
+  note?: string;
+  /** Vzhled poznámky: upozornění (oranžová), nebo informace (Co je nového). */
+  noteTone?: "warning" | "info";
 }
 
 /**
@@ -40,7 +44,7 @@ interface PackageCardProps {
  * zkrátí, tlačítka ne. Memo: při překreslení mřížky se překreslí jen karty,
  * kterých se změna týká (vlastní stav si každá karta sleduje sama).
  */
-export const PackageCard = memo(function PackageCard({ entry, showUninstall, className }: PackageCardProps) {
+export const PackageCard = memo(function PackageCard({ entry, showUninstall, className, note, noteTone = "warning" }: PackageCardProps) {
   const { t } = useTranslation();
   const { status, installed, job } = usePackageState(entry.id);
   const hostChange = useInstallerHostChange(installed);
@@ -138,8 +142,14 @@ export const PackageCard = memo(function PackageCard({ entry, showUninstall, cla
         )}
       </p>
       {/* Popis vždy na dva řádky (delší se zkrátí) – všechny karty mají stejnou výšku */}
-      <p className="mt-2 line-clamp-2 h-10 shrink-0 text-[13px] leading-5 break-words text-muted" title={entry.description || undefined}>
-        {entry.description || entry.sources[0]?.packageId}
+      <p
+        className={cn(
+          "mt-2 line-clamp-2 h-10 shrink-0 text-[13px] leading-5 break-words",
+          note ? (noteTone === "warning" ? "font-medium text-amber-600 dark:text-amber-400" : "text-fg/80") : "text-muted",
+        )}
+        title={note ?? (entry.description || undefined)}
+      >
+        {note ?? (entry.description || entry.sources[0]?.packageId)}
       </p>
 
       {/* Patička u spodního okraje: zdroj + akce, nebo živý průběh přes celou šířku */}

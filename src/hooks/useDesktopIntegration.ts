@@ -12,12 +12,13 @@
  */
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 import { isTauri } from "@/lib/tauri";
 import { useAppUpdate } from "@/store/appUpdate";
 import { useSettings } from "@/store/settings";
+import { useToasts } from "@/store/toasts";
 import { useUpdates } from "./useInstalledItems";
 import { useTrayStatus } from "./useTrayStatus";
 
@@ -68,6 +69,36 @@ export function useDesktopIntegration() {
     const unlisten = listen<string>("tray-navigate", (event) => navigate(event.payload));
     return () => void unlisten.then((stop) => stop());
   }, [navigate]);
+
+  // Klávesová zkratka Win+Shift+H (shortcut.rs): zapnout / vypnout podle nastavení; po stisku
+  // backend ukáže okno a pošle „focus-search“ – kurzor do vyhledávání (TopBar)
+  const globalShortcut = useSettings((s) => s.globalShortcut);
+  useEffect(() => {
+    if (!isTauri()) return;
+    invoke("set_global_shortcut", { enabled: globalShortcut }).catch((error) => {
+      if (globalShortcut) useToasts.getState().push("info", t("settings.globalShortcutTaken", { error: String(error) }));
+    });
+  }, [globalShortcut, t]);
+  // Příkaz hubget v terminálu: skript zapíše (i po přesunutí HubGetu) nebo smaže backend
+  const cliCommand = useSettings((s) => s.cliCommand);
+  const cliAtStartup = useRef(true);
+  useEffect(() => {
+    if (!isTauri()) return;
+    const startup = cliAtStartup.current;
+    cliAtStartup.current = false;
+    invoke("set_cli_command", { enabled: cliCommand }).catch((error) => {
+      if (!cliCommand) return;
+      // Při startu jen do konzole – cizí hubget.cmd by jinak hlásil chybu při každém spuštění;
+      // oznámení až po zapnutí v Nastavení
+      if (startup) console.warn("[HubGet] Příkaz hubget:", error);
+      else useToasts.getState().push("info", i18n.t("settings.cliCommandFailed", { error: String(error) }));
+    });
+  }, [cliCommand]);
+  useEffect(() => {
+    if (!isTauri()) return;
+    const unlisten = listen("focus-search", () => window.dispatchEvent(new Event("hubget:focus-search")));
+    return () => void unlisten.then((stop) => stop());
+  }, []);
 
   // Nová verze HubGetu: kontrola 8 s po spuštění (ať nezdržuje načtení katalogu)
   useEffect(() => {

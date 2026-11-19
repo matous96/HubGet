@@ -389,6 +389,12 @@ fn approved_state(location: &Location) -> bool {
     registry::binary_value(machine, &key, value).map_or(true, |bytes| is_enabled_flag(&bytes))
 }
 
+/// Hodnota `value` v klíči Run je zapnutá (vypnutou nechávají Správce úloh i HubGet v klíči,
+/// jen ji označí ve StartupApproved) – usage.rs.
+pub(crate) fn run_value_enabled(machine: bool, wow: bool, value: &str) -> bool {
+    approved_state(&Location::Run { machine, wow, value: value.to_string() })
+}
+
 fn is_enabled_flag(bytes: &[u8]) -> bool {
     bytes.first().map_or(true, |flag| flag & 1 == 0)
 }

@@ -9,6 +9,9 @@ import { PackageRow } from "./PackageRow";
 interface PackageCollectionProps {
   packages: CatalogEntry[];
   showUninstall?: boolean;
+  /** Poznámky místo popisu podle id aplikace (Nepoužívané). */
+  notes?: ReadonlyMap<string, string>;
+  noteTone?: "warning" | "info";
 }
 
 /** Mřížka: nejmenší šířka karty a mezera – sloupce přibývají se šířkou okna (jako auto-fill). */
@@ -37,7 +40,7 @@ let lastWidth = 0;
  * každého řádku virtualizér změří (karty s delším popisem jsou vyšší).
  * Seznam leží uvnitř stránky – obsah nad ním (záhlaví, filtry) je scrollMargin.
  */
-export function PackageCollection({ packages, showUninstall }: PackageCollectionProps) {
+export function PackageCollection({ packages, showUninstall, notes, noteTone }: PackageCollectionProps) {
   const mode = useSettings((s) => s.viewMode) === "list" ? "list" : "grid";
   const scroller = useScrollContainer();
   const container = useRef<HTMLDivElement>(null);
@@ -95,10 +98,10 @@ export function PackageCollection({ packages, showUninstall }: PackageCollection
             }}
           >
             {mode === "list" ? (
-              <PackageRow entry={packages[first]} showUninstall={showUninstall} />
+              <PackageRow entry={packages[first]} showUninstall={showUninstall} note={notes?.get(packages[first].id)} noteTone={noteTone} />
             ) : (
               // Karty bez vlastních animací – při přeskládání mřížky (filtr, šířka okna) nepřejíždějí do strany
-              packages.slice(first, first + columns).map((p) => <PackageCard key={p.id} entry={p} showUninstall={showUninstall} />)
+              packages.slice(first, first + columns).map((p) => <PackageCard key={p.id} entry={p} showUninstall={showUninstall} note={notes?.get(p.id)} noteTone={noteTone} />)
             )}
           </div>
         );

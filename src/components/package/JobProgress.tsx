@@ -30,9 +30,9 @@ export function JobProgress({ job, className }: JobProgressProps) {
     return () => window.clearInterval(timer);
   }, [estimated]);
   const percent = estimated ? estimatePercent(Math.max(0, now - (since ?? now)), expected) : job.progress.percent;
-  const waiting = phase === "queued" || phase === "elevating" || phase === "interactive";
-  // Fáze, kdy se čeká na uživatele (UAC, průvodce instalací) – zvýraznit
-  const needsUser = phase === "elevating" || phase === "interactive";
+  // Fáze, kdy se čeká na uživatele (UAC, průvodce instalací, uložení práce a zavření aplikace) – zvýraznit
+  const needsUser = phase === "elevating" || phase === "interactive" || phase === "closingApp";
+  const waiting = phase === "queued" || needsUser;
 
   return (
     <div className={cn("flex w-full min-w-0 items-center gap-2", className)}>

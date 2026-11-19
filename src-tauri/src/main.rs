@@ -20,5 +20,13 @@ fn main() {
     if args.len() == 3 && args[1] == unibox_lib::ELEVATED_STARTUP_FLAG {
         std::process::exit(unibox_lib::elevated_startup_main(&args[2]));
     }
+    // Povýšené vytvoření bodu obnovení systému před hromadnou aktualizací – restore.rs
+    if args.len() == 3 && args[1] == unibox_lib::ELEVATED_RESTORE_FLAG {
+        std::process::exit(unibox_lib::elevated_restore_main(&args[2]));
+    }
+    // Příkaz `hubget` v terminálu (skript hubget.cmd): předá příkaz HubGetu a skončí – cli.rs
+    if args.len() >= 2 && args[1] == unibox_lib::CLI_FLAG {
+        std::process::exit(unibox_lib::cli_main(&args[2..]));
+    }
     unibox_lib::run()
 }

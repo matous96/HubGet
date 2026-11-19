@@ -24,7 +24,7 @@ import { dueTime, type Schedule } from "@/lib/schedule";
 import { isTauri } from "@/lib/tauri";
 import { refreshChocoOutdated, refreshScoopBuckets } from "@/services/managers";
 import { notifyEvent } from "@/services/notify";
-import { INTERVAL_MS, useAutoUpdates } from "@/store/autoUpdates";
+import { IDLE_MINUTES, INTERVAL_MS, useAutoUpdates } from "@/store/autoUpdates";
 import { updateOptionsFor } from "@/store/installOptions";
 import { installerHostChange } from "@/store/installerUrls";
 import { useJobs } from "@/store/jobs";
@@ -40,7 +40,7 @@ import { isUnmanagedOrigin, useInstalledItems, type InstalledItem } from "./useI
 let currentItems: InstalledItem[] = [];
 
 /** Proč se automatická instalace nespustila. */
-export type SkipReason = "battery" | "saver" | "metered";
+export type SkipReason = "battery" | "saver" | "metered" | "busy" | "active";
 
 /** Výsledek kontroly: počet dostupných aktualizací a kolik se jich zařadilo k instalaci. */
 export interface CheckResult {
@@ -135,7 +135,7 @@ async function runScheduledInstall() {
 
 /** Zařadí aktualizace k instalaci podle nastavení (vše / vybrané, baterie, úspora, měřené připojení). */
 async function installUpdates(updatable: InstalledPackage[]): Promise<Omit<CheckResult, "available">> {
-  const { autoInstall, selected, skipOnBattery, skipOnSaver, skipOnMetered } = useAutoUpdates.getState();
+  const { autoInstall, selected, skipOnBattery, skipOnSaver, skipOnMetered, skipWhileBusy, onlyWhenIdle } = useAutoUpdates.getState();
   // Verze, jejichž automatická aktualizace už AUTO_FAILURE_LIMIT× selhala nebo potřebuje práva
   // správce (Čeká na potvrzení), zůstanou na uživateli
   const { failed, needsAdmin } = useUpdateHolds.getState();
@@ -147,7 +147,9 @@ async function installUpdates(updatable: InstalledPackage[]): Promise<Omit<Check
     retryAt = null;
     return { queued: 0 };
   }
-  const status = await invoke<{ onBattery: boolean; metered: boolean; batterySaver: boolean }>("power_network_status").catch(() => null);
+  const status = await invoke<{ onBattery: boolean; metered: boolean; batterySaver: boolean; busy: boolean; idleSeconds: number }>(
+    "power_network_status",
+  ).catch(() => null);
   const blocked: SkipReason | undefined =
     status?.onBattery && skipOnBattery
       ? "battery"
@@ -155,7 +157,13 @@ async function installUpdates(updatable: InstalledPackage[]): Promise<Omit<Check
         ? "saver"
         : status?.metered && skipOnMetered
           ? "metered"
-          : undefined;
+          : // Hra, video přes celou obrazovku, prezentace – instalace by zpomalila a vyskakovala oznámení
+            status?.busy && skipWhileBusy
+            ? "busy"
+            : // Uživatel u počítače pracuje – počkat, až bude chvíli nečinný
+              status && onlyWhenIdle && status.idleSeconds < IDLE_MINUTES * 60
+              ? "active"
+              : undefined;
   if (blocked) {
     // Poprvé oznámit, že aktualizace čekají; pak to zkoušet znovu
     if (retryAt === null) {

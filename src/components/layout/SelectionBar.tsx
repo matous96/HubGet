@@ -4,9 +4,12 @@
  * zařadí do fronty a běží na pozadí jedna po druhé (store/jobs.ts);
  * nainstalované a už zařazené aplikace se přeskočí.
  */
-import { Download, PackagePlus, RefreshCw, X } from "lucide-react";
+import { Download, PackagePlus, RefreshCw, Trash2, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import { isUnmanagedOrigin } from "@/hooks/useInstalledItems";
 import { pickSource, useInstalledIndex } from "@/hooks/usePackages";
 import { isWebOnly } from "@/lib/webOnly";
 import { useBundle } from "@/store/bundle";
@@ -32,6 +35,21 @@ export function SelectionBar() {
   const toInstall = free.filter((e) => !installedIndex.has(e.id) && pickSource(e, enabled, preferred));
   // Aplikaci jen z webu výrobce HubGet neaktualizuje (ani do sady nepatří – nemá zdroj)
   const toUpdate = free.filter((e) => !isWebOnly(e) && installedIndex.get(e.id)?.availableVersion);
+  // Odinstalovat jde jen to, co HubGet spravuje (ne hry ze Steamu, programy mimo správce)
+  const toUninstall = free.filter((e) => {
+    const pkg = installedIndex.get(e.id);
+    return !!pkg && !isUnmanagedOrigin(pkg.origin) && !pkg.diskLocation;
+  });
+  const [confirmUninstall, setConfirmUninstall] = useState(false);
+
+  const uninstallAll = () => {
+    for (const e of toUninstall) {
+      const pkg = installedIndex.get(e.id)!;
+      enqueue({ appId: e.id, appName: e.name, source: pkg.source, packageId: pkg.packageId, kind: "uninstall" });
+    }
+    toast("success", t("selection.uninstallQueued", { count: toUninstall.length }));
+    clear();
+  };
 
   const installAll = () => {
     for (const e of toInstall) {
@@ -70,7 +88,8 @@ export function SelectionBar() {
     "inline-flex h-9 cursor-pointer items-center gap-2 rounded-full px-4 text-sm font-semibold transition disabled:cursor-default disabled:opacity-40";
 
   return (
-    <AnimatePresence>
+    <>
+      <AnimatePresence>
       {selected.length > 0 && (
         <motion.div
           initial={{ opacity: 0, y: 24 }}
@@ -90,6 +109,15 @@ export function SelectionBar() {
             <RefreshCw className="size-4" />
             {t("selection.update", { count: toUpdate.length })}
           </button>
+          <button
+            type="button"
+            disabled={!toUninstall.length}
+            onClick={() => setConfirmUninstall(true)}
+            className={`${button} bg-surface-2 hover:bg-danger/12 hover:text-danger`}
+          >
+            <Trash2 className="size-4" />
+            {t("selection.uninstall", { count: toUninstall.length })}
+          </button>
           <button type="button" onClick={toBundle} className={`${button} bg-surface-2 hover:bg-surface-3`}>
             <PackagePlus className="size-4" />
             {t("selection.toBundle")}
@@ -105,6 +133,18 @@ export function SelectionBar() {
           </button>
         </motion.div>
       )}
-    </AnimatePresence>
+      </AnimatePresence>
+      <ConfirmDialog
+        open={confirmUninstall}
+        title={t("selection.uninstallConfirm", {
+          count: toUninstall.length,
+          names: toUninstall.slice(0, 4).map((e) => e.name).join(", ") + (toUninstall.length > 4 ? "…" : ""),
+        })}
+        confirmLabel={t("selection.uninstall", { count: toUninstall.length })}
+        danger
+        onConfirm={uninstallAll}
+        onClose={() => setConfirmUninstall(false)}
+      />
+    </>
   );
 }

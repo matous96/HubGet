@@ -60,7 +60,16 @@ export function TopBar() {
       }
     };
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    // Klávesová zkratka Win+Shift+H odkudkoli (useDesktopIntegration)
+    const focusSearch = () => {
+      inputRef.current?.focus();
+      inputRef.current?.select();
+    };
+    window.addEventListener("hubget:focus-search", focusSearch);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("hubget:focus-search", focusSearch);
+    };
   }, []);
 
   const update = (next: string) => {

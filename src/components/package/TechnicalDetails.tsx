@@ -5,6 +5,7 @@ import {
   CircleAlert,
   Cpu,
   Download,
+  ExternalLink,
   FlaskConical,
   HardDrive,
   Layers,
@@ -167,6 +168,17 @@ function Checksum({ pkg }: { pkg: PackageSource }) {
             {verified ? <Check className="mt-px size-3.5 shrink-0" /> : <ShieldCheck className="mt-px size-3.5 shrink-0" />}
             {verified ? t("tech.checksumVerified", { source: meta.label }) : t("tech.checksumRegistry", { source: meta.label })}
           </p>
+          {/* Výsledky antivirů pro tentýž soubor – stránka VirusTotalu podle otisku, bez klíče a bez nahrávání */}
+          <a
+            href={`https://www.virustotal.com/gui/file/${pkg.sha256.toLowerCase()}`}
+            target="_blank"
+            rel="noreferrer"
+            title={t("tech.virusTotalHint")}
+            className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-accent hover:underline"
+          >
+            <ExternalLink className="size-3.5" />
+            {t("tech.virusTotal")}
+          </a>
         </>
       ) : (
         <p className="text-sm text-muted">{t("tech.checksumNone")}</p>

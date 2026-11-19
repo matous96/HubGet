@@ -2,8 +2,13 @@
  * Nainstalované balíčky spárované s profily z katalogu, dostupné aktualizace
  * a „Aktualizovat vše“. Sdílí je přehled na domovské stránce i stránka Nainstalované.
  */
+import { invoke } from "@tauri-apps/api/core";
 import { useMemo } from "react";
+import i18n from "@/i18n";
+import { isTauri } from "@/lib/tauri";
+import { useAutoUpdates } from "@/store/autoUpdates";
 import { useHistory } from "@/store/history";
+import { useToasts } from "@/store/toasts";
 import { seenKey, useInstallSeen } from "@/store/installSeen";
 import { updateOptionsFor } from "@/store/installOptions";
 import { useBusyAppIds, useJobs } from "@/store/jobs";
@@ -94,9 +99,21 @@ export function useUpdates(source?: SourceId) {
   const pending = updatable.filter((i) => !busy.has(i.entry.id));
   const running = updatable.length - pending.length;
 
-  /** Zařadí do fronty všechny aktualizace, každou přes správce, kterým byla aplikace nainstalována. */
-  const updateAll = () => {
-    for (const { pkg, entry } of pending) {
+  /**
+   * Zařadí do fronty všechny aktualizace, každou přes správce, kterým byla aplikace nainstalována.
+   * S nastavením „bod obnovení“ (aspoň 2 aplikace) nejdřív vytvoří bod obnovení systému.
+   */
+  const updateAll = async () => {
+    const batch = [...pending];
+    if (batch.length >= 2 && isTauri() && useAutoUpdates.getState().restorePoint) {
+      const { push } = useToasts.getState();
+      push("info", i18n.t("autoUpdates.restorePointCreating"));
+      const result = await invoke<string>("create_restore_point", { description: i18n.t("autoUpdates.restorePointName", { count: batch.length }) }).catch(
+        () => "failed",
+      );
+      push(result === "created" || result === "recent" ? "success" : "info", i18n.t(`autoUpdates.restorePoint_${result}`));
+    }
+    for (const { pkg, entry } of batch) {
       enqueue({
         appId: entry.id,
         appName: entry.name,

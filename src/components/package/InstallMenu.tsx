@@ -24,6 +24,7 @@ import {
   SkipForward,
   SlidersHorizontal,
   SquareTerminal,
+  Undo2,
   type LucideIcon,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
@@ -33,10 +34,12 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 import { useDismiss } from "@/hooks/useDismiss";
 import { useInstallActions } from "@/hooks/useInstallActions";
+import { useRollback } from "@/hooks/useRollback";
 import { cn } from "@/lib/utils";
 import { isTauri } from "@/lib/tauri";
 import { isWebOnly, openDownloadPage } from "@/lib/webOnly";
 import { useInstallUi } from "@/store/installUi";
+import { useRollbackUi } from "@/store/rollback";
 import { useSettings } from "@/store/settings";
 import type { CatalogEntry, SourceId } from "@/types";
 import { unpinLabel, useUpdatePin } from "./UpdatePin";
@@ -63,6 +66,9 @@ export function InstallMenuItems({ entry, source, showDetails = true, onClose }:
   const notInstalled = status === "available";
   const pin = useUpdatePin(actions.installed, entry.name);
   const trackAll = useSettings((s) => s.trackInstalls);
+  // Poslední aktualizace se nepovedla – vrátit předchozí verzi (RollbackDialog)
+  const rollback = useRollback(entry.id, actions.installed);
+  const openRollback = useRollbackUi((s) => s.open);
 
   const run = (fn: () => void) => () => {
     onClose();
@@ -97,6 +103,22 @@ export function InstallMenuItems({ entry, source, showDetails = true, onClose }:
           <Item icon={SkipForward} label={t("pins.skip", { version: pin.offered })} onClick={run(pin.skip)} />
           <Item icon={AlarmClock} label={t("pins.snoozeWeek")} onClick={run(() => pin.snooze(7))} />
         </>
+      )}
+      {rollback && actions.installed && (
+        <Item
+          icon={Undo2}
+          label={t("rollback.menu", { version: rollback.toVersion })}
+          disabled={busy}
+          onClick={run(() =>
+            openRollback({
+              entry,
+              source: actions.installed!.source,
+              packageId: actions.installed!.packageId,
+              toVersion: rollback.toVersion,
+              currentVersion: rollback.currentVersion,
+            }),
+          )}
+        />
       )}
       {pin.canPin && !pin.pin && <Item icon={Lock} label={t("pins.lock")} onClick={run(pin.lock)} />}
       {pin.canPin && pin.pin && <Item icon={LockOpen} label={t(unpinLabel(pin.pin))} onClick={run(pin.unpin)} />}

@@ -106,7 +106,8 @@
     "bundles": "Sady balíčků",
     "startup": "Po spuštění",
     "publish": "Publikovat",
-    "about": "O HubGetu"
+    "about": "O HubGetu",
+    "overview": "Přehled počítače"
   },
   "startup": {
     "title": "Po spuštění",
@@ -620,7 +621,9 @@
       "selfUpdating": "{{name}} se po aktualizaci na {{target}} sama vrátila na verzi {{version}} – aktualizuje se vlastním aktualizátorem. Aktualizace přes správce se jí už nenabízejí.",
       "traced": "Sledování instalace {{name}}: zaznamenáno nových položek – {{count}} (složky, zástupci, registr). Po odinstalaci se nabídnou ke smazání.",
       "skippedRunning": "{{name}} běží – automatická aktualizace počká, až aplikaci zavřete.",
-      "forceClosed": "{{name}} běžela – natvrdo ukončeny procesy {{processes}}, aby ji instalátor mohl přepsat.",
+      "appClosed": "{{name}} běžela – zavřena (procesy {{processes}}), aby ji instalátor mohl přepsat.",
+      "appClosing": "{{name}} se při zavírání ptá na uložení práce – čekám, až ji uživatel zavře.",
+      "appCloseTimeout": "{{name}} zůstala 15 minut otevřená – operace zrušena.",
       "needsAdmin": "{{name}} potřebuje k aktualizaci práva správce – počká na ruční aktualizaci."
     },
     "notice": {
@@ -1076,7 +1079,9 @@
       "notifications": "Předvolby oznámení",
       "notificationsHint": "Které události HubGet oznamuje.",
       "looks": "Vzhled aplikací",
-      "looksHint": "Barvy banneru a ikony, které jste aplikacím nastavili. Vidíte je jen vy."
+      "looksHint": "Barvy banneru a ikony, které jste aplikacím nastavili. Vidíte je jen vy.",
+      "devices": "Moje počítače",
+      "devicesHint": "Přehled aplikací na každém počítači – co kde čeká na aktualizaci a co nainstalovat jinam."
     },
     "status": "Stav",
     "syncing": "Synchronizuji…",
@@ -1418,6 +1423,7 @@
   },
   "phase": {
     "queued": "Ve frontě",
+    "closingApp": "Čeká na zavření aplikace",
     "elevating": "Potvrďte dialog UAC",
     "downloading": "Stahování",
     "interactive": "Dokončete průvodce instalací",
@@ -1616,7 +1622,9 @@
     "depForSource": "potřebuje {{source}}",
     "depKind_package": "Balíček",
     "depKind_runtime": "Běhové prostředí",
-    "depKind_feature": "Funkce Windows"
+    "depKind_feature": "Funkce Windows",
+    "virusTotal": "Ověřit na VirusTotalu",
+    "virusTotalHint": "Výsledky desítek antivirů pro instalátor s tímto otiskem. Nic se nenahrává – VirusTotal soubor hledá podle otisku."
   },
   "installMenu": {
     "install": "Nainstalovat",
@@ -1692,7 +1700,8 @@
     "filterPlaceholder": "Filtrovat…",
     "incompleteTitle": "Seznam není úplný",
     "incompleteText": "Nepodařilo se načíst seznam od: {{names}}. Jejich aplikace tu chybí, i když v počítači jsou.",
-    "incompleteRetry": "Zkusit znovu"
+    "incompleteRetry": "Zkusit znovu",
+    "unused": "Nepoužívané"
   },
   "view": {
     "grid": "Mřížka",
@@ -1701,7 +1710,8 @@
     "sort": {
       "popularity": "Popularita",
       "name": "Název",
-      "recent": "Nově nainstalované"
+      "recent": "Nově nainstalované",
+      "size": "Velikost"
     }
   },
   "settings": {
@@ -1747,8 +1757,8 @@
     "uninstall": "Odinstalace a běžící aplikace",
     "closeBackgroundProcesses": "Ukončit aplikaci běžící na pozadí bez dotazu",
     "closeBackgroundProcessesHint": "Před instalací, aktualizací nebo odinstalací HubGet sám ukončí procesy aplikace, které nemají okno (např. ikona u hodin, proces visící v paměti). Aplikaci s otevřeným oknem vám nabídne zavřít jedním kliknutím.",
-    "forceCloseRunning": "Ukončit běžící aplikaci natvrdo bez dotazu",
-    "forceCloseRunningHint": "Před instalací, aktualizací nebo odinstalací HubGet aplikaci, která běží, hned natvrdo ukončí – i s otevřeným oknem, bez dotazu. Neuložená práce se ztratí. Automatické aktualizace na pozadí aplikaci s oknem nezavírají, počkají.",
+    "forceCloseRunning": "Zavírat běžící aplikace bez dotazu",
+    "forceCloseRunningHint": "Před instalací, aktualizací nebo odinstalací HubGet běžící aplikaci sám zavře – jako křížkem. Když se aplikace zeptá na uložení práce, počká, až ji uložíte a aplikaci zavřete; aplikaci schovanou u hodin nebo zamrzlou ukončí natvrdo. Vypnuté: HubGet se nejdřív zeptá. Automatické aktualizace na pozadí aplikaci s oknem nezavírají, počkají.",
     "advancedUninstall": "Pokročilá odinstalace se skenem zbytků (registry a soubory)",
     "advancedUninstallHint": "Po odinstalaci prohledá kromě AppData i Program Files, ProgramData, zástupce v nabídce Start a na ploše a registr Windows (HKCU a HKLM\\Software) a nabídne nalezené zbytky ke smazání. Soubory jdou do Koše, klíče registru se před smazáním zálohují.",
     "autoCleanup": "Automaticky odstraňovat zbytkové soubory a položky registru bez zobrazení potvrzovacího okna",
@@ -1781,7 +1791,13 @@
     "exportButton": "Exportovat…",
     "importApps": "Importovat a nainstalovat",
     "importAppsHint": "Profil (.json, .html), sada (.ubundle) nebo export z WinGetu – HubGet ukáže souhrn a chybějící aplikace nainstaluje jedním kliknutím. Nainstalované se přeskočí.",
-    "importButton": "Vybrat soubor…"
+    "importButton": "Vybrat soubor…",
+    "globalShortcut": "Klávesová zkratka Win+Shift+H",
+    "globalShortcutHint": "Otevře HubGet odkudkoli s kurzorem ve vyhledávání – i když je schovaný u hodin.",
+    "globalShortcutTaken": "Zkratku Win+Shift+H nejde zapnout – nejspíš ji používá jiný program ({{error}}).",
+    "cliCommand": "Příkaz hubget v terminálu",
+    "cliCommandHint": "V příkazovém řádku nebo PowerShellu napište třeba hubget install vlc, hubget update nebo hubget help. Příkaz provede HubGet a průběh ukáže v aplikaci.",
+    "cliCommandFailed": "Příkaz hubget se nepodařilo zapnout: {{error}}"
   },
   "files": {
     "saved": "Uloženo: {{path}}",
@@ -1870,7 +1886,16 @@
     "addedToBundle_one": "{{count}} aplikace přidána do Sady balíčků",
     "addedToBundle_few": "{{count}} aplikace přidány do Sady balíčků",
     "addedToBundle_many": "{{count}} aplikací přidáno do Sady balíčků",
-    "addedToBundle_other": "{{count}} aplikací přidáno do Sady balíčků"
+    "addedToBundle_other": "{{count}} aplikací přidáno do Sady balíčků",
+    "uninstall": "Odinstalovat ({{count}})",
+    "uninstallQueued_one": "Do fronty přidána {{count}} odinstalace",
+    "uninstallQueued_few": "Do fronty přidány {{count}} odinstalace",
+    "uninstallQueued_many": "Do fronty přidáno {{count}} odinstalací",
+    "uninstallQueued_other": "Do fronty přidáno {{count}} odinstalací",
+    "uninstallConfirm_one": "Odinstalovat {{count}} aplikaci? {{names}}",
+    "uninstallConfirm_few": "Odinstalovat {{count}} aplikace? {{names}}",
+    "uninstallConfirm_many": "Odinstalovat {{count}} aplikací? {{names}}",
+    "uninstallConfirm_other": "Odinstalovat {{count}} aplikací? {{names}}"
   },
   "pins": {
     "title": "Ignorované a odložené aktualizace",
@@ -1917,7 +1942,9 @@
     "fallbackNext": "{{name}}: instalace přes {{from}} selhala – zkouším {{to}}…",
     "fallbackFailed": "{{name}} se nepodařilo nainstalovat: instalátor ze zdroje {{from}} není dostupný a záložní instalace přes {{sources}} selhala – {{error}}",
     "endedProcesses": "{{name}} běžela na pozadí – HubGet ji ukončil a pokračuje",
-    "forceClosed": "{{name}} běžela – HubGet ji natvrdo ukončil a pokračuje"
+    "appClosed": "{{name}} běžela – HubGet ji zavřel a pokračuje",
+    "appClosing": "{{name}} se ptá na uložení práce – uložte ji a aplikaci zavřete, HubGet pak bude pokračovat",
+    "appCloseTimeout": "{{name}} zůstala otevřená – operace zrušena"
   },
   "notifications": {
     "title": "Oznámení",
@@ -1945,7 +1972,9 @@
     "endedProcesses": "Aplikace běžela na pozadí – ukončeny procesy {{processes}}.",
     "selfUpdating": "Po aktualizaci na {{target}} se aplikace sama vrátila na verzi {{version}} – aktualizuje se vlastním aktualizátorem. Další aktualizace přes správce už nenabízíme (změníte v detailu aplikace).",
     "summary": "Fronta operací dokončena – úspěšně {{success}}, selhalo {{failed}}, zrušeno {{cancelled}}.",
-    "forceClosed": "Aplikace běžela – natvrdo ukončeny procesy {{processes}}."
+    "appClosed": "Aplikace běžela – zavřena (procesy {{processes}}).",
+    "appClosing": "Aplikace se ptá na uložení práce – po jejím zavření bude HubGet pokračovat.",
+    "appCloseTimeout": "Aplikace zůstala 15 minut otevřená – operace byla zrušena. Zkuste ji znovu, až aplikaci zavřete."
   },
   "tray": {
     "browse": "Procházet balíčky",
@@ -2048,7 +2077,8 @@
     "backup": "Záloha a katalog",
     "news": "Novinky",
     "commands": "Příkazy pro terminál",
-    "contact": "Kontaktovat HubGet"
+    "contact": "Kontaktovat HubGet",
+    "devices": "Moje počítače"
   },
   "contact": {
     "intro": "Máte dotaz, narazili jste na chybu, nebo máte nápad či nabídku spolupráce? Napište nám – odpovíme vám e-mailem.",
@@ -2108,7 +2138,9 @@
     "test": "Zkušební oznámení",
     "testHint": "Pošle oznámení Windows – ověříte, že se zobrazují (nastavení Windows → Oznámení).",
     "testButton": "Odeslat",
-    "testMessage": "Oznámení HubGetu fungují."
+    "testMessage": "Oznámení HubGetu fungují.",
+    "weeklySummary": "Týdenní souhrn",
+    "weeklySummaryHint": "Jednou týdně: kolik aktualizací HubGet nainstaloval, kolik jich čeká a kolik aplikací jste dlouho nespustili."
   },
   "autoUpdates": {
     "found_one": "Je k dispozici {{count}} aktualizace: {{names}}",
@@ -2230,7 +2262,36 @@
     "needsAdmin": "Aktualizace na verzi {{version}} potřebuje práva správce, a tak se na pozadí nespustí – čeká na vaše potvrzení v Dostupných aktualizacích.",
     "pendingTitle": "Čeká na vaše potvrzení ({{n}})",
     "pendingText": "Tyto aktualizace potřebují práva správce, a tak je automatické aktualizace na pozadí nespustily. Potvrdíte je všechny jedním dialogem Windows.",
-    "pendingAction": "Aktualizovat jako správce"
+    "pendingAction": "Aktualizovat jako správce",
+    "skipWhileBusy": "Neinstalovat během hry nebo prezentace",
+    "skipWhileBusyHint": "Hra nebo video přes celou obrazovku a režim prezentace – instalace počká, až skončí.",
+    "onlyWhenIdle": "Instalovat jen, když se na počítači nepracuje",
+    "onlyWhenIdleHint": "Aspoň {{minutes}} minut bez klávesnice a myši – aktualizace nezdrží práci a nezavírají aplikace pod rukama.",
+    "restorePoint": "Před hromadnou aktualizací vytvořit bod obnovení",
+    "restorePointHint": "Při „Aktualizovat vše“ (aspoň 2 aplikace) – kdyby se něco pokazilo, vrátíte Windows do stavu před aktualizací. Potřebuje potvrzení oprávnění správce a zapnutou Ochranu systému; Windows vytvoří nejvýš jeden bod za 24 hodin. Automatické aktualizace na pozadí bod nevytvářejí.",
+    "restorePointCreating": "Vytvářím bod obnovení systému…",
+    "restorePoint_created": "Bod obnovení systému vytvořen – aktualizuji.",
+    "restorePoint_recent": "Bod obnovení z posledních 24 hodin už existuje – Windows nový nevytvořil. Aktualizuji.",
+    "restorePoint_disabled": "Bod obnovení nejde vytvořit – ve Windows je vypnutá Ochrana systému. Aktualizuji bez něj.",
+    "restorePoint_cancelled": "Bod obnovení se nevytvořil (oprávnění správce nepotvrzeno). Aktualizuji bez něj.",
+    "restorePoint_failed": "Bod obnovení se nepodařilo vytvořit. Aktualizuji bez něj.",
+    "waiting_busy_one": "{{count}} aktualizace čeká – běží hra nebo prezentace. HubGet ji nainstaluje, až skončí.",
+    "waiting_busy_few": "{{count}} aktualizace čekají – běží hra nebo prezentace. HubGet je nainstaluje, až skončí.",
+    "waiting_busy_many": "{{count}} aktualizací čeká – běží hra nebo prezentace. HubGet je nainstaluje, až skončí.",
+    "waiting_busy_other": "{{count}} aktualizací čeká – běží hra nebo prezentace. HubGet je nainstaluje, až skončí.",
+    "waiting_active_one": "{{count}} aktualizace čeká, až na počítači chvíli nebudete pracovat.",
+    "waiting_active_few": "{{count}} aktualizace čekají, až na počítači chvíli nebudete pracovat.",
+    "waiting_active_many": "{{count}} aktualizací čeká, až na počítači chvíli nebudete pracovat.",
+    "waiting_active_other": "{{count}} aktualizací čeká, až na počítači chvíli nebudete pracovat.",
+    "skipped_busy_one": "Nalezena {{count}} aktualizace – automatická instalace počká, až skončí hra nebo prezentace",
+    "skipped_busy_few": "Nalezeny {{count}} aktualizace – automatická instalace počká, až skončí hra nebo prezentace",
+    "skipped_busy_many": "Nalezeno {{count}} aktualizace – automatická instalace počká, až skončí hra nebo prezentace",
+    "skipped_busy_other": "Nalezeno {{count}} aktualizací – automatická instalace počká, až skončí hra nebo prezentace",
+    "skipped_active_one": "Nalezena {{count}} aktualizace – automatická instalace počká, až na počítači nebudete pracovat",
+    "skipped_active_few": "Nalezeny {{count}} aktualizace – automatická instalace počká, až na počítači nebudete pracovat",
+    "skipped_active_many": "Nalezeno {{count}} aktualizace – automatická instalace počká, až na počítači nebudete pracovat",
+    "skipped_active_other": "Nalezeno {{count}} aktualizací – automatická instalace počká, až na počítači nebudete pracovat",
+    "restorePointName": "HubGet - před hromadnou aktualizací"
   },
   "security": {
     "warningTitle": "Upozornění!",
@@ -2312,5 +2373,159 @@
       "uninstall": "Odinstalace",
       "download": "Stažení"
     }
+  },
+  "commandSearch": {
+    "title": "Akce",
+    "updateAll": "Aktualizovat vše ({{count}})",
+    "checkUpdates": "Zkontrolovat aktualizace"
+  },
+  "rollback": {
+    "menu": "Vrátit na verzi {{version}}",
+    "title": "Vrátit {{name}} na verzi {{version}}?",
+    "text": "HubGet odinstaluje nainstalovanou verzi {{current}} a nainstaluje verzi {{version}}, která byla před poslední aktualizací. Nastavení a data aplikace odinstalace obvykle nechá.",
+    "skipNote": "Automatické aktualizace verzi {{current}} přeskočí – nabídnou až novější.",
+    "confirm": "Vrátit na {{version}}",
+    "hint": "Aplikace se po aktualizaci na {{current}} chová špatně? Vraťte ji na verzi před aktualizací.",
+    "unavailable": "Verze {{version}} už u správce balíčků není ke stažení – vrátit ji nejde."
+  },
+  "watch": {
+    "start": "Hlídat novou verzi",
+    "startWeb": "Dát vědět, až půjde nainstalovat přes HubGet",
+    "stop": "Přestat hlídat",
+    "title": "Hlídané aplikace",
+    "subtitle": "HubGet dá vědět, až vyjde nová verze nebo až aplikaci z webu výrobce půjde nainstalovat přes HubGet.",
+    "newVersion": "Vyšla nová verze {{version}}.",
+    "nowInstallable": "{{name}} jde teď nainstalovat přes HubGet – jedním kliknutím, i s aktualizacemi."
+  },
+  "unused": {
+    "lastUsed": "Naposledy spuštěno {{when}}",
+    "never": "Od instalace nespuštěno",
+    "intro": "Aplikace, které jste nespustili déle než {{days}} dní (podle záznamů Windows) – neběží ani se nespouštějí po přihlášení. Zabírají místo na disku; vyberte je a odinstalujte lištou dole.",
+    "selectAll": "Vybrat všechny",
+    "none": "Všechny aplikace jste za posledních {{days}} dní použili – nic nepoužívaného tu není.",
+    "totalSize": "Celkem zabírají {{size}}."
+  },
+  "devices": {
+    "title": "Moje počítače",
+    "intro": "Počítače přihlášené k vašemu účtu. Z jiného počítače sem jde nainstalovat aplikace, které tu chybí.",
+    "signIn": "Přihlaste se – HubGet pak ukáže všechny vaše počítače a jejich aplikace.",
+    "syncOff": "Zapněte synchronizaci „Moje počítače“ (Nastavení → Záloha a katalog → Synchronizace).",
+    "onlyThis": "Zatím jen tento počítač – další se objeví, až se v nich přihlásíte do HubGetu.",
+    "this": "Tento počítač",
+    "seen": "naposledy {{when}}",
+    "apps_one": "{{count}} aplikace",
+    "apps_few": "{{count}} aplikace",
+    "apps_many": "{{count}} aplikací",
+    "apps_other": "{{count}} aplikací",
+    "updates_one": "{{count}} aktualizace",
+    "updates_few": "{{count}} aktualizace",
+    "updates_many": "{{count}} aktualizací",
+    "updates_other": "{{count}} aktualizací",
+    "installHere": "Nainstalovat sem ({{count}})"
+  },
+  "eol": {
+    "title_one": "{{count}} program bez bezpečnostních oprav",
+    "title_few": "{{count}} programy bez bezpečnostních oprav",
+    "title_many": "{{count}} programů bez bezpečnostních oprav",
+    "title_other": "{{count}} programů bez bezpečnostních oprav",
+    "text": "Těmto verzím skončila podpora (podle endoflife.date) – chyby v nich už nikdo neopraví. Přejděte na novější verzi.",
+    "since": "bez podpory od {{date}}",
+    "newest": "nejnovější je {{name}} {{cycle}}",
+    "detail": "{{name}} {{cycle}} už od {{date}} nedostává bezpečnostní opravy.",
+    "detailNewest": "Nainstalujte novější – nejnovější je {{name}} {{cycle}}."
+  },
+  "duplicates": {
+    "title_one": "{{count}} aplikace je nainstalovaná dvakrát",
+    "title_few": "{{count}} aplikace jsou nainstalované dvakrát",
+    "title_many": "{{count}} aplikací je nainstalovaných dvakrát",
+    "title_other": "{{count}} aplikací je nainstalovaných dvakrát",
+    "text": "Stejná aplikace od dvou zdrojů – zabírá místo dvakrát a aktualizuje se zvlášť. Pokud jednu z instalací nepotřebujete, otevřete ji a odinstalujte."
+  },
+  "updates": {
+    "whatsNew": "Co je nového: {{text}}"
+  },
+  "weekly": {
+    "message": "Tento týden: {{parts}}.",
+    "updated_one": "{{count}} aktualizace nainstalovaná",
+    "updated_few": "{{count}} aktualizace nainstalované",
+    "updated_many": "{{count}} aktualizací nainstalovaných",
+    "updated_other": "{{count}} aktualizací nainstalovaných",
+    "installed_one": "{{count}} nová aplikace",
+    "installed_few": "{{count}} nové aplikace",
+    "installed_many": "{{count}} nových aplikací",
+    "installed_other": "{{count}} nových aplikací",
+    "waiting_one": "{{count}} aktualizace čeká",
+    "waiting_few": "{{count}} aktualizace čekají",
+    "waiting_many": "{{count}} aktualizací čeká",
+    "waiting_other": "{{count}} aktualizací čeká",
+    "admin_one": "{{count}} čeká na potvrzení oprávnění správce",
+    "admin_few": "{{count}} čekají na potvrzení oprávnění správce",
+    "admin_many": "{{count}} čeká na potvrzení oprávnění správce",
+    "admin_other": "{{count}} čeká na potvrzení oprávnění správce",
+    "unused_one": "{{count}} aplikaci jste dlouho nespustili",
+    "unused_few": "{{count}} aplikace jste dlouho nespustili",
+    "unused_many": "{{count}} aplikací jste dlouho nespustili",
+    "unused_other": "{{count}} aplikací jste dlouho nespustili"
+  },
+  "overview": {
+    "title": "Přehled počítače",
+    "subtitle": "Co je v počítači nainstalované, kolik to zabírá a co by stálo za úklid.",
+    "desktopOnly": "Přehled počítače je jen v aplikaci HubGet pro Windows.",
+    "apps": "Nainstalované aplikace",
+    "managed": "z toho {{count}} spravuje HubGet",
+    "size": "Zabírají na disku",
+    "sizeHint_one": "podle údajů {{count}} aplikace",
+    "sizeHint_few": "podle údajů {{count}} aplikací",
+    "sizeHint_many": "podle údajů {{count}} aplikace",
+    "sizeHint_other": "podle údajů {{count}} aplikací",
+    "updates": "Dostupné aktualizace",
+    "updatedMonth_one": "za 30 dní aktualizována {{count}} aplikace",
+    "updatedMonth_few": "za 30 dní aktualizovány {{count}} aplikace",
+    "updatedMonth_many": "za 30 dní aktualizováno {{count}} aplikace",
+    "updatedMonth_other": "za 30 dní aktualizováno {{count}} aplikací",
+    "unused": "Nepoužívané",
+    "unusedHint": "nespuštěné {{days}} dní",
+    "eol": "Bez bezpečnostních oprav",
+    "duplicates": "Nainstalované dvakrát",
+    "oldest": "Nejdéle nainstalovaná aplikace: {{name}} ({{when}}).",
+    "largest": "Největší aplikace",
+    "idleAutostart": "Spouští se s Windows, ale nepoužíváte je",
+    "idleAutostartHint": "Tyto aplikace jste {{days}} dní neotevřeli, a přesto se spouštějí po přihlášení a zdržují start počítače. Vypnout je můžete v části Po spuštění.",
+    "openStartup": "Otevřít Po spuštění",
+    "caches": "Mezipaměti správců balíčků",
+    "cachesHint": "Stažené instalátory a staré verze, které správci balíčků nechávají na disku. Smazat je je bezpečné – když budou potřeba, stáhnou se znovu.",
+    "cachesEmpty": "Mezipaměti jsou prázdné.",
+    "cachesBusy": "Úklid počká, než doběhnou operace ve frontě.",
+    "freeAll": "Uvolnit {{size}}",
+    "freed": "Uvolněno {{size}}.",
+    "clean": "Vyčistit",
+    "cache_winget": "WinGet – stažené instalátory",
+    "cache_chocolatey": "Chocolatey – stažené balíčky",
+    "cache_scoop": "Scoop – stažené soubory a staré verze",
+    "cache_npm": "npm – mezipaměť balíčků",
+    "cache_pip": "pip – mezipaměť balíčků",
+    "signatures": "Digitální podpisy programů",
+    "signaturesHint": "Ověří podpis hlavního programu každé aplikace. Bez podpisu bývají i bezpečné open-source programy, ale neplatný podpis znamená, že soubor někdo změnil nebo certifikát není důvěryhodný.",
+    "check": "Zkontrolovat",
+    "checkAgain": "Zkontrolovat znovu",
+    "signaturesResult": "Podepsané: {{signed}} · bez podpisu: {{unsigned}} · neplatný podpis: {{invalid}}",
+    "sig_signed": "podepsaný",
+    "sig_unsigned": "bez podpisu",
+    "sig_invalid": "neplatný podpis",
+    "sig_unknown": "program nenalezen",
+    "showUnsigned": "Zobrazit programy bez podpisu ({{count}})"
+  },
+  "cli": {
+    "installQueued": "Z terminálu se instaluje: {{names}}",
+    "alreadyInstalled": "Už nainstalováno: {{names}}",
+    "notFound": "„{{names}}“ nejde najít jednoznačně – vyberte aplikaci ve výsledcích hledání.",
+    "updateAll_one": "Z terminálu se aktualizuje {{count}} aplikace",
+    "updateAll_few": "Z terminálu se aktualizují {{count}} aplikace",
+    "updateAll_many": "Z terminálu se aktualizuje {{count}} aplikace",
+    "updateAll_other": "Z terminálu se aktualizuje {{count}} aplikací",
+    "noUpdates": "Všechny aplikace jsou aktuální.",
+    "updateQueued": "Z terminálu se aktualizuje: {{names}}",
+    "upToDate": "Bez aktualizace: {{names}}",
+    "notInstalled": "„{{names}}“ mezi nainstalovanými jednoznačně není."
   }
 }

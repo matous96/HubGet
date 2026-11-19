@@ -38,6 +38,12 @@ export function NotificationsSection() {
           onChange={(batchSummary) => prefs.set({ batchSummary })}
           disabled={!prefs.enabled}
         />
+        <SwitchRow
+          label={t("notifPrefs.weeklySummary")}
+          hint={t("notifPrefs.weeklySummaryHint")}
+          checked={prefs.weeklySummary}
+          onChange={(weeklySummary) => prefs.set({ weeklySummary })}
+        />
       </Card>
 
       <Card title={t("notifPrefs.types")}>

@@ -23,11 +23,20 @@ interface SettingsState {
   closeToTray: boolean;
   /** Desktop: barevná tečka na ikoně u hodin (aktualizace, probíhající operace, chyba, hotovo). */
   trayBadge: boolean;
+  /** Desktop: klávesová zkratka Win+Shift+H otevře HubGet s kurzorem ve vyhledávání. */
+  globalShortcut: boolean;
+  /** Desktop: příkaz hubget v terminálu (skript ve složce WindowsApps – cli.rs). */
+  cliCommand: boolean;
   /** Barva zvýraznění (tlačítka, odznaky, aktivní stavy) jako HEX; null = výchozí modrá HubGetu. */
   accentColor: string | null;
   /** Před operací ukončit procesy aplikace běžící na pozadí (bez okna) bez dotazu. */
   closeBackgroundProcesses: boolean;
-  /** Před ruční operací ukončit běžící aplikaci natvrdo i s oknem – bez dialogu (zapíná si uživatel sám). */
+  /**
+   * „Zavírat běžící aplikace bez dotazu“ (výchozí): před ruční operací aplikaci zavřít bez
+   * dialogu – jako křížkem; když se ptá na uložení práce, počkat, až ji uživatel zavře
+   * (store/jobs.ts closeRunningApp). Vypnuté = dialog AppRunningDialog. Název klíče z doby,
+   * kdy se ukončovalo vždy natvrdo.
+   */
   forceCloseRunning: boolean;
   /** Pokročilá odinstalace: po odinstalaci hledat zbytky i v Program Files, ProgramData, zástupcích a registru. */
   advancedUninstall: boolean;
@@ -45,6 +54,8 @@ interface SettingsState {
   setPreferredSource: (source: SourceId) => void;
   setCloseToTray: (enabled: boolean) => void;
   setTrayBadge: (enabled: boolean) => void;
+  setGlobalShortcut: (enabled: boolean) => void;
+  setCliCommand: (enabled: boolean) => void;
   setAccentColor: (color: string | null) => void;
   setCloseBackgroundProcesses: (enabled: boolean) => void;
   setForceCloseRunning: (enabled: boolean) => void;
@@ -68,9 +79,11 @@ export const useSettings = create<SettingsState>()(
       preferredSource: "winget",
       closeToTray: true,
       trayBadge: true,
+      globalShortcut: true,
+      cliCommand: true,
       accentColor: null,
       closeBackgroundProcesses: true,
-      forceCloseRunning: false,
+      forceCloseRunning: true,
       advancedUninstall: false,
       autoCleanup: false,
       trackInstalls: false,
@@ -92,6 +105,8 @@ export const useSettings = create<SettingsState>()(
       setPreferredSource: (preferredSource) => set({ preferredSource }),
       setCloseToTray: (closeToTray) => set({ closeToTray }),
       setTrayBadge: (trayBadge) => set({ trayBadge }),
+      setGlobalShortcut: (globalShortcut) => set({ globalShortcut }),
+      setCliCommand: (cliCommand) => set({ cliCommand }),
       setAccentColor: (accentColor) => set({ accentColor: accentColor && /^#[0-9a-f]{6}$/i.test(accentColor) ? accentColor : null }),
       setCloseBackgroundProcesses: (closeBackgroundProcesses) => set({ closeBackgroundProcesses }),
       setForceCloseRunning: (forceCloseRunning) => set({ forceCloseRunning }),
@@ -105,9 +120,11 @@ export const useSettings = create<SettingsState>()(
       // Zdroj, který v uložených nastaveních ještě nebyl (nově přidaný správce),
       // je ve výchozím stavu zapnutý. Zdroje, které už HubGet nepodporuje
       // (dřívější Microsoft Store), se zahodí.
-      partialize: (state) => ({ ...state, knownSources: [...SOURCE_IDS] }),
+      // `forceCloseDefault`: nastavení uložené před verzí, kde je zavírání bez dotazu výchozí (do 0.2.1
+      // bylo vypnuté a dialog „Aplikace právě běží“ byl krok navíc) – jednou se zapne každému
+      partialize: (state) => ({ ...state, knownSources: [...SOURCE_IDS], forceCloseDefault: true }),
       merge: (persisted, current) => {
-        const saved = persisted as (Partial<SettingsState> & { knownSources?: string[] }) | undefined;
+        const saved = persisted as (Partial<SettingsState> & { knownSources?: string[]; forceCloseDefault?: boolean }) | undefined;
         const known = saved?.knownSources ?? ["winget", "chocolatey", "scoop"];
         const enabledSources = SOURCE_IDS.filter(
           (id) => !saved?.enabledSources || saved.enabledSources.includes(id) || !known.includes(id),
@@ -118,6 +135,7 @@ export const useSettings = create<SettingsState>()(
           ...saved,
           enabledSources,
           preferredSource: preferred && isSourceId(preferred) ? preferred : current.preferredSource,
+          forceCloseRunning: saved?.forceCloseDefault ? (saved.forceCloseRunning ?? current.forceCloseRunning) : true,
         };
       },
     },

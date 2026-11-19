@@ -17,6 +17,8 @@ pub struct SystemInfo {
     pub os_build: u32,
     /// Verze HubGetu.
     pub app_version: String,
+    /// Název počítače (Moje počítače v Nastavení).
+    pub computer_name: Option<String>,
 }
 
 /// Registr se čte mimo vlákno okna (synchronní příkaz by běžel na hlavním vlákně).
@@ -25,7 +27,8 @@ pub async fn system_info(app: tauri::AppHandle) -> Result<SystemInfo, String> {
     let app_version = app.package_info().version.to_string();
     crate::process::background(move || {
         let (arch, os_name, os_display_version, os_build) = read_windows_info();
-        Ok(SystemInfo { arch, os_name, os_display_version, os_build, app_version })
+        let computer_name = std::env::var("COMPUTERNAME").ok().filter(|n| !n.is_empty());
+        Ok(SystemInfo { arch, os_name, os_display_version, os_build, app_version, computer_name })
     })
     .await
 }
@@ -82,6 +85,11 @@ pub struct PowerNetwork {
     metered: bool,
     /// Zapnutá úspora baterie (Windows: Úspora energie / Battery saver).
     battery_saver: bool,
+    /// Běží aplikace přes celou obrazovku (hra, video), prezentace nebo hra Direct3D –
+    /// Windows v tu chvíli nepouští oznámení (SHQueryUserNotificationState).
+    busy: bool,
+    /// Jak dlouho uživatel nesáhl na klávesnici ani myš (s).
+    idle_seconds: u64,
 }
 
 /// Asynchronně: synchronní příkazy Tauri běží v hlavním vlákně okna a dotaz
@@ -90,9 +98,45 @@ pub struct PowerNetwork {
 pub async fn power_network_status() -> Result<PowerNetwork, String> {
     crate::process::background(|| {
         let (on_battery, battery_saver) = power();
-        Ok(PowerNetwork { on_battery, metered: metered(), battery_saver })
+        Ok(PowerNetwork { on_battery, metered: metered(), battery_saver, busy: busy(), idle_seconds: idle_seconds() })
     })
     .await
+}
+
+/// Aplikace přes celou obrazovku, hra Direct3D nebo prezentace.
+#[cfg(windows)]
+fn busy() -> bool {
+    use windows_sys::Win32::UI::Shell::{SHQueryUserNotificationState, QUNS_BUSY, QUNS_PRESENTATION_MODE, QUNS_RUNNING_D3D_FULL_SCREEN};
+    let mut state = 0;
+    // SAFETY: zápis do vlastní proměnné
+    if unsafe { SHQueryUserNotificationState(&mut state) } != 0 {
+        return false;
+    }
+    matches!(state, QUNS_BUSY | QUNS_RUNNING_D3D_FULL_SCREEN | QUNS_PRESENTATION_MODE)
+}
+
+/// Sekundy od posledního vstupu z klávesnice nebo myši.
+#[cfg(windows)]
+fn idle_seconds() -> u64 {
+    use windows_sys::Win32::System::SystemInformation::GetTickCount;
+    use windows_sys::Win32::UI::Input::KeyboardAndMouse::{GetLastInputInfo, LASTINPUTINFO};
+    let mut info = LASTINPUTINFO { cbSize: std::mem::size_of::<LASTINPUTINFO>() as u32, dwTime: 0 };
+    // SAFETY: zápis do vlastní struktury se správnou velikostí
+    if unsafe { GetLastInputInfo(&mut info) } == 0 {
+        return 0;
+    }
+    // Obě hodnoty jsou 32bitové milisekundy od startu – rozdíl s přetečením
+    (unsafe { GetTickCount() }.wrapping_sub(info.dwTime) / 1000) as u64
+}
+
+#[cfg(not(windows))]
+fn busy() -> bool {
+    false
+}
+
+#[cfg(not(windows))]
+fn idle_seconds() -> u64 {
+    0
 }
 
 /// Napájení: (běží z baterie, zapnutá úspora baterie).

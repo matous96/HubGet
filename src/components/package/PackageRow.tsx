@@ -24,13 +24,17 @@ interface PackageRowProps {
   showUninstall?: boolean;
   /** Úzká varianta (např. dvousloupcový žebříček): bez odznaku zdroje a verzí, ať zůstane místo na název. */
   compact?: boolean;
+  /** Poznámka místo popisu (Nepoužívané: „Naposledy spuštěno před 8 měsíci“). */
+  note?: string;
+  /** Vzhled poznámky: upozornění (oranžová), nebo informace (Co je nového). */
+  noteTone?: "warning" | "info";
 }
 
 /**
  * Řádek balíčku pro zobrazení „seznam“. Memo: stránka se stovkami řádků
  * (Nainstalované) překreslí jen řádky, kterých se změna týká.
  */
-export const PackageRow = memo(function PackageRow({ entry, showUninstall, compact }: PackageRowProps) {
+export const PackageRow = memo(function PackageRow({ entry, showUninstall, compact, note, noteTone = "warning" }: PackageRowProps) {
   const { t } = useTranslation();
   const { installed, job } = usePackageState(entry.id);
   const hostChange = useInstallerHostChange(installed);
@@ -79,7 +83,16 @@ export const PackageRow = memo(function PackageRow({ entry, showUninstall, compa
           {isWebOnly(entry) && (!installed || compact) && <WebBadge className="shrink-0" />}
           <CategoryBadge category={entry.categories[0]} className="shrink-0 @max-sm:hidden" />
         </div>
-        <p className="truncate text-[13px] text-muted">{entry.description || entry.sources[0]?.packageId}</p>
+        {note ? (
+          <p
+            className={cn("truncate text-[13px]", noteTone === "warning" ? "font-medium text-amber-600 dark:text-amber-400" : "text-fg/80")}
+            title={note}
+          >
+            {note}
+          </p>
+        ) : (
+          <p className="truncate text-[13px] text-muted">{entry.description || entry.sources[0]?.packageId}</p>
+        )}
       </div>
 
       {/* Zdroj (u nainstalovaných) a verze: nainstalovaná → dostupná */}

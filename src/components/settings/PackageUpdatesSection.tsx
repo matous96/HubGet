@@ -18,9 +18,11 @@ import { Spinner } from "@/components/ui/States";
 import { runUpdateCheck } from "@/hooks/useAutoUpdates";
 import { useInstalled } from "@/hooks/usePackages";
 import { nextTime, type Schedule } from "@/lib/schedule";
+import { isTauri } from "@/lib/tauri";
 import { cn, formatRelative } from "@/lib/utils";
 import { getSource, SOURCES } from "@/services/managers";
 import {
+  IDLE_MINUTES,
   INTERVAL_MS,
   INTERVALS,
   MIN_AGE_DAYS,
@@ -202,6 +204,28 @@ export function PackageUpdatesSection() {
           onChange={(skipOnMetered) => auto.set({ skipOnMetered })}
           disabled={auto.autoInstall === "off"}
         />
+        <SwitchRow
+          label={t("autoUpdates.skipWhileBusy")}
+          hint={t("autoUpdates.skipWhileBusyHint")}
+          checked={auto.skipWhileBusy}
+          onChange={(skipWhileBusy) => auto.set({ skipWhileBusy })}
+          disabled={auto.autoInstall === "off"}
+        />
+        <SwitchRow
+          label={t("autoUpdates.onlyWhenIdle")}
+          hint={t("autoUpdates.onlyWhenIdleHint", { minutes: IDLE_MINUTES })}
+          checked={auto.onlyWhenIdle}
+          onChange={(onlyWhenIdle) => auto.set({ onlyWhenIdle })}
+          disabled={auto.autoInstall === "off"}
+        />
+        {isTauri() && (
+          <SwitchRow
+            label={t("autoUpdates.restorePoint")}
+            hint={t("autoUpdates.restorePointHint")}
+            checked={auto.restorePoint}
+            onChange={(restorePoint) => auto.set({ restorePoint })}
+          />
+        )}
         <p className="px-4 py-3 text-xs text-muted">{t("autoUpdates.trayNote")}</p>
       </Card>
 

@@ -18,7 +18,7 @@ import { supabase } from "./supabase";
  * Oblasti dat účtu (stejný výčet hlídá databáze). Bezpečnostní volby mezi nimi záměrně nejsou.
  * „looks“ = vlastní vzhled aplikací (store/appLooks.ts) – migrace 20261105120000_user_data_looks.sql.
  */
-export const SYNC_KINDS = ["settings", "favorites", "bundle", "notifications", "looks"] as const;
+export const SYNC_KINDS = ["settings", "favorites", "bundle", "notifications", "looks", "devices"] as const;
 export type SyncKindId = (typeof SYNC_KINDS)[number];
 
 export interface RemoteRecord {

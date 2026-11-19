@@ -15,6 +15,10 @@ export interface HistoryEntry {
   packageId: string;
   kind: OperationKind;
   version?: string;
+  /** Aktualizace: verze před ní – kam se jde vrátit (useRollback). */
+  fromVersion?: string;
+  /** Aktualizace: verze, na kterou se aktualizovalo (pokud ji správce nabízel). */
+  toVersion?: string;
   /** Volby instalace – kvůli zopakování operace se stejným nastavením. */
   options?: InstallOptions;
   outcome: OperationOutcome;

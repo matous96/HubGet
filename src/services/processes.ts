@@ -24,6 +24,23 @@ export const findAppProcesses = (packageId: string, name: string): Promise<Runni
 /** Zavře procesy – slušně, s `force` natvrdo. Vrátí id procesů, které běží dál. */
 export const closeProcesses = (pids: number[], force: boolean) => invoke<number[]>("close_processes", { pids, force });
 
+/** Stav zavírané aplikace. */
+export interface CloseState {
+  /** Procesy, které běží dál. */
+  alive: number[];
+  /** Z nich procesy s viditelným, reagujícím oknem – aplikace se ptá na uložení práce. */
+  waiting: number[];
+}
+
+/**
+ * Zavře aplikaci bez ztráty práce: žádost o zavření (jako křížek); co se schová k hodinám
+ * nebo zamrzne, natvrdo. Aplikaci, která se ptá na uložení, nechá běžet (`waiting`).
+ */
+export const closeApp = (pids: number[]) => invoke<CloseState>("close_app", { pids });
+
+/** Stav aplikace, na jejíž zavření se čeká – nic neukončuje. */
+export const appCloseState = (pids: number[]) => invoke<CloseState>("app_close_state", { pids });
+
 /** Ukončí procesy bez dotazu (slušně, kdo nereaguje, natvrdo). Vrátí id těch, které ukončit nešlo. */
 export const endProcesses = (pids: number[]) => invoke<number[]>("end_processes", { pids });
 

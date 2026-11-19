@@ -106,7 +106,8 @@
     "bundles": "软件包合集",
     "startup": "启动应用",
     "publish": "发布",
-    "about": "关于 HubGet"
+    "about": "关于 HubGet",
+    "overview": "电脑概览"
   },
   "startup": {
     "title": "启动应用",
@@ -596,7 +597,9 @@
       "selfUpdating": "{{name}} 在更新到 {{target}} 后自行回到了版本 {{version}}——它使用自己的更新程序。将不再通过包管理器提供更新。",
       "traced": "{{name}} 的安装监视：记录了 {{count}} 个新项目（文件夹、快捷方式、注册表）。卸载后会提示删除它们。",
       "skippedRunning": "{{name}} 正在运行——自动更新将等你关闭它后再进行。",
-      "forceClosed": "{{name}} 正在运行——已强制结束进程 {{processes}}，以便安装程序覆盖它。",
+      "appClosed": "{{name}} 正在运行——已关闭（进程 {{processes}}），以便安装程序覆盖它。",
+      "appClosing": "{{name}} 关闭时询问是否保存工作——正在等待用户关闭它。",
+      "appCloseTimeout": "{{name}} 保持打开 15 分钟——操作已取消。",
       "needsAdmin": "{{name}} 需要管理员权限才能更新——将等待手动更新。"
     },
     "notice": {
@@ -1046,7 +1049,9 @@
       "notifications": "通知偏好",
       "notificationsHint": "HubGet 会就哪些事件通知你。",
       "looks": "应用外观",
-      "looksHint": "你为应用设置的横幅颜色和图标，仅你本人可见。"
+      "looksHint": "你为应用设置的横幅颜色和图标，仅你本人可见。",
+      "devices": "我的电脑",
+      "devicesHint": "每台电脑上的应用概览——哪里需要更新，哪些可以安装到其他电脑。"
     },
     "status": "状态",
     "syncing": "正在同步…",
@@ -1375,6 +1380,7 @@
   },
   "phase": {
     "queued": "排队中",
+    "closingApp": "正在等待应用关闭",
     "elevating": "请确认 UAC 提示",
     "downloading": "正在下载",
     "interactive": "请完成安装向导",
@@ -1553,7 +1559,9 @@
     "depForSource": "{{source}} 需要",
     "depKind_package": "软件包",
     "depKind_runtime": "运行时",
-    "depKind_feature": "Windows 功能"
+    "depKind_feature": "Windows 功能",
+    "virusTotal": "在 VirusTotal 上检查",
+    "virusTotalHint": "数十款杀毒引擎对具有此哈希值的安装程序的检测结果。不会上传任何内容——VirusTotal 按哈希值查找文件。"
   },
   "installMenu": {
     "install": "安装",
@@ -1629,7 +1637,8 @@
     "filterPlaceholder": "筛选…",
     "incompleteTitle": "列表不完整",
     "incompleteText": "无法加载以下来源的列表：{{names}}。其应用虽已安装，但此处未显示。",
-    "incompleteRetry": "重试"
+    "incompleteRetry": "重试",
+    "unused": "未使用"
   },
   "view": {
     "grid": "网格",
@@ -1638,7 +1647,8 @@
     "sort": {
       "popularity": "人气",
       "name": "名称",
-      "recent": "最近安装"
+      "recent": "最近安装",
+      "size": "大小"
     }
   },
   "settings": {
@@ -1684,8 +1694,8 @@
     "uninstall": "卸载和正在运行的应用",
     "closeBackgroundProcesses": "不经询问关闭在后台运行的应用",
     "closeBackgroundProcessesHint": "在安装、更新或卸载之前，HubGet 会结束该应用没有窗口的进程（例如通知区域图标或卡在内存中的进程）。如果应用有打开的窗口，会提供一键关闭。",
-    "forceCloseRunning": "不经询问强制关闭正在运行的应用",
-    "forceCloseRunningHint": "在安装、更新或卸载之前，HubGet 会立即强制关闭正在运行的应用——即使它有打开的窗口，也不会询问。未保存的工作将会丢失。后台自动更新不会关闭有打开窗口的应用——会等待。",
+    "forceCloseRunning": "不经询问关闭正在运行的应用",
+    "forceCloseRunningHint": "在安装、更新或卸载之前，HubGet 会自行关闭正在运行的应用——就像点击它的关闭按钮。如果应用询问是否保存工作，HubGet 会等你保存并关闭应用；隐藏在通知区域或未响应的应用会被强制关闭。关闭此项：HubGet 会先询问。后台自动更新不会关闭有打开窗口的应用——会等待。",
     "advancedUninstall": "高级卸载，扫描残留（注册表和文件）",
     "advancedUninstallHint": "卸载后，除 AppData 外还会搜索 Program Files、ProgramData、开始菜单和桌面快捷方式以及 Windows 注册表（HKCU 和 HKLM\\Software），并提供删除残留。文件会移到回收站；注册表项在删除前会先备份。",
     "autoCleanup": "自动删除残留文件和注册表项，不显示确认窗口",
@@ -1716,7 +1726,13 @@
     "exportButton": "导出…",
     "importApps": "导入并安装",
     "importAppsHint": "配置（.json、.html）、合集（.ubundle）或 WinGet 导出文件——HubGet 会显示摘要，并一键安装缺少的应用。已安装的应用会被跳过。",
-    "importButton": "选择文件…"
+    "importButton": "选择文件…",
+    "globalShortcut": "键盘快捷键 Win+Shift+H",
+    "globalShortcutHint": "在任何地方打开 HubGet 并将光标置于搜索框——即使它隐藏在通知区域中。",
+    "globalShortcutTaken": "无法启用 Win+Shift+H——可能已被其他程序占用（{{error}}）。",
+    "cliCommand": "终端中的 hubget 命令",
+    "cliCommandHint": "在命令提示符或 PowerShell 中输入如 hubget install vlc、hubget update 或 hubget help。HubGet 会执行命令并在应用中显示进度。",
+    "cliCommandFailed": "无法启用 hubget 命令：{{error}}"
   },
   "files": {
     "saved": "已保存：{{path}}",
@@ -1781,7 +1797,10 @@
     "updatesQueued_one": "已将 {{count}} 个更新加入队列",
     "updatesQueued_other": "已将 {{count}} 个更新加入队列",
     "addedToBundle_one": "已将 {{count}} 个应用加入软件包合集",
-    "addedToBundle_other": "已将 {{count}} 个应用加入软件包合集"
+    "addedToBundle_other": "已将 {{count}} 个应用加入软件包合集",
+    "uninstall": "卸载（{{count}}）",
+    "uninstallQueued_other": "已将 {{count}} 个卸载加入队列",
+    "uninstallConfirm_other": "卸载 {{count}} 个应用？{{names}}"
   },
   "pins": {
     "title": "已忽略和推迟的更新",
@@ -1828,7 +1847,9 @@
     "fallbackNext": "{{name}}：通过 {{from}} 安装失败——正在尝试 {{to}}…",
     "fallbackFailed": "无法安装 {{name}}：{{from}} 的安装程序不可用，通过 {{sources}} 的备用安装也失败了——{{error}}",
     "endedProcesses": "{{name}} 正在后台运行——HubGet 已将其关闭并继续",
-    "forceClosed": "{{name}} 正在运行——HubGet 已将其强制关闭并继续"
+    "appClosed": "{{name}} 正在运行——HubGet 已将其关闭并继续",
+    "appClosing": "{{name}} 正在询问是否保存工作——请保存并关闭应用，HubGet 随后会继续",
+    "appCloseTimeout": "{{name}} 仍处于打开状态——操作已取消"
   },
   "notifications": {
     "title": "通知",
@@ -1854,7 +1875,9 @@
     "endedProcesses": "该应用正在后台运行——已结束进程 {{processes}}。",
     "selfUpdating": "更新到 {{target}} 后，该应用自行回到了版本 {{version}}——它使用自己的更新程序。将不再提供包管理器更新（可在应用页面更改）。",
     "summary": "操作队列已完成——{{success}} 个成功，{{failed}} 个失败，{{cancelled}} 个已取消。",
-    "forceClosed": "该应用正在运行——已强制结束进程 {{processes}}。"
+    "appClosed": "该应用正在运行——已关闭（进程 {{processes}}）。",
+    "appClosing": "该应用正在询问是否保存工作——关闭后 HubGet 会继续。",
+    "appCloseTimeout": "该应用保持打开 15 分钟——操作已取消。关闭应用后请重试。"
   },
   "tray": {
     "browse": "浏览软件包",
@@ -1953,7 +1976,8 @@
     "backup": "备份和目录",
     "news": "新功能",
     "commands": "终端命令",
-    "contact": "联系 HubGet"
+    "contact": "联系 HubGet",
+    "devices": "我的电脑"
   },
   "contact": {
     "intro": "有问题、发现了错误，或者有想法、合作意向？给我们留言，我们会通过电子邮件回复你。",
@@ -2013,7 +2037,9 @@
     "test": "测试通知",
     "testHint": "发送一条 Windows 通知，以确认通知能正常显示（Windows 设置 → 通知）。",
     "testButton": "发送",
-    "testMessage": "HubGet 通知工作正常。"
+    "testMessage": "HubGet 通知工作正常。",
+    "weeklySummary": "每周摘要",
+    "weeklySummaryHint": "每周一次：HubGet 安装了多少更新、还有多少在等待，以及有多少应用你很久没打开了。"
   },
   "autoUpdates": {
     "found_one": "有 {{count}} 个可用更新：{{names}}",
@@ -2113,7 +2139,24 @@
     "needsAdmin": "更新到版本 {{version}} 需要管理员权限，因此不会在后台运行——正在“可用更新”中等待你的确认。",
     "pendingTitle": "等待你的确认（{{n}}）",
     "pendingText": "这些更新需要管理员权限，因此自动更新没有在后台运行它们。只需一个 Windows 对话框即可全部确认。",
-    "pendingAction": "以管理员身份更新"
+    "pendingAction": "以管理员身份更新",
+    "skipWhileBusy": "游戏或演示时不安装",
+    "skipWhileBusyHint": "全屏游戏、视频或演示模式——安装会等到结束后再进行。",
+    "onlyWhenIdle": "仅在电脑空闲时安装",
+    "onlyWhenIdleHint": "至少 {{minutes}} 分钟没有键盘和鼠标操作——更新不会拖慢你，也不会关闭你正在使用的应用。",
+    "restorePoint": "全部更新前创建还原点",
+    "restorePointHint": "使用“全部更新”（至少 2 个应用）时——如果出现问题，可以将 Windows 恢复到更新前的状态。需要管理员批准并开启系统保护；Windows 每 24 小时最多创建一个还原点。后台自动更新不会创建。",
+    "restorePointCreating": "正在创建系统还原点…",
+    "restorePoint_created": "已创建系统还原点——正在更新。",
+    "restorePoint_recent": "过去 24 小时内已有还原点——Windows 未创建新的还原点。正在更新。",
+    "restorePoint_disabled": "无法创建还原点——Windows 中的系统保护已关闭。将在没有还原点的情况下更新。",
+    "restorePoint_cancelled": "未创建还原点（未获得管理员权限）。将在没有还原点的情况下更新。",
+    "restorePoint_failed": "无法创建还原点。将在没有还原点的情况下更新。",
+    "waiting_busy_other": "{{count}} 个更新正在等待——游戏或演示正在进行。结束后 HubGet 会安装它们。",
+    "waiting_active_other": "{{count}} 个更新将在你暂时不使用电脑时安装。",
+    "skipped_busy_other": "发现 {{count}} 个更新——自动安装将等到游戏或演示结束",
+    "skipped_active_other": "发现 {{count}} 个更新——自动安装将等你暂时不使用电脑时进行",
+    "restorePointName": "HubGet - 全部更新前"
   },
   "security": {
     "warningTitle": "警告！",
@@ -2195,5 +2238,123 @@
       "uninstall": "卸载",
       "download": "下载"
     }
+  },
+  "commandSearch": {
+    "title": "操作",
+    "updateAll": "全部更新（{{count}}）",
+    "checkUpdates": "检查更新"
+  },
+  "rollback": {
+    "menu": "回退到 {{version}} 版本",
+    "title": "将 {{name}} 回退到 {{version}} 版本？",
+    "text": "HubGet 会卸载已安装的 {{current}} 版本，并安装上次更新前的 {{version}} 版本。卸载通常会保留应用的设置和数据。",
+    "skipNote": "自动更新将跳过 {{current}} 版本，只提供更新的版本。",
+    "confirm": "回退到 {{version}}",
+    "hint": "更新到 {{current}} 后应用出现问题？将其回退到更新前的版本。",
+    "unavailable": "包管理器已不再提供 {{version}} 版本——无法回退。"
+  },
+  "watch": {
+    "start": "有新版本时通知我",
+    "startWeb": "HubGet 可以安装时通知我",
+    "stop": "停止通知",
+    "title": "关注的应用",
+    "subtitle": "有新版本发布，或开发者网站上的应用可以通过 HubGet 安装时，HubGet 会通知你。",
+    "newVersion": "{{version}} 版本已发布。",
+    "nowInstallable": "{{name}} 现在可以通过 HubGet 一键安装，并可自动更新。"
+  },
+  "unused": {
+    "lastUsed": "上次打开：{{when}}",
+    "never": "安装后从未打开",
+    "intro": "超过 {{days}} 天未打开的应用（根据 Windows 记录）——它们未在运行，也不会在登录时启动。它们占用磁盘空间；选中后可通过下方工具栏卸载。",
+    "selectAll": "全选",
+    "none": "过去 {{days}} 天内你使用过所有应用——这里没有未使用的应用。",
+    "totalSize": "共占用 {{size}}。"
+  },
+  "devices": {
+    "title": "我的电脑",
+    "intro": "登录你账户的电脑。可以把其他电脑上有、而这台电脑缺少的应用安装到这里。",
+    "signIn": "登录后，HubGet 会显示你的所有电脑及其应用。",
+    "syncOff": "请开启“我的电脑”同步（设置 → 备份与目录 → 同步）。",
+    "onlyThis": "目前只有这台电脑——在其他电脑上登录 HubGet 后，它们会显示在这里。",
+    "this": "此电脑",
+    "seen": "上次在线：{{when}}",
+    "apps_other": "{{count}} 个应用",
+    "updates_other": "{{count}} 个更新",
+    "installHere": "安装到这里（{{count}}）"
+  },
+  "eol": {
+    "title_other": "{{count}} 个程序已不再获得安全更新",
+    "text": "这些版本已停止支持（根据 endoflife.date）——其中的漏洞不会再被修复。请升级到较新的版本。",
+    "since": "自 {{date}} 起不再支持",
+    "newest": "最新版本为 {{name}} {{cycle}}",
+    "detail": "{{name}} {{cycle}} 自 {{date}} 起不再获得安全更新。",
+    "detailNewest": "请安装较新的版本——最新为 {{name}} {{cycle}}。"
+  },
+  "duplicates": {
+    "title_other": "有 {{count}} 个应用被安装了两次",
+    "text": "同一应用来自两个来源——占用双倍空间且分别更新。如果不需要其中一个安装，请打开并卸载它。"
+  },
+  "updates": {
+    "whatsNew": "新功能：{{text}}"
+  },
+  "weekly": {
+    "message": "本周：{{parts}}。",
+    "updated_other": "已安装 {{count}} 个更新",
+    "installed_other": "{{count}} 个新应用",
+    "waiting_other": "{{count}} 个更新待安装",
+    "admin_other": "{{count}} 个需要管理员批准",
+    "unused_other": "{{count}} 个应用很久没打开了"
+  },
+  "overview": {
+    "title": "电脑概览",
+    "subtitle": "这台电脑上安装了什么、占用多少空间，以及哪些值得清理。",
+    "desktopOnly": "电脑概览仅在 Windows 版 HubGet 应用中提供。",
+    "apps": "已安装的应用",
+    "managed": "其中 {{count}} 个由 HubGet 管理",
+    "size": "磁盘占用",
+    "sizeHint_other": "基于 {{count}} 个应用的数据",
+    "updates": "可用更新",
+    "updatedMonth_other": "过去 30 天更新了 {{count}} 个应用",
+    "unused": "未使用",
+    "unusedHint": "{{days}} 天未打开",
+    "eol": "无安全更新",
+    "duplicates": "重复安装",
+    "oldest": "安装最久的应用：{{name}}（{{when}}）。",
+    "largest": "占用最大的应用",
+    "idleAutostart": "随 Windows 启动但你并未使用",
+    "idleAutostartHint": "你已 {{days}} 天未打开这些应用，但它们仍会在登录时启动并拖慢开机。可以在“启动应用”中关闭它们。",
+    "openStartup": "打开启动应用",
+    "caches": "包管理器缓存",
+    "cachesHint": "包管理器留在磁盘上的已下载安装程序和旧版本。可以放心删除——需要时会重新下载。",
+    "cachesEmpty": "缓存为空。",
+    "cachesBusy": "清理将等待队列中的操作完成。",
+    "freeAll": "释放 {{size}}",
+    "freed": "已释放 {{size}}。",
+    "clean": "清理",
+    "cache_winget": "WinGet – 已下载的安装程序",
+    "cache_chocolatey": "Chocolatey – 已下载的包",
+    "cache_scoop": "Scoop – 下载文件和旧版本",
+    "cache_npm": "npm – 包缓存",
+    "cache_pip": "pip – 包缓存",
+    "signatures": "程序数字签名",
+    "signaturesHint": "检查每个应用主程序的签名。许多安全的开源程序也没有签名，但签名无效意味着文件已被修改或证书不受信任。",
+    "check": "检查",
+    "checkAgain": "重新检查",
+    "signaturesResult": "已签名：{{signed}} · 未签名：{{unsigned}} · 签名无效：{{invalid}}",
+    "sig_signed": "已签名",
+    "sig_unsigned": "未签名",
+    "sig_invalid": "签名无效",
+    "sig_unknown": "未找到程序",
+    "showUnsigned": "显示未签名的程序（{{count}}）"
+  },
+  "cli": {
+    "installQueued": "正在从终端安装：{{names}}",
+    "alreadyInstalled": "已安装：{{names}}",
+    "notFound": "“{{names}}”无法唯一匹配一个应用——请在搜索结果中选择。",
+    "updateAll_other": "正在从终端更新 {{count}} 个应用",
+    "noUpdates": "所有应用均为最新。",
+    "updateQueued": "正在从终端更新：{{names}}",
+    "upToDate": "已是最新：{{names}}",
+    "notInstalled": "“{{names}}”无法唯一匹配一个已安装的应用。"
   }
 }

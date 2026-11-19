@@ -106,7 +106,8 @@
     "bundles": "Lots de paquets",
     "startup": "Au démarrage",
     "publish": "Publier",
-    "about": "À propos de HubGet"
+    "about": "À propos de HubGet",
+    "overview": "Aperçu du PC"
   },
   "startup": {
     "title": "Applications au démarrage",
@@ -608,7 +609,9 @@
       "selfUpdating": "{{name}} est revenu de lui-même à la version {{version}} après sa mise à jour vers {{target}} – il utilise son propre outil de mise à jour. Les mises à jour via le gestionnaire de paquets ne sont plus proposées.",
       "traced": "Suivi de l’installation de {{name}} : {{count}} nouveaux éléments enregistrés (dossiers, raccourcis, registre). Leur suppression sera proposée après une désinstallation.",
       "skippedRunning": "{{name}} est en cours d’exécution – la mise à jour automatique attendra que vous la fermiez.",
-      "forceClosed": "{{name}} était en cours d’exécution – les processus {{processes}} ont été arrêtés de force pour que le programme d’installation puisse le remplacer.",
+      "appClosed": "{{name}} était en cours d’exécution – fermée (processus {{processes}}) pour que le programme d’installation puisse le remplacer.",
+      "appClosing": "{{name}} demande d’enregistrer le travail à la fermeture – en attente de sa fermeture par l’utilisateur.",
+      "appCloseTimeout": "{{name}} est restée ouverte 15 minutes – opération annulée.",
       "needsAdmin": "{{name}} nécessite des droits d’administrateur pour la mise à jour – elle attendra une mise à jour manuelle."
     },
     "notice": {
@@ -1061,7 +1064,9 @@
       "notifications": "Préférences de notification",
       "notificationsHint": "Les événements pour lesquels HubGet vous avertit.",
       "looks": "Apparence des apps",
-      "looksHint": "Couleurs de bannière et icônes que vous avez attribuées aux apps. Vous seul les voyez."
+      "looksHint": "Couleurs de bannière et icônes que vous avez attribuées aux apps. Vous seul les voyez.",
+      "devices": "Mes PC",
+      "devicesHint": "Un aperçu des applications de chaque PC – ce qui attend une mise à jour et quoi installer ailleurs."
     },
     "status": "État",
     "syncing": "Synchronisation…",
@@ -1397,6 +1402,7 @@
   },
   "phase": {
     "queued": "En file d’attente",
+    "closingApp": "En attente de la fermeture de l’application",
     "elevating": "Confirmez l’invite UAC",
     "downloading": "Téléchargement",
     "interactive": "Terminez l’assistant d’installation",
@@ -1585,7 +1591,9 @@
     "depForSource": "requise par {{source}}",
     "depKind_package": "Paquet",
     "depKind_runtime": "Environnement d’exécution",
-    "depKind_feature": "Fonctionnalité Windows"
+    "depKind_feature": "Fonctionnalité Windows",
+    "virusTotal": "Vérifier sur VirusTotal",
+    "virusTotalHint": "Résultats de dizaines d’antivirus pour le programme d’installation avec cette empreinte. Rien n’est envoyé – VirusTotal recherche le fichier par son empreinte."
   },
   "installMenu": {
     "install": "Installer",
@@ -1661,7 +1669,8 @@
     "filterPlaceholder": "Filtrer…",
     "incompleteTitle": "La liste est incomplète",
     "incompleteText": "Impossible de charger la liste de : {{names}}. Leurs applications manquent ici alors qu’elles sont installées.",
-    "incompleteRetry": "Réessayer"
+    "incompleteRetry": "Réessayer",
+    "unused": "Inutilisées"
   },
   "view": {
     "grid": "Grille",
@@ -1670,7 +1679,8 @@
     "sort": {
       "popularity": "Popularité",
       "name": "Nom",
-      "recent": "Récemment installées"
+      "recent": "Récemment installées",
+      "size": "Taille"
     }
   },
   "settings": {
@@ -1716,8 +1726,8 @@
     "uninstall": "Désinstallation et applications en cours",
     "closeBackgroundProcesses": "Fermer sans demander une application qui tourne en arrière-plan",
     "closeBackgroundProcessesHint": "Avant une installation, une mise à jour ou une désinstallation, HubGet arrête les processus de l’application qui n’ont pas de fenêtre (une icône dans la zone de notification ou un processus resté en mémoire, par exemple). Pour une application dont la fenêtre est ouverte, la fermeture est proposée en un clic.",
-    "forceCloseRunning": "Forcer la fermeture d’une application en cours d’exécution sans demander",
-    "forceCloseRunningHint": "Avant une installation, une mise à jour ou une désinstallation, HubGet force immédiatement la fermeture de l’application en cours d’exécution – même avec une fenêtre ouverte, sans demander. Le travail non enregistré est perdu. Les mises à jour automatiques en arrière-plan ne ferment pas une application dont la fenêtre est ouverte – elles attendent.",
+    "forceCloseRunning": "Fermer les applications en cours d’exécution sans demander",
+    "forceCloseRunningHint": "Avant une installation, une mise à jour ou une désinstallation, HubGet ferme lui-même l’application en cours d’exécution – comme avec son bouton de fermeture. Si l’application demande d’enregistrer votre travail, HubGet attend que vous l’enregistriez et fermiez l’application ; une application masquée dans la zone de notification ou qui ne répond pas est fermée de force. Désactivé : HubGet demande d’abord. Les mises à jour automatiques en arrière-plan ne ferment pas une application dont la fenêtre est ouverte – elles attendent.",
     "advancedUninstall": "Désinstallation avancée avec recherche des résidus (registre et fichiers)",
     "advancedUninstallHint": "Après une désinstallation, en plus d’AppData, il examine Program Files, ProgramData, les raccourcis du menu Démarrer et du Bureau et le registre Windows (HKCU et HKLM\\Software), puis propose de supprimer les résidus. Les fichiers vont dans la Corbeille ; les clés du registre sont sauvegardées avant d’être supprimées.",
     "autoCleanup": "Supprimer automatiquement les résidus de fichiers et du registre, sans fenêtre de confirmation",
@@ -1749,7 +1759,13 @@
     "exportButton": "Exporter…",
     "importApps": "Importer et installer",
     "importAppsHint": "Un profil (.json, .html), un lot (.ubundle) ou un export WinGet – HubGet affiche un résumé et installe les applications manquantes en un clic. Les applications installées sont ignorées.",
-    "importButton": "Choisir un fichier…"
+    "importButton": "Choisir un fichier…",
+    "globalShortcut": "Raccourci clavier Win+Maj+H",
+    "globalShortcutHint": "Ouvre HubGet de n’importe où avec le curseur dans la recherche – même s’il est masqué dans la zone de notification.",
+    "globalShortcutTaken": "Impossible d’activer Win+Maj+H – un autre programme l’utilise probablement ({{error}}).",
+    "cliCommand": "Commande hubget dans le terminal",
+    "cliCommandHint": "Dans l’invite de commandes ou PowerShell, tapez par exemple hubget install vlc, hubget update ou hubget help. HubGet exécute la commande et affiche la progression dans l’application.",
+    "cliCommandFailed": "Impossible d’activer la commande hubget : {{error}}"
   },
   "files": {
     "saved": "Enregistré : {{path}}",
@@ -1826,7 +1842,14 @@
     "updatesQueued_many": "{{count}} mises à jour en file d’attente",
     "addedToBundle_one": "{{count}} application ajoutée aux Lots de paquets",
     "addedToBundle_other": "{{count}} applications ajoutées aux Lots de paquets",
-    "addedToBundle_many": "{{count}} applications ajoutées aux Lots de paquets"
+    "addedToBundle_many": "{{count}} applications ajoutées aux Lots de paquets",
+    "uninstall": "Désinstaller ({{count}})",
+    "uninstallQueued_one": "{{count}} désinstallation en file d’attente",
+    "uninstallQueued_many": "{{count}} désinstallations en file d’attente",
+    "uninstallQueued_other": "{{count}} désinstallations en file d’attente",
+    "uninstallConfirm_one": "Désinstaller {{count}} application ? {{names}}",
+    "uninstallConfirm_many": "Désinstaller {{count}} applications ? {{names}}",
+    "uninstallConfirm_other": "Désinstaller {{count}} applications ? {{names}}"
   },
   "pins": {
     "title": "Mises à jour ignorées et reportées",
@@ -1873,7 +1896,9 @@
     "fallbackNext": "{{name}} : l’installation via {{from}} a échoué – essai avec {{to}}…",
     "fallbackFailed": "Impossible d’installer {{name}} : le programme d’installation de {{from}} n’est pas disponible et la solution de secours via {{sources}} a échoué – {{error}}",
     "endedProcesses": "{{name}} tournait en arrière-plan – HubGet l’a fermé et continue",
-    "forceClosed": "{{name}} était en cours d’exécution – HubGet a forcé sa fermeture et continue"
+    "appClosed": "{{name}} était en cours d’exécution – HubGet l’a fermée et continue",
+    "appClosing": "{{name}} demande d’enregistrer votre travail – enregistrez-le et fermez l’application, puis HubGet continuera",
+    "appCloseTimeout": "{{name}} est restée ouverte – opération annulée"
   },
   "notifications": {
     "title": "Notifications",
@@ -1900,7 +1925,9 @@
     "endedProcesses": "L’application tournait en arrière-plan – les processus {{processes}} ont été arrêtés.",
     "selfUpdating": "Après sa mise à jour vers {{target}}, l’application est revenue d’elle-même à la version {{version}} – elle utilise son propre outil de mise à jour. Les mises à jour via le gestionnaire de paquets ne seront plus proposées (modifiable sur la page de l’application).",
     "summary": "File d’opérations terminée – {{success}} réussies, {{failed}} échouées, {{cancelled}} annulées.",
-    "forceClosed": "L’application était en cours d’exécution – les processus {{processes}} ont été arrêtés de force."
+    "appClosed": "L’application était en cours d’exécution – fermée (processus {{processes}}).",
+    "appClosing": "L’application demande d’enregistrer votre travail – HubGet continuera une fois qu’elle sera fermée.",
+    "appCloseTimeout": "L’application est restée ouverte 15 minutes – l’opération a été annulée. Réessayez une fois l’application fermée."
   },
   "tray": {
     "browse": "Parcourir les paquets",
@@ -2001,7 +2028,8 @@
     "backup": "Sauvegarde et catalogue",
     "news": "Nouveautés",
     "commands": "Commandes du terminal",
-    "contact": "Contacter HubGet"
+    "contact": "Contacter HubGet",
+    "devices": "Mes PC"
   },
   "contact": {
     "intro": "Une question, un bug, une idée ou une proposition de collaboration ? Écrivez-nous – nous vous répondrons par e-mail.",
@@ -2061,7 +2089,9 @@
     "test": "Notification de test",
     "testHint": "Envoie une notification Windows pour vérifier qu’elles s’affichent (Paramètres Windows → Notifications).",
     "testButton": "Envoyer",
-    "testMessage": "Les notifications de HubGet fonctionnent."
+    "testMessage": "Les notifications de HubGet fonctionnent.",
+    "weeklySummary": "Résumé hebdomadaire",
+    "weeklySummaryHint": "Une fois par semaine : combien de mises à jour HubGet a installées, combien attendent et combien d’applications vous n’avez pas ouvertes depuis longtemps."
   },
   "autoUpdates": {
     "found_one": "{{count}} mise à jour disponible : {{names}}",
@@ -2172,7 +2202,32 @@
     "needsAdmin": "La mise à jour vers la version {{version}} nécessite des droits d’administrateur et ne s’exécute donc pas en arrière-plan – elle attend votre confirmation dans Mises à jour disponibles.",
     "pendingTitle": "En attente de votre confirmation ({{n}})",
     "pendingText": "Ces mises à jour nécessitent des droits d’administrateur, les mises à jour automatiques ne les ont donc pas lancées en arrière-plan. Confirmez-les toutes avec une seule boîte de dialogue Windows.",
-    "pendingAction": "Mettre à jour en tant qu’administrateur"
+    "pendingAction": "Mettre à jour en tant qu’administrateur",
+    "skipWhileBusy": "Ne pas installer pendant un jeu ou une présentation",
+    "skipWhileBusyHint": "Un jeu ou une vidéo en plein écran, ou le mode présentation – l’installation attend la fin.",
+    "onlyWhenIdle": "N’installer que lorsque le PC n’est pas utilisé",
+    "onlyWhenIdleHint": "Au moins {{minutes}} minutes sans clavier ni souris – les mises à jour ne vous ralentissent pas et ne ferment pas les applications que vous utilisez.",
+    "restorePoint": "Créer un point de restauration avant de tout mettre à jour",
+    "restorePointHint": "Avec « Tout mettre à jour » (au moins 2 applications) – en cas de problème, vous ramenez Windows à l’état d’avant la mise à jour. Nécessite l’approbation administrateur et la Protection du système activée ; Windows crée au plus un point par 24 heures. Les mises à jour automatiques en arrière-plan n’en créent pas.",
+    "restorePointCreating": "Création d’un point de restauration du système…",
+    "restorePoint_created": "Point de restauration créé – mise à jour en cours.",
+    "restorePoint_recent": "Un point de restauration de moins de 24 heures existe déjà – Windows n’en a pas créé de nouveau. Mise à jour en cours.",
+    "restorePoint_disabled": "Impossible de créer un point de restauration – la Protection du système est désactivée dans Windows. Mise à jour sans point.",
+    "restorePoint_cancelled": "Aucun point de restauration créé (autorisation administrateur refusée). Mise à jour sans point.",
+    "restorePoint_failed": "Impossible de créer le point de restauration. Mise à jour sans point.",
+    "waiting_busy_one": "{{count}} mise à jour en attente – un jeu ou une présentation est en cours. HubGet l’installera ensuite.",
+    "waiting_busy_many": "{{count}} mises à jour en attente – un jeu ou une présentation est en cours. HubGet les installera ensuite.",
+    "waiting_busy_other": "{{count}} mises à jour en attente – un jeu ou une présentation est en cours. HubGet les installera ensuite.",
+    "waiting_active_one": "{{count}} mise à jour attend que vous fassiez une pause.",
+    "waiting_active_many": "{{count}} mises à jour attendent que vous fassiez une pause.",
+    "waiting_active_other": "{{count}} mises à jour attendent que vous fassiez une pause.",
+    "skipped_busy_one": "{{count}} mise à jour trouvée – l’installation automatique attend la fin du jeu ou de la présentation",
+    "skipped_busy_many": "{{count}} mises à jour trouvées – l’installation automatique attend la fin du jeu ou de la présentation",
+    "skipped_busy_other": "{{count}} mises à jour trouvées – l’installation automatique attend la fin du jeu ou de la présentation",
+    "skipped_active_one": "{{count}} mise à jour trouvée – l’installation automatique attend une pause",
+    "skipped_active_many": "{{count}} mises à jour trouvées – l’installation automatique attend une pause",
+    "skipped_active_other": "{{count}} mises à jour trouvées – l’installation automatique attend une pause",
+    "restorePointName": "HubGet - avant de tout mettre à jour"
   },
   "security": {
     "warningTitle": "Attention !",
@@ -2254,5 +2309,147 @@
       "uninstall": "La désinstallation",
       "download": "Le téléchargement"
     }
+  },
+  "commandSearch": {
+    "title": "Actions",
+    "updateAll": "Tout mettre à jour ({{count}})",
+    "checkUpdates": "Rechercher des mises à jour"
+  },
+  "rollback": {
+    "menu": "Revenir à la version {{version}}",
+    "title": "Revenir à la version {{version}} de {{name}} ?",
+    "text": "HubGet désinstalle la version installée {{current}} et installe la {{version}}, celle d’avant la dernière mise à jour. La désinstallation conserve généralement les paramètres et données de l’application.",
+    "skipNote": "Les mises à jour automatiques ignoreront la {{current}} et ne proposeront qu’une version plus récente.",
+    "confirm": "Revenir à {{version}}",
+    "hint": "L’application fonctionne mal depuis la mise à jour vers la {{current}} ? Revenez à la version d’avant la mise à jour.",
+    "unavailable": "La version {{version}} n’est plus disponible chez le gestionnaire de paquets – impossible de la restaurer."
+  },
+  "watch": {
+    "start": "M’avertir des nouvelles versions",
+    "startWeb": "M’avertir quand HubGet pourra l’installer",
+    "stop": "Ne plus m’avertir",
+    "title": "Applications suivies",
+    "subtitle": "HubGet vous prévient quand une nouvelle version sort ou quand une application du site de l’éditeur peut être installée avec HubGet.",
+    "newVersion": "La version {{version}} est sortie.",
+    "nowInstallable": "{{name}} peut maintenant être installée avec HubGet – en un clic, mises à jour comprises."
+  },
+  "unused": {
+    "lastUsed": "Ouverte pour la dernière fois {{when}}",
+    "never": "Jamais ouverte depuis l’installation",
+    "intro": "Applications que vous n’avez pas ouvertes depuis plus de {{days}} jours (selon Windows) – elles ne tournent pas et ne démarrent pas à l’ouverture de session. Elles occupent de l’espace ; sélectionnez-les et désinstallez-les avec la barre du bas.",
+    "selectAll": "Tout sélectionner",
+    "none": "Vous avez utilisé toutes vos applications ces {{days}} derniers jours – rien d’inutilisé ici.",
+    "totalSize": "Au total, elles occupent {{size}}."
+  },
+  "devices": {
+    "title": "Mes PC",
+    "intro": "Les PC connectés à votre compte. Vous pouvez installer ici les applications d’un autre PC qui manquent.",
+    "signIn": "Connectez-vous et HubGet affichera tous vos PC et leurs applications.",
+    "syncOff": "Activez la synchronisation « Mes PC » (Paramètres → Sauvegarde et catalogue → Synchronisation).",
+    "onlyThis": "Seulement ce PC pour l’instant – les autres apparaîtront une fois connecté à HubGet dessus.",
+    "this": "Ce PC",
+    "seen": "vu {{when}}",
+    "apps_one": "{{count}} application",
+    "apps_many": "{{count}} applications",
+    "apps_other": "{{count}} applications",
+    "updates_one": "{{count}} mise à jour",
+    "updates_many": "{{count}} mises à jour",
+    "updates_other": "{{count}} mises à jour",
+    "installHere": "Installer ici ({{count}})"
+  },
+  "eol": {
+    "title_one": "{{count}} programme sans mises à jour de sécurité",
+    "title_many": "{{count}} programmes sans mises à jour de sécurité",
+    "title_other": "{{count}} programmes sans mises à jour de sécurité",
+    "text": "Ces versions ne sont plus prises en charge (selon endoflife.date) – leurs failles ne sont plus corrigées. Passez à une version plus récente.",
+    "since": "sans support depuis le {{date}}",
+    "newest": "la plus récente est {{name}} {{cycle}}",
+    "detail": "{{name}} {{cycle}} ne reçoit plus de mises à jour de sécurité depuis le {{date}}.",
+    "detailNewest": "Installez une version plus récente – la dernière est {{name}} {{cycle}}."
+  },
+  "duplicates": {
+    "title_one": "{{count}} application est installée deux fois",
+    "title_many": "{{count}} applications sont installées deux fois",
+    "title_other": "{{count}} applications sont installées deux fois",
+    "text": "La même application depuis deux sources – elle occupe deux fois l’espace et se met à jour séparément. Si vous n’avez pas besoin de l’une des installations, ouvrez-la et désinstallez-la."
+  },
+  "updates": {
+    "whatsNew": "Nouveautés : {{text}}"
+  },
+  "weekly": {
+    "message": "Cette semaine : {{parts}}.",
+    "updated_one": "{{count}} mise à jour installée",
+    "updated_many": "{{count}} mises à jour installées",
+    "updated_other": "{{count}} mises à jour installées",
+    "installed_one": "{{count}} nouvelle application",
+    "installed_many": "{{count}} nouvelles applications",
+    "installed_other": "{{count}} nouvelles applications",
+    "waiting_one": "{{count}} mise à jour en attente",
+    "waiting_many": "{{count}} mises à jour en attente",
+    "waiting_other": "{{count}} mises à jour en attente",
+    "admin_one": "{{count}} attend l’autorisation administrateur",
+    "admin_many": "{{count}} attendent l’autorisation administrateur",
+    "admin_other": "{{count}} attendent l’autorisation administrateur",
+    "unused_one": "{{count}} application pas ouverte depuis longtemps",
+    "unused_many": "{{count}} applications pas ouvertes depuis longtemps",
+    "unused_other": "{{count}} applications pas ouvertes depuis longtemps"
+  },
+  "overview": {
+    "title": "Aperçu du PC",
+    "subtitle": "Ce qui est installé sur ce PC, la place que cela occupe et ce qui mérite un nettoyage.",
+    "desktopOnly": "L’aperçu du PC n’est disponible que dans l’application HubGet pour Windows.",
+    "apps": "Applications installées",
+    "managed": "dont {{count}} gérées par HubGet",
+    "size": "Espace disque",
+    "sizeHint_one": "selon {{count}} application",
+    "sizeHint_many": "selon {{count}} applications",
+    "sizeHint_other": "selon {{count}} applications",
+    "updates": "Mises à jour disponibles",
+    "updatedMonth_one": "{{count}} application mise à jour ces 30 derniers jours",
+    "updatedMonth_many": "{{count}} applications mises à jour ces 30 derniers jours",
+    "updatedMonth_other": "{{count}} applications mises à jour ces 30 derniers jours",
+    "unused": "Inutilisées",
+    "unusedHint": "pas ouvertes depuis {{days}} jours",
+    "eol": "Sans correctifs de sécurité",
+    "duplicates": "Installées deux fois",
+    "oldest": "Application installée depuis le plus longtemps : {{name}} ({{when}}).",
+    "largest": "Applications les plus volumineuses",
+    "idleAutostart": "Démarrent avec Windows, mais vous ne les utilisez pas",
+    "idleAutostartHint": "Vous n’avez pas ouvert ces applications depuis {{days}} jours, pourtant elles se lancent à la connexion et ralentissent le démarrage. Vous pouvez les désactiver dans Au démarrage.",
+    "openStartup": "Ouvrir Au démarrage",
+    "caches": "Caches des gestionnaires de paquets",
+    "cachesHint": "Installateurs téléchargés et anciennes versions que les gestionnaires de paquets laissent sur le disque. Vous pouvez les supprimer sans risque – ils seront retéléchargés si besoin.",
+    "cachesEmpty": "Les caches sont vides.",
+    "cachesBusy": "Le nettoyage attend la fin des opérations en file d’attente.",
+    "freeAll": "Libérer {{size}}",
+    "freed": "{{size}} libérés.",
+    "clean": "Vider",
+    "cache_winget": "WinGet – installateurs téléchargés",
+    "cache_chocolatey": "Chocolatey – paquets téléchargés",
+    "cache_scoop": "Scoop – téléchargements et anciennes versions",
+    "cache_npm": "npm – cache des paquets",
+    "cache_pip": "pip – cache des paquets",
+    "signatures": "Signatures numériques des programmes",
+    "signaturesHint": "Vérifie la signature du programme principal de chaque application. Des programmes open source sûrs ne sont souvent pas signés, mais une signature invalide signifie que le fichier a été modifié ou que le certificat n’est pas fiable.",
+    "check": "Vérifier",
+    "checkAgain": "Vérifier à nouveau",
+    "signaturesResult": "Signés : {{signed}} · non signés : {{unsigned}} · signature invalide : {{invalid}}",
+    "sig_signed": "signé",
+    "sig_unsigned": "non signé",
+    "sig_invalid": "signature invalide",
+    "sig_unknown": "programme introuvable",
+    "showUnsigned": "Afficher les programmes non signés ({{count}})"
+  },
+  "cli": {
+    "installQueued": "Installation depuis le terminal : {{names}}",
+    "alreadyInstalled": "Déjà installé : {{names}}",
+    "notFound": "« {{names}} » ne correspond pas à une seule application – choisissez-la dans les résultats de recherche.",
+    "updateAll_one": "Mise à jour de {{count}} application depuis le terminal",
+    "updateAll_many": "Mise à jour de {{count}} applications depuis le terminal",
+    "updateAll_other": "Mise à jour de {{count}} applications depuis le terminal",
+    "noUpdates": "Toutes les applications sont à jour.",
+    "updateQueued": "Mise à jour depuis le terminal : {{names}}",
+    "upToDate": "Déjà à jour : {{names}}",
+    "notInstalled": "« {{names}} » ne correspond pas à une seule application installée."
   }
 }

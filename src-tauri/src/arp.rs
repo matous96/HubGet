@@ -29,6 +29,8 @@ pub struct ArpEntry {
     hidden: bool,
     /// Kdy byl program nainstalován (ms od 1. 1. 1970) – viz [`install_time`].
     pub installed_at: Option<i64>,
+    /// Velikost na disku podle instalátoru (EstimatedSize, v bajtech); None = neuvedl.
+    pub estimated_size: Option<u64>,
 }
 
 /// Milisekundy od 1. 1. 1970 pro datum a čas v UTC (bez knihovny – výpočet dne podle
@@ -106,6 +108,12 @@ pub fn load() -> Vec<ArpEntry> {
                 quiet_uninstall: get("QuietUninstallString"),
                 hidden,
                 installed_at: install_time(&get("InstallDate"), written),
+                // EstimatedSize je v kB; nula a nesmyslné hodnoty (víc než 2 TB) se neberou
+                estimated_size: sub
+                    .get_value::<u32, _>("EstimatedSize")
+                    .ok()
+                    .filter(|kb| *kb > 0 && *kb < 2_000_000_000)
+                    .map(|kb| u64::from(kb) * 1024),
             });
         }
     }
@@ -396,6 +404,32 @@ impl ArpEntry {
         let scope = if self.user { "User" } else { "Machine" };
         let arch = if self.x86 { "X86" } else { "X64" };
         format!(r"ARP\{scope}\{arch}\{}", self.key)
+    }
+
+    /// Hlavní program aplikace: ikona v Programech a funkcích bývá jeho .exe
+    /// („C:\…\vlc.exe,0“), jinak .exe ve složce instalace, které se jmenuje jako aplikace,
+    /// a nakonec největší .exe v ní (bez odinstalátorů).
+    pub fn main_executable(&self) -> Option<PathBuf> {
+        let icon = expand(self.display_icon.trim().trim_matches('"'));
+        let icon = icon.rsplit_once(',').filter(|(_, index)| index.trim().parse::<i32>().is_ok()).map_or(icon.as_str(), |(path, _)| path);
+        let icon = Path::new(icon.trim().trim_matches('"'));
+        let is_exe = |p: &Path| p.extension().is_some_and(|e| e.eq_ignore_ascii_case("exe"));
+        let uninstaller = |p: &Path| p.file_stem().is_some_and(|s| s.to_string_lossy().to_lowercase().starts_with("unins"));
+        if is_exe(icon) && !uninstaller(icon) && icon.is_file() {
+            return Some(icon.to_path_buf());
+        }
+        let location = expand(self.install_location.trim().trim_matches('"'));
+        let exes: Vec<PathBuf> = std::fs::read_dir(location.trim())
+            .ok()?
+            .flatten()
+            .map(|e| e.path())
+            .filter(|p| is_exe(p) && !uninstaller(p) && p.is_file())
+            .collect();
+        let key = name_key(&self.name);
+        exes.iter()
+            .find(|p| p.file_stem().is_some_and(|s| !key.is_empty() && key.starts_with(&name_key(&s.to_string_lossy()))))
+            .or_else(|| exes.iter().max_by_key(|p| p.metadata().map(|m| m.len()).unwrap_or(0)))
+            .cloned()
     }
 
     /// Číslo hry ze Steamu („Steam App 1091500“ → „1091500“).

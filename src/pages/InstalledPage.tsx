@@ -1,24 +1,28 @@
-import { RefreshCw, Search } from "lucide-react";
+import { Clock, RefreshCw, Search } from "lucide-react";
 import { useEffect, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { PackageCollection } from "@/components/package/PackageCollection";
 import { Button } from "@/components/ui/Button";
 import { CollectionToolbar } from "@/components/ui/CollectionToolbar";
 import { CardSkeletons, EmptyState, ErrorState, PageHeader } from "@/components/ui/States";
+import { UNUSED_DAYS, useUnusedApps } from "@/hooks/useAppUsage";
 import { useInstallOrder, useInstalledItems, useUpdates } from "@/hooks/useInstalledItems";
 import { useSortedPackages } from "@/hooks/usePackages";
 import { useUrlState } from "@/hooks/useUrlState";
-import { cn, normalize } from "@/lib/utils";
+import { isTauri } from "@/lib/tauri";
+import { cn, formatSizeText, normalize } from "@/lib/utils";
+import { compareVersions } from "@/lib/version";
 import { ORIGINS } from "@/services/managers";
 import { AdminPendingPanel } from "@/components/package/AdminPendingPanel";
 import { ListFailurePanel } from "@/components/package/ListFailurePanel";
+import { DuplicatesPanel, EndOfLifePanel } from "@/components/package/InstalledNotices";
 import { OriginFilter, type OriginFilterValue } from "@/components/package/SourceFilter";
 import { useAutoUpdates } from "@/store/autoUpdates";
 import { useSelection } from "@/store/selection";
 import { useSettings } from "@/store/settings";
 import type { InstallOrigin } from "@/types";
 
-type Filter = "all" | "updates";
+type Filter = "all" | "updates" | "unused";
 
 /** Nainstalované balíčky s filtrem aktualizací, hromadnou aktualizací a řazením i podle data instalace. */
 export function InstalledPage() {
@@ -27,11 +31,27 @@ export function InstalledPage() {
   const { updatable, pending: pendingUpdates, updateAll } = useUpdates();
   // Filtry jsou v adrese (?filter=updates&origin=steam&q=…): na záložku aktualizací odkazuje
   // postranní panel a po otevření detailu a návratu zpět zůstanou
-  const [filter, setFilter] = useUrlState<Filter>("filter", "all", (v) => v === "updates");
+  const [filter, setFilter] = useUrlState<Filter>("filter", "all", (v) => v === "updates" || v === "unused");
+  // Nepoužívané aplikace (záznamy Windows o spuštění) – jen v desktopové aplikaci
+  const { unused, notes, sizes, unusedSize, isLoading: usageLoading } = useUnusedApps(items, isTauri());
   // Řadit → Nově nainstalované: nejnovější instalace nahoře (jen tady – jinde podle popularity)
   const byInstallTime = useInstallOrder();
-  const recentFirst = useSettings((s) => s.sortMode) === "recent";
-  const list = filter === "updates" ? updatable : items;
+  const sortMode = useSettings((s) => s.sortMode);
+  const language = useSettings((s) => s.language);
+  const recentFirst = sortMode === "recent";
+  const largestFirst = sortMode === "size" && isTauri();
+  const unusedItems = useMemo(() => unused.map((u) => u.item), [unused]);
+  // Co je nového u dostupných aktualizací – poznámky k verzi z katalogu, pokud patří k nabízené verzi
+  const whatsNew = useMemo(() => {
+    const notes = new Map<string, string>();
+    for (const { pkg, entry } of updatable) {
+      if (!entry.releaseNotes || !pkg.availableVersion || !entry.latestVersion) continue;
+      if (compareVersions(entry.latestVersion, pkg.availableVersion) !== 0) continue;
+      notes.set(entry.id, t("updates.whatsNew", { text: entry.releaseNotes.replace(/\s+/g, " ").trim().slice(0, 240) }));
+    }
+    return notes;
+  }, [updatable, t]);
+  const list = filter === "updates" ? updatable : filter === "unused" ? unusedItems : items;
   const [text, setText] = useUrlState<string>("q", "");
   const [originFilter, setOriginFilter] = useUrlState<OriginFilterValue>("origin", "all", (v) => ORIGINS.some((o) => o.id === v));
 
@@ -68,12 +88,18 @@ export function InstalledPage() {
       .filter((e) => !q || normalize(e.name).includes(q) || normalize(e.id).includes(q));
   }, [list, origin, text, recentFirst, byInstallTime]);
   const sortedByMode = useSortedPackages(entries);
-  const sorted = recentFirst ? entries : sortedByMode;
+  // Nepoužívané zůstanou od nejdéle nespuštěných
+  const bySize = useMemo(
+    () => (largestFirst ? [...entries].sort((a, b) => (sizes.get(b.id) ?? -1) - (sizes.get(a.id) ?? -1)) : entries),
+    [largestFirst, entries, sizes],
+  );
+  const sorted = largestFirst ? bySize : recentFirst || filter === "unused" ? entries : sortedByMode;
 
   const tabs: { id: Filter; label: string; count: number }[] = [
     // Jen zobrazené položky (bez programů nalezených jen na disku) – stejně jako filtr zdrojů a postranní panel
     { id: "all", label: t("installed.all"), count: items.length },
     { id: "updates", label: t("installed.updates"), count: updatable.length },
+    ...(isTauri() ? [{ id: "unused" as const, label: t("installed.unused"), count: unused.length }] : []),
   ];
 
   return (
@@ -135,7 +161,7 @@ export function InstalledPage() {
         </div>
 
         <div className="ml-auto">
-          <CollectionToolbar recentSort />
+          <CollectionToolbar recentSort sizeSort={isTauri()} />
         </div>
       </div>
 
@@ -147,17 +173,46 @@ export function InstalledPage() {
       {/* Správce nevrátil seznam – jeho aplikace chybí, i když nainstalované jsou */}
       {!isLoading && <ListFailurePanel onRetry={() => void refetch()} retrying={isFetching} />}
 
+      {/* Runtime bez bezpečnostních oprav (endoflife.date) a aplikace nainstalované dvakrát */}
+      {filter === "all" && !isLoading && (
+        <>
+          <EndOfLifePanel items={items} />
+          <DuplicatesPanel items={items} />
+        </>
+      )}
+
       {/* Aktualizace odložené kvůli právům správce – jedním potvrzením UAC */}
       {filter === "updates" && <AdminPendingPanel />}
 
-      {isLoading ? (
+      {/* Nepoužívané: co to znamená a výběr všech k hromadné odinstalaci (lišta dole) */}
+      {filter === "unused" && sorted.length > 0 && (
+        <div className="mb-5 flex flex-wrap items-center gap-3 rounded-2xl border border-line bg-surface px-4 py-3">
+          <Clock className="size-5 shrink-0 text-amber-500" />
+          <p className="min-w-0 flex-1 text-sm text-muted">{t("unused.intro", { days: UNUSED_DAYS })}
+            {unusedSize > 0 && <strong className="ml-1 text-fg">{t("unused.totalSize", { size: formatSizeText(unusedSize, language) })}</strong>}</p>
+          <Button variant="secondary" onClick={() => selectMany(sorted)}>
+            {t("unused.selectAll")}
+          </Button>
+        </div>
+      )}
+
+      {isLoading || (filter === "unused" && usageLoading) ? (
         <CardSkeletons count={6} />
       ) : isError ? (
         <ErrorState onRetry={() => void refetch()} />
       ) : sorted.length === 0 ? (
-        <EmptyState message={filter === "updates" && !text ? t("installed.noUpdates") : t("installed.empty")} />
+        <EmptyState
+          message={
+            filter === "updates" && !text ? t("installed.noUpdates") : filter === "unused" && !text ? t("unused.none", { days: UNUSED_DAYS }) : t("installed.empty")
+          }
+        />
       ) : (
-        <PackageCollection packages={sorted} showUninstall />
+        <PackageCollection
+          packages={sorted}
+          showUninstall
+          notes={filter === "unused" ? notes : filter === "updates" ? whatsNew : undefined}
+          noteTone={filter === "updates" ? "info" : "warning"}
+        />
       )}
     </>
   );

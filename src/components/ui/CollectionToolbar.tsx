@@ -6,18 +6,29 @@ import type { SortMode, ViewMode } from "@/types";
 
 /**
  * Přepínač zobrazení (mřížka / seznam) a řazení (popularita / název, s `recentSort`
- * i nově nainstalované – jen u nainstalovaných; jinde se takové řazení ukáže jako popularita).
+ * i nově nainstalované, se `sizeSort` podle velikosti – jen u nainstalovaných; jinde se takové
+ * řazení ukáže jako popularita).
  */
-export function CollectionToolbar({ count, hideSort, recentSort }: { count?: number; hideSort?: boolean; recentSort?: boolean }) {
+export function CollectionToolbar({
+  count,
+  hideSort,
+  recentSort,
+  sizeSort,
+}: {
+  count?: number;
+  hideSort?: boolean;
+  recentSort?: boolean;
+  sizeSort?: boolean;
+}) {
   const { t } = useTranslation();
   const { viewMode, setViewMode, sortMode: chosen, setSortMode } = useSettings();
-  const sortMode: SortMode = chosen === "recent" && !recentSort ? "popularity" : chosen;
+  const sortMode: SortMode = (chosen === "recent" && !recentSort) || (chosen === "size" && !sizeSort) ? "popularity" : chosen;
 
   const views: { id: ViewMode; icon: typeof List }[] = [
     { id: "grid", icon: LayoutGrid },
     { id: "list", icon: List },
   ];
-  const sorts: SortMode[] = recentSort ? ["popularity", "name", "recent"] : ["popularity", "name"];
+  const sorts: SortMode[] = ["popularity", "name", ...(recentSort ? ["recent" as const] : []), ...(sizeSort ? ["size" as const] : [])];
 
   return (
     <div className="flex flex-wrap items-center gap-3">

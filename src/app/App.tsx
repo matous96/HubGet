@@ -9,6 +9,7 @@ import { CommandsPage } from "@/pages/CommandsPage";
 import { HelpPage } from "@/pages/HelpPage";
 import { HomePage } from "@/pages/HomePage";
 import { InstalledPage } from "@/pages/InstalledPage";
+import { OverviewPage } from "@/pages/OverviewPage";
 import { LogsPage } from "@/pages/LogsPage";
 import { PackageDetailPage } from "@/pages/PackageDetailPage";
 import { PublishPage } from "@/pages/PublishPage";
@@ -47,6 +48,7 @@ export function App() {
             <Route path="top" element={<TopChartsPage />} />
             <Route path="recent" element={<RecentPage />} />
             <Route path="installed" element={<InstalledPage />} />
+            <Route path="overview" element={<OverviewPage />} />
             <Route path="favorites" element={<FavoritesPage />} />
             <Route path="bundles" element={<BundlesPage />} />
             {/* Sdílená sada z odkazu (…/bundles/shared?d=…) a seznam aplikací z webu (unibox://import?apps=…) */}

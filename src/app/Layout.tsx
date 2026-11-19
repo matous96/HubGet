@@ -18,6 +18,11 @@ import { InstallOptionsDialog } from "@/components/package/InstallOptionsDialog"
 import { ErrorBoundary, PageCrash } from "@/components/ui/ErrorBoundary";
 import { Tooltips } from "@/components/ui/Tooltip";
 import { AppInUseDialog, AppRunningDialog } from "@/components/package/AppInUseDialog";
+import { RollbackDialog } from "@/components/package/RollbackDialog";
+import { WatchlistWatcher } from "@/components/package/WatchlistWatcher";
+import { DeviceReporter } from "@/components/settings/DevicesSection";
+import { WeeklySummary } from "@/components/layout/WeeklySummary";
+import { CliCommands } from "@/components/layout/CliCommands";
 import { FallbackOfferDialog } from "@/components/package/FallbackOfferDialog";
 import { LeftoversDialog } from "@/components/package/LeftoversDialog";
 import { ManagerSetupDialog } from "@/components/package/ManagerSetupDialog";
@@ -133,6 +138,8 @@ export function Layout() {
     <div className="flex h-full flex-col overflow-hidden">
       <Isolated name="BackgroundServices">
         <BackgroundServices />
+        {/* Příkazy z terminálu (hubget install …) */}
+        <CliCommands />
       </Isolated>
       {/* Desktop: okno bez systémových dekorací má vlastní titulkovou lištu */}
       {desktop && <TitleBar />}
@@ -199,6 +206,10 @@ const OVERLAYS: [string, ComponentType][] = [
   ["ProfileImportDialog", ProfileImportDialog],
   ["ManagerSetupDialog", ManagerSetupDialog],
   ["AppInUseDialog", AppInUseDialog],
+  ["RollbackDialog", RollbackDialog],
+  ["WatchlistWatcher", WatchlistWatcher],
+  ["DeviceReporter", DeviceReporter],
+  ["WeeklySummary", WeeklySummary],
   ["AppRunningDialog", AppRunningDialog],
   ["FallbackOfferDialog", FallbackOfferDialog],
   ["UpdateDialog", UpdateDialog],

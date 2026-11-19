@@ -15,7 +15,7 @@ import { useSync } from "@/store/sync";
 import { useToasts } from "@/store/toasts";
 import { Card, Row, SwitchRow } from "./SettingsUi";
 
-const KINDS: SyncKindId[] = ["favorites", "bundle", "settings", "notifications", "looks"];
+const KINDS: SyncKindId[] = ["favorites", "bundle", "settings", "notifications", "looks", "devices"];
 
 export function SyncCard() {
   const { t, i18n } = useTranslation();

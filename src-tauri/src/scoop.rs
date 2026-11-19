@@ -26,7 +26,7 @@ const KNOWN_BUCKETS: &[&str] =
     &["main", "extras", "versions", "nirsoft", "sysinternals", "php", "nerd-fonts", "nonportable", "java", "games"];
 
 /// Složka Scoopu aktuálního uživatele.
-fn root() -> PathBuf {
+pub(crate) fn root() -> PathBuf {
     // Vlastní cesta z Nastavení (je-li povolena) ke scoop.ps1 – „…\shims\scoop.ps1“
     // nebo „…\apps\scoop\current\bin\scoop.ps1“ → kořen Scoopu
     if let Some(script) = crate::security::manager_path("scoop", &["scoop.ps1"]) {

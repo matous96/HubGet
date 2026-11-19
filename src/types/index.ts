@@ -388,6 +388,7 @@ export interface InstallOptions {
 /** Fáze průběhu operace – zobrazuje se přímo na kartě. */
 export type OperationPhase =
   | "queued"
+  | "closingApp" // čeká, až uživatel uloží práci a zavře běžící aplikaci
   | "elevating" // čeká na potvrzení dialogu UAC
   | "downloading"
   | "interactive" // čeká se na uživatele v průvodci instalací
@@ -416,6 +417,13 @@ export interface Job {
   kind: OperationKind;
   /** Konkrétní verze k instalaci (starší verze); jinak nejnovější. */
   version?: string;
+  /**
+   * Starší verze místo nainstalované novější: správce downgrade odmítá (winget „Už je
+   * nainstalovaná novější verze“), proto nejdřív odinstalovat a pak nainstalovat `version`.
+   */
+  replaceInstalled?: boolean;
+  /** Vrácení aktualizace: po úspěchu tuto (vadnou) verzi automatické aktualizace přeskočí. */
+  skipVersion?: string;
   /** Volby instalace (jako správce, interaktivně…). */
   options?: InstallOptions;
   /** Automatická aktualizace na pozadí (bez dotazů na uživatele). */
@@ -445,4 +453,4 @@ export type ThemeSetting = "system" | "dark" | "light";
 export type UserMode = "regular" | "developer";
 export type ViewMode = "grid" | "list";
 /** Řazení; „recent“ (nově nainstalované) nabízí jen stránka Nainstalované, jinde platí jako popularita. */
-export type SortMode = "popularity" | "name" | "recent";
+export type SortMode = "popularity" | "name" | "recent" | "size";

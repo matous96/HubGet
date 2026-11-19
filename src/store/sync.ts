@@ -153,7 +153,7 @@ export const useSync = create<SyncState>()(
   persist(
     (set, get) => ({
       enabled: true,
-      kinds: { favorites: true, bundle: true, settings: true, notifications: true, looks: true },
+      kinds: { favorites: true, bundle: true, settings: true, notifications: true, looks: true, devices: true },
       status: "idle",
       lastSyncedAt: null,
 

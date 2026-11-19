@@ -44,6 +44,8 @@ tauri-plugin-process = "2"
 tauri-plugin-autostart = "2"
 # Oznámení Windows (výsledky operací, nalezené aktualizace) podle Nastavení → Oznámení
 tauri-plugin-notification = "2"
+# Klávesová zkratka Win+Shift+H – otevře HubGet odkudkoli s kurzorem ve vyhledávání (shortcut.rs)
+tauri-plugin-global-shortcut = "2"
 
 [target.'cfg(windows)'.dependencies]
 winreg = "0.55"
@@ -54,16 +56,22 @@ winreg = "0.55"
 # vlastnosti instalátoru MSI při publikování aplikace (ApplicationInstallationAndServicing) – publish.rs
 windows-sys = { version = "0.61", features = [
   "Win32_Foundation",
+  "Win32_Globalization",
   "Win32_System_ApplicationInstallationAndServicing",
+  "Win32_System_Console",
   "Win32_Security",
   "Win32_Security_Authorization",
   "Win32_Security_Cryptography",
+  # Ověření digitálního podpisu programů (WinVerifyTrust) – signatures.rs
+  "Win32_Security_WinTrust",
   "Win32_Storage_FileSystem",
   "Win32_System_Diagnostics_ToolHelp",
   "Win32_System_Power",
   "Win32_System_Registry",
   "Win32_System_SystemInformation",
   "Win32_System_Threading",
+  # Doba nečinnosti uživatele (GetLastInputInfo) – automatické aktualizace jen mimo práci
+  "Win32_UI_Input_KeyboardAndMouse",
   "Win32_UI_Shell",
   "Win32_UI_WindowsAndMessaging",
 ] }
@@ -74,6 +82,7 @@ windows = { version = "0.62", features = [
   "Foundation",
   "Networking_Connectivity",
   "Win32_Foundation",
+  "Win32_Globalization",
   "Win32_Graphics_Gdi",
   "Win32_Storage_FileSystem",
   "Win32_System_Com",

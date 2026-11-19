@@ -6,8 +6,10 @@
  *    např. OBS při aktualizaci) – dialog nabídne aplikaci zavřít a operaci
  *    zopakovat.
  * Jen u operací spuštěných uživatelem – automatické aktualizace na pozadí
- * aplikace s oknem nezavírají. Se zapnutým „Ukončit běžící aplikaci natvrdo bez dotazu“
- * se dialog před operací neukáže (fronta úloh aplikaci ukončí sama).
+ * aplikace s oknem nezavírají. Se zapnutým „Zavírat běžící aplikace bez dotazu“ (výchozí)
+ * se dialog před operací neukáže – fronta úloh aplikaci zavře sama (u dotazu na uložení
+ * práce počká, až ji zavře uživatel) a po chybě „aplikace běží“ ji zavře a operaci jednou
+ * zopakuje; dialog po neúspěchu až potom.
  */
 import { create } from "zustand";
 import type { RunningProcess } from "@/services/processes";

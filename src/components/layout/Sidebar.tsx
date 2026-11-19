@@ -1,4 +1,5 @@
 import {
+  Gauge,
   Download,
   Heart,
   History,
@@ -113,6 +114,8 @@ export function Sidebar() {
           />
           {/* Programy spouštěné po přihlášení (jen desktop) */}
           {isTauri() && <NavItem to="/startup" icon={Power} label={t("nav.startup")} />}
+          {/* Přehled počítače: statistiky, úklid mezipamětí, podpisy (jen desktop) */}
+          {isTauri() && <NavItem to="/overview" icon={Gauge} label={t("nav.overview")} />}
         </Section>
 
         <Section title={t("nav.categories")}>

@@ -1,6 +1,7 @@
 //! Backend HubGetu (Tauri 2).
 //!
 //! - `system` – architektura a verze Windows,
+//! - `cli` – příkaz `hubget` v terminálu (předání příkazu běžícímu HubGetu),
 //! - `apps` – spouštění nainstalovaných aplikací (položky nabídky Start),
 //! - `arp` – záznamy Programy a funkce: ověření, že program na disku opravdu je,
 //! - `icons` – ikony s mezipamětí na disku (protokol icon://, ikony z EXE),
@@ -28,6 +29,8 @@
 
 mod apps;
 mod arp;
+mod caches;
+mod cli;
 mod choco;
 mod dev;
 mod disk;
@@ -42,20 +45,26 @@ mod powershell;
 mod process;
 mod progress;
 mod publish;
+mod restore;
 mod running;
 mod scoop;
 mod secure_store;
+mod shortcut;
 mod security;
+mod signatures;
 mod startup;
 mod system;
 mod tracker;
 mod tray;
+mod usage;
 mod version_info;
 mod winget;
 
 pub use elevation::{helper_main as elevated_main, session_main as elevated_session_main, ELEVATED_FLAG, ELEVATED_SESSION_FLAG};
 pub use leftovers::{elevated_cleanup_main, ELEVATED_CLEANUP_FLAG};
 pub use startup::{elevated_startup_main, ELEVATED_STARTUP_FLAG};
+pub use restore::{elevated_restore_main, ELEVATED_RESTORE_FLAG};
+pub use cli::{cli_main, CLI_FLAG};
 
 /// Příznak spuštění při startu Windows (zapisuje ho tauri-plugin-autostart do registru).
 const AUTOSTART_FLAG: &str = "--autostart";
@@ -64,8 +73,12 @@ const AUTOSTART_FLAG: &str = "--autostart";
 pub fn run() {
     tauri::Builder::default()
         // Musí být první: druhé spuštění HubGetu jen ukáže už běžící okno
-        // (odkaz unibox://, kterým bylo spuštěné, předá běžícímu přes deep-link)
-        .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| tray::show_main_window(app)))
+        // (odkaz unibox://, kterým bylo spuštěné, předá běžícímu přes deep-link; příkaz z terminálu – cli.rs)
+        .plugin(tauri_plugin_single_instance::init(|app, args, _cwd| {
+            cli::receive(app, &args);
+            tray::show_main_window(app)
+        }))
+        .manage(cli::PendingCommands::default())
         // Odkazy unibox:// z webu a sdílených sad – zpracuje je frontend (lib/deepLink.ts)
         .plugin(tauri_plugin_deep_link::init())
         // Otevírání odkazů v systémovém prohlížeči a e-mailovém klientovi
@@ -78,6 +91,8 @@ pub fn run() {
         .plugin(tauri_plugin_process::init())
         // Oznámení Windows (výsledky operací, nalezené aktualizace) – podle Nastavení → Oznámení
         .plugin(tauri_plugin_notification::init())
+        // Klávesová zkratka Win+Shift+H – zapíná ji frontend podle nastavení (shortcut.rs)
+        .plugin(shortcut::plugin())
         // Spouštění při startu Windows – s příznakem, aby se HubGet spustil schovaný u hodin
         .plugin(tauri_plugin_autostart::init(
             tauri_plugin_autostart::MacosLauncher::LaunchAgent,
@@ -111,6 +126,8 @@ pub fn run() {
             if !std::env::args().any(|arg| arg == AUTOSTART_FLAG) {
                 tray::show_main_window(app.handle());
             }
+            // Spuštění příkazem z terminálu, když HubGet neběžel
+            cli::receive(app.handle(), &std::env::args().collect::<Vec<_>>());
             winget::warm_up();
             Ok(())
         })
@@ -169,8 +186,18 @@ pub fn run() {
             security::check_manager_path,
             system::power_network_status,
             system::devolutions_agent_status,
+            caches::cache_info,
+            cli::take_cli_commands,
+            cli::set_cli_command,
+            caches::clean_cache,
+            restore::create_restore_point,
+            shortcut::set_global_shortcut,
+            signatures::check_signatures,
+            usage::app_last_used,
             running::app_processes,
             running::close_processes,
+            running::close_app,
+            running::app_close_state,
             running::end_processes,
             startup::startup_items,
             startup::startup_set_enabled,

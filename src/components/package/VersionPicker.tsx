@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { Spinner } from "@/components/ui/States";
 import { useDismiss } from "@/hooks/useDismiss";
 import { cn } from "@/lib/utils";
+import { compareVersions } from "@/lib/version";
 import { getSource, managers } from "@/services/managers";
 import { useJobs } from "@/store/jobs";
 import type { CatalogEntry, InstalledPackage, PackageSource } from "@/types";
@@ -44,6 +45,10 @@ export function VersionPicker({ entry, pkg, installed, disabled }: VersionPicker
 
   const install = (version: string) => {
     setOpen(false);
+    // Starší verze než nainstalovaná: správce downgrade odmítá („Už je nainstalovaná novější
+    // verze“) – nejdřív odinstalovat, pak nainstalovat zvolenou verzi
+    const older =
+      installed?.source === pkg.source && !!installed.installedVersion && compareVersions(version, installed.installedVersion) < 0;
     enqueue({
       appId: entry.id,
       appName: entry.name,
@@ -51,6 +56,7 @@ export function VersionPicker({ entry, pkg, installed, disabled }: VersionPicker
       packageId: pkg.packageId,
       kind: "install",
       version,
+      replaceInstalled: older,
     });
   };
 
