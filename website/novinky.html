@@ -78,17 +78,18 @@
         <div class="page-head__inner reveal">
           <p class="eyebrow" data-t="t1">Novinky</p>
           <h1 data-t="t2">Co je nového v&nbsp;HubGetu</h1>
-          <p class="lead" data-t="t3">Co přinesly jednotlivé řady verzí HubGetu, nejnovější nahoře. Od první veřejné verze 0.1.0 z&nbsp;21.&nbsp;10. vyšlo <!--obsah:updates-words-->pětadvacet<!--/obsah:updates-words--> aktualizací.</p>
+          <p class="lead" data-t="t3">Co přinesly jednotlivé řady verzí HubGetu, nejnovější nahoře. Od první veřejné verze 0.1.0 z&nbsp;21.&nbsp;10. vyšlo <!--obsah:updates-words-->šestadvacet<!--/obsah:updates-words--> aktualizací.</p>
           <nav class="versions-nav" aria-label="Přejít na verzi">
             <!--obsah:versions-->
+            <a class="chip" href="#v0-3">0.3</a>
             <a class="chip" href="#v0-2">0.2</a>
             <a class="chip" href="#v0-1">0.1</a>
             <!--/obsah:versions-->
           </nav>
         </div>
         <dl class="stats reveal">
-          <div><dt data-t="t4">Aktuální verze</dt><dd><!--obsah:version-->0.2.1<!--/obsah:version--></dd></div>
-          <div><dt data-t="t5">Aktualizací od verze 0.1.0</dt><dd><!--obsah:updates-->25<!--/obsah:updates--></dd></div>
+          <div><dt data-t="t4">Aktuální verze</dt><dd><!--obsah:version-->0.3.0<!--/obsah:version--></dd></div>
+          <div><dt data-t="t5">Aktualizací od verze 0.1.0</dt><dd><!--obsah:updates-->26<!--/obsah:updates--></dd></div>
           <div><dt data-t="t6">Aplikací v&nbsp;katalogu</dt><dd data-t="t7">25&nbsp;100+</dd></div>
           <div><dt data-t="t8">Správci naostro</dt><dd data-t="t9">WinGet · Chocolatey · Scoop + 8 pro vývojáře</dd></div>
         </dl>
@@ -149,6 +150,21 @@
             <h3>Hledání v&nbsp;Nastavení</h3>
             <p>Ctrl+F najde jakoukoli volbu ze všech sekcí – i&nbsp;historii operací, která je nově v&nbsp;Nastavení.</p>
           </article>
+          <article class="card highlight reveal">
+            <span class="highlight__ver">Verze 0.3</span>
+            <h3>Přehled počítače</h3>
+            <p>Co zabírá místo, co se zbytečně spouští s&nbsp;Windows, úklid mezipamětí a&nbsp;kontrola podpisů programů.</p>
+          </article>
+          <article class="card highlight reveal">
+            <span class="highlight__ver">Verze 0.3</span>
+            <h3>Vrácení aktualizace</h3>
+            <p>Nová verze nefunguje? Jedním kliknutím zpět na tu předchozí.</p>
+          </article>
+          <article class="card highlight reveal">
+            <span class="highlight__ver">Verze 0.3</span>
+            <h3>Příkaz hubget v&nbsp;terminálu</h3>
+            <p>hubget install vlc, hubget update a&nbsp;další přímo v&nbsp;příkazovém řádku i&nbsp;PowerShellu.</p>
+          </article>
           <!--/obsah:highlights-->
         </div>
       </div>
@@ -165,6 +181,53 @@
 
         <div class="timeline">
           <!--obsah:releases-->
+          <!-- 0.3 -->
+          <article class="release" id="v0-3">
+            <div class="release__meta">
+              <span class="release__ver">0.3</span>
+              <time class="release__date" datetime="2026-11-19">19. 11. 2026</time>
+            </div>
+            <div class="card release__body">
+              <div class="release__head">
+                <h2>Přehled počítače, příkaz hubget a&nbsp;vrácení aktualizace</h2>
+                <span class="badge badge--live">Nejnovější</span>
+              </div>
+              <p class="release__lead">Verze 0.3.0 (19. 11. 2026).</p>
+              <div class="changes changes--new">
+                <h3>Nové</h3>
+                <ul>
+                  <li><strong>Přehled počítače</strong> (v postranním panelu pod Knihovnou) – kolik aplikací máte a&nbsp;kolik zabírají, největší z&nbsp;nich, aplikace spouštěné s&nbsp;Windows, které nepoužíváte, úklid mezipamětí správců balíčků (WinGet, Chocolatey, Scoop, npm, pip) a&nbsp;kontrola digitálních podpisů programů.</li>
+                  <li><strong>Příkaz hubget v&nbsp;terminálu</strong> – hubget install, update, search, show a&nbsp;updates v&nbsp;příkazovém řádku i&nbsp;PowerShellu; průběh ukáže HubGet. Zapíná se v&nbsp;Nastavení → Desktopová aplikace.</li>
+                  <li><strong>Vrácení aktualizace</strong> – když nová verze nefunguje, jedním kliknutím zpět na tu předchozí; vadnou verzi pak automatické aktualizace přeskočí. Ze Starších verzí jde nainstalovat i&nbsp;verzi starší, než máte.</li>
+                  <li><strong>Nepoužívané aplikace</strong> – nová záložka v&nbsp;Nainstalovaných s&nbsp;aplikacemi, které jste 90 dní nespustili, i&nbsp;s&nbsp;hromadnou odinstalací.</li>
+                  <li><strong>Hlídání aplikací</strong> – zvonek v&nbsp;detailu aplikace: HubGet dá vědět, až vyjde nová verze nebo až aplikaci z&nbsp;webu výrobce půjde nainstalovat přes HubGet.</li>
+                  <li><strong>Moje počítače</strong> (Nastavení) – aplikace a&nbsp;čekající aktualizace všech vašich počítačů; co tu chybí, sem nainstalujete jedním kliknutím.</li>
+                  <li>Upozornění na programy <strong>bez bezpečnostních oprav</strong> (starší Python, Node.js, .NET, Java…) a&nbsp;na aplikace <strong>nainstalované dvakrát</strong>.</li>
+                  <li><strong>Win+Shift+H</strong> otevře HubGet odkudkoli s&nbsp;kurzorem ve vyhledávání a&nbsp;jednou týdně přijde <strong>souhrn</strong> aktualizací.</li>
+                </ul>
+              </div>
+              <div class="changes changes--better">
+                <h3>Vylepšeno</h3>
+                <ul>
+                  <li>Běžící aplikace se před aktualizací zavírají bez dialogu. Když se aplikace ptá na uložení práce (Word, grafické editory), HubGet počká, až ji zavřete.</li>
+                  <li>Automatické aktualizace se neinstalují během hry, filmu přes celou obrazovku ani prezentace a&nbsp;volitelně jen tehdy, když u&nbsp;počítače nepracujete.</li>
+                  <li>Před hromadnou aktualizací může HubGet vytvořit bod obnovení systému.</li>
+                  <li>Nainstalované jde řadit podle velikosti na disku a&nbsp;u&nbsp;dostupných aktualizací je vidět, co je nového.</li>
+                  <li>Ctrl+K kromě aplikací najde i&nbsp;akce a&nbsp;stránky – Aktualizovat vše, Protokoly, sekce Nastavení.</li>
+                  <li>U&nbsp;instalátoru v&nbsp;technických údajích je odkaz na kontrolu ve VirusTotalu.</li>
+                </ul>
+              </div>
+              <div class="changes changes--fix">
+                <h3>Opraveno</h3>
+                <ul>
+                  <li>V&nbsp;Nainstalovaných se aplikace ze Storu ukazovaly dvakrát.</li>
+                  <li>Některé ikony ve formátu ICO se nezobrazovaly.</li>
+                  <li>Tlačítko Zpět po hledání nevedlo na předchozí stránku.</li>
+                </ul>
+              </div>
+            </div>
+          </article>
+
           <!-- 0.2 -->
           <article class="release" id="v0-2">
             <div class="release__meta">
@@ -174,7 +237,6 @@
             <div class="card release__body">
               <div class="release__head">
                 <h2>Nový vzhled ikon, vlastní vzhled aplikací a&nbsp;hledání v&nbsp;Nastavení</h2>
-                <span class="badge badge--live">Nejnovější</span>
               </div>
               <p class="release__lead">Verze 0.2.0 až 0.2.1 (3. – 5. 11. 2026).</p>
               <div class="changes changes--new">

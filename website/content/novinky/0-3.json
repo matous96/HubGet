@@ -1,0 +1,87 @@
+{
+  "version": "0.3",
+  "date": "2026-11-19",
+  "releases": 1,
+  "cs": {
+    "title": "Přehled počítače, příkaz hubget a vrácení aktualizace",
+    "lead": "Verze 0.3.0 (19. 11. 2026).",
+    "highlights": [
+      {
+        "title": "Přehled počítače",
+        "text": "Co zabírá místo, co se zbytečně spouští s Windows, úklid mezipamětí a kontrola podpisů programů."
+      },
+      {
+        "title": "Vrácení aktualizace",
+        "text": "Nová verze nefunguje? Jedním kliknutím zpět na tu předchozí."
+      },
+      {
+        "title": "Příkaz hubget v terminálu",
+        "text": "hubget install vlc, hubget update a další přímo v příkazovém řádku i PowerShellu."
+      }
+    ],
+    "new": [
+      "**Přehled počítače** (v postranním panelu pod Knihovnou) – kolik aplikací máte a kolik zabírají, největší z nich, aplikace spouštěné s Windows, které nepoužíváte, úklid mezipamětí správců balíčků (WinGet, Chocolatey, Scoop, npm, pip) a kontrola digitálních podpisů programů.",
+      "**Příkaz hubget v terminálu** – hubget install, update, search, show a updates v příkazovém řádku i PowerShellu; průběh ukáže HubGet. Zapíná se v Nastavení → Desktopová aplikace.",
+      "**Vrácení aktualizace** – když nová verze nefunguje, jedním kliknutím zpět na tu předchozí; vadnou verzi pak automatické aktualizace přeskočí. Ze Starších verzí jde nainstalovat i verzi starší, než máte.",
+      "**Nepoužívané aplikace** – nová záložka v Nainstalovaných s aplikacemi, které jste 90 dní nespustili, i s hromadnou odinstalací.",
+      "**Hlídání aplikací** – zvonek v detailu aplikace: HubGet dá vědět, až vyjde nová verze nebo až aplikaci z webu výrobce půjde nainstalovat přes HubGet.",
+      "**Moje počítače** (Nastavení) – aplikace a čekající aktualizace všech vašich počítačů; co tu chybí, sem nainstalujete jedním kliknutím.",
+      "Upozornění na programy **bez bezpečnostních oprav** (starší Python, Node.js, .NET, Java…) a na aplikace **nainstalované dvakrát**.",
+      "**Win+Shift+H** otevře HubGet odkudkoli s kurzorem ve vyhledávání a jednou týdně přijde **souhrn** aktualizací."
+    ],
+    "improved": [
+      "Běžící aplikace se před aktualizací zavírají bez dialogu. Když se aplikace ptá na uložení práce (Word, grafické editory), HubGet počká, až ji zavřete.",
+      "Automatické aktualizace se neinstalují během hry, filmu přes celou obrazovku ani prezentace a volitelně jen tehdy, když u počítače nepracujete.",
+      "Před hromadnou aktualizací může HubGet vytvořit bod obnovení systému.",
+      "Nainstalované jde řadit podle velikosti na disku a u dostupných aktualizací je vidět, co je nového.",
+      "Ctrl+K kromě aplikací najde i akce a stránky – Aktualizovat vše, Protokoly, sekce Nastavení.",
+      "U instalátoru v technických údajích je odkaz na kontrolu ve VirusTotalu."
+    ],
+    "fixed": [
+      "V Nainstalovaných se aplikace ze Storu ukazovaly dvakrát.",
+      "Některé ikony ve formátu ICO se nezobrazovaly.",
+      "Tlačítko Zpět po hledání nevedlo na předchozí stránku."
+    ]
+  },
+  "en": {
+    "title": "PC overview, the hubget command and rolling back updates",
+    "lead": "Version 0.3.0 (Nov 19, 2026).",
+    "highlights": [
+      {
+        "title": "PC overview",
+        "text": "What takes up space, what starts with Windows for nothing, cache cleanup and program signature checks."
+      },
+      {
+        "title": "Roll back an update",
+        "text": "New version not working? Go back to the previous one in one click."
+      },
+      {
+        "title": "The hubget command",
+        "text": "hubget install vlc, hubget update and more right in Command Prompt and PowerShell."
+      }
+    ],
+    "new": [
+      "**PC overview** (in the sidebar under Library) – how many apps you have and how much space they take, the largest ones, apps that start with Windows but you don’t use, cleaning up package manager caches (WinGet, Chocolatey, Scoop, npm, pip) and checking program signatures.",
+      "**The hubget command** – hubget install, update, search, show and updates in Command Prompt and PowerShell; HubGet shows the progress. Turn it on in Settings → Desktop app.",
+      "**Roll back an update** – if a new version doesn’t work, go back to the previous one in one click; automatic updates then skip the faulty version. Older versions can now be installed over a newer one too.",
+      "**Unused apps** – a new tab in Installed with apps you haven’t opened for 90 days, with bulk uninstall.",
+      "**Watch apps** – the bell on an app’s page: HubGet lets you know when a new version comes out or when an app from the developer’s website can be installed through HubGet.",
+      "**My PCs** (Settings) – apps and pending updates on all your PCs; install what’s missing here in one click.",
+      "Warnings about programs **without security updates** (older Python, Node.js, .NET, Java…) and apps **installed twice**.",
+      "**Win+Shift+H** opens HubGet from anywhere with the cursor in search, and a weekly **summary** of updates."
+    ],
+    "improved": [
+      "Running apps are closed before an update without a dialog. If an app asks you to save your work (Word, graphics editors), HubGet waits until you close it.",
+      "Automatic updates don’t install while you play, watch full-screen video or present, and optionally only while you’re away from the PC.",
+      "HubGet can create a system restore point before updating all apps.",
+      "Installed apps can be sorted by size on disk, and available updates show what’s new.",
+      "Besides apps, Ctrl+K also finds actions and pages – Update all, Logs, Settings sections.",
+      "The installer’s technical details include a link to check it on VirusTotal."
+    ],
+    "fixed": [
+      "Microsoft Store apps appeared twice in Installed.",
+      "Some ICO icons didn’t show.",
+      "The Back button after a search didn’t return to the previous page."
+    ]
+  }
+}

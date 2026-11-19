@@ -78,17 +78,18 @@
         <div class="page-head__inner reveal">
           <p class="eyebrow" data-t="t1">What’s new</p>
           <h1 data-t="t2">What’s new in&nbsp;HubGet</h1>
-          <p class="lead" data-t="t3">What each series of HubGet versions brought, newest first. <!--obsah:updates-words-capital-->Twenty-five<!--/obsah:updates-words-capital--> updates have shipped since the first version 0.1.0 came out on October&nbsp;21.</p>
+          <p class="lead" data-t="t3">What each series of HubGet versions brought, newest first. <!--obsah:updates-words-capital-->Twenty-six<!--/obsah:updates-words-capital--> updates have shipped since the first version 0.1.0 came out on October&nbsp;21.</p>
           <nav class="versions-nav" aria-label="Jump to version">
             <!--obsah:versions-->
+            <a class="chip" href="#v0-3">0.3</a>
             <a class="chip" href="#v0-2">0.2</a>
             <a class="chip" href="#v0-1">0.1</a>
             <!--/obsah:versions-->
           </nav>
         </div>
         <dl class="stats reveal">
-          <div><dt data-t="t4">Current version</dt><dd><!--obsah:version-->0.2.1<!--/obsah:version--></dd></div>
-          <div><dt data-t="t5">Updates since 0.1.0</dt><dd><!--obsah:updates-->25<!--/obsah:updates--></dd></div>
+          <div><dt data-t="t4">Current version</dt><dd><!--obsah:version-->0.3.0<!--/obsah:version--></dd></div>
+          <div><dt data-t="t5">Updates since 0.1.0</dt><dd><!--obsah:updates-->26<!--/obsah:updates--></dd></div>
           <div><dt data-t="t6">Apps in the catalog</dt><dd data-t="t7">25,100+</dd></div>
           <div><dt data-t="t8">Package managers for real</dt><dd data-t="t9">WinGet · Chocolatey · Scoop + 8 for developers</dd></div>
         </dl>
@@ -149,6 +150,21 @@
             <h3>Search in Settings</h3>
             <p>Ctrl+F finds any option across all sections – including operation history, now part of Settings.</p>
           </article>
+          <article class="card highlight reveal">
+            <span class="highlight__ver">Version 0.3</span>
+            <h3>PC overview</h3>
+            <p>What takes up space, what starts with Windows for nothing, cache cleanup and program signature checks.</p>
+          </article>
+          <article class="card highlight reveal">
+            <span class="highlight__ver">Version 0.3</span>
+            <h3>Roll back an update</h3>
+            <p>New version not working? Go back to the previous one in one click.</p>
+          </article>
+          <article class="card highlight reveal">
+            <span class="highlight__ver">Version 0.3</span>
+            <h3>The hubget command</h3>
+            <p>hubget install vlc, hubget update and more right in Command Prompt and PowerShell.</p>
+          </article>
           <!--/obsah:highlights-->
         </div>
       </div>
@@ -165,6 +181,53 @@
 
         <div class="timeline">
           <!--obsah:releases-->
+          <!-- 0.3 -->
+          <article class="release" id="v0-3">
+            <div class="release__meta">
+              <span class="release__ver">0.3</span>
+              <time class="release__date" datetime="2026-11-19">Nov 19, 2026</time>
+            </div>
+            <div class="card release__body">
+              <div class="release__head">
+                <h2>PC overview, the hubget command and rolling back updates</h2>
+                <span class="badge badge--live">Latest</span>
+              </div>
+              <p class="release__lead">Version 0.3.0 (Nov 19, 2026).</p>
+              <div class="changes changes--new">
+                <h3>New</h3>
+                <ul>
+                  <li><strong>PC overview</strong> (in the sidebar under Library) – how many apps you have and how much space they take, the largest ones, apps that start with Windows but you don’t use, cleaning up package manager caches (WinGet, Chocolatey, Scoop, npm, pip) and checking program signatures.</li>
+                  <li><strong>The hubget command</strong> – hubget install, update, search, show and updates in Command Prompt and PowerShell; HubGet shows the progress. Turn it on in Settings → Desktop app.</li>
+                  <li><strong>Roll back an update</strong> – if a new version doesn’t work, go back to the previous one in one click; automatic updates then skip the faulty version. Older versions can now be installed over a newer one too.</li>
+                  <li><strong>Unused apps</strong> – a new tab in Installed with apps you haven’t opened for 90 days, with bulk uninstall.</li>
+                  <li><strong>Watch apps</strong> – the bell on an app’s page: HubGet lets you know when a new version comes out or when an app from the developer’s website can be installed through HubGet.</li>
+                  <li><strong>My PCs</strong> (Settings) – apps and pending updates on all your PCs; install what’s missing here in one click.</li>
+                  <li>Warnings about programs <strong>without security updates</strong> (older Python, Node.js, .NET, Java…) and apps <strong>installed twice</strong>.</li>
+                  <li><strong>Win+Shift+H</strong> opens HubGet from anywhere with the cursor in search, and a weekly <strong>summary</strong> of updates.</li>
+                </ul>
+              </div>
+              <div class="changes changes--better">
+                <h3>Improved</h3>
+                <ul>
+                  <li>Running apps are closed before an update without a dialog. If an app asks you to save your work (Word, graphics editors), HubGet waits until you close it.</li>
+                  <li>Automatic updates don’t install while you play, watch full-screen video or present, and optionally only while you’re away from the PC.</li>
+                  <li>HubGet can create a system restore point before updating all apps.</li>
+                  <li>Installed apps can be sorted by size on disk, and available updates show what’s new.</li>
+                  <li>Besides apps, Ctrl+K also finds actions and pages – Update all, Logs, Settings sections.</li>
+                  <li>The installer’s technical details include a link to check it on VirusTotal.</li>
+                </ul>
+              </div>
+              <div class="changes changes--fix">
+                <h3>Fixed</h3>
+                <ul>
+                  <li>Microsoft Store apps appeared twice in Installed.</li>
+                  <li>Some ICO icons didn’t show.</li>
+                  <li>The Back button after a search didn’t return to the previous page.</li>
+                </ul>
+              </div>
+            </div>
+          </article>
+
           <!-- 0.2 -->
           <article class="release" id="v0-2">
             <div class="release__meta">
@@ -174,7 +237,6 @@
             <div class="card release__body">
               <div class="release__head">
                 <h2>A new look for icons, custom app looks and search in Settings</h2>
-                <span class="badge badge--live">Latest</span>
               </div>
               <p class="release__lead">Versions 0.2.0 to 0.2.1 (Nov 3–5, 2026).</p>
               <div class="changes changes--new">
