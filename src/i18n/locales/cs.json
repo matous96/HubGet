@@ -2104,6 +2104,11 @@
     "agreements": "Je potřeba přijmout licenční podmínky ({{code}}).",
     "uninstallFailed": "Odinstalace selhala ({{code}}).",
     "inUse": "Aplikace právě běží – zavřete ji a zkuste to znovu ({{code}}).",
+    "inUseByOther_one": "Soubory aplikace teď používá {{detail}} – zavřete ho a zkuste to znovu ({{code}}).",
+    "inUseByOther_few": "Soubory aplikace teď používají {{detail}} – zavřete je a zkuste to znovu ({{code}}).",
+    "inUseByOther_many": "Soubory aplikace teď používají {{detail}} – zavřete je a zkuste to znovu ({{code}}).",
+    "inUseByOther_other": "Soubory aplikace teď používají {{detail}} – zavřete je a zkuste to znovu ({{code}}).",
+    "inUseByOtherUnknown": "Soubory aplikace teď používá jiný program (třeba prohlížeč nebo videohovor s její virtuální kamerou) – zavřete ho a zkuste to znovu ({{code}}).",
     "busy": "Právě probíhá jiná instalace – zkuste to za chvíli ({{code}}).",
     "dependencies": "Chybí závislost potřebná k instalaci ({{code}}).",
     "diskFull": "Na disku není dost místa ({{code}}).",
@@ -2479,6 +2484,13 @@
       "uninstall": "Odinstalace",
       "download": "Stažení",
       "repair": "Oprava"
+    },
+    "other": {
+      "title": "Soubory aplikace {{name}} používají jiné programy",
+      "text": "Operaci nešlo dokončit, protože soubory aplikace {{name}} má načtené jiný program (třeba prohlížeč nebo videohovor s její virtuální kamerou) a instalátor je nemůže přepsat.",
+      "closeAndRetry": "Zavřít je a zkusit znovu",
+      "notFound": "Programy, které soubory používají, se nepodařilo najít (možná běží s právy správce). Zavřete prohlížeče a aplikace pro videohovory a zkuste to znovu.",
+      "hint": "Zavřou se jen programy ze seznamu – nejdřív slušně, takže se případně zeptají na uložení práce."
     }
   },
   "commandSearch": {

@@ -2044,6 +2044,10 @@
     "agreements": "É preciso aceitar os contratos de licença ({{code}}).",
     "uninstallFailed": "A desinstalação falhou ({{code}}).",
     "inUse": "O aplicativo está em execução – feche-o e tente novamente ({{code}}).",
+    "inUseByOther_one": "{{detail}} está usando arquivos do aplicativo – feche-o e tente novamente ({{code}}).",
+    "inUseByOther_many": "{{detail}} estão usando arquivos do aplicativo – feche-os e tente novamente ({{code}}).",
+    "inUseByOther_other": "{{detail}} estão usando arquivos do aplicativo – feche-os e tente novamente ({{code}}).",
+    "inUseByOtherUnknown": "Outro programa está usando arquivos do aplicativo (por exemplo, um navegador ou uma videochamada com a câmera virtual dele) – feche-o e tente novamente ({{code}}).",
     "busy": "Outra instalação está em andamento – tente novamente em instantes ({{code}}).",
     "dependencies": "Está faltando uma dependência necessária para a instalação ({{code}}).",
     "diskFull": "Espaço em disco insuficiente ({{code}}).",
@@ -2402,6 +2406,13 @@
       "uninstall": "A desinstalação",
       "download": "O download",
       "repair": "Reparo"
+    },
+    "other": {
+      "title": "Outros programas estão usando arquivos do {{name}}",
+      "text": "A operação não pôde ser concluída porque outro programa carregou arquivos do {{name}} (por exemplo, um navegador ou uma videochamada com a câmera virtual dele) e o instalador não consegue substituí-los.",
+      "closeAndRetry": "Fechá-los e tentar novamente",
+      "notFound": "Não foi possível encontrar os programas que usam os arquivos (talvez sejam executados como administrador). Feche navegadores e aplicativos de videochamada e tente novamente.",
+      "hint": "Somente os programas da lista são fechados – primeiro normalmente, para que possam pedir para salvar seu trabalho."
     }
   },
   "commandSearch": {

@@ -1984,6 +1984,9 @@
     "agreements": "Die Lizenzvereinbarungen müssen akzeptiert werden ({{code}}).",
     "uninstallFailed": "Die Deinstallation ist fehlgeschlagen ({{code}}).",
     "inUse": "Die App läuft – schließen Sie sie und versuchen Sie es erneut ({{code}}).",
+    "inUseByOther_one": "{{detail}} verwendet Dateien der App – schließen Sie das Programm und versuchen Sie es erneut ({{code}}).",
+    "inUseByOther_other": "{{detail}} verwenden Dateien der App – schließen Sie diese Programme und versuchen Sie es erneut ({{code}}).",
+    "inUseByOtherUnknown": "Ein anderes Programm verwendet Dateien der App (z. B. ein Browser oder Videoanruf mit ihrer virtuellen Kamera) – schließen Sie es und versuchen Sie es erneut ({{code}}).",
     "busy": "Eine andere Installation läuft – versuchen Sie es gleich erneut ({{code}}).",
     "dependencies": "Eine für die Installation nötige Abhängigkeit fehlt ({{code}}).",
     "diskFull": "Nicht genug Speicherplatz ({{code}}).",
@@ -2325,6 +2328,13 @@
       "uninstall": "Die Deinstallation",
       "download": "Der Download",
       "repair": "Reparatur"
+    },
+    "other": {
+      "title": "Andere Programme verwenden Dateien von {{name}}",
+      "text": "Der Vorgang konnte nicht abgeschlossen werden, weil ein anderes Programm Dateien von {{name}} geladen hat (z. B. ein Browser oder Videoanruf mit ihrer virtuellen Kamera) und das Installationsprogramm sie nicht überschreiben kann.",
+      "closeAndRetry": "Schließen und erneut versuchen",
+      "notFound": "Die Programme, die die Dateien verwenden, wurden nicht gefunden (sie laufen eventuell als Administrator). Schließen Sie Browser und Videoanruf-Apps und versuchen Sie es erneut.",
+      "hint": "Geschlossen werden nur die Programme in der Liste – zuerst regulär, damit sie nach dem Speichern fragen können."
     }
   },
   "commandSearch": {

@@ -175,6 +175,11 @@ impl OperationResult {
         self.error_key
     }
 
+    /// Chyba s upřesněním od správce (u „inUseByOther“ názvy programů, které drží soubory aplikace).
+    pub fn with_detail(self, detail: Option<String>) -> Self {
+        OperationResult { detail, ..self }
+    }
+
     /// Úspěch, který se projeví až po restartu (winget jen připravil novou verzi MSIX).
     pub fn with_restart_required(self) -> Self {
         OperationResult { restart_required: true, ..self }

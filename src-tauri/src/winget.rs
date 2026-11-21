@@ -747,6 +747,9 @@ fn interpret(kind: Kind, code: i32) -> Verdict {
         // Oprava aplikace nainstalované jen pro uživatele nesmí běžet jako správce
         0x8A15_007D => Verdict::error("repairUserScope"),
         0x8A15_0006 => Verdict::error("installerFailed").retry_elevated(),
+        // Balíček MSIX s vlastní službou Windows (ChatGPT s Codexem) zaregistruje jen správce:
+        // „Administrator privileges required to install packaged service“
+        0x8007_3D28 => Verdict::error("requiresAdmin").retry_elevated(),
         // Instalace MSI selhala – mj. aplikace pro všechny uživatele bez ALLUSERS=1 (viz winget_operation)
         MSI_INSTALL_FAILED => Verdict::error("installerFailed").retry_elevated(),
         other => Verdict::error(match other {
@@ -763,7 +766,9 @@ fn interpret(kind: Kind, code: i32) -> Verdict {
             0x8A15_0107 => "network",
             0x8A15_0041 | 0x8A15_0046 => "agreements",
             0x8A15_002F => "uninstallFailed",
-            0x8A15_0101 | 0x8A15_0103 | 0x8A15_0111 => "inUse",
+            0x8A15_0101 | 0x8A15_0103 => "inUse",
+            // Soubory aplikace drží jiný program (OBS: virtuální kamera v prohlížeči) – viz running::file_users
+            0x8A15_0111 => "inUseByOther",
             0x8A15_0102 => "busy",
             0x8A15_0104 | 0x8A15_0110 => "dependencies",
             0x8A15_0105 => "diskFull",
@@ -857,6 +862,12 @@ pub async fn winget_operation(
     let mut result = operations::execute(id, spec, on_event).await?;
     if request.kind == Kind::Download {
         return Ok(result);
+    }
+    // Soubory aplikace drží jiný program – do chyby jeho název („Microsoft Edge, Claude“)
+    if result.error_key() == Some("inUseByOther") {
+        let (package_id, name) = (request.package_id.clone(), request.name.clone().unwrap_or_default());
+        let names = background(move || Ok(crate::running::file_user_names(&crate::running::file_users(&package_id, &name)))).await?;
+        result = result.with_detail(names);
     }
     // „Není co aktualizovat“ (0x8A15002B): buď aplikace už nejnovější verzi má (nabídka vznikla
     // ze zastaralého stavu serveru wingetu, viz CHANGED), nebo nová verze potřebuje jiný typ
@@ -1230,7 +1241,16 @@ mod tests {
         let uninstall = interpret(Kind::Uninstall, 0x8A15_0030_u32 as i32);
         assert_eq!(uninstall.error_key, Some("uninstallFailed"));
         assert!(uninstall.retry_elevated);
-        assert!(!interpret(Kind::Update, 0x8A15_0111_u32 as i32).retry_elevated);
+        // OBS 33.0.1: instalátor skončil kódem 6 (manifest → packageInUseByApplication) – virtuální
+        // kameru OBS má načtenou Edge; práva správce nepomůžou, jde o cizí program
+        let other = interpret(Kind::Update, 0x8A15_0111_u32 as i32);
+        assert_eq!(other.error_key, Some("inUseByOther"));
+        assert!(!other.retry_elevated);
+        assert_eq!(interpret(Kind::Update, 0x8A15_0101_u32 as i32).error_key, Some("inUse"));
+        // ChatGPT 26.1117 (MSIX se službou Codex): „Administrator privileges required to install packaged service“
+        let packaged_service = interpret(Kind::Update, 0x8007_3D28_u32 as i32);
+        assert_eq!(packaged_service.error_key, Some("requiresAdmin"));
+        assert!(packaged_service.retry_elevated);
         // Selhaná instalace MSI (EffectCraft 0.18.0 pro všechny uživatele bez ALLUSERS=1) → znovu jako správce
         let msi = interpret(Kind::Update, MSI_INSTALL_FAILED as i32);
         assert_eq!(msi.error_key, Some("installerFailed"));

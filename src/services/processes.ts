@@ -15,11 +15,20 @@ export interface RunningProcess {
   gui: boolean;
   /** Leží ve složce instalace ze záznamu v registru (ne jen podle názvu). */
   certain: boolean;
+  /** Název programu („Microsoft Edge“) – jen u cizích programů z `findFileUsers`. */
+  description?: string;
 }
 
 /** Procesy aplikace podle složky instalace, názvu a id balíčku. */
 export const findAppProcesses = (packageId: string, name: string): Promise<RunningProcess[]> =>
   isTauri() ? invoke<RunningProcess[]>("app_processes", { packageId, name }) : Promise.resolve([]);
+
+/**
+ * Cizí programy, které mají načtené soubory aplikace (chyba „inUseByOther“ – virtuální
+ * kamera OBS v prohlížeči nebo ve videohovoru). Nezavírají se bez dotazu.
+ */
+export const findFileUsers = (packageId: string, name: string): Promise<RunningProcess[]> =>
+  isTauri() ? invoke<RunningProcess[]>("app_file_users", { packageId, name }) : Promise.resolve([]);
 
 /** Zavře procesy – slušně, s `force` natvrdo. Vrátí id procesů, které běží dál. */
 export const closeProcesses = (pids: number[], force: boolean) => invoke<number[]>("close_processes", { pids, force });

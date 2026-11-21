@@ -230,6 +230,7 @@ pub fn run() {
             signatures::check_signatures,
             usage::app_last_used,
             running::app_processes,
+            running::app_file_users,
             running::close_processes,
             running::close_app,
             running::app_close_state,

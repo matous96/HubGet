@@ -2044,6 +2044,10 @@
     "agreements": "Les contrats de licence doivent être acceptés ({{code}}).",
     "uninstallFailed": "La désinstallation a échoué ({{code}}).",
     "inUse": "L’application est en cours d’exécution – fermez-la et réessayez ({{code}}).",
+    "inUseByOther_one": "{{detail}} utilise des fichiers de l’application – fermez-le et réessayez ({{code}}).",
+    "inUseByOther_many": "{{detail}} utilisent des fichiers de l’application – fermez-les et réessayez ({{code}}).",
+    "inUseByOther_other": "{{detail}} utilisent des fichiers de l’application – fermez-les et réessayez ({{code}}).",
+    "inUseByOtherUnknown": "Un autre programme utilise des fichiers de l’application (par exemple un navigateur ou un appel vidéo avec sa caméra virtuelle) – fermez-le et réessayez ({{code}}).",
     "busy": "Une autre installation est en cours – réessayez dans un instant ({{code}}).",
     "dependencies": "Une dépendance nécessaire à l’installation est manquante ({{code}}).",
     "diskFull": "Espace disque insuffisant ({{code}}).",
@@ -2402,6 +2406,13 @@
       "uninstall": "La désinstallation",
       "download": "Le téléchargement",
       "repair": "Réparation"
+    },
+    "other": {
+      "title": "D’autres programmes utilisent les fichiers de {{name}}",
+      "text": "L’opération n’a pas pu aboutir, car un autre programme a chargé des fichiers de {{name}} (par exemple un navigateur ou un appel vidéo avec sa caméra virtuelle) et le programme d’installation ne peut pas les remplacer.",
+      "closeAndRetry": "Les fermer et réessayer",
+      "notFound": "Les programmes qui utilisent les fichiers sont introuvables (ils s’exécutent peut-être en tant qu’administrateur). Fermez les navigateurs et les applications d’appel vidéo, puis réessayez.",
+      "hint": "Seuls les programmes de la liste sont fermés – d’abord normalement, pour qu’ils puissent vous proposer d’enregistrer votre travail."
     }
   },
   "commandSearch": {

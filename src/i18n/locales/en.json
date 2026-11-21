@@ -1984,6 +1984,9 @@
     "agreements": "The license agreements must be accepted ({{code}}).",
     "uninstallFailed": "Uninstall failed ({{code}}).",
     "inUse": "The app is running – close it and try again ({{code}}).",
+    "inUseByOther_one": "{{detail}} is using the app’s files – close it and try again ({{code}}).",
+    "inUseByOther_other": "{{detail}} are using the app’s files – close them and try again ({{code}}).",
+    "inUseByOtherUnknown": "Another program is using the app’s files (for example a browser or video call using its virtual camera) – close it and try again ({{code}}).",
     "busy": "Another installation is in progress – try again shortly ({{code}}).",
     "dependencies": "A dependency required for installation is missing ({{code}}).",
     "diskFull": "Not enough disk space ({{code}}).",
@@ -2325,6 +2328,13 @@
       "uninstall": "The uninstall",
       "download": "The download",
       "repair": "Repair"
+    },
+    "other": {
+      "title": "Other programs are using {{name}}’s files",
+      "text": "The operation couldn’t finish because another program has {{name}}’s files loaded (for example a browser or video call using its virtual camera), so the installer can’t overwrite them.",
+      "closeAndRetry": "Close them and try again",
+      "notFound": "The programs using the files couldn’t be found (they may run as administrator). Close browsers and video call apps and try again.",
+      "hint": "Only the programs in the list are closed – politely first, so they can ask you to save your work."
     }
   },
   "commandSearch": {

@@ -26,7 +26,12 @@ export interface BeforeOperation {
 interface AppInUseState {
   /** Operace, která selhala kvůli běžící aplikaci (nabídka zavřít a zopakovat). */
   request: EnqueueRequest | null;
-  open: (request: EnqueueRequest) => void;
+  /**
+   * Soubory aplikace drží jiné programy (winget „inUseByOther“ – virtuální kamera OBS
+   * v prohlížeči): dialog nabídne zavřít je, ne aplikaci samotnou.
+   */
+  otherApps: boolean;
+  open: (request: EnqueueRequest, otherApps?: boolean) => void;
   close: () => void;
   /** Otázka před operací (null = žádná). */
   before: BeforeOperation | null;
@@ -39,8 +44,9 @@ interface AppInUseState {
 
 export const useAppInUse = create<AppInUseState>()((set, get) => ({
   request: null,
-  open: (request) => set({ request }),
-  close: () => set({ request: null }),
+  otherApps: false,
+  open: (request, otherApps = false) => set({ request, otherApps }),
+  close: () => set({ request: null, otherApps: false }),
   before: null,
   resolveBefore: null,
   ask: (question) =>

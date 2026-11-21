@@ -8,7 +8,8 @@
  *    pokračuje. Jde i pokračovat bez zavření, nebo operaci zrušit.
  *  - AppInUseDialog (po neúspěchu): instalátor aplikaci nemohl přepsat
  *    (winget „inUse“) – dialog najde její procesy, nabídne je zavřít
- *    a operaci zařadí znovu.
+ *    a operaci zařadí znovu. U „inUseByOther“ (soubory aplikace drží jiný
+ *    program – virtuální kamera OBS v Edgi) nabídne zavřít ty programy.
  */
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { RotateCcw, XCircle } from "lucide-react";
@@ -17,7 +18,7 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { Spinner } from "@/components/ui/States";
-import { closeProcesses, findAppProcesses, type RunningProcess } from "@/services/processes";
+import { closeProcesses, findAppProcesses, findFileUsers, type RunningProcess } from "@/services/processes";
 import { useAppInUse } from "@/store/appInUse";
 import { useJobs } from "@/store/jobs";
 
@@ -28,7 +29,7 @@ function ProcessList({ processes }: { processes: RunningProcess[] }) {
     <ul className="mt-3 flex flex-col gap-1 rounded-xl border border-line p-2 text-sm">
       {processes.map((p) => (
         <li key={p.pid} className="flex items-center justify-between gap-3 px-2 py-1" title={p.path}>
-          <span className="min-w-0 truncate font-medium">{p.name}</span>
+          <span className="min-w-0 truncate font-medium">{p.description ?? p.name}</span>
           <span className="flex shrink-0 items-center gap-2 text-xs text-muted">
             {!p.visible && <span className="rounded-full bg-surface-2 px-2 py-0.5">{t("appInUse.background")}</span>}
             PID {p.pid}
@@ -103,18 +104,25 @@ export function AppRunningDialog() {
   );
 }
 
-/** Po neúspěchu: aplikace běží a instalátor ji nemohl přepsat – zavřít a zkusit znovu. */
+/**
+ * Po neúspěchu: aplikace běží a instalátor ji nemohl přepsat – zavřít a zkusit znovu.
+ * `otherApps`: soubory aplikace drží jiné programy (virtuální kamera OBS v prohlížeči
+ * nebo ve videohovoru) – nabídnout zavřít ty, aplikace sama neběží.
+ */
 export function AppInUseDialog() {
   const { t } = useTranslation();
-  const { request, close } = useAppInUse();
+  const { request, otherApps, close } = useAppInUse();
   const enqueue = useJobs((s) => s.enqueue);
 
   const { data: processes, isLoading } = useQuery({
-    queryKey: ["app-processes", request?.packageId, request?.appName],
-    queryFn: () => findAppProcesses(request!.packageId, request!.appName),
+    queryKey: ["app-processes", request?.packageId, request?.appName, otherApps],
+    queryFn: () => (otherApps ? findFileUsers : findAppProcesses)(request!.packageId, request!.appName),
     enabled: !!request,
     staleTime: 0,
   });
+  /** Texty dialogu: aplikace běží, nebo její soubory drží jiné programy. */
+  const text = (key: "title" | "text" | "closeAndRetry" | "notFound" | "hint") =>
+    t(otherApps ? `appInUse.other.${key}` : `appInUse.${key}`, { name: request?.appName ?? "" });
 
   const retry = () => {
     if (request) enqueue(request);
@@ -132,7 +140,7 @@ export function AppInUseDialog() {
     <Modal
       open={!!request}
       onClose={dismiss}
-      title={t("appInUse.title", { name: request?.appName ?? "" })}
+      title={text("title")}
       footer={
         <>
           <Button variant="secondary" onClick={dismiss} disabled={closing.pending}>
@@ -141,7 +149,7 @@ export function AppInUseDialog() {
           {processes && processes.length > 0 ? (
             <Button variant={closing.stubborn ? "danger" : "primary"} disabled={closing.pending} onClick={closing.close}>
               {closing.pending ? <Spinner className="size-4 text-accent-fg" /> : <XCircle className="size-4" />}
-              {t(closing.stubborn ? "appInUse.forceClose" : "appInUse.closeAndRetry")}
+              {closing.stubborn ? t("appInUse.forceClose") : text("closeAndRetry")}
             </Button>
           ) : (
             <Button onClick={retry} disabled={isLoading}>
@@ -152,16 +160,16 @@ export function AppInUseDialog() {
         </>
       }
     >
-      <p className="text-sm">{t("appInUse.text", { name: request?.appName ?? "" })}</p>
+      <p className="text-sm">{text("text")}</p>
       {isLoading ? (
         <Spinner className="mt-4 size-5" />
       ) : processes && processes.length > 0 ? (
         <ProcessList processes={processes} />
       ) : (
-        <p className="mt-3 text-sm text-muted">{t("appInUse.notFound")}</p>
+        <p className="mt-3 text-sm text-muted">{text("notFound")}</p>
       )}
       {closing.stubborn && <p className="mt-3 rounded-xl bg-danger/10 px-3 py-2 text-xs text-danger">{t("appInUse.stubborn")}</p>}
-      <p className="mt-3 text-xs text-muted">{t("appInUse.hint")}</p>
+      <p className="mt-3 text-xs text-muted">{text("hint")}</p>
     </Modal>
   );
 }

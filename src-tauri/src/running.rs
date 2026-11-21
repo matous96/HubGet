@@ -1,7 +1,7 @@
 //! Běžící procesy aplikace.
 //!
 //! Před instalací, aktualizací a odinstalací (a po neúspěchu s chybou „inUse“ –
-//! winget 0x8A150101 / 0x8A150111) HubGet najde procesy aplikace a zavře je –
+//! winget 0x8A150101) HubGet najde procesy aplikace a zavře je –
 //! jinak instalátor běžící soubory nepřepíše (OBS v oznamovací oblasti u hodin,
 //! proces, který v paměti zůstal po zavření okna nebo po odinstalaci).
 //!
@@ -17,6 +17,10 @@
 //! ukončí sám (proces na pozadí), nebo se zeptá. Složky instalace si backend
 //! pamatuje: po odinstalaci záznam z registru zmizí, ale procesy, které ze
 //! složky dál běží, se dají dohledat a ukončit.
+//!
+//! Soubory aplikace může držet i cizí program (winget 0x8A150111, chyba „inUseByOther“):
+//! modul virtuální kamery OBS načtený v prohlížeči nebo ve videohovoru. Ty najde
+//! `file_users` podle načtených knihoven – nezavírají se samy, rozhodne uživatel.
 
 use serde::Serialize;
 use std::collections::{HashMap, HashSet};
@@ -40,6 +44,10 @@ pub struct RunningProcess {
     gui: bool,
     /// Leží ve složce instalace ze záznamu v registru (ne jen podle názvu).
     certain: bool,
+    /// Název programu (FileDescription – „Microsoft Edge“) – jen u cizích programů,
+    /// které mají načtené soubory aplikace (`app_file_users`).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    description: Option<String>,
 }
 
 /// Podsložky, ze kterých se složka instalace vystoupá výš („obs-studio\bin\64bit“ → „obs-studio“,
@@ -231,31 +239,126 @@ pub fn is_gui_program(path: &str) -> bool {
     read().is_ok_and(|subsystem| subsystem == 2)
 }
 
+/// Složky instalace aplikace (malými písmeny, se „\“ na konci): z registru, u programu
+/// rozbaleného na ploše jeho složka, jinak zapamatované z dřívějška (po odinstalaci).
+fn app_dirs(package_id: &str, name: &str) -> Vec<String> {
+    let registry = arp::Registry::load();
+    let mut dirs: Vec<String> = registry
+        .matching(package_id, name, "")
+        .into_iter()
+        .flat_map(install_dirs)
+        .map(|d| format!("{}\\", d.to_string_lossy().trim_end_matches('\\').to_lowercase()))
+        .collect();
+    // Program rozbalený na ploše (Tor Browser) záznam v registru nemá – jeho složka
+    if dirs.is_empty() {
+        dirs.extend(crate::disk::portable_folder(name).map(|dir| format!("{}\\", arp::folder_key(&dir))));
+    }
+    let mut known = KNOWN_DIRS.lock().unwrap_or_else(|e| e.into_inner());
+    let known = known.get_or_insert_with(HashMap::new);
+    if dirs.is_empty() {
+        dirs = known.get(package_id).cloned().unwrap_or_default();
+    } else {
+        known.insert(package_id.to_string(), dirs.clone());
+    }
+    dirs
+}
+
+/// Cesty knihoven (DLL) načtených v procesu; proces, do kterého nejde nahlédnout
+/// (běží s právy správce, chráněný), nemá žádné.
+#[cfg(windows)]
+fn module_paths(pid: u32) -> Vec<String> {
+    use windows_sys::Win32::Foundation::{CloseHandle, GetLastError, ERROR_BAD_LENGTH, INVALID_HANDLE_VALUE};
+    use windows_sys::Win32::System::Diagnostics::ToolHelp::{
+        CreateToolhelp32Snapshot, Module32FirstW, Module32NextW, MODULEENTRY32W, TH32CS_SNAPMODULE, TH32CS_SNAPMODULE32,
+    };
+
+    let mut paths = Vec::new();
+    // SAFETY: snapshot se zavře; cesta se čte jen do první nuly v poli pevné délky
+    unsafe {
+        // ERROR_BAD_LENGTH = proces právě načítá knihovny – stačí to zkusit znovu
+        let mut snapshot = INVALID_HANDLE_VALUE;
+        for _ in 0..3 {
+            snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, pid);
+            if snapshot != INVALID_HANDLE_VALUE || GetLastError() != ERROR_BAD_LENGTH {
+                break;
+            }
+        }
+        if snapshot == INVALID_HANDLE_VALUE {
+            return paths;
+        }
+        let mut entry: MODULEENTRY32W = std::mem::zeroed();
+        entry.dwSize = std::mem::size_of::<MODULEENTRY32W>() as u32;
+        let mut ok = Module32FirstW(snapshot, &mut entry) != 0;
+        while ok {
+            let len = entry.szExePath.iter().position(|&c| c == 0).unwrap_or(entry.szExePath.len());
+            paths.push(String::from_utf16_lossy(&entry.szExePath[..len]));
+            ok = Module32NextW(snapshot, &mut entry) != 0;
+        }
+        CloseHandle(snapshot);
+    }
+    paths
+}
+
+#[cfg(not(windows))]
+fn module_paths(_pid: u32) -> Vec<String> {
+    Vec::new()
+}
+
+/// Cizí programy, které mají načtené soubory aplikace – instalátor je nemůže přepsat
+/// (winget 0x8A150111 „používá jiná aplikace“): modul virtuální kamery OBS v prohlížeči,
+/// v Discordu nebo ve videohovoru. Programy aplikace samotné (spustitelný soubor v její
+/// složce) a procesy Windows sem nepatří.
+pub(crate) fn file_users(package_id: &str, name: &str) -> Vec<RunningProcess> {
+    let dirs = app_dirs(package_id, name);
+    if dirs.is_empty() {
+        return Vec::new();
+    }
+    let own = std::process::id();
+    let windows = visible_window_pids();
+    processes()
+        .into_iter()
+        .filter(|p| p.pid != own && !in_windows(&p.path) && !dirs.iter().any(|dir| inside(&p.path, dir)))
+        .filter(|p| module_paths(p.pid).iter().any(|module| dirs.iter().any(|dir| inside(module, dir))))
+        .map(|p| {
+            let description = crate::version_info::fields(Path::new(&p.path), &["FileDescription"])
+                .remove(0)
+                .or_else(|| Path::new(&p.path).file_stem().map(|s| s.to_string_lossy().into_owned()));
+            RunningProcess {
+                visible: windows.contains(&p.pid),
+                gui: is_gui_program(&p.path),
+                certain: false,
+                description,
+                pid: p.pid,
+                name: p.name,
+                path: p.path,
+            }
+        })
+        .collect()
+}
+
+/// Názvy programů z `file_users` bez opakování („Microsoft Edge, Claude“); None = žádné.
+pub(crate) fn file_user_names(users: &[RunningProcess]) -> Option<String> {
+    let mut names: Vec<&str> = Vec::new();
+    for name in users.iter().filter_map(|p| p.description.as_deref()) {
+        if !names.iter().any(|n| n.eq_ignore_ascii_case(name)) {
+            names.push(name);
+        }
+    }
+    (!names.is_empty()).then(|| names.join(", "))
+}
+
+/// Cizí programy, které mají načtené soubory aplikace (AppInUseDialog po chybě „inUseByOther“).
+#[tauri::command]
+pub async fn app_file_users(package_id: String, name: String) -> Result<Vec<RunningProcess>, String> {
+    background(move || Ok(file_users(&package_id, &name))).await
+}
+
 /// Procesy aplikace: podle složek instalace (registr + zapamatované z dřívějška)
 /// a podle názvu aplikace / id balíčku.
 #[tauri::command]
 pub async fn app_processes(package_id: String, name: String) -> Result<Vec<RunningProcess>, String> {
     background(move || {
-        let registry = arp::Registry::load();
-        let mut dirs: Vec<String> = registry
-            .matching(&package_id, &name, "")
-            .into_iter()
-            .flat_map(install_dirs)
-            .map(|d| format!("{}\\", d.to_string_lossy().trim_end_matches('\\').to_lowercase()))
-            .collect();
-        // Program rozbalený na ploše (Tor Browser) záznam v registru nemá – jeho složka
-        if dirs.is_empty() {
-            dirs.extend(crate::disk::portable_folder(&name).map(|dir| format!("{}\\", arp::folder_key(&dir))));
-        }
-        {
-            let mut known = KNOWN_DIRS.lock().unwrap_or_else(|e| e.into_inner());
-            let known = known.get_or_insert_with(HashMap::new);
-            if dirs.is_empty() {
-                dirs = known.get(&package_id).cloned().unwrap_or_default();
-            } else {
-                known.insert(package_id.clone(), dirs.clone());
-            }
-        }
+        let dirs = app_dirs(&package_id, &name);
         let (apps, _) = leftovers::name_keys(&name, &package_id);
         let own = std::process::id();
         let own_dir = std::env::current_exe().ok().and_then(|exe| exe.parent().map(|d| format!("{}\\", d.to_string_lossy().to_lowercase())));
@@ -269,6 +372,7 @@ pub async fn app_processes(package_id: String, name: String) -> Result<Vec<Runni
                     visible: windows.contains(&p.pid),
                     gui: is_gui_program(&p.path),
                     certain,
+                    description: None,
                     pid: p.pid,
                     name: p.name,
                     path: p.path,
@@ -460,6 +564,39 @@ mod tests {
         let (nvidia, _) = leftovers::name_keys("NVIDIA App", "Nvidia.NvidiaApp");
         assert!(named_like_app(r"C:\Program Files\NVIDIA Corporation\NVIDIA App\CEF\NVIDIA Overlay.exe", &nvidia));
         assert!(!named_like_app(r"C:\Users\x\AppData\Local\ChatGPT\app\ChatGPT.exe", &nvidia));
+    }
+
+    #[test]
+    fn nazvy_cizich_programu() {
+        let user = |name: &str, description: Option<&str>| RunningProcess {
+            pid: 1,
+            name: name.into(),
+            path: String::new(),
+            visible: false,
+            gui: true,
+            certain: false,
+            description: description.map(str::to_string),
+        };
+        let users = [
+            user("msedge.exe", Some("Microsoft Edge")),
+            user("msedge.exe", Some("Microsoft Edge")),
+            user("claude.exe", Some("Claude")),
+            user("x.exe", None),
+        ];
+        assert_eq!(file_user_names(&users).as_deref(), Some("Microsoft Edge, Claude"));
+        assert_eq!(file_user_names(&[]), None);
+    }
+
+    /// Kdo má načtené soubory OBS (virtuální kamera): cargo test --lib running -- --ignored --nocapture
+    #[test]
+    #[ignore]
+    fn live_file_users() {
+        let start = Instant::now();
+        let users = file_users("OBSProject.OBSStudio", "OBS Studio");
+        for user in &users {
+            println!("{} ({}) {:?} {}", user.name, user.pid, user.description, user.path);
+        }
+        println!("{:?} → {:?} za {:?}", users.len(), file_user_names(&users), start.elapsed());
     }
 
     #[test]

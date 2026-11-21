@@ -2044,6 +2044,10 @@
     "agreements": "Hay que aceptar los acuerdos de licencia ({{code}}).",
     "uninstallFailed": "Falló la desinstalación ({{code}}).",
     "inUse": "La aplicación se está ejecutando: ciérrala e inténtalo de nuevo ({{code}}).",
+    "inUseByOther_one": "{{detail}} está usando archivos de la aplicación: ciérralo e inténtalo de nuevo ({{code}}).",
+    "inUseByOther_many": "{{detail}} están usando archivos de la aplicación: ciérralos e inténtalo de nuevo ({{code}}).",
+    "inUseByOther_other": "{{detail}} están usando archivos de la aplicación: ciérralos e inténtalo de nuevo ({{code}}).",
+    "inUseByOtherUnknown": "Otro programa está usando archivos de la aplicación (por ejemplo, un navegador o una videollamada con su cámara virtual): ciérralo e inténtalo de nuevo ({{code}}).",
     "busy": "Hay otra instalación en curso: inténtalo de nuevo en breve ({{code}}).",
     "dependencies": "Falta una dependencia necesaria para la instalación ({{code}}).",
     "diskFull": "No hay espacio suficiente en el disco ({{code}}).",
@@ -2402,6 +2406,13 @@
       "uninstall": "La desinstalación",
       "download": "La descarga",
       "repair": "Reparación"
+    },
+    "other": {
+      "title": "Otros programas están usando archivos de {{name}}",
+      "text": "La operación no pudo completarse porque otro programa tiene cargados archivos de {{name}} (por ejemplo, un navegador o una videollamada con su cámara virtual) y el instalador no puede sobrescribirlos.",
+      "closeAndRetry": "Cerrarlos e intentar de nuevo",
+      "notFound": "No se encontraron los programas que usan los archivos (quizá se ejecutan como administrador). Cierra los navegadores y las aplicaciones de videollamada e inténtalo de nuevo.",
+      "hint": "Solo se cierran los programas de la lista, primero de forma normal, para que puedan pedirte que guardes el trabajo."
     }
   },
   "commandSearch": {

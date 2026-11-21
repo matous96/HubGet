@@ -37,11 +37,15 @@ const abortError = () => new DOMException("Aborted", "AbortError");
 
 /** Srozumitelná chyba z výsledku operace. */
 function errorMessage(result: BackendResult): string {
-  const key = result.errorKey ?? "unknown";
+  let key = result.errorKey ?? "unknown";
+  // Soubory aplikace drží jiný program: v `detail` jeho název („Microsoft Edge, Claude“),
+  // bez něj (program s právy správce, do kterého HubGet nevidí) obecná zpráva
+  const users = key === "inUseByOther" && result.detail ? result.detail.split(", ").length : 0;
+  if (key === "inUseByOther" && !users) key = "inUseByOtherUnknown";
   // status = stav HTTP u nefunkčního odkazu na instalátor (0x80190194 → 404);
   // u pádu instalátoru je v `detail` kód pádu (0xC0000005), ne HRESULT wingetu
   const code = key === "installerCrashed" && result.detail ? result.detail : hex(result.code);
-  const message = i18n.t(`wingetError.${key}`, { code, status: result.code & 0xffff, detail: result.detail ?? "" });
+  const message = i18n.t(`wingetError.${key}`, { code, status: result.code & 0xffff, detail: result.detail ?? "", ...(users ? { count: users } : {}) });
   return key === "unknown" && result.detail ? `${message} – ${result.detail}` : message;
 }
 

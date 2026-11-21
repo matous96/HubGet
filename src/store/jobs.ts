@@ -733,10 +733,12 @@ export const useJobs = create<JobsState>()((set, get) => {
     // Přes kterého správce je aplikace nainstalovaná (štítek a správa i po restartu)
     if (outcome === "success" && job.kind === "install") useInstalledVia.getState().installed(job.source, job.packageId);
     if (outcome === "success" && job.kind === "uninstall") useInstalledVia.getState().removed(job.source, job.packageId);
-    // Aplikace běží (OBS při aktualizaci…) – nabídnout ji zavřít a zkusit znovu
-    if (outcome === "error" && result.errorKey === "inUse" && !job.background) {
+    // Aplikace běží (OBS při aktualizaci…) – nabídnout ji zavřít a zkusit znovu; soubory aplikace
+    // drží jiný program (virtuální kamera OBS v prohlížeči) – nabídnout zavřít ten
+    const inUse = result.errorKey === "inUse" || result.errorKey === "inUseByOther";
+    if (outcome === "error" && inUse && !job.background) {
       const { appId: id, appName, source, packageId, kind, version, options } = job;
-      useAppInUse.getState().open({ appId: id, appName, source, packageId, kind, version, options });
+      useAppInUse.getState().open({ appId: id, appName, source, packageId, kind, version, options }, result.errorKey === "inUseByOther");
     }
 
     // Stav v UI hned podle výsledku, pak ověření u správce (na pozadí – další úloha nečeká)
