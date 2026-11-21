@@ -28,6 +28,72 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
   {
+    version: "0.3.2",
+    date: "2026-11-21",
+    highlights: [
+      {
+        cs: "Hry ze všech obchodů: kromě Steamu teď Knihovna ukáže i hry z Epic Games, EA app, GOG Galaxy, Ubisoft Connect a Battle.net – s ikonou, velikostí a spuštěním přes jejich obchod.",
+        en: "Games from every store: besides Steam, the Library now shows games from Epic Games, EA app, GOG Galaxy, Ubisoft Connect and Battle.net – with icon, size and launching through their store.",
+      },
+      {
+        cs: "Kontrola podpisu instalátoru: před instalací a aktualizací HubGet ověří digitální podpis staženého instalátoru. Neplatný podpis nebo nový vydavatel instalaci zastaví a vysvětlí proč.",
+        en: "Installer signature check: before installing or updating, HubGet verifies the digital signature of the downloaded installer. An invalid signature or a new publisher stops the installation and explains why.",
+      },
+      {
+        cs: "Opravit aplikaci: v nabídce nainstalované aplikace spustí opravu přes winget, pokud ji instalátor podporuje.",
+        en: "Repair app: in the menu of an installed app, runs a repair through winget when the installer supports it.",
+      },
+      {
+        cs: "Převzít do správy: aplikace nainstalované mimo HubGet, které jsou v katalogu, můžete jedním klikem převzít – HubGet pak hlídá jejich aktualizace.",
+        en: "Take over: apps installed outside HubGet that are in the catalog can be taken over with one click – HubGet then watches their updates.",
+      },
+      {
+        cs: "Aplikace, které se aktualizují samy (Chrome, Firefox, Discord…), dostanou na vlastní aktualizaci 14 dní (bezpečnostní opravu 3 dny), než ji nabídne HubGet.",
+        en: "Apps that update themselves (Chrome, Firefox, Discord…) get 14 days to update on their own (3 days for a security fix) before HubGet offers the update.",
+      },
+      {
+        cs: "Porovnat aplikace: až čtyři aplikace vedle sebe – hodnocení, velikost, licence, poslední vydání, podporované správce. Nově v katalogu: co přibylo za 7, 30 nebo 90 dní.",
+        en: "Compare apps: up to four apps side by side – rating, size, license, last release, supported managers. New in the catalog: what was added in the last 7, 30 or 90 days.",
+      },
+      {
+        cs: "Nový počítač: vyberte aplikace po skupinách (prohlížeč, kancelář, komunikace, multimédia…) a nainstalujte je najednou. Hledání podle účelu česky – „střih videa“, „hesla“, „pdf“.",
+        en: "New PC: pick apps by group (browser, office, chat, media…) and install them all at once. Search by purpose – “video editing”, “passwords”, “pdf”.",
+      },
+      {
+        cs: "Přehled počítače: úklid předinstalovaných aplikací Windows (dají se vrátit z Microsoft Store) a volitelné aktualizace ovladačů z Windows Update.",
+        en: "PC overview: clean up apps preinstalled with Windows (they can be restored from the Microsoft Store) and optional driver updates from Windows Update.",
+      },
+      {
+        cs: "Upozornění na opuštěné aplikace (projekt archivovaný nebo roky bez změn), Nedávno aktualizováno v Knihovně a Váš rok s HubGetem – kolik jste instalovali, aktualizovali a kolik času ušetřili.",
+        en: "Warnings about abandoned apps (archived project or years without changes), Recently updated in the Library and Your year with HubGet – how much you installed, updated and how much time you saved.",
+      },
+      {
+        cs: "Komunita: návrhy aplikací do katalogu s hlasováním, odpovědi vývojářů na recenze, žebříček podle instalací v HubGetu (30, 90, 365 dní; sdílení je dobrovolné) a statistiky instalací pro vývojáře.",
+        en: "Community: suggest apps for the catalog and vote, developer replies to reviews, a chart by installs in HubGet (30, 90, 365 days; sharing is opt-in) and install statistics for developers.",
+      },
+      {
+        cs: "Přístupnost: velikost textu (nebo podle Windows), omezení animací, podtržené odkazy, odkaz Přeskočit na obsah a lepší podpora režimu vysokého kontrastu.",
+        en: "Accessibility: text size (or follow Windows), reduced motion, underlined links, a Skip to content link and better support for high contrast mode.",
+      },
+    ],
+    featured: [
+      {
+        title: { cs: "Hry ze všech obchodů", en: "Games from every store" },
+        text: {
+          cs: "Steam, Epic, EA, GOG, Ubisoft i Battle.net v jedné Knihovně.",
+          en: "Steam, Epic, EA, GOG, Ubisoft and Battle.net in one Library.",
+        },
+      },
+      {
+        title: { cs: "Kontrola podpisu instalátoru", en: "Installer signature check" },
+        text: {
+          cs: "Neplatný podpis nebo nový vydavatel instalaci zastaví dřív, než se spustí.",
+          en: "An invalid signature or a new publisher stops the installation before it runs.",
+        },
+      },
+    ],
+  },
+  {
     version: "0.3.1",
     date: "2026-11-19",
     highlights: [
