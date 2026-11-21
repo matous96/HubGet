@@ -19,6 +19,7 @@
     "core:window:allow-minimize",
     "core:window:allow-toggle-maximize",
     "core:window:allow-close",
-    "core:window:allow-set-progress-bar"
+    "core:window:allow-set-progress-bar",
+    "core:webview:allow-set-webview-zoom"
   ]
 }

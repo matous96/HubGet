@@ -38,6 +38,9 @@ import { holdByCommunity } from "@/store/reliability";
 import { writeLog } from "@/store/logs";
 import type { InstalledPackage } from "@/types";
 import { isUnmanagedOrigin, useInstalledItems, type InstalledItem } from "./useInstalledItems";
+import { withAdoptedPackages } from "./usePackages";
+import { useAdopted } from "@/store/adopted";
+import type { LoadedCatalog } from "@/services/catalog";
 
 /** Aktuální spárování nainstalovaných s katalogem (id karty a název) – z hooku níže. */
 let currentItems: InstalledItem[] = [];
@@ -76,7 +79,9 @@ const communityWarned = new Set<string>();
 /** Aktualizace k instalaci z posledního načtení (s pravidly: zámky, minimální stáří…). */
 function currentUpdatable(): InstalledPackage[] {
   const raw = queryClient.getQueriesData<InstalledPackage[]>({ queryKey: queryKeys.installed }).flatMap(([, d]) => d ?? []);
-  const updatable = applyUpdateRules(raw, currentUpdateRules()).filter((p) => p.availableVersion && !isUnmanagedOrigin(p.origin));
+  // Převzaté programy (store/adopted.ts) se aktualizují jako balíčky wingetu
+  const adopted = withAdoptedPackages(raw, queryClient.getQueryData<LoadedCatalog>(queryKeys.catalog), useAdopted.getState().items);
+  const updatable = applyUpdateRules(adopted, currentUpdateRules()).filter((p) => p.availableVersion && !isUnmanagedOrigin(p.origin));
   return [...new Map(updatable.map((p) => [pinKey(p), p])).values()];
 }
 

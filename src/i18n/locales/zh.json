@@ -107,7 +107,9 @@
     "startup": "启动应用",
     "publish": "发布",
     "about": "关于 HubGet",
-    "overview": "电脑概览"
+    "overview": "电脑概览",
+    "new": "目录新增",
+    "newPc": "新电脑"
   },
   "startup": {
     "title": "启动应用",
@@ -420,26 +422,33 @@
       "popularity": "按目录热度得分排列的最受欢迎应用",
       "rating": "按 HubGet 用户星级排列的最高评分应用",
       "movers": "过去 7 天下载量增长最多的应用",
-      "trending": "有最新更新的热门应用"
+      "trending": "有最新更新的热门应用",
+      "installs_other": "过去 {{count}} 天内 HubGet 用户安装最多的应用"
     },
     "all": "全部",
     "sortLabel": "排行榜排序",
     "sort": {
       "popularity": "热度",
       "rating": "评分最高",
-      "movers": "本周飙升"
+      "movers": "本周飙升",
+      "installs": "HubGet 安装最多"
     },
     "sortHint": {
       "popularity": "目录热度得分（默认）",
       "rating": "HubGet 用户的平均星级",
-      "movers": "过去 7 天下载量增长最大"
+      "movers": "过去 7 天下载量增长最大",
+      "installs": "所选时间段内安装该应用的 HubGet 用户数"
     },
     "moversPending": "目录收集满一周的下载数据后，将显示本周飙升的应用。在此之前，显示有最新更新的热门应用。",
     "noRatings": "还没有应用获得用户评分。",
     "ratingCount_one": "{{count}} 个评分",
     "ratingCount_other": "{{count}} 个评分",
     "weeklyDownloads_one": "过去 7 天下载 {{formatted}} 次",
-    "weeklyDownloads_other": "过去 7 天下载 {{formatted}} 次"
+    "weeklyDownloads_other": "过去 7 天下载 {{formatted}} 次",
+    "period_other": "{{count}} 天",
+    "noInstalls": "HubGet 用户开始匿名分享安装记录后，排行榜就会填充——应用达到 3 次安装后才会出现。",
+    "installsUnavailable": "安装排行榜暂不可用。",
+    "installCount_other": "{{formatted}} 次安装"
   },
   "recent": {
     "title": "最近查看",
@@ -548,7 +557,8 @@
       "install": "安装",
       "update": "更新",
       "uninstall": "卸载",
-      "download": "下载安装程序"
+      "download": "下载安装程序",
+      "repair": "修复"
     },
     "outcome": {
       "success": "已完成",
@@ -602,7 +612,8 @@
       "appClosing": "{{name}} 关闭时询问是否保存工作——正在等待用户关闭它。",
       "appCloseTimeout": "{{name}} 保持打开 15 分钟——操作已取消。",
       "needsAdmin": "{{name}} 需要管理员权限才能更新——将等待手动更新。",
-      "settingsBackupFailed": "更新前无法备份 {{name}} 的设置：{{error}}"
+      "settingsBackupFailed": "更新前无法备份 {{name}} 的设置：{{error}}",
+      "repairDone": "修复成功（{{seconds}} 秒）。"
     },
     "notice": {
       "prefetchFailed": "无法提前下载安装程序（{{detail}}）——将由 WinGet 下载。",
@@ -610,7 +621,9 @@
       "preCommand": "正在运行安装前命令：{{detail}}",
       "postCommand": "正在运行安装后命令：{{detail}}",
       "postCommandFailed": "安装后命令失败（{{detail}}）——安装本身已成功。",
-      "needsAdmin": "需要管理员权限——后台自动更新不会打开 UAC 对话框。"
+      "needsAdmin": "需要管理员权限——后台自动更新不会打开 UAC 对话框。",
+      "signedBy": "安装程序签名者：{{detail}}",
+      "unsigned": "安装程序没有数字签名。"
     },
     "phase": {
       "queued": "正在排队…",
@@ -618,7 +631,8 @@
       "downloading": "正在下载安装程序…",
       "interactive": "正在等待你完成安装向导…",
       "installing": "正在运行安装程序…",
-      "uninstalling": "正在卸载…"
+      "uninstalling": "正在卸载…",
+      "repairing": "正在修复安装…"
     }
   },
   "help": {
@@ -851,7 +865,8 @@
       "title": "{{category}}精选",
       "subtitle": "{{names}} 等热门应用。",
       "description": "HubGet 目录中{{category}}分类的热门应用——按人气和用户反馈挑选。可以逐个安装，也可以一次全部安装。下次我们会挑选别的应用。"
-    }
+    },
+    "seeAllNew": "全部新增应用"
   },
   "collection": {
     "open": "打开合集 {{name}}",
@@ -928,7 +943,6 @@
     "installedVia": "安装方式",
     "managedBySteam": "此游戏由 Steam 管理——更新和文件验证在 Steam 中进行。",
     "openInSteam": "在 Steam 中打开",
-    "managedByEa": "此游戏由 EA app 管理——更新和文件验证在 EA app 中进行。",
     "localInstall": "在包管理器之外安装——HubGet 可以卸载它，但无法更新。",
     "webOnlyNote": "{{publisher}} 仅在其官网提供 {{name}} 下载，因此 HubGet 无法安装、更新或卸载它。安装后，HubGet 仍能识别并打开它。",
     "webSource": "官网",
@@ -975,7 +989,8 @@
     "cliPin": "固定版本",
     "cliMore": "更多命令和说明",
     "cliUnsupported": "{{manager}} 不支持此操作",
-    "openSourceAlternatives": "{{name}} 的开源替代品"
+    "openSourceAlternatives": "{{name}} 的开源替代品",
+    "managedByStore": "此游戏由 {{store}} 管理——更新和文件验证在 {{store}} 中进行。"
   },
   "report": {
     "button": "报告问题",
@@ -1406,7 +1421,8 @@
     "uninstalling": "正在卸载",
     "estimate": "估计值——安装程序不报告进度",
     "remainingSeconds_other": "剩余 {{count}} 秒",
-    "remainingMinutes_other": "剩余 {{count}} 分钟"
+    "remainingMinutes_other": "剩余 {{count}} 分钟",
+    "repairing": "正在修复"
   },
   "status": {
     "updates": "更新",
@@ -1596,9 +1612,11 @@
     "skipHash": "跳过校验和",
     "download": "下载安装程序",
     "details": "详细信息",
-    "more": "更多安装选项",
+    "more": "更多应用选项",
     "unsupported": "此包管理器不支持该操作",
-    "sandbox": "在 Windows 沙盒中试用"
+    "sandbox": "在 Windows 沙盒中试用",
+    "repair": "修复",
+    "repairHint": "从安装程序恢复应用损坏的文件——适用于应用无法启动或报错的情况。设置会保留。"
   },
   "installOptions": {
     "title": "安装选项——{{name}}",
@@ -1826,7 +1844,9 @@
     "addedToBundle_other": "已将 {{count}} 个应用加入软件包合集",
     "uninstall": "卸载（{{count}}）",
     "uninstallQueued_other": "已将 {{count}} 个卸载加入队列",
-    "uninstallConfirm_other": "卸载 {{count}} 个应用？{{names}}"
+    "uninstallConfirm_other": "卸载 {{count}} 个应用？{{names}}",
+    "compare": "比较",
+    "compareHint_other": "请选择 2 到 {{count}} 个应用"
   },
   "pins": {
     "title": "已忽略和推迟的更新",
@@ -1859,7 +1879,8 @@
     "snoozedState": "到 {{version}} 的更新已推迟到 {{date}}",
     "lockedAll": "已忽略更新",
     "skippedVersion": "已跳过版本 {{version}}",
-    "snoozedUntil": "推迟到 {{date}}"
+    "snoozedUntil": "推迟到 {{date}}",
+    "selfWaitState": "会自动更新——如果到 {{date}} 仍未自行更新，HubGet 将提供 {{version}} 版本"
   },
   "toast": {
     "installDone": "{{name}}——已安装（{{source}}）",
@@ -1875,7 +1896,8 @@
     "endedProcesses": "{{name}} 正在后台运行——HubGet 已将其关闭并继续",
     "appClosed": "{{name}} 正在运行——HubGet 已将其关闭并继续",
     "appClosing": "{{name}} 正在询问是否保存工作——请保存并关闭应用，HubGet 随后会继续",
-    "appCloseTimeout": "{{name}} 仍处于打开状态——操作已取消"
+    "appCloseTimeout": "{{name}} 仍处于打开状态——操作已取消",
+    "repairDone": "{{name}} – 已修复（{{source}}）"
   },
   "notifications": {
     "title": "通知",
@@ -1903,7 +1925,8 @@
     "summary": "操作队列已完成——{{success}} 个成功，{{failed}} 个失败，{{cancelled}} 个已取消。",
     "appClosed": "该应用正在运行——已关闭（进程 {{processes}}）。",
     "appClosing": "该应用正在询问是否保存工作——关闭后 HubGet 会继续。",
-    "appCloseTimeout": "该应用保持打开 15 分钟——操作已取消。关闭应用后请重试。"
+    "appCloseTimeout": "该应用保持打开 15 分钟——操作已取消。关闭应用后请重试。",
+    "repairDone": "已修复（{{source}}）"
   },
   "tray": {
     "browse": "浏览软件包",
@@ -1957,7 +1980,13 @@
     "linkBroken": "安装程序下载链接暂时失效（错误 {{status}}）。请尝试选择其他安装来源（例如 Chocolatey/Scoop）。",
     "unknown": "WinGet 以错误 {{code}} 结束",
     "preCommandFailed": "安装前命令失败（{{code}}）——安装未开始。",
-    "needsAdmin": "此操作需要管理员权限——不会在后台运行，请手动启动（{{code}}）。"
+    "needsAdmin": "此操作需要管理员权限——不会在后台运行，请手动启动（{{code}}）。",
+    "repairUnsupported": "此应用的安装程序不支持修复——请卸载后重新安装（{{code}}）。",
+    "repairFailed": "修复以错误结束（{{code}}）。",
+    "repairUserScope": "仅为你安装的应用无法以管理员权限修复——请在不使用管理员权限的情况下重试（{{code}}）。",
+    "signerChanged": "新版本的安装程序与上次的签名者不同（{{detail}}）——HubGet 未运行它。详情见应用页面。",
+    "signatureMissing": "以前的安装程序由“{{detail}}”签名，此安装程序没有数字签名——HubGet 未运行它。",
+    "signatureInvalid": "安装程序的数字签名与其内容不符——文件在签名后被修改。HubGet 未运行它。"
   },
   "managerError": {
     "failed": "{{name}} 以错误 {{code}} 结束",
@@ -2183,7 +2212,9 @@
     "skipped_busy_other": "发现 {{count}} 个更新——自动安装将等到游戏或演示结束",
     "skipped_active_other": "发现 {{count}} 个更新——自动安装将等你暂时不使用电脑时进行",
     "restorePointName": "HubGet - 全部更新前",
-    "foundSecurity": "安全更新（{{total}} 个中的 {{security}} 个）：{{names}}"
+    "foundSecurity": "安全更新（{{total}} 个中的 {{security}} 个）：{{names}}",
+    "selfUpdatingWait": "给会自动更新的应用留出时间",
+    "selfUpdatingWaitHint": "Chrome、Firefox、Steam、Discord 等应用自带更新程序。HubGet 不会计入它们的更新；如果 {{days}} 天后（安全修复为 {{securityDays}} 天）仍未自行更新，才会提供更新。"
   },
   "security": {
     "warningTitle": "警告！",
@@ -2272,7 +2303,8 @@
       "install": "安装",
       "update": "更新",
       "uninstall": "卸载",
-      "download": "下载"
+      "download": "下载",
+      "repair": "修复"
     }
   },
   "commandSearch": {
@@ -2525,5 +2557,224 @@
     "protectionOn": "系统保护已开启——可以创建还原点",
     "protectionOff": "系统保护已关闭——无法创建还原点",
     "protectionHint": "在“控制面板 → 系统 → 系统保护 → 配置”（C: 盘）中开启。之后 HubGet 可在批量更新前创建还原点。"
+  },
+  "recentlyUpdated": {
+    "title": "最近更新",
+    "subtitle_other": "HubGet 在过去 {{count}} 天内更新的应用。",
+    "showAll_other": "全部显示（{{count}}）",
+    "automatic": "自动",
+    "more": "更多"
+  },
+  "preinstalled": {
+    "title": "预装应用",
+    "hint": "Windows 或电脑制造商在新帐户中安装的游戏、资讯、提示和合作伙伴应用。仅为你移除，可从 Microsoft Store 恢复。",
+    "review": "查看",
+    "failed": "无法加载应用列表。",
+    "none": "这里没有已知的预装应用。",
+    "found_other": "找到 {{count}} 个预装应用",
+    "recommendedCount_other": "建议移除 {{count}} 个",
+    "intro": "仅从你的 Windows 帐户中移除（无需管理员权限），随时可从 Microsoft Store 恢复。推荐移除的是大多数人不用的应用——已停用或推广类应用。Windows 组件以及被其他程序依赖的应用不在列表中。",
+    "group": {
+      "games": "游戏",
+      "microsoft": "Microsoft 应用",
+      "partners": "合作伙伴应用"
+    },
+    "recommended": "建议移除",
+    "selectRecommended_other": "选择推荐项（{{count}}）",
+    "remove_other": "移除（{{count}}）",
+    "confirm_other": "移除 {{count}} 个应用？{{names}}——可从 Microsoft Store 恢复。",
+    "removed_other": "已移除 {{count}} 个应用",
+    "removeFailed": "无法移除：{{names}}。详细信息见“历史记录”。",
+    "removeError": "移除失败：{{error}}",
+    "storeFailed": "无法打开 Microsoft Store：{{error}}",
+    "removedTitle": "已在 HubGet 中移除",
+    "restore": "从 Microsoft Store 恢复"
+  },
+  "compare": {
+    "title": "比较应用",
+    "subtitle_other": "最多并排比较 {{count}} 个应用——评分、许可证、大小、ARM64 支持等目录信息。",
+    "clear": "清空比较",
+    "empty": "还没有要比较的应用。可在上方搜索添加、右键单击应用卡片（添加到比较），或勾选多个应用后选择“比较”。",
+    "caption": "比较：{{names}}",
+    "remove": "从比较中移除 {{name}}",
+    "best": "最佳",
+    "unknown": "未注明",
+    "yes": "是",
+    "no": "否",
+    "rating": "评分",
+    "license": "许可证",
+    "openSource": "开源",
+    "version": "最新版本",
+    "released": "发布日期",
+    "size": "安装程序大小",
+    "installedSize": "磁盘空间",
+    "arm64": "原生 ARM64",
+    "architectures": "架构",
+    "minOs": "最低 Windows 版本",
+    "sources": "安装来源",
+    "webOnly": "仅限开发者网站",
+    "stars": "GitHub 星标",
+    "installed": "此电脑",
+    "installedVersion": "已安装（{{version}}）",
+    "notInstalled": "未安装",
+    "links": "链接",
+    "homepage": "网站",
+    "repository": "源代码",
+    "addPlaceholder": "添加要比较的应用…",
+    "open_other": "比较（{{count}}）",
+    "menuAdd": "添加到比较",
+    "menuRemove": "从比较中移除",
+    "added": "{{name}} – 已添加到比较（{{count}}/{{max}}）",
+    "full_other": "最多可比较 {{count}} 个应用。"
+  },
+  "a11y": {
+    "skipToContent": "跳到内容",
+    "title": "辅助功能",
+    "textSize": "文本大小",
+    "textSizeHint": "放大或缩小整个窗口中的文本和控件。",
+    "textSizeWindows": "跟随 Windows 设置 → 辅助功能 → 文本大小（当前为 {{size}}）。",
+    "textSizeSystem": "跟随 Windows",
+    "textSizeDefault": "默认",
+    "motion": "动画",
+    "motionHint": "“跟随 Windows”遵循 Windows 设置 → 辅助功能 → 动画效果。“减少”会始终关闭 HubGet 中的动效、淡入淡出和过渡。",
+    "motionSystem": "跟随 Windows",
+    "motionReduce": "减少",
+    "underlineLinks": "为链接添加下划线",
+    "underlineLinksHint": "即使不依靠颜色，也能将链接与其他文本区分开。",
+    "keyboardHint": "HubGet 可完全使用键盘操作：Tab 和 Shift+Tab 在项目间切换，第一次按 Tab 会出现“跳到内容”，Ctrl+K 搜索，Enter 打开应用，菜单键（Shift+F10）打开其菜单。HubGet 自身支持 Windows 对比度主题和讲述人。"
+  },
+  "adopt": {
+    "title_other": "{{count}} 个来自开发者网站的程序可交由 WinGet 管理",
+    "text": "这些程序未通过包管理器安装，但 WinGet 中有它们。交由 WinGet 管理后，HubGet 会提供更新——电脑上不会有任何改动，程序保持原位。",
+    "show": "显示",
+    "hide": "隐藏",
+    "adoptAll_other": "全部接管（{{count}}）",
+    "adopt": "交由 WinGet 管理",
+    "adopted": "{{name}} – 已交由 WinGet 管理（{{id}}）",
+    "adoptedAll_other": "已将 {{count}} 个程序交由 WinGet 管理",
+    "adoptedNote": "由 WinGet 管理（{{id}}）——更新会通过 WinGet 安装新版本。",
+    "release": "取消接管",
+    "released": "{{name}} – 已取消接管",
+    "offer": "此应用未通过包管理器安装，但 WinGet 中有它（{{id}}）。交由 WinGet 管理后，HubGet 会提供更新——程序保持原位。"
+  },
+  "newApps": {
+    "title": "目录新增",
+    "subtitle_other": "过去 {{count}} 天内加入 HubGet 目录的应用",
+    "days_other": "{{count}} 天",
+    "added": "加入时间：{{when}}",
+    "trackedSince": "目录自 {{date}} 起记录新增应用——暂无更长时间段的数据。",
+    "empty_other": "过去 {{count}} 天内目录中没有新增应用。",
+    "count_other": "{{count}} 个应用"
+  },
+  "selfUpdating": {
+    "waiting_other": "会自动更新（{{count}}）：{{names}}——只有在 {{days}} 天内仍未自行更新时，HubGet 才会提供更新。"
+  },
+  "installStats": {
+    "setting": "为安装排行榜做贡献",
+    "settingHint": "安装应用后，HubGet 只会匿名发送该应用的目录 ID 和本 HubGet 安装的随机 ID。这些报告构成“HubGet 安装最多”排行榜。",
+    "contribute": "为排行榜做贡献"
+  },
+  "signer": {
+    "changedTitle": "安装程序由其他发布者签名",
+    "changedText": "{{version}} 版本由“{{to}}”签名，以前的安装程序由“{{from}}”签名，因此 HubGet 未安装。如果你信任此变更（公司更名或更换证书），请更新。",
+    "missingTitle": "安装程序没有数字签名",
+    "missingText": "以前的安装程序由“{{from}}”签名，{{version}} 版本没有签名，因此 HubGet 未安装。",
+    "trust": "信任并更新"
+  },
+  "abandoned": {
+    "title_other": "{{count}} 个应用可能已停止开发",
+    "text": "它们不再获得错误修复和安全补丁。请考虑仍在开发的替代应用。",
+    "archived": "GitHub 仓库已归档——开发已结束",
+    "noCommits_other": "自 {{date}} 起 GitHub 上无更新（超过 {{count}} 年）",
+    "noRelease_other": "最新版本发布于 {{date}}（超过 {{count}} 年）",
+    "instead": "替代：",
+    "note": "此应用可能已停止开发：{{reason}}。"
+  },
+  "newPc": {
+    "title": "新电脑",
+    "subtitle": "勾选需要的应用，HubGet 会一次性依次安装，无需在安装程序中点击。",
+    "saveBundle": "保存为套装",
+    "install_other": "安装所选（{{count}}）",
+    "installed": "已安装",
+    "details": "{{name}} 的详细信息",
+    "more": "更多",
+    "hint": "可在目录中找到更多应用并加入套装；套装也可迁移到其他电脑。"
+  },
+  "drivers": {
+    "title": "Windows 更新中的驱动程序",
+    "open": "在 Windows 更新中安装",
+    "searching": "正在搜索…",
+    "check": "检查驱动程序",
+    "hint": "Windows 更新提供但尚未安装的驱动程序。由 Windows 更新（可选更新）安装，也可回滚。",
+    "none": "Windows 更新没有提供新的驱动程序。"
+  },
+  "year": {
+    "title": "你的 {{year}} HubGet 年度回顾",
+    "subtitle": "HubGet 今年在这台电脑上做了什么——仅来自本地历史记录，不会发送任何数据。",
+    "empty": "今年 HubGet 尚未安装或更新任何应用。",
+    "installs": "已安装应用",
+    "updates": "更新",
+    "automatic_other": "其中 {{count}} 次自动",
+    "saved": "节省的时间（估算）",
+    "hours": "小时",
+    "minutes": "分钟",
+    "uninstalls": "已卸载应用",
+    "repairs": "修复",
+    "topApps": "更新最多",
+    "updateCount_other": "{{count}} 次更新",
+    "months": "按月",
+    "busiest": "最忙的月份：{{month}}",
+    "note": "自 {{date}} 起统计。时间估算：手动安装约 5 分钟，更新约 3 分钟。",
+    "link": "HubGet 年度回顾"
+  },
+  "requests": {
+    "title": "建议的应用",
+    "subtitle": "大家希望 HubGet 收录的应用。为你也想要的投票——呼声最高的会加入目录。",
+    "suggest": "建议应用",
+    "unavailable": "建议的应用暂不可用。",
+    "empty": "还没有人提出建议——来做第一个吧。",
+    "vote": "为 {{name}} 投票",
+    "unvote": "取消为 {{name}} 投票",
+    "added": "已添加",
+    "web": "网站",
+    "failed": "失败：{{error}}",
+    "thanks": "谢谢！{{name}} 已加入建议的应用。",
+    "suggestTitle": "建议应用",
+    "suggestText": "告诉我们你希望 HubGet 收录哪个应用。如果已有人建议，将计入你的投票。",
+    "send": "提交建议",
+    "name": "应用名称",
+    "url": "应用网站（可选）",
+    "note": "备注（可选）",
+    "missing": "缺少应用？提出建议",
+    "notFound": "没有找到想要的？"
+  },
+  "devReplies": {
+    "saved": "回复已保存",
+    "deleted": "回复已删除",
+    "failed": "失败：{{error}}",
+    "title": "开发者回复（{{author}}）",
+    "write": "回复",
+    "save": "保存回复",
+    "edit": "编辑回复",
+    "approved": "你是此应用的已验证开发者",
+    "requested": "请求已发送——批准后即可回复评价。",
+    "githubOnly": "回复评价需要 GitHub 帐户——请使用 GitHub 登录。",
+    "pending": "你回复评价的请求正在等待批准。",
+    "youAreMaintainer": "你是此应用的开发者——打开评价即可回复。",
+    "claim": "我是此应用的开发者",
+    "claimTitle": "回复 {{name}} 的评价",
+    "claimText": "批准后即可在评价下回复。我们会核实你的 GitHub 帐户是否属于该应用的仓库——请填写仓库。",
+    "repo": "GitHub 仓库",
+    "send": "发送请求",
+    "hasReply": "开发者回复"
+  },
+  "devStats": {
+    "title": "你的应用统计",
+    "text": "你的应用通过 HubGet 安装的次数——来自自愿匿名报告。少于 3 次不显示。",
+    "search": "在目录中查找应用…",
+    "unavailable": "统计暂不可用。",
+    "few": "少于 3",
+    "days_other": "{{count}} 天内",
+    "requests": "大家希望 HubGet 收录的应用——建议的应用"
   }
 }

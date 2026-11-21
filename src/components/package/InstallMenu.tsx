@@ -1,6 +1,6 @@
 /**
  * Nabídka možností instalace (po vzoru UniGetUI):
- *  - InstallMenuItems – položky nabídky (Nainstalovat, Možnosti instalace,
+ *  - InstallMenuItems – položky nabídky (Nainstalovat, Opravit, Možnosti instalace,
  *    Ruční instalace, Jako správce, Interaktivně, Bez kontrolního součtu,
  *    Stáhnout instalátor, Vyzkoušet ve Windows Sandboxu, Podrobnosti),
  *  - InstallSplitMenu – šipka vedle tlačítka Instalovat v detailu aplikace,
@@ -11,6 +11,7 @@ import {
   AlarmClock,
   ArrowDownToLine,
   ChevronDown,
+  Columns3,
   Download,
   ExternalLink,
   FlaskConical,
@@ -26,6 +27,7 @@ import {
   SlidersHorizontal,
   SquareTerminal,
   Undo2,
+  Wrench,
   type LucideIcon,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
@@ -37,16 +39,39 @@ import { useNavigate } from "react-router";
 import { useDismiss } from "@/hooks/useDismiss";
 import { useInstallActions } from "@/hooks/useInstallActions";
 import { useRollback } from "@/hooks/useRollback";
+import { useCatalogIndex } from "@/hooks/usePackages";
+import { COMPARE_MAX } from "@/lib/compare";
 import { cn } from "@/lib/utils";
 import { isTauri } from "@/lib/tauri";
 import { isWebOnly, openDownloadPage } from "@/lib/webOnly";
+import { useCompare } from "@/store/compare";
 import { useInstallUi } from "@/store/installUi";
 import { useRollbackUi } from "@/store/rollback";
 import { useSettings } from "@/store/settings";
+import { useToasts } from "@/store/toasts";
 import type { CatalogEntry, SourceId } from "@/types";
 import { unpinLabel, useUpdatePin } from "./UpdatePin";
 
 const detailUrl = (id: string) => `/package/${encodeURIComponent(id)}`;
+
+/** Přidat aplikaci k porovnání / odebrat ji z něj (jen aplikace z katalogu – jiné údaje k porovnání nemají). */
+function useCompareToggle(entry: CatalogEntry) {
+  const { t } = useTranslation();
+  const toast = useToasts((s) => s.push);
+  const inCatalog = useCatalogIndex().has(entry.id);
+  const active = useCompare((s) => s.ids.includes(entry.id));
+  const toggle = useCompare((s) => s.toggle);
+  return {
+    available: inCatalog,
+    label: t(active ? "compare.menuRemove" : "compare.menuAdd"),
+    toggle: () => {
+      const result = toggle(entry.id);
+      const count = useCompare.getState().ids.length;
+      if (result === "added") toast("success", t("compare.added", { name: entry.name, count, max: COMPARE_MAX }));
+      else if (result === "full") toast("info", t("compare.full", { count: COMPARE_MAX }));
+    },
+  };
+}
 
 interface MenuItemsProps {
   entry: CatalogEntry;
@@ -71,6 +96,12 @@ export function InstallMenuItems({ entry, source, showDetails = true, onClose }:
   // Poslední aktualizace se nepovedla – vrátit předchozí verzi (RollbackDialog)
   const rollback = useRollback(entry.id, actions.installed);
   const openRollback = useRollbackUi((s) => s.open);
+  const compare = useCompareToggle(entry);
+  // Balíček z repozitáře správce (ne program jen v registru, na disku nebo hra z herního obchodu)
+  const repoPackage = !!actions.source && !/^(ARP|MSIX|DISK|EPIC)\\/i.test(actions.source.packageId);
+  // Je nad Podrobnostmi aspoň jedna akce (jinak by nabídka začínala oddělovačem – hra ze Steamu)
+  const hasActions =
+    notInstalled || status === "updatable" || actions.canRepair || pin.canPin || (!!rollback && !!actions.installed) || repoPackage;
 
   const run = (fn: () => void) => () => {
     onClose();
@@ -84,7 +115,8 @@ export function InstallMenuItems({ entry, source, showDetails = true, onClose }:
         {notInstalled && (
           <Item icon={ExternalLink} label={t("package.webDownload")} onClick={run(() => openDownloadPage(entry))} />
         )}
-        {notInstalled && showDetails && <Separator />}
+        {notInstalled && (showDetails || compare.available) && <Separator />}
+        {compare.available && <Item icon={Columns3} label={compare.label} onClick={run(compare.toggle)} />}
         {showDetails && (
           <Item icon={Info} label={t("installMenu.details")} shortcut="Enter" onClick={run(() => navigate(detailUrl(entry.id)))} />
         )}
@@ -99,6 +131,10 @@ export function InstallMenuItems({ entry, source, showDetails = true, onClose }:
       ) : status === "updatable" ? (
         <Item icon={RefreshCw} label={t("package.update")} disabled={busy} onClick={run(actions.update)} />
       ) : null}
+      {/* Oprava poškozené instalace (winget repair) – jen u nainstalované aplikace z wingetu / Aplikací ve Windows */}
+      {!notInstalled && actions.canRepair && (
+        <Item icon={Wrench} label={t("installMenu.repair")} hint={t("installMenu.repairHint")} disabled={!!job} onClick={run(actions.repair)} />
+      )}
       {/* Přeskočit nabízenou verzi / odložit / ignorovat aktualizace / zrušit zámek */}
       {pin.canPin && pin.offered && (
         <>
@@ -136,10 +172,15 @@ export function InstallMenuItems({ entry, source, showDetails = true, onClose }:
           />
         </>
       )}
-      {!notInstalled && <Separator />}
-      <Item icon={SquareTerminal} label={t("installMenu.manual")} disabled={!actions.source} onClick={run(() => openManual(entry, actions.source?.source))} />
-
-      <Separator />
+      {/* Ruční instalace, stažení instalátoru a Sandbox jen u balíčku z repozitáře správce – ne u programu
+          jen v registru či na disku ani u hry z herního obchodu (id „ARP\…“, „MSIX\…“, „DISK\…“, „EPIC\…“) */}
+      {repoPackage && (
+        <>
+          {!notInstalled && <Separator />}
+          <Item icon={SquareTerminal} label={t("installMenu.manual")} onClick={run(() => openManual(entry, actions.source?.source))} />
+          <Separator />
+        </>
+      )}
       {notInstalled && (
         <>
           <Item icon={ShieldUser} label={t("installMenu.asAdmin")} disabled={busy} onClick={run(() => actions.install({ asAdmin: true }))} />
@@ -163,24 +204,23 @@ export function InstallMenuItems({ entry, source, showDetails = true, onClose }:
           />
         </>
       )}
-      <Item
-        icon={ArrowDownToLine}
-        label={t("installMenu.download")}
-        disabled={busy || !support?.download}
-        hint={!support?.download ? t("installMenu.unsupported") : undefined}
-        onClick={run(actions.download)}
-      />
+      {repoPackage && (
+        <Item
+          icon={ArrowDownToLine}
+          label={t("installMenu.download")}
+          disabled={busy || !support?.download}
+          hint={!support?.download ? t("installMenu.unsupported") : undefined}
+          onClick={run(actions.download)}
+        />
+      )}
       {/* Vyzkoušet v izolovaném Windows Sandboxu – jen WinGet (instalátor stáhne winget) */}
-      {isTauri() && actions.source?.source === "winget" && (
+      {isTauri() && repoPackage && actions.source?.source === "winget" && (
         <Item icon={FlaskConical} label={t("installMenu.sandbox")} onClick={run(() => void trySandbox(actions.source!.packageId, entry.name))} />
       )}
 
-      {showDetails && (
-        <>
-          <Separator />
-          <Item icon={Info} label={t("installMenu.details")} shortcut="Enter" onClick={run(() => navigate(detailUrl(entry.id)))} />
-        </>
-      )}
+      {(showDetails || compare.available) && hasActions && <Separator />}
+      {compare.available && <Item icon={Columns3} label={compare.label} onClick={run(compare.toggle)} />}
+      {showDetails && <Item icon={Info} label={t("installMenu.details")} shortcut="Enter" onClick={run(() => navigate(detailUrl(entry.id)))} />}
     </>
   );
 }

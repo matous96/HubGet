@@ -898,6 +898,8 @@ fn ps_module_script(dev: Dev, kind: Kind, id: &str, version: Option<&str>, all_u
         ),
         Kind::Update => (format!("Update-PSResource -Name '{id}' -TrustRepository"), format!("Update-Module -Name '{id}' -Force")),
         Kind::Uninstall => (format!("Uninstall-PSResource -Name '{id}'"), format!("Uninstall-Module -Name '{id}' -AllVersions -Force")),
+        // Opravu dev_operation odmítne předem – skript by neudělal nic
+        Kind::Repair => (String::from("exit 1"), String::from("exit 1")),
         Kind::Download => (
             format!("Save-PSResource -Name '{id}' -Repository PSGallery -TrustRepository -Path {path}{}", version.map(|v| format!(" -Version '{v}'")).unwrap_or_default()),
             format!("Save-Module -Name '{id}' -Repository PSGallery -Path {path} -Force{}", version.map(|v| format!(" -RequiredVersion '{v}'")).unwrap_or_default()),
@@ -953,7 +955,7 @@ fn ps_needs_admin(dev: Dev, kind: Kind, id: &str, all_users: bool) -> bool {
         Kind::Update | Kind::Uninstall => std::fs::read_dir(program_files().join(modules).join(id))
             .map(|versions| versions.flatten().any(|v| v.path().join("PSGetModuleInfo.xml").is_file()))
             .unwrap_or(false),
-        Kind::Download => false,
+        Kind::Download | Kind::Repair => false,
     }
 }
 
@@ -1116,6 +1118,9 @@ pub async fn dev_operation(
 ) -> Result<OperationResult, String> {
     // Firemní zásady: povolené zdroje a aplikace (org_policy.rs)
     crate::org_policy::check(&format!("{source:?}").to_lowercase(), &request)?;
+    if request.kind == Kind::Repair {
+        return Err(format!("Opravu balíčku {} neumí", source.label()));
+    }
     if !valid_id(source, &request.package_id) {
         return Err(format!("Neplatné id balíčku: {}", request.package_id));
     }
@@ -1166,6 +1171,7 @@ pub async fn dev_operation(
         prefetch: None,
         pre_command,
         post_command,
+        signer_check: None,
     };
     operations::execute(id, spec, on_event).await
 }

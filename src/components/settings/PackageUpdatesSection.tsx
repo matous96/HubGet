@@ -39,6 +39,8 @@ import { useToasts } from "@/store/toasts";
 import { pinKey } from "@/store/updatePins";
 import type { SourceId } from "@/types";
 import { Card, Row, SwitchRow } from "./SettingsUi";
+import { SELF_UPDATE_GRACE_DAYS, SELF_UPDATE_SECURITY_GRACE_DAYS } from "@/data/selfUpdating";
+import { installStatsAvailable } from "@/store/installStats";
 
 /** Záloha nastavení aplikací před aktualizací (settings_backup.rs) – obnoví se při vrácení aktualizace. */
 function BackupSettingsRow() {
@@ -99,7 +101,12 @@ export function PackageUpdatesSection() {
         </Row>
         {auto.checkRepeat === "interval" ? (
           <Row label={t("autoUpdates.interval")} disabled={!auto.autoCheck}>
-            <select value={auto.interval} onChange={(e) => auto.set({ interval: e.target.value as typeof auto.interval })} className={select}>
+            <select
+              value={auto.interval}
+              onChange={(e) => auto.set({ interval: e.target.value as typeof auto.interval })}
+              aria-label={t("autoUpdates.interval")}
+              className={select}
+            >
               {INTERVALS.map((v) => (
                 <option key={v} value={v}>
                   {t(`autoUpdates.interval_${v}`)}
@@ -346,6 +353,7 @@ function UpdateSecurityCard() {
       <Row label={t("autoUpdates.minAge")} hint={t("autoUpdates.minAgeHint")}>
         <div className="flex items-center gap-2">
           <select
+            aria-label={t("autoUpdates.minAge")}
             value={custom ? "custom" : String(auto.minAgeDays)}
             onChange={(e) => {
               const isCustom = e.target.value === "custom";
@@ -432,6 +440,15 @@ function UpdateSecurityCard() {
           onChange={(communityReliability) => auto.set({ communityReliability })}
         />
       )}
+      {/* Žebříček instalací v HubGetu – anonymní hlášení instalací (Supabase), proto jen po zapnutí */}
+      {installStatsAvailable() && (
+        <SwitchRow
+          label={t("installStats.setting")}
+          hint={t("installStats.settingHint")}
+          checked={auto.communityInstalls}
+          onChange={(communityInstalls) => auto.set({ communityInstalls })}
+        />
+      )}
       <SwitchRow
         label={t("autoUpdates.warnHostChange")}
         hint={t("autoUpdates.warnHostChangeHint")}
@@ -439,7 +456,12 @@ function UpdateSecurityCard() {
         onChange={(warnHostChange) => auto.set({ warnHostChange })}
       />
       <Row label={t("autoUpdates.stuck")} hint={t("autoUpdates.stuckHint")}>
-        <select value={auto.stuckLimit} onChange={(e) => auto.set({ stuckLimit: Number(e.target.value) })} className={select}>
+        <select
+          value={auto.stuckLimit}
+          onChange={(e) => auto.set({ stuckLimit: Number(e.target.value) })}
+          aria-label={t("autoUpdates.stuck")}
+          className={select}
+        >
           {[0, 2, 3, 5].map((n) => (
             <option key={n} value={n}>
               {n === 0 ? t("autoUpdates.stuckNever") : t("autoUpdates.stuckAfter", { count: n })}
@@ -447,6 +469,13 @@ function UpdateSecurityCard() {
           ))}
         </select>
       </Row>
+      {/* Chrome, Steam, Discord… – aktualizace až po lhůtě, pokud se mezitím neaktualizují samy (data/selfUpdating.ts) */}
+      <SwitchRow
+        label={t("autoUpdates.selfUpdatingWait")}
+        hint={t("autoUpdates.selfUpdatingWaitHint", { days: SELF_UPDATE_GRACE_DAYS, securityDays: SELF_UPDATE_SECURITY_GRACE_DAYS })}
+        checked={auto.selfUpdatingWait}
+        onChange={(selfUpdatingWait) => auto.set({ selfUpdatingWait })}
+      />
     </Card>
   );
 }

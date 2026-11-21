@@ -129,7 +129,7 @@ struct PsInstalled {
 /// Nainstalovaný balíček; `winget_source` je „winget“, „msstore“, nebo None
 /// u programů nainstalovaných mimo winget (původ určí frontend).
 /// `disk_location` má program nalezený jen podle složky na disku (id „DISK\<složka>“),
-/// `ea_game` hra z EA app (frontend ji ukáže jako hru se zdrojem EA app).
+/// `game_store` herní obchod u hry mimo Steam (ea, gog, ubisoft, battlenet, epic – frontend ji ukáže jako hru z něj).
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Installed {
@@ -144,8 +144,8 @@ pub struct Installed {
     /// instalací nové verze přes winget, odinstalace = složka do Koše.
     #[serde(skip_serializing_if = "std::ops::Not::not")]
     portable: bool,
-    #[serde(skip_serializing_if = "std::ops::Not::not")]
-    ea_game: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    game_store: Option<&'static str>,
     /// Kdy byl program nainstalován (ms od 1. 1. 1970) – řazení Nově nainstalované.
     #[serde(skip_serializing_if = "Option::is_none")]
     installed_at: Option<i64>,
@@ -165,7 +165,7 @@ impl Installed {
             name: p.name,
             disk_location: None,
             portable: false,
-            ea_game: false,
+            game_store: None,
             installed_at: None,
         }
     }
@@ -180,7 +180,7 @@ impl Installed {
             winget_source: None,
             disk_location: None,
             portable: false,
-            ea_game: entry.is_ea_game(),
+            game_store: entry.game_store(),
             installed_at: entry.installed_at,
         }
     }
@@ -196,13 +196,28 @@ impl Installed {
             winget_source: None,
             disk_location: Some(location),
             portable: app.desktop,
-            ea_game: false,
+            game_store: None,
             // Program bez záznamu v registru: kdy vznikla jeho složka
             installed_at: std::fs::metadata(&app.folder)
                 .and_then(|meta| meta.created())
                 .ok()
                 .and_then(|time| time.duration_since(std::time::UNIX_EPOCH).ok())
                 .map(|age| age.as_millis() as i64),
+        }
+    }
+
+    /// Hra z Epic Games (v registru není – games.rs). Aktualizuje ji Epic sám.
+    fn from_epic(game: &crate::games::EpicGame) -> Self {
+        Installed {
+            package_id: game.package_id(),
+            name: game.name.clone(),
+            installed_version: game.version.clone(),
+            available_version: None,
+            winget_source: None,
+            disk_location: None,
+            portable: false,
+            game_store: Some("epic"),
+            installed_at: game.installed_at,
         }
     }
 }
@@ -445,13 +460,14 @@ fn installed_at(p: &PsInstalled, registry: &arp::Registry) -> Option<i64> {
     registry.matching(&p.id, &p.name, version).iter().filter_map(|entry| entry.installed_at).max()
 }
 
-/// Hra z EA app? Jen programy mimo winget (id „ARP\…“), podle jejich záznamu v registru.
-fn is_ea_game(p: &PsInstalled, registry: &arp::Registry) -> bool {
+/// Hra z herního obchodu (EA app, GOG, Ubisoft Connect, Battle.net)? Jen programy mimo winget
+/// (id „ARP\…“), podle jejich záznamu v registru.
+fn game_store_of(p: &PsInstalled, registry: &arp::Registry) -> Option<&'static str> {
     if !p.source.is_empty() {
-        return false;
+        return None;
     }
     let version = if p.version.eq_ignore_ascii_case("unknown") { "" } else { &p.version };
-    registry.matching(&p.id, &p.name, version).iter().any(|entry| entry.is_ea_game())
+    registry.matching(&p.id, &p.name, version).iter().find_map(|entry| entry.game_store())
 }
 
 /// Nainstalované programy ve třech úrovních:
@@ -459,7 +475,8 @@ fn is_ea_game(p: &PsInstalled, registry: &arp::Registry) -> bool {
 ///     každý ověřený v registru a na disku,
 ///  2. když výpis wingetu selže (chybí modul, rozbitý zdroj, jiná verze wingetu),
 ///     přímo registr (HKLM i HKCU) – programy, jejichž spustitelný soubor existuje,
-///  3. programy, které nezná winget ani registr, podle složek na disku (disk.rs) –
+///  3. hry z Epic Games podle manifestů Epicu (games.rs – do registru se nezapisují),
+///  4. programy, které nezná winget ani registr, podle složek na disku (disk.rs) –
 ///     jen se zástupcem v nabídce Start, který odliší instalaci od složky
 ///     ponechané odinstalátorem.
 #[tauri::command]
@@ -472,9 +489,9 @@ pub async fn winget_installed(app: AppHandle) -> Result<Vec<Installed>, String> 
                 .into_iter()
                 .filter(|p| verified(p, &registry))
                 .map(|p| {
-                    let ea_game = is_ea_game(&p, &registry);
+                    let game_store = game_store_of(&p, &registry);
                     let installed_at = installed_at(&p, &registry);
-                    Installed { ea_game, installed_at, ..Installed::from_winget(p) }
+                    Installed { game_store, installed_at, ..Installed::from_winget(p) }
                 })
                 .collect(),
             Err(error) => {
@@ -482,8 +499,17 @@ pub async fn winget_installed(app: AppHandle) -> Result<Vec<Installed>, String> 
                 registry.installed().into_iter().map(Installed::from_arp).collect()
             }
         };
-        let known: HashSet<String> = items.iter().map(|item| arp::name_key(&item.name)).collect();
-        let found = disk::scan(&registry.folders(), &known);
+        let mut known: HashSet<String> = items.iter().map(|item| arp::name_key(&item.name)).collect();
+        // Hry z Epicu: jen ty, které registr nezná (některé vydavatelé zapíší i tam), a jejich složky
+        // hledání na disku přeskočí – hra by jinak byla podruhé jako program na disku
+        let mut folders = registry.folders();
+        for game in crate::games::epic_games() {
+            folders.push(arp::folder_key(&game.folder));
+            if known.insert(arp::name_key(&game.name)) {
+                items.push(Installed::from_epic(&game));
+            }
+        }
+        let found = disk::scan(&folders, &known);
         if !found.is_empty() {
             let targets = apps::launch_targets(Duration::from_secs(60)).unwrap_or_default();
             items.extend(disk::with_shortcut(found, &targets).into_iter().map(Installed::from_disk));
@@ -617,6 +643,8 @@ fn operation_args(request: &OperationRequest, downloads: &Path) -> Vec<String> {
             push(&[if options.interactive { "--interactive" } else { "--silent" }]);
         }
         Kind::Uninstall => push(&["uninstall", "--id", id, "--exact", "--silent"]),
+        // MSI a MSIX opraví Windows, instalátor EXE winget spustí s parametry opravy z manifestu
+        Kind::Repair => push(&["repair", "--id", id, "--exact", "--silent"]),
         Kind::Download => {
             push(&["download", "--id", id, "--exact", "--source", source]);
             push(&["--download-directory", downloads.as_ref()]);
@@ -629,7 +657,7 @@ fn operation_args(request: &OperationRequest, downloads: &Path) -> Vec<String> {
             push(&["--version", version]);
         }
     }
-    if request.kind != Kind::Uninstall {
+    if matches!(request.kind, Kind::Install | Kind::Update | Kind::Download) {
         if let Some(arch) = options.architecture.as_deref().filter(|a| matches!(*a, "x64" | "x86" | "arm64")) {
             push(&["--architecture", arch]);
         }
@@ -713,6 +741,11 @@ fn interpret(kind: Kind, code: i32) -> Verdict {
         // nainstalovaného pro všechny uživatele (msiexec 1603), instalátor bez práv
         0x8A15_0019 => Verdict::error("requiresAdmin").retry_elevated(),
         0x8A15_0030 => Verdict::error("uninstallFailed").retry_elevated(),
+        // Oprava: instalátor bez opravy (EXE bez parametrů opravy v manifestu, přenosné balíčky)
+        0x8A15_0079 | 0x8A15_007A | 0x8A15_007C => Verdict::error("repairUnsupported"),
+        0x8A15_007B if kind == Kind::Repair => Verdict::error("repairFailed").retry_elevated(),
+        // Oprava aplikace nainstalované jen pro uživatele nesmí běžet jako správce
+        0x8A15_007D => Verdict::error("repairUserScope"),
         0x8A15_0006 => Verdict::error("installerFailed").retry_elevated(),
         // Instalace MSI selhala – mj. aplikace pro všechny uživatele bez ALLUSERS=1 (viz winget_operation)
         MSI_INSTALL_FAILED => Verdict::error("installerFailed").retry_elevated(),
@@ -791,8 +824,8 @@ pub async fn winget_operation(
     // asynchronního běhu): aktualizace a odinstalace rovnou jako správce, bez neúspěšného prvního pokusu
     let scope = options.and_then(|o| o.scope.as_deref()).filter(|s| matches!(*s, "user" | "machine"));
     let machine = match (request.kind, scope) {
-        (Kind::Update | Kind::Uninstall, Some(scope)) => scope == "machine",
-        (Kind::Update | Kind::Uninstall, None) if !is_store_id(&request.package_id) => {
+        (Kind::Update | Kind::Uninstall | Kind::Repair, Some(scope)) => scope == "machine",
+        (Kind::Update | Kind::Uninstall | Kind::Repair, None) if !is_store_id(&request.package_id) => {
             let (package_id, name) = (request.package_id.clone(), request.name.clone());
             crate::process::background(move || Ok(machine_only(&package_id, name.as_deref()))).await?
         }
@@ -817,6 +850,9 @@ pub async fn winget_operation(
         prefetch,
         pre_command,
         post_command,
+        // Podpis staženého instalátoru: u instalace a aktualizace zjistit vydavatele a porovnat
+        // s minulým (store/signers.ts); stažení instalátoru do Stažených souborů nic nespouští
+        signer_check: matches!(request.kind, Kind::Install | Kind::Update).then(|| options.and_then(|o| o.expected_signer.clone())),
     };
     let mut result = operations::execute(id, spec, on_event).await?;
     if request.kind == Kind::Download {

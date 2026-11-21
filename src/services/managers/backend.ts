@@ -28,6 +28,8 @@ export interface BackendResult {
   restartRequired: boolean;
   /** Poslední řádek výstupu – vodítko u neznámé chyby. */
   detail: string | null;
+  /** Kdo podepsal stažený instalátor („“ = bez podpisu; chybí = nezjišťovalo se). */
+  signer?: string;
 }
 
 /** Návratový kód jako HRESULT („0x8A150011“). */
@@ -51,7 +53,7 @@ export function startBackendOperation(
   channel.onmessage = (event) => {
     if (event.type === "progress") onProgress({ phase: event.phase, percent: event.percent });
     else if (event.type === "line") writeLog(source, "output", event.text);
-    else writeLog(source, "warning", i18n.t(`logs.notice.${event.key}`, { detail: event.detail ?? "" }));
+    else writeLog(source, event.key === "signedBy" ? "info" : "warning", i18n.t(`logs.notice.${event.key}`, { detail: event.detail ?? "" }));
   };
 
   const done = invoke<BackendResult>(command, { ...extra, id, request, onEvent: channel }).then(
@@ -60,6 +62,7 @@ export function startBackendOperation(
       error: result.outcome === "error" ? errorMessage(result) : undefined,
       errorKey: result.outcome === "error" ? (result.errorKey ?? undefined) : undefined,
       restartRequired: result.restartRequired,
+      signer: result.signer,
     }),
     (e: unknown) => ({ outcome: "error" as const, error: String(e) }),
   );

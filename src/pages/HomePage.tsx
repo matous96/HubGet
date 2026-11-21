@@ -20,6 +20,7 @@ import { trendingScore } from "@/lib/trending";
 import { cn, topN } from "@/lib/utils";
 import { knownIconSizes, measureIcon, useIconQuality } from "@/store/iconQuality";
 import { useSettings } from "@/store/settings";
+import { usePopularityBoost } from "@/store/installStats";
 import { isFirstDay, useTodayPager, useTodayShift, type TodaySlot } from "@/store/todayPager";
 import type { CatalogEntry } from "@/types";
 
@@ -114,18 +115,20 @@ export function HomePage() {
 
   // Obsah záložek (běžný uživatel bez balíčků jen pro vývojáře)
   // Jen prvních 12 v jednom průchodu – řazení celého katalogu by u Trendů trvalo desítky ms
+  // Populární i podle skutečných instalací v HubGetu (store/installStats.ts)
+  const boost = usePopularityBoost();
   const tabItems = useMemo(() => {
     const now = Date.now();
     const visible = modeFilter(all);
     const time = (date: string | null | undefined) => (date ? Date.parse(date) || 0 : 0);
     const score: Record<Tab, (p: CatalogEntry) => number> = {
       trending: (p) => trendingScore(p, now),
-      popular: (p) => p.popularity,
+      popular: (p) => p.popularity + boost(p.id),
       new: (p) => time(p.addedAt),
       updated: (p) => time(p.releaseDate),
     };
     return topN(visible, TAB_SIZE, score[tab]);
-  }, [all, tab, modeFilter]);
+  }, [all, tab, modeFilter, boost]);
 
   // Režim Vývojář: nástroje pro vývojáře hned v prvním řádku
   const devTools = useMemo(
@@ -148,7 +151,8 @@ export function HomePage() {
       <div className="mb-5 grid grid-cols-[1fr_auto] items-end gap-x-6 gap-y-3 xl:grid-cols-[auto_minmax(0,1fr)_auto]">
         <div>
           <p className="text-xs font-semibold tracking-[0.14em] text-muted uppercase">{dateLabel}</p>
-          <h2 className="font-display text-4xl font-bold tracking-tight">{t("home.today")}</h2>
+          {/* Nadpis stránky (h1 – čtečky obrazovky podle něj stránku pojmenují a přeskakují na ni) */}
+          <h1 className="font-display text-4xl font-bold tracking-tight">{t("home.today")}</h1>
         </div>
         {/* Bezpečné (bez virů), jednoduché, vše pod kontrolou – v rovině s nadpisem „Dnes“ */}
         <ValuePillars className="order-last col-span-2 pb-1.5 xl:order-none xl:col-span-1" />
@@ -235,8 +239,9 @@ export function HomePage() {
             </div>
 
             <div className="mb-4 flex items-center justify-end gap-4">
-              <Link to="/top" className="mr-auto text-sm font-medium text-accent hover:underline">
-                {t("home.seeAll")}
+              {/* Záložka Nové vede na Nově v katalogu, ostatní na žebříček */}
+              <Link to={tab === "new" ? "/new" : "/top"} className="mr-auto text-sm font-medium text-accent hover:underline">
+                {t(tab === "new" ? "home.seeAllNew" : "home.seeAll")}
               </Link>
               {/* Pořadí určuje záložka – nabízíme jen přepnutí mřížka / seznam */}
               <CollectionToolbar hideSort />

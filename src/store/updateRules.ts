@@ -10,7 +10,9 @@
  *  3. neprojevené aktualizace – po N „úspěšných“ aktualizacích, po kterých
  *     správce verzi nabízí dál, se přestane nabízet,
  *  4. aplikace, které se aktualizují samy – po aktualizaci se samy vrátily na
- *     starší verzi (Discord), aktualizace přes správce se jim nenabízejí.
+ *     starší verzi (Discord), aktualizace přes správce se jim nenabízejí; známé aplikace
+ *     s vlastním aktualizátorem (data/selfUpdating.ts – Chrome, Steam…) dostanou čas
+ *     aktualizovat se samy a nabídnou se až po lhůtě (bezpečnostní oprava po kratší).
  * Bezpečnostní aktualizace (lib/securityUpdates.ts) pravidlo 2 obejdou (Nastavení →
  * Bezpečnostní aktualizace bez čekání).
  * „Nabídnout hned / znovu“ (store/updateHolds.ts → allowed) pravidla 2 a 3 obejde,
@@ -19,6 +21,8 @@
 import { queryClient, queryKeys } from "@/app/queryClient";
 import type { LoadedCatalog } from "@/services/catalog";
 import { isSecurityRelease, type OsvFinding } from "@/lib/securityUpdates";
+import { wingetBaseId } from "@/lib/wingetVariant";
+import { SELF_UPDATE_GRACE_DAYS, SELF_UPDATE_SECURITY_GRACE_DAYS, SELF_UPDATING_WINGET } from "@/data/selfUpdating";
 import type { InstalledPackage, SourceId } from "@/types";
 import { minAgeFor, useAutoUpdates, type AutoUpdatesSettings } from "./autoUpdates";
 import { useUpdateHolds, versionKey, type SelfUpdating } from "./updateHolds";
@@ -37,6 +41,12 @@ export interface UpdateRules {
   allowed: Record<string, string>;
   /** Aplikace, které se aktualizují samy (klíč pinKey). */
   selfUpdating: Record<string, SelfUpdating>;
+  /** Známá aplikace s vlastním aktualizátorem (data/selfUpdating.ts), i nainstalovaná jiným správcem. */
+  knownSelfUpdating: (pkg: InstalledPackage) => boolean;
+  /** Známé aplikace, kterým uživatel aktualizace nabízí hned (klíč pinKey). */
+  selfOffer: Record<string, string>;
+  /** Nastavení: aplikacím, které se aktualizují samy, dát čas. */
+  selfUpdatingWait: boolean;
   stuckLimit: number;
   now: number;
   /** Nabízená verze opravuje bezpečnostní chybu (poznámky k verzi, zranitelnost nainstalované verze z OSV.dev). */
@@ -65,6 +75,31 @@ function releaseIndex(catalog: LoadedCatalog) {
   return index;
 }
 
+/**
+ * Balíčky známých aplikací s vlastním aktualizátorem: id wingetu ze seznamu a všechny zdroje
+ * téhož profilu v katalogu (Chrome přes Chocolatey či Scoop se aktualizuje stejně sám).
+ */
+const selfIndexes = new WeakMap<LoadedCatalog, Set<string>>();
+
+function selfIndex(catalog: LoadedCatalog | undefined): Set<string> {
+  if (!catalog) return new Set();
+  let index = selfIndexes.get(catalog);
+  if (!index) {
+    index = new Set();
+    for (const entry of catalog.catalog.packages) {
+      if (!entry.sources.some((s) => s.source === "winget" && SELF_UPDATING_WINGET.has(s.packageId.toLowerCase()))) continue;
+      for (const s of entry.sources) index.add(`${s.source}:${s.packageId}`.toLowerCase());
+    }
+    selfIndexes.set(catalog, index);
+  }
+  return index;
+}
+
+export function isKnownSelfUpdating(pkg: Pick<InstalledPackage, "source" | "packageId">, index: Set<string>): boolean {
+  if (pkg.source === "winget" && SELF_UPDATING_WINGET.has((wingetBaseId(pkg.packageId) ?? pkg.packageId).toLowerCase())) return true;
+  return index.has(`${pkg.source}:${pkg.packageId}`.toLowerCase());
+}
+
 type Inputs = [
   UpdatePins,
   AutoUpdatesSettings["minAgeDays"],
@@ -78,6 +113,8 @@ type Inputs = [
   LoadedCatalog | undefined,
   boolean,
   Record<string, OsvFinding>,
+  Record<string, string>,
+  boolean,
 ];
 
 // Pro stejné vstupy vždy stejný objekt pravidel – všechny komponenty pak sdílí jeden výsledek
@@ -85,8 +122,9 @@ let memo: { inputs: Inputs; rules: UpdateRules } | null = null;
 
 function rulesOf(inputs: Inputs): UpdateRules {
   if (memo && memo.inputs.every((value, i) => value === inputs[i])) return memo.rules;
-  const [pins, minAgeDays, minAgeBySource, stuckLimit, firstSeen, stuck, allowed, selfUpdating, clock, catalog, securityNoWait, vulnerable] = inputs;
+  const [pins, minAgeDays, minAgeBySource, stuckLimit, firstSeen, stuck, allowed, selfUpdating, clock, catalog, securityNoWait, vulnerable, selfOffer, selfUpdatingWait] = inputs;
   const index = catalog ? releaseIndex(catalog) : undefined;
+  const selfKnown = selfIndex(catalog);
   const rules: UpdateRules = {
     pins,
     minAge: (source) => minAgeFor({ minAgeDays, minAgeBySource }, source),
@@ -98,6 +136,9 @@ function rulesOf(inputs: Inputs): UpdateRules {
     stuck,
     allowed,
     selfUpdating,
+    knownSelfUpdating: (pkg) => isKnownSelfUpdating(pkg, selfKnown),
+    selfOffer,
+    selfUpdatingWait,
     stuckLimit,
     now: clock,
     security: (pkg, version) => isSecurityRelease(catalog, pkg, version) || !!findingOf(vulnerable, pkg),
@@ -120,16 +161,18 @@ export function useUpdateRules(catalog: LoadedCatalog | undefined): UpdateRules 
   const clock = useUpdateHolds((s) => s.clock);
   const securityNoWait = useAutoUpdates((s) => s.securityNoWait);
   const vulnerable = useVulnerabilities((s) => s.found);
-  return rulesOf([pins, minAgeDays, minAgeBySource, stuckLimit, firstSeen, stuck, allowed, selfUpdating, clock, catalog, securityNoWait, vulnerable]);
+  const selfOffer = useUpdateHolds((s) => s.selfOffer);
+  const selfUpdatingWait = useAutoUpdates((s) => s.selfUpdatingWait);
+  return rulesOf([pins, minAgeDays, minAgeBySource, stuckLimit, firstSeen, stuck, allowed, selfUpdating, clock, catalog, securityNoWait, vulnerable, selfOffer, selfUpdatingWait]);
 }
 
 /** Totéž mimo React (kontrola aktualizací na pozadí). */
 export function currentUpdateRules(): UpdateRules {
-  const { minAgeDays, minAgeBySource, stuckLimit, securityNoWait } = useAutoUpdates.getState();
-  const { firstSeen, stuck, allowed, selfUpdating, clock } = useUpdateHolds.getState();
+  const { minAgeDays, minAgeBySource, stuckLimit, securityNoWait, selfUpdatingWait } = useAutoUpdates.getState();
+  const { firstSeen, stuck, allowed, selfUpdating, selfOffer, clock } = useUpdateHolds.getState();
   const catalog = queryClient.getQueryData<LoadedCatalog>(queryKeys.catalog);
   const vulnerable = useVulnerabilities.getState().found;
-  return rulesOf([useUpdatePins.getState().pins, minAgeDays, minAgeBySource, stuckLimit, firstSeen, stuck, allowed, selfUpdating, clock, catalog, securityNoWait, vulnerable]);
+  return rulesOf([useUpdatePins.getState().pins, minAgeDays, minAgeBySource, stuckLimit, firstSeen, stuck, allowed, selfUpdating, clock, catalog, securityNoWait, vulnerable, selfOffer, selfUpdatingWait]);
 }
 
 /**
@@ -151,6 +194,14 @@ export function applyUpdateRules(data: InstalledPackage[], rules: UpdateRules): 
       ...(until ? { pinUntil: new Date(until).toISOString() } : {}),
     });
     if (rules.selfUpdating[pinKey(pkg)]) return hold("self");
+    // Známá aplikace s vlastním aktualizátorem: čas aktualizovat se sama, pak ji nabídnout
+    // (vypnutý aktualizátor, firemní zásady); bezpečnostní oprava po kratší lhůtě
+    if (rules.selfUpdatingWait && !rules.selfOffer[pinKey(pkg)] && rules.knownSelfUpdating(pkg)) {
+      const grace = rules.security(pkg, version) ? SELF_UPDATE_SECURITY_GRACE_DAYS : SELF_UPDATE_GRACE_DAYS;
+      const seen = rules.firstSeen[key] ? Date.parse(rules.firstSeen[key]) : rules.now;
+      const until = Math.min(rules.releasedAt(pkg, version) ?? seen, seen) + grace * DAY_MS;
+      if (until > rules.now) return hold("self", until);
+    }
     if (rules.stuckLimit > 0 && (rules.stuck[key] ?? 0) >= rules.stuckLimit) return hold("stuck");
     const days = rules.minAge(pkg.source);
     if (days > 0 && !(rules.securityNoWait && rules.security(pkg, version))) {

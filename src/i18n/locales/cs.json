@@ -107,7 +107,9 @@
     "startup": "Po spuštění",
     "publish": "Publikovat",
     "about": "O HubGetu",
-    "overview": "Přehled počítače"
+    "overview": "Přehled počítače",
+    "new": "Nově v katalogu",
+    "newPc": "Nový počítač"
   },
   "startup": {
     "title": "Po spuštění",
@@ -422,19 +424,25 @@
       "popularity": "Nejoblíbenější aplikace podle skóre popularity katalogu",
       "rating": "Nejlépe hodnocené aplikace podle hvězdiček od uživatelů HubGetu",
       "movers": "Aplikace, kterým za posledních 7 dní nejvíc vzrostl počet stažení",
-      "trending": "Populární aplikace s čerstvou aktualizací"
+      "trending": "Populární aplikace s čerstvou aktualizací",
+      "installs_one": "Aplikace, které uživatelé HubGetu nejčastěji instalovali za poslední {{count}} den",
+      "installs_few": "Aplikace, které uživatelé HubGetu nejčastěji instalovali za poslední {{count}} dny",
+      "installs_many": "Aplikace, které uživatelé HubGetu nejčastěji instalovali za posledních {{count}} dne",
+      "installs_other": "Aplikace, které uživatelé HubGetu nejčastěji instalovali za posledních {{count}} dní"
     },
     "all": "Vše",
     "sortLabel": "Řadit žebříček",
     "sort": {
       "popularity": "Popularita",
       "rating": "Nejlépe hodnocené",
-      "movers": "Skokani týdne"
+      "movers": "Skokani týdne",
+      "installs": "Nejinstalovanější v HubGetu"
     },
     "sortHint": {
       "popularity": "Skóre popularity z katalogu (výchozí)",
       "rating": "Průměr hvězdiček od uživatelů HubGetu",
-      "movers": "Největší růst stažení za posledních 7 dní"
+      "movers": "Největší růst stažení za posledních 7 dní",
+      "installs": "Kolik uživatelů HubGetu aplikaci nainstalovalo za zvolené období"
     },
     "moversPending": "Skokani týdne se zobrazí, až katalog nasbírá týden údajů o stahování. Zatím jsou seřazené populární aplikace s čerstvou aktualizací.",
     "noRatings": "Zatím tu nejsou aplikace s hodnocením od uživatelů.",
@@ -445,7 +453,17 @@
     "weeklyDownloads_one": "{{formatted}} stažení za posledních 7 dní",
     "weeklyDownloads_few": "{{formatted}} stažení za posledních 7 dní",
     "weeklyDownloads_many": "{{formatted}} stažení za posledních 7 dní",
-    "weeklyDownloads_other": "{{formatted}} stažení za posledních 7 dní"
+    "weeklyDownloads_other": "{{formatted}} stažení za posledních 7 dní",
+    "period_one": "{{count}} den",
+    "period_few": "{{count}} dny",
+    "period_many": "{{count}} dne",
+    "period_other": "{{count}} dní",
+    "noInstalls": "Žebříček se naplní, až uživatelé HubGetu začnou anonymně sdílet instalace – aplikace se v něm objeví od 3 instalací.",
+    "installsUnavailable": "Žebříček instalací teď není k dispozici.",
+    "installCount_one": "{{formatted}} instalace",
+    "installCount_few": "{{formatted}} instalace",
+    "installCount_many": "{{formatted}} instalace",
+    "installCount_other": "{{formatted}} instalací"
   },
   "recent": {
     "title": "Naposledy zobrazené",
@@ -566,7 +584,8 @@
       "install": "Instalace",
       "update": "Aktualizace",
       "uninstall": "Odinstalace",
-      "download": "Stažení instalátoru"
+      "download": "Stažení instalátoru",
+      "repair": "Oprava"
     },
     "outcome": {
       "success": "Dokončeno",
@@ -626,7 +645,8 @@
       "appClosing": "{{name}} se při zavírání ptá na uložení práce – čekám, až ji uživatel zavře.",
       "appCloseTimeout": "{{name}} zůstala 15 minut otevřená – operace zrušena.",
       "needsAdmin": "{{name}} potřebuje k aktualizaci práva správce – počká na ruční aktualizaci.",
-      "settingsBackupFailed": "Nastavení aplikace {{name}} se před aktualizací nepodařilo zálohovat: {{error}}"
+      "settingsBackupFailed": "Nastavení aplikace {{name}} se před aktualizací nepodařilo zálohovat: {{error}}",
+      "repairDone": "Úspěšně opraveno ({{seconds}} s)."
     },
     "notice": {
       "prefetchFailed": "Instalátor se nepodařilo stáhnout předem ({{detail}}) – stáhne ho WinGet.",
@@ -634,7 +654,9 @@
       "preCommand": "Spouštím příkaz před instalací: {{detail}}",
       "postCommand": "Spouštím příkaz po instalaci: {{detail}}",
       "postCommandFailed": "Příkaz po instalaci skončil s chybou ({{detail}}) – instalace sama proběhla v pořádku.",
-      "needsAdmin": "Potřebuje práva správce – automatická aktualizace na pozadí dialog UAC neotevírá."
+      "needsAdmin": "Potřebuje práva správce – automatická aktualizace na pozadí dialog UAC neotevírá.",
+      "signedBy": "Instalátor podepsal: {{detail}}",
+      "unsigned": "Instalátor není digitálně podepsaný."
     },
     "phase": {
       "queued": "Čeká ve frontě…",
@@ -642,7 +664,8 @@
       "downloading": "Stahuji instalační balíček…",
       "interactive": "Čekám, až projdete průvodcem instalací…",
       "installing": "Spouštím instalátor…",
-      "uninstalling": "Odinstalovávám…"
+      "uninstalling": "Odinstalovávám…",
+      "repairing": "Opravuji instalaci…"
     }
   },
   "help": {
@@ -877,7 +900,8 @@
       "title": "To nejlepší: {{category}}",
       "subtitle": "{{names}} a další oblíbené aplikace.",
       "description": "Oblíbené aplikace z kategorie {{category}} v katalogu HubGetu – podle popularity a ohlasu uživatelů. Nainstalujte si je jednotlivě, nebo všechny najednou. Při dalším zobrazení vybereme jiné."
-    }
+    },
+    "seeAllNew": "Všechny nové aplikace"
   },
   "collection": {
     "open": "Otevřít kolekci {{name}}",
@@ -958,7 +982,6 @@
     "installedVia": "Nainstalováno přes",
     "managedBySteam": "Hru spravuje Steam – aktualizace a ověřování souborů probíhá ve Steamu.",
     "openInSteam": "Otevřít ve Steamu",
-    "managedByEa": "Hru spravuje EA app – aktualizace a ověřování souborů probíhá v EA app.",
     "localInstall": "Nainstalováno mimo správce balíčků – HubGet ji umí odinstalovat, ale ne aktualizovat.",
     "webOnlyNote": "{{publisher}} dává aplikaci {{name}} ke stažení jen na svém webu, proto ji HubGet nemůže nainstalovat, aktualizovat ani odinstalovat. Nainstalovanou ji ale pozná a otevře.",
     "webSource": "Web výrobce",
@@ -1005,7 +1028,8 @@
     "cliPin": "Zamknout verzi",
     "cliMore": "Další příkazy a vysvětlení",
     "cliUnsupported": "{{manager}} tohle neumí",
-    "openSourceAlternatives": "Open-source alternativy k aplikaci {{name}}"
+    "openSourceAlternatives": "Open-source alternativy k aplikaci {{name}}",
+    "managedByStore": "Hru spravuje {{store}} – aktualizace a ověřování souborů probíhá v {{store}}."
   },
   "report": {
     "button": "Nahlásit problém",
@@ -1464,7 +1488,8 @@
     "remainingMinutes_one": "zbývá {{count}} min",
     "remainingMinutes_few": "zbývají {{count}} min",
     "remainingMinutes_many": "zbývá {{count}} min",
-    "remainingMinutes_other": "zbývá {{count}} min"
+    "remainingMinutes_other": "zbývá {{count}} min",
+    "repairing": "Oprava"
   },
   "status": {
     "updates": "Aktualizace",
@@ -1680,9 +1705,11 @@
     "skipHash": "Přeskočit kontrolní součet",
     "download": "Stáhnout instalátor",
     "details": "Podrobnosti",
-    "more": "Další možnosti instalace",
+    "more": "Další možnosti aplikace",
     "unsupported": "Tento správce balíčků to nepodporuje",
-    "sandbox": "Vyzkoušet ve Windows Sandboxu"
+    "sandbox": "Vyzkoušet ve Windows Sandboxu",
+    "repair": "Opravit",
+    "repairHint": "Obnoví poškozené soubory aplikace z jejího instalátoru – když nejde spustit nebo hlásí chyby. Nastavení zůstane."
   },
   "installOptions": {
     "title": "Možnosti instalace – {{name}}",
@@ -1942,7 +1969,12 @@
     "uninstallConfirm_one": "Odinstalovat {{count}} aplikaci? {{names}}",
     "uninstallConfirm_few": "Odinstalovat {{count}} aplikace? {{names}}",
     "uninstallConfirm_many": "Odinstalovat {{count}} aplikací? {{names}}",
-    "uninstallConfirm_other": "Odinstalovat {{count}} aplikací? {{names}}"
+    "uninstallConfirm_other": "Odinstalovat {{count}} aplikací? {{names}}",
+    "compare": "Porovnat",
+    "compareHint_one": "Vyberte 2 až {{count}} aplikaci",
+    "compareHint_few": "Vyberte 2 až {{count}} aplikace",
+    "compareHint_many": "Vyberte 2 až {{count}} aplikace",
+    "compareHint_other": "Vyberte 2 až {{count}} aplikací"
   },
   "pins": {
     "title": "Ignorované a odložené aktualizace",
@@ -1975,7 +2007,8 @@
     "snoozedState": "Aktualizace na {{version}} odložena do {{date}}",
     "lockedAll": "Aktualizace se ignorují",
     "skippedVersion": "Přeskočená verze {{version}}",
-    "snoozedUntil": "Odloženo do {{date}}"
+    "snoozedUntil": "Odloženo do {{date}}",
+    "selfWaitState": "Aktualizuje se sama – {{version}} HubGet nabídne {{date}}, pokud se mezitím neaktualizuje sama"
   },
   "toast": {
     "installDone": "{{name}} – nainstalováno ({{source}})",
@@ -1991,7 +2024,8 @@
     "endedProcesses": "{{name}} běžela na pozadí – HubGet ji ukončil a pokračuje",
     "appClosed": "{{name}} běžela – HubGet ji zavřel a pokračuje",
     "appClosing": "{{name}} se ptá na uložení práce – uložte ji a aplikaci zavřete, HubGet pak bude pokračovat",
-    "appCloseTimeout": "{{name}} zůstala otevřená – operace zrušena"
+    "appCloseTimeout": "{{name}} zůstala otevřená – operace zrušena",
+    "repairDone": "{{name}} – opraveno ({{source}})"
   },
   "notifications": {
     "title": "Oznámení",
@@ -2021,7 +2055,8 @@
     "summary": "Fronta operací dokončena – úspěšně {{success}}, selhalo {{failed}}, zrušeno {{cancelled}}.",
     "appClosed": "Aplikace běžela – zavřena (procesy {{processes}}).",
     "appClosing": "Aplikace se ptá na uložení práce – po jejím zavření bude HubGet pokračovat.",
-    "appCloseTimeout": "Aplikace zůstala 15 minut otevřená – operace byla zrušena. Zkuste ji znovu, až aplikaci zavřete."
+    "appCloseTimeout": "Aplikace zůstala 15 minut otevřená – operace byla zrušena. Zkuste ji znovu, až aplikaci zavřete.",
+    "repairDone": "Opraveno ({{source}})"
   },
   "tray": {
     "browse": "Procházet balíčky",
@@ -2079,7 +2114,13 @@
     "linkBroken": "Odkaz na stažení instalátoru je dočasně nefunkční (Chyba {{status}}). Zkuste vybrat jiný zdroj instalace (např. Chocolatey/Scoop).",
     "unknown": "WinGet skončil s chybou {{code}}",
     "preCommandFailed": "Příkaz před instalací skončil s chybou ({{code}}) – instalace se nespustila.",
-    "needsAdmin": "Operace potřebuje práva správce – na pozadí se nespouští, spusťte ji ručně ({{code}})."
+    "needsAdmin": "Operace potřebuje práva správce – na pozadí se nespouští, spusťte ji ručně ({{code}}).",
+    "repairUnsupported": "Instalátor této aplikace opravu neumí – aplikaci odinstalujte a nainstalujte znovu ({{code}}).",
+    "repairFailed": "Oprava skončila s chybou ({{code}}).",
+    "repairUserScope": "Aplikaci nainstalovanou jen pro vás nejde opravovat s právy správce – zkuste to znovu bez nich ({{code}}).",
+    "signerChanged": "Instalátor nové verze podepsal někdo jiný než minule ({{detail}}) – HubGet ho nespustil. Podrobnosti jsou v detailu aplikace.",
+    "signatureMissing": "Dřívější instalátory podepsal „{{detail}}“, tento digitální podpis nemá – HubGet ho nespustil.",
+    "signatureInvalid": "Digitální podpis instalátoru neodpovídá jeho obsahu – soubor po podpisu někdo změnil. HubGet ho nespustil."
   },
   "managerError": {
     "failed": "{{name}} skončil s chybou {{code}}",
@@ -2339,7 +2380,9 @@
     "skipped_active_many": "Nalezeno {{count}} aktualizace – automatická instalace počká, až na počítači nebudete pracovat",
     "skipped_active_other": "Nalezeno {{count}} aktualizací – automatická instalace počká, až na počítači nebudete pracovat",
     "restorePointName": "HubGet - před hromadnou aktualizací",
-    "foundSecurity": "Bezpečnostní aktualizace ({{security}} z {{total}}): {{names}}"
+    "foundSecurity": "Bezpečnostní aktualizace ({{security}} z {{total}}): {{names}}",
+    "selfUpdatingWait": "Dát aplikacím, které se aktualizují samy, čas",
+    "selfUpdatingWaitHint": "Chrome, Firefox, Steam, Discord a další mají vlastní aktualizátor. Jejich aktualizace HubGet nezapočítá a nabídne je až po {{days}} dnech (bezpečnostní opravu po {{securityDays}} dnech), pokud se mezitím neaktualizují samy."
   },
   "security": {
     "warningTitle": "Upozornění!",
@@ -2434,7 +2477,8 @@
       "install": "Instalace",
       "update": "Aktualizace",
       "uninstall": "Odinstalace",
-      "download": "Stažení"
+      "download": "Stažení",
+      "repair": "Oprava"
     }
   },
   "commandSearch": {
@@ -2768,5 +2812,302 @@
     "protectionOn": "Ochrana systému je zapnutá – jde vytvářet body obnovení",
     "protectionOff": "Ochrana systému je vypnutá – body obnovení nejde vytvořit",
     "protectionHint": "Zapnete ji v Ovládacích panelech → Systém → Ochrana systému → Konfigurovat (disk C:). HubGet pak může před hromadnou aktualizací vytvořit bod obnovení."
+  },
+  "recentlyUpdated": {
+    "title": "Nedávno aktualizováno",
+    "subtitle_one": "Aplikace, které HubGet aktualizoval za poslední {{count}} den.",
+    "subtitle_few": "Aplikace, které HubGet aktualizoval za poslední {{count}} dny.",
+    "subtitle_many": "Aplikace, které HubGet aktualizoval za posledních {{count}} dne.",
+    "subtitle_other": "Aplikace, které HubGet aktualizoval za posledních {{count}} dní.",
+    "showAll_one": "Zobrazit všechny ({{count}})",
+    "showAll_few": "Zobrazit všechny ({{count}})",
+    "showAll_many": "Zobrazit všechny ({{count}})",
+    "showAll_other": "Zobrazit všechny ({{count}})",
+    "automatic": "automaticky",
+    "more": "další"
+  },
+  "preinstalled": {
+    "title": "Předinstalované aplikace",
+    "hint": "Hry, zprávy, tipy a aplikace partnerů, které Windows nebo výrobce počítače nainstaluje s novým účtem. Odeberou se jen vám a vrátit je jde z Microsoft Storu.",
+    "review": "Projít",
+    "failed": "Seznam aplikací se nepodařilo načíst.",
+    "none": "Žádná ze známých předinstalovaných aplikací tu není.",
+    "found_one": "Nalezena {{count}} předinstalovaná aplikace",
+    "found_few": "Nalezeny {{count}} předinstalované aplikace",
+    "found_many": "Nalezeno {{count}} předinstalované aplikace",
+    "found_other": "Nalezeno {{count}} předinstalovaných aplikací",
+    "recommendedCount_one": "{{count}} doporučujeme odebrat",
+    "recommendedCount_few": "{{count}} doporučujeme odebrat",
+    "recommendedCount_many": "{{count}} doporučujeme odebrat",
+    "recommendedCount_other": "{{count}} doporučujeme odebrat",
+    "intro": "Odeberou se jen vašemu účtu Windows (bez práv správce) a kdykoli je vrátíte z Microsoft Storu. Doporučené jsou aplikace, které většina lidí nepoužívá – ukončené nebo reklamní. Součásti Windows a aplikace, na kterých něco závisí, v seznamu nejsou.",
+    "group": {
+      "games": "Hry",
+      "microsoft": "Aplikace Microsoftu",
+      "partners": "Aplikace partnerů"
+    },
+    "recommended": "Doporučeno odebrat",
+    "selectRecommended_one": "Vybrat doporučené ({{count}})",
+    "selectRecommended_few": "Vybrat doporučené ({{count}})",
+    "selectRecommended_many": "Vybrat doporučené ({{count}})",
+    "selectRecommended_other": "Vybrat doporučené ({{count}})",
+    "remove_one": "Odebrat ({{count}})",
+    "remove_few": "Odebrat ({{count}})",
+    "remove_many": "Odebrat ({{count}})",
+    "remove_other": "Odebrat ({{count}})",
+    "confirm_one": "Odebrat {{count}} aplikaci? {{names}} – vrátit ji jde z Microsoft Storu.",
+    "confirm_few": "Odebrat {{count}} aplikace? {{names}} – vrátit je jde z Microsoft Storu.",
+    "confirm_many": "Odebrat {{count}} aplikace? {{names}} – vrátit je jde z Microsoft Storu.",
+    "confirm_other": "Odebrat {{count}} aplikací? {{names}} – vrátit je jde z Microsoft Storu.",
+    "removed_one": "Odebrána {{count}} aplikace",
+    "removed_few": "Odebrány {{count}} aplikace",
+    "removed_many": "Odebráno {{count}} aplikace",
+    "removed_other": "Odebráno {{count}} aplikací",
+    "removeFailed": "Nepodařilo se odebrat: {{names}}. Podrobnosti jsou v Historii.",
+    "removeError": "Odebrání selhalo: {{error}}",
+    "storeFailed": "Microsoft Store se nepodařilo otevřít: {{error}}",
+    "removedTitle": "Odebrané v HubGetu",
+    "restore": "Vrátit z Microsoft Storu"
+  },
+  "compare": {
+    "title": "Porovnat aplikace",
+    "subtitle_one": "Až {{count}} aplikace vedle sebe – hodnocení, licence, velikost, podpora ARM64 a další údaje z katalogu.",
+    "subtitle_few": "Až {{count}} aplikace vedle sebe – hodnocení, licence, velikost, podpora ARM64 a další údaje z katalogu.",
+    "subtitle_many": "Až {{count}} aplikace vedle sebe – hodnocení, licence, velikost, podpora ARM64 a další údaje z katalogu.",
+    "subtitle_other": "Až {{count}} aplikací vedle sebe – hodnocení, licence, velikost, podpora ARM64 a další údaje z katalogu.",
+    "clear": "Vyprázdnit porovnání",
+    "empty": "Zatím nic neporovnáváte. Přidejte aplikace hledáním výše, pravým tlačítkem na kartě aplikace (Přidat k porovnání) nebo zaškrtněte několik aplikací a zvolte Porovnat.",
+    "caption": "Porovnání: {{names}}",
+    "remove": "Odebrat {{name}} z porovnání",
+    "best": "Nejlepší",
+    "unknown": "Neuvedeno",
+    "yes": "Ano",
+    "no": "Ne",
+    "rating": "Hodnocení",
+    "license": "Licence",
+    "openSource": "Otevřený zdrojový kód",
+    "version": "Nejnovější verze",
+    "released": "Vydáno",
+    "size": "Velikost instalátoru",
+    "installedSize": "Místo na disku",
+    "arm64": "Nativně pro ARM64",
+    "architectures": "Architektury",
+    "minOs": "Minimální Windows",
+    "sources": "Zdroje instalace",
+    "webOnly": "Jen z webu výrobce",
+    "stars": "Hvězdy na GitHubu",
+    "installed": "V tomto počítači",
+    "installedVersion": "Nainstalováno ({{version}})",
+    "notInstalled": "Nenainstalováno",
+    "links": "Odkazy",
+    "homepage": "Web",
+    "repository": "Zdrojový kód",
+    "addPlaceholder": "Přidat aplikaci k porovnání…",
+    "open_one": "Porovnat ({{count}})",
+    "open_few": "Porovnat ({{count}})",
+    "open_many": "Porovnat ({{count}})",
+    "open_other": "Porovnat ({{count}})",
+    "menuAdd": "Přidat k porovnání",
+    "menuRemove": "Odebrat z porovnání",
+    "added": "{{name}} – přidáno k porovnání ({{count}}/{{max}})",
+    "full_one": "Porovnat jde nejvýš {{count}} aplikaci.",
+    "full_few": "Porovnat jde nejvýš {{count}} aplikace.",
+    "full_many": "Porovnat jde nejvýš {{count}} aplikace.",
+    "full_other": "Porovnat jde nejvýš {{count}} aplikací."
+  },
+  "a11y": {
+    "skipToContent": "Přeskočit na obsah",
+    "title": "Přístupnost",
+    "textSize": "Velikost textu",
+    "textSizeHint": "Zvětší nebo zmenší text i ovládací prvky v celém okně.",
+    "textSizeWindows": "Podle Nastavení Windows → Přístupnost → Velikost textu (teď {{size}}).",
+    "textSizeSystem": "Podle Windows",
+    "textSizeDefault": "Výchozí",
+    "motion": "Animace",
+    "motionHint": "„Podle Windows“ řídí Nastavení Windows → Přístupnost → Efekty animace. „Omezit“ vypne pohyb, prolínání a přechody v HubGetu vždy.",
+    "motionSystem": "Podle Windows",
+    "motionReduce": "Omezit",
+    "underlineLinks": "Podtrhávat odkazy",
+    "underlineLinksHint": "Odkazy se odliší od ostatního textu i bez barvy.",
+    "keyboardHint": "HubGet jde ovládat celý klávesnicí: Tab a Shift+Tab přechází mezi prvky, první Tab nabídne Přeskočit na obsah, Ctrl+K hledá, Enter otevře aplikaci a klávesa Menu (Shift+F10) její nabídku. Kontrastní motivy Windows a Předčítání (Narrator) HubGet podporuje sám."
+  },
+  "adopt": {
+    "title_one": "{{count}} program z webu výrobce jde převzít do správy WinGetu",
+    "title_few": "{{count}} programy z webu výrobce jde převzít do správy WinGetu",
+    "title_many": "{{count}} programu z webu výrobce jde převzít do správy WinGetu",
+    "title_other": "{{count}} programů z webu výrobce jde převzít do správy WinGetu",
+    "text": "Jsou nainstalované mimo správce balíčků, ale WinGet je má. Po převzetí jim HubGet bude nabízet aktualizace – v počítači se nic nezmění a program zůstane, kde je.",
+    "show": "Zobrazit",
+    "hide": "Skrýt",
+    "adoptAll_one": "Převzít vše ({{count}})",
+    "adoptAll_few": "Převzít vše ({{count}})",
+    "adoptAll_many": "Převzít vše ({{count}})",
+    "adoptAll_other": "Převzít vše ({{count}})",
+    "adopt": "Převzít do správy",
+    "adopted": "{{name}} – převzato do správy WinGetu ({{id}})",
+    "adoptedAll_one": "Převzat {{count}} program",
+    "adoptedAll_few": "Převzaty {{count}} programy",
+    "adoptedAll_many": "Převzato {{count}} programu",
+    "adoptedAll_other": "Převzato {{count}} programů",
+    "adoptedNote": "Převzato do správy WinGetu ({{id}}) – aktualizace nainstaluje novou verzi přes WinGet.",
+    "release": "Zrušit převzetí",
+    "released": "{{name}} – převzetí zrušeno",
+    "offer": "Nainstalováno mimo správce balíčků, ale WinGet tuto aplikaci má ({{id}}). Po převzetí jí HubGet bude nabízet aktualizace – program zůstane, kde je."
+  },
+  "newApps": {
+    "title": "Nově v katalogu",
+    "subtitle_one": "Aplikace, které do katalogu HubGetu přibyly za poslední {{count}} den",
+    "subtitle_few": "Aplikace, které do katalogu HubGetu přibyly za poslední {{count}} dny",
+    "subtitle_many": "Aplikace, které do katalogu HubGetu přibyly za posledních {{count}} dne",
+    "subtitle_other": "Aplikace, které do katalogu HubGetu přibyly za posledních {{count}} dní",
+    "days_one": "{{count}} den",
+    "days_few": "{{count}} dny",
+    "days_many": "{{count}} dne",
+    "days_other": "{{count}} dní",
+    "added": "Přidáno: {{when}}",
+    "trackedSince": "Katalog sleduje nové aplikace od {{date}} – za delší období zatím údaje nemá.",
+    "empty_one": "Za poslední {{count}} den do katalogu nic nepřibylo.",
+    "empty_few": "Za poslední {{count}} dny do katalogu nic nepřibylo.",
+    "empty_many": "Za posledních {{count}} dne do katalogu nic nepřibylo.",
+    "empty_other": "Za posledních {{count}} dní do katalogu nic nepřibylo.",
+    "count_one": "{{count}} aplikace",
+    "count_few": "{{count}} aplikace",
+    "count_many": "{{count}} aplikace",
+    "count_other": "{{count}} aplikací"
+  },
+  "selfUpdating": {
+    "waiting_one": "Aktualizuje se sama ({{count}}): {{names}} – HubGet její aktualizaci nabídne, jen pokud se neaktualizuje do {{days}} dní.",
+    "waiting_few": "Aktualizují se samy ({{count}}): {{names}} – HubGet jejich aktualizace nabídne, jen pokud se neaktualizují do {{days}} dní.",
+    "waiting_many": "Aktualizují se samy ({{count}}): {{names}} – HubGet jejich aktualizace nabídne, jen pokud se neaktualizují do {{days}} dní.",
+    "waiting_other": "Aktualizují se samy ({{count}}): {{names}} – HubGet jejich aktualizace nabídne, jen pokud se neaktualizují do {{days}} dní."
+  },
+  "installStats": {
+    "setting": "Přispívat do žebříčku instalací",
+    "settingHint": "Po instalaci aplikace anonymně pošle jen její id z katalogu a náhodné id této instalace HubGetu. Z hlášení vzniká žebříček Nejinstalovanější v HubGetu.",
+    "contribute": "Přispívat do žebříčku"
+  },
+  "signer": {
+    "changedTitle": "Instalátor podepsal jiný vydavatel",
+    "changedText": "Verzi {{version}} podepsal „{{to}}“, dřívější instalátory „{{from}}“, proto ji HubGet nenainstaloval. Pokud změně věříte (firma se přejmenovala nebo změnila certifikát), aktualizujte.",
+    "missingTitle": "Instalátor nemá digitální podpis",
+    "missingText": "Dřívější instalátory podepsal „{{from}}“, verze {{version}} podpis nemá, proto ji HubGet nenainstaloval.",
+    "trust": "Důvěřovat a aktualizovat"
+  },
+  "abandoned": {
+    "title_one": "{{count}} aplikace se nejspíš už nevyvíjí",
+    "title_few": "{{count}} aplikace se nejspíš už nevyvíjejí",
+    "title_many": "{{count}} aplikace se nejspíš už nevyvíjí",
+    "title_other": "{{count}} aplikací se nejspíš už nevyvíjí",
+    "text": "Nedostávají opravy chyb ani bezpečnostní záplaty. Zvažte náhradu, která se dál vyvíjí.",
+    "archived": "repozitář na GitHubu je archivovaný – vývoj skončil",
+    "noCommits_one": "na GitHubu bez změn od {{date}} (přes {{count}} rok)",
+    "noCommits_few": "na GitHubu bez změn od {{date}} (přes {{count}} roky)",
+    "noCommits_many": "na GitHubu bez změn od {{date}} (přes {{count}} roku)",
+    "noCommits_other": "na GitHubu bez změn od {{date}} (přes {{count}} let)",
+    "noRelease_one": "poslední verze je z {{date}} (přes {{count}} rok)",
+    "noRelease_few": "poslední verze je z {{date}} (přes {{count}} roky)",
+    "noRelease_many": "poslední verze je z {{date}} (přes {{count}} roku)",
+    "noRelease_other": "poslední verze je z {{date}} (přes {{count}} let)",
+    "instead": "Náhrada:",
+    "note": "Aplikace se nejspíš už nevyvíjí: {{reason}}."
+  },
+  "newPc": {
+    "title": "Nový počítač",
+    "subtitle": "Zaškrtněte aplikace, které chcete, a HubGet je nainstaluje najednou – jednu po druhé, bez klikání v instalátorech.",
+    "saveBundle": "Uložit jako sadu",
+    "install_one": "Nainstalovat vybrané ({{count}})",
+    "install_few": "Nainstalovat vybrané ({{count}})",
+    "install_many": "Nainstalovat vybrané ({{count}})",
+    "install_other": "Nainstalovat vybrané ({{count}})",
+    "installed": "Nainstalováno",
+    "details": "Podrobnosti o aplikaci {{name}}",
+    "more": "Více",
+    "hint": "Další aplikace najdete v katalogu a přidáte do sady balíčků; sadu pak přenesete i na jiný počítač."
+  },
+  "drivers": {
+    "title": "Ovladače z Windows Update",
+    "open": "Nainstalovat ve Windows Update",
+    "searching": "Hledám…",
+    "check": "Zkontrolovat ovladače",
+    "hint": "Ovladače, které Windows Update nabízí a nejsou nainstalované. Instaluje je Windows Update (Volitelné aktualizace) – umí je i vrátit.",
+    "none": "Windows Update žádné nové ovladače nenabízí."
+  },
+  "year": {
+    "title": "Váš rok s HubGetem {{year}}",
+    "subtitle": "Co HubGet v tomto počítači za rok udělal – jen z místní historie, nic se neposílá.",
+    "empty": "Za tento rok zatím HubGet nic nenainstaloval ani neaktualizoval.",
+    "installs": "Nainstalovaných aplikací",
+    "updates": "Aktualizací",
+    "automatic_one": "z toho automaticky {{count}}",
+    "automatic_few": "z toho automaticky {{count}}",
+    "automatic_many": "z toho automaticky {{count}}",
+    "automatic_other": "z toho automaticky {{count}}",
+    "saved": "Ušetřený čas (odhad)",
+    "hours": "hodin",
+    "minutes": "minut",
+    "uninstalls": "Odinstalovaných aplikací",
+    "repairs": "Oprav",
+    "topApps": "Nejčastěji aktualizované",
+    "updateCount_one": "{{count}} aktualizace",
+    "updateCount_few": "{{count}} aktualizace",
+    "updateCount_many": "{{count}} aktualizace",
+    "updateCount_other": "{{count}} aktualizací",
+    "months": "Po měsících",
+    "busiest": "Nejrušnější měsíc: {{month}}",
+    "note": "Počítá se od {{date}}. Odhad času: ruční instalace asi 5 minut, aktualizace asi 3 minuty.",
+    "link": "Váš rok s HubGetem"
+  },
+  "requests": {
+    "title": "Navržené aplikace",
+    "subtitle": "Aplikace, které lidé v HubGetu postrádají. Hlasujte pro ty, které chcete i vy – nejžádanější přibudou do katalogu.",
+    "suggest": "Navrhnout aplikaci",
+    "unavailable": "Navržené aplikace teď nejsou k dispozici.",
+    "empty": "Zatím nikdo nic nenavrhl – buďte první.",
+    "vote": "Hlasovat pro {{name}}",
+    "unvote": "Zrušit hlas pro {{name}}",
+    "added": "Přidáno",
+    "web": "Web",
+    "failed": "Nepodařilo se: {{error}}",
+    "thanks": "Díky! {{name}} je mezi navrženými aplikacemi.",
+    "suggestTitle": "Navrhnout aplikaci",
+    "suggestText": "Napište, jakou aplikaci v HubGetu postrádáte. Když ji už někdo navrhl, započítá se váš hlas.",
+    "send": "Navrhnout",
+    "name": "Název aplikace",
+    "url": "Web aplikace (nepovinné)",
+    "note": "Poznámka (nepovinné)",
+    "missing": "Chybí vám aplikace? Navrhněte ji",
+    "notFound": "Nenašli jste, co hledáte?"
+  },
+  "devReplies": {
+    "saved": "Odpověď uložena",
+    "deleted": "Odpověď smazána",
+    "failed": "Nepodařilo se: {{error}}",
+    "title": "Odpověď vývojáře ({{author}})",
+    "write": "Odpovědět",
+    "save": "Uložit odpověď",
+    "edit": "Upravit odpověď",
+    "approved": "Jste ověřený vývojář této aplikace",
+    "requested": "Žádost odeslána – po schválení budete moci odpovídat na recenze.",
+    "githubOnly": "Odpovídat na recenze jde jen s účtem GitHub – přihlaste se přes GitHub.",
+    "pending": "Vaše žádost o odpovídání na recenze čeká na schválení.",
+    "youAreMaintainer": "Jste vývojář této aplikace – otevřete recenzi a odpovězte na ni.",
+    "claim": "Jsem vývojář této aplikace",
+    "claimTitle": "Odpovídat na recenze aplikace {{name}}",
+    "claimText": "Po schválení budete moci odpovídat pod recenzemi. Ověříme, že váš účet GitHub patří k repozitáři aplikace – uveďte ho.",
+    "repo": "Repozitář na GitHubu",
+    "send": "Odeslat žádost",
+    "hasReply": "Odpověď vývojáře"
+  },
+  "devStats": {
+    "title": "Statistiky vaší aplikace",
+    "text": "Kolikrát lidé vaši aplikaci nainstalovali přes HubGet – z dobrovolných anonymních hlášení. Méně než 3 instalace se neukazují.",
+    "search": "Najít aplikaci v katalogu…",
+    "unavailable": "Statistiky teď nejsou k dispozici.",
+    "few": "méně než 3",
+    "days_one": "za {{count}} den",
+    "days_few": "za {{count}} dny",
+    "days_many": "za {{count}} dne",
+    "days_other": "za {{count}} dní",
+    "requests": "Co lidé v HubGetu postrádají – Navržené aplikace"
   }
 }

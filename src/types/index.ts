@@ -232,6 +232,10 @@ export interface CatalogEntry {
    * pipeline s GITHUB_TOKEN). Detail aplikace načte aktuální číslo živě.
    */
   githubStars?: number | null;
+  /** Repozitář na GitHubu je archivovaný – vývoj skončil (data pipeline, GraphQL). */
+  archived?: boolean;
+  /** Poslední push do repozitáře na GitHubu (ISO) – dlouho bez změn = možná opuštěná. */
+  lastCommit?: string | null;
   /** Hlášení chyb vývojářům (issue tracker). */
   issuesUrl?: string | null;
   /** Oficiální dokumentace (winget: Documentations). */
@@ -285,10 +289,16 @@ export interface Catalog {
  *  - id správce: nainstalováno přes daného správce (u wingetu z repozitáře winget),
  *  - msstore: aplikace z Microsoft Storu, kterou winget vidí se zdrojem „msstore“,
  *  - steam: hra ze Steamu (winget ji vidí jako „ARP\Machine\X64\Steam App <id>“),
+ *  - ea, gog, ubisoft, battlenet: hra z EA app, GOG, Ubisoft Connect, Battle.net
+ *    (pozná ji backend podle záznamu v registru – GameStore v arp.rs),
+ *  - epic: hra z Epic Games (v registru není – backend ji najde v manifestech Epicu, id „EPIC\…“),
  *  - local: program nainstalovaný mimo správce balíčků (winget ho jen najde
  *    v seznamu Programy a funkce, umí ho odinstalovat, ale ne aktualizovat).
  */
-export type InstallOrigin = SourceId | "msstore" | "steam" | "ea" | "local";
+export type InstallOrigin = SourceId | "msstore" | GameStore | "local";
+
+/** Herní obchod, jehož hry HubGet ukáže mezi nainstalovanými (spravuje je jejich spouštěč). */
+export type GameStore = "steam" | "ea" | "gog" | "ubisoft" | "battlenet" | "epic";
 
 /** Zdroj screenshotů: komunitní databáze UniGetUI, nebo popis balíčku v Chocolatey. */
 export type ScreenshotSource = "unigetui" | "chocolatey";
@@ -328,6 +338,11 @@ export interface InstalledPackage {
    */
   portable?: boolean;
   /**
+   * Převzatý program (store/adopted.ts): původní id záznamu ve Windows („ARP\…“) – `packageId`
+   * je pak id balíčku wingetu z katalogu. Odinstalace a oprava jdou přes toto id.
+   */
+  adoptedFrom?: string;
+  /**
    * Kdy byl program nainstalován (ms od 1. 1. 1970) podle Windows – záznam v registru,
    * u programu jen na disku vznik jeho složky. Čas nově objeveného balíčku (store/installSeen).
    */
@@ -343,10 +358,13 @@ export interface RepoSearchResult {
 }
 
 /** Druh operace nad balíčkem. */
-export type OperationKind = "install" | "update" | "uninstall" | "download";
+export type OperationKind = "install" | "update" | "uninstall" | "download" | "repair";
 
-/** Operace, pro které existuje příkaz správce (stažení instalátoru má vlastní příkaz). */
-export type CommandKind = Exclude<OperationKind, "download">;
+/**
+ * Operace, pro které existuje příkaz správce (stažení instalátoru má vlastní příkaz,
+ * opravu umí jen winget – commandGuide.ts).
+ */
+export type CommandKind = Exclude<OperationKind, "download" | "repair">;
 
 /** Rozsah instalace: pro aktuálního uživatele, nebo pro všechny uživatele počítače. */
 export type InstallScope = "user" | "machine";
@@ -362,6 +380,11 @@ export interface InstallOptions {
   interactive?: boolean;
   /** Nekontrolovat kontrolní součet instalátoru (riskantní – jen pro zastaralé manifesty). */
   skipHash?: boolean;
+  /**
+   * Kdo podepsal minulý instalátor (store/signers.ts, doplní fronta úloh; „“ = bez podpisu) –
+   * backend instalátor jiného vydavatele nebo bez podpisu nespustí (signatures.rs).
+   */
+  expectedSigner?: string;
   architecture?: Arch;
   scope?: InstallScope;
   /** Cílová složka instalace. */
@@ -398,7 +421,8 @@ export type OperationPhase =
   | "downloading"
   | "interactive" // čeká se na uživatele v průvodci instalací
   | "installing"
-  | "uninstalling";
+  | "uninstalling"
+  | "repairing";
 
 export interface OperationProgress {
   phase: OperationPhase;

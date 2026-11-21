@@ -1,29 +1,39 @@
 /**
- * Počty hvězdiček repozitářů na GitHubu pro katalog (pole `githubStars`).
+ * Údaje o repozitářích na GitHubu pro katalog: hvězdičky (pole `githubStars`) a u GraphQL
+ * i archivace a poslední změna (`archived`, `lastCommit` – opuštěné aplikace v HubGetu).
  *
  * Dva zdroje:
  *  - s tokenem (proměnná prostředí GITHUB_TOKEN, osobní token bez oprávnění)
- *    GraphQL API GitHubu – aktuální čísla, až 100 repozitářů jedním dotazem,
+ *    GraphQL API GitHubu – aktuální čísla, archivace a poslední push, až 100 repozitářů
+ *    jedním dotazem,
  *  - bez tokenu deps.dev (Google Open Source Insights) – veřejné API bez klíče,
  *    dávky po 500 repozitářích, čísla bývají pár dní stará. Repozitáře, které
  *    deps.dev nezná, zůstanou bez čísla; detail aplikace si ho načte živě sám.
  *
- * Výsledek se ukládá do .cache/github-stars.json a platí MAX_AGE.githubStars.
+ * Výsledek se ukládá do .cache/github-repos.json a platí MAX_AGE.githubStars.
  */
 import { readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { CACHE_DIR, MAX_AGE, USER_AGENT } from "../config.ts";
 import { log } from "../lib/log.ts";
 
-const CACHE_FILE = join(CACHE_DIR, "github-stars.json");
+const CACHE_FILE = join(CACHE_DIR, "github-repos.json");
 const GRAPHQL_BATCH = 100;
 const DEPS_DEV_BATCH = 500;
 const DEPS_DEV_URL = "https://api.deps.dev/v3alpha/projectbatch";
 
+/** Údaje o repozitáři; archivace a poslední push jen z GraphQL (deps.dev je nezná). */
+export interface RepoInfo {
+  stars: number;
+  archived?: boolean;
+  /** Poslední push do repozitáře (ISO). */
+  pushedAt?: string;
+}
+
 interface StarsCache {
   fetchedAt: number;
-  /** owner/repo → počet; null = repozitář neexistuje, je soukromý nebo ho zdroj nezná. */
-  stars: Record<string, number | null>;
+  /** owner/repo → údaje; null = repozitář neexistuje, je soukromý nebo ho zdroj nezná. */
+  stars: Record<string, RepoInfo | null>;
 }
 
 async function readCache(): Promise<StarsCache> {
@@ -37,11 +47,11 @@ async function readCache(): Promise<StarsCache> {
 /** Jména pro GraphQL: owner/repo do řetězcového literálu (jen bezpečné znaky). */
 const literal = (value: string) => JSON.stringify(value);
 
-async function queryGraphql(token: string, repos: string[]): Promise<Record<string, number | null>> {
+async function queryGraphql(token: string, repos: string[]): Promise<Record<string, RepoInfo | null>> {
   const fields = repos
     .map((repo, i) => {
       const [owner, name] = repo.split("/");
-      return `r${i}: repository(owner: ${literal(owner)}, name: ${literal(name)}) { stargazerCount }`;
+      return `r${i}: repository(owner: ${literal(owner)}, name: ${literal(name)}) { stargazerCount isArchived pushedAt }`;
     })
     .join("\n");
   const response = await fetch("https://api.github.com/graphql", {
@@ -51,9 +61,14 @@ async function queryGraphql(token: string, repos: string[]): Promise<Record<stri
   });
   if (!response.ok) throw new Error(`GitHub GraphQL: HTTP ${response.status}`);
   // Neexistující repozitář vrátí null a chybu NOT_FOUND – zbytek dávky platí
-  const body = (await response.json()) as { data?: Record<string, { stargazerCount: number } | null> };
+  const body = (await response.json()) as { data?: Record<string, { stargazerCount: number; isArchived: boolean; pushedAt: string | null } | null> };
   if (!body.data) throw new Error("GitHub GraphQL: odpověď bez dat");
-  return Object.fromEntries(repos.map((repo, i) => [repo, body.data![`r${i}`]?.stargazerCount ?? null]));
+  return Object.fromEntries(
+    repos.map((repo, i) => {
+      const r = body.data![`r${i}`];
+      return [repo, r ? { stars: r.stargazerCount, archived: r.isArchived, ...(r.pushedAt ? { pushedAt: r.pushedAt } : {}) } : null];
+    }),
+  );
 }
 
 interface DepsDevBatch {
@@ -61,8 +76,8 @@ interface DepsDevBatch {
   nextPageToken?: string;
 }
 
-async function queryDepsDev(repos: string[]): Promise<Record<string, number | null>> {
-  const result: Record<string, number | null> = Object.fromEntries(repos.map((repo) => [repo, null]));
+async function queryDepsDev(repos: string[]): Promise<Record<string, RepoInfo | null>> {
+  const result: Record<string, RepoInfo | null> = Object.fromEntries(repos.map((repo) => [repo, null]));
   const requests = repos.map((repo) => ({ projectKey: { id: `github.com/${repo}` } }));
   // Velkou odpověď deps.dev stránkuje – stejný dotaz se pošle znovu s pageToken
   let pageToken: string | undefined;
@@ -76,15 +91,15 @@ async function queryDepsDev(repos: string[]): Promise<Record<string, number | nu
     const body = (await response.json()) as DepsDevBatch;
     for (const item of body.responses ?? []) {
       const repo = item.request.projectKey.id.replace(/^github\.com\//, "");
-      if (repo in result) result[repo] = item.project?.starsCount ?? null;
+      if (repo in result) result[repo] = item.project?.starsCount !== undefined ? { stars: item.project.starsCount } : null;
     }
     pageToken = body.nextPageToken || undefined;
   } while (pageToken);
   return result;
 }
 
-/** Počty hvězdiček pro zadané repozitáře (owner/repo malými písmeny). */
-export async function loadGithubStars(repos: string[]): Promise<Map<string, number | null>> {
+/** Údaje o zadaných repozitářích (owner/repo malými písmeny). */
+export async function loadGithubRepos(repos: string[]): Promise<Map<string, RepoInfo | null>> {
   const cache = await readCache();
   const fresh = Date.now() - cache.fetchedAt < MAX_AGE.githubStars;
   const missing = fresh ? repos.filter((repo) => !(repo in cache.stars)) : repos;
@@ -96,7 +111,7 @@ export async function loadGithubStars(repos: string[]): Promise<Map<string, numb
     const query = token ? (batch: string[]) => queryGraphql(token, batch) : queryDepsDev;
     if (!token) log.info(`GitHub: bez GITHUB_TOKEN – hvězdičky z deps.dev (${missing.length} repozitářů)`);
 
-    const result: Record<string, number | null> = fresh ? { ...cache.stars } : {};
+    const result: Record<string, RepoInfo | null> = fresh ? { ...cache.stars } : {};
     for (let i = 0; i < missing.length; i += batchSize) {
       const batch = missing.slice(i, i + batchSize);
       try {

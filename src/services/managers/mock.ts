@@ -162,6 +162,10 @@ function createMockManager(config: MockConfig): PackageManager {
           installed.delete(request.packageId);
           return { outcome: "success" as const };
         }
+        if (request.kind === "repair") {
+          if (!(await step("repairing", 2000))) return { outcome: "cancelled" as const };
+          return { outcome: "success" as const };
+        }
 
         if (!(await step("downloading", 2200 + Math.random() * 1500))) return { outcome: "cancelled" as const };
         // Interaktivní instalace: čeká se, až uživatel projde průvodcem

@@ -7,6 +7,7 @@ import { GitHubIcon } from "@/components/ui/BrandIcons";
 import { HubGetLogo } from "@/components/ui/Logo";
 import { SourceIcon } from "@/components/package/SourceIcon";
 import { VerifiedBadge } from "@/components/package/VerifiedBadge";
+import { DeveloperStats } from "@/components/publish/DeveloperStats";
 import { CONTACT_PATH, GITHUB_URL } from "@/config";
 import { useInstallableStats } from "@/hooks/usePackages";
 import { cn, formatAppCount } from "@/lib/utils";
@@ -172,6 +173,9 @@ export function PublishPage() {
           </a>
         </div>
       </div>
+
+      {/* Instalace vaší aplikace přes HubGet a co lidé v katalogu postrádají */}
+      <DeveloperStats />
 
       {/* Dotazy */}
       <section className="mb-10 flex flex-wrap items-center justify-between gap-4 rounded-3xl border border-line bg-surface-2/60 px-7 py-6">

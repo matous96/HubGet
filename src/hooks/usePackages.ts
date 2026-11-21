@@ -6,7 +6,7 @@ import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { queryClient, queryKeys } from "@/app/queryClient";
 import { archFamilies, matchesArch } from "@/lib/arch";
-import { eaIconSrc, steamIconSrc } from "@/lib/iconSrc";
+import { gameIconSrc, steamIconSrc } from "@/lib/iconSrc";
 import { installedNameKey } from "@/lib/nameKey";
 import { isTauri } from "@/lib/tauri";
 import { isWebOnly } from "@/lib/webOnly";
@@ -14,12 +14,14 @@ import { wingetBaseId } from "@/lib/wingetVariant";
 import { normalize } from "@/lib/utils";
 import { compareVersions } from "@/lib/version";
 import { loadCatalog, type LoadedCatalog } from "@/services/catalog";
-import { getAllInstalled, getSource, isEaGame, isSourceId, sortBySourceOrder, steamAppId } from "@/services/managers";
+import { gameStoreOf, getAllInstalled, getOrigin, getSource, isSourceId, sortBySourceOrder, steamAppId } from "@/services/managers";
 import { useJobs } from "@/store/jobs";
 import { usePackageIndex } from "@/store/packageIndex";
 import { activeSources, sourcePriority, useSettings } from "@/store/settings";
 import { inLockedSource, useSourceScope } from "@/store/sourceLock";
 import { applyUpdateRules, useUpdateRules, type UpdateRules } from "@/store/updateRules";
+import { useAdopted, type Adoption } from "@/store/adopted";
+import { pinKey } from "@/store/updatePins";
 import type { CatalogEntry, InstalledPackage, Job, PackageSource, RepoSearchResult, SortMode, SourceId } from "@/types";
 
 /** Klíč pro dohledání podle zdroje: "scoop:extras/firefox". */
@@ -70,7 +72,11 @@ export function useCatalogIndex() {
 /** Mapa "zdroj:id balíčku" → profil v katalogu (spojení dat od správců s katalogem). */
 export function useSourceIndex() {
   const { data } = useCatalog();
-  if (!data) return NO_ENTRIES;
+  return data ? catalogSourceIndex(data) : NO_ENTRIES;
+}
+
+/** Aplikace z katalogu podle zdroje a id balíčku („winget:Mozilla.Firefox“) – jednou pro katalog. */
+function catalogSourceIndex(data: LoadedCatalog) {
   return cached(sourceIndexes, data, () => {
     const map = new Map<string, CatalogEntry>();
     for (const entry of data.catalog.packages) {
@@ -271,19 +277,41 @@ export function useInstalledEntries() {
 let ruleSelector: {
   rules: UpdateRules;
   catalog: LoadedCatalog | undefined;
+  adopted: Record<string, Adoption>;
   select: (data: InstalledPackage[]) => InstalledPackage[];
 } | null = null;
 
-function selectWithRules(rules: UpdateRules, catalog: LoadedCatalog | undefined) {
-  if (ruleSelector?.rules !== rules || ruleSelector.catalog !== catalog) {
+function selectWithRules(rules: UpdateRules, catalog: LoadedCatalog | undefined, adopted: Record<string, Adoption>) {
+  if (ruleSelector?.rules !== rules || ruleSelector.catalog !== catalog || ruleSelector.adopted !== adopted) {
     let last: { data: InstalledPackage[]; result: InstalledPackage[] } | null = null;
     const select = (data: InstalledPackage[]) => {
-      if (last?.data !== data) last = { data, result: applyUpdateRules(withPortablePackages(data, catalog), rules) };
+      if (last?.data !== data) last = { data, result: applyUpdateRules(withAdoptedPackages(withPortablePackages(data, catalog), catalog, adopted), rules) };
       return last.result;
     };
-    ruleSelector = { rules, catalog, select };
+    ruleSelector = { rules, catalog, adopted, select };
   }
   return ruleSelector.select;
+}
+
+/**
+ * Převzaté programy (store/adopted.ts): program mimo správce se vede pod id balíčku wingetu
+ * z katalogu a novější verze v katalogu se nabídne jako aktualizace. Původní id zůstane
+ * v `adoptedFrom` (odinstalace, oprava). Když už winget balíček vidí sám (po aktualizaci přes
+ * winget), převzetí se neuplatní – aplikace by byla dvakrát.
+ */
+export function withAdoptedPackages(data: InstalledPackage[], catalog: LoadedCatalog | undefined, adopted: Record<string, Adoption>): InstalledPackage[] {
+  if (!catalog || !Object.keys(adopted).length) return data;
+  const index = catalogSourceIndex(catalog);
+  const listed = new Set(data.filter((p) => p.source === "winget" && p.origin !== "local").map((p) => p.packageId.toLowerCase()));
+  return data.map((p) => {
+    const adoption = p.origin === "local" && !p.diskLocation && !p.portable ? adopted[pinKey(p)] : undefined;
+    if (!adoption || listed.has(adoption.wingetId.toLowerCase())) return p;
+    const winget = index.get(sourceKey("winget", adoption.wingetId))?.sources.find((s) => s.source === "winget" && s.packageId === adoption.wingetId);
+    if (!winget) return p;
+    // Verzi programu zná jen registr – bez ní se aktualizace nenabízí (jako u wingetu „Unknown“)
+    const newer = !!p.installedVersion && !!winget.version && compareVersions(winget.version, p.installedVersion) > 0;
+    return { ...p, packageId: winget.packageId, origin: "winget", adoptedFrom: p.packageId, availableVersion: newer ? winget.version : null };
+  });
 }
 
 /**
@@ -313,10 +341,11 @@ export function useInstalled() {
   const enabled = useMemo(() => activeSources(enabledSources, userMode), [enabledSources, userMode]);
   const { data: catalog } = useCatalog();
   const rules = useUpdateRules(catalog);
+  const adopted = useAdopted((s) => s.items);
   return useQuery({
     queryKey: [...queryKeys.installed, enabled],
     queryFn: () => getAllInstalled(enabled),
-    select: selectWithRules(rules, catalog),
+    select: selectWithRules(rules, catalog, adopted),
     // Bez strukturálního sdílení – jinak by každá komponenta dostala vlastní kopii pole
     structuralSharing: false,
   });
@@ -457,9 +486,11 @@ export function fallbackEntry(source: SourceId, packageId: string, name: string,
       homepage: `https://store.steampowered.com/app/${appId}`,
     };
   }
-  // Hra z EA app: kategorie Hry a ikona hry z jejího záznamu v registru (stejně jako u Steamu)
-  if (isEaGame(packageId)) {
-    return { ...base, publisher: "EA app", categories: ["games"], iconUrl: isTauri() ? eaIconSrc(packageId) : null };
+  // Hra z EA app, GOG, Ubisoft Connect, Battle.net či Epic Games: kategorie Hry a ikona hry
+  // (z jejího záznamu v registru, u Epicu ze spustitelného souboru – stejně jako u Steamu)
+  const store = gameStoreOf(packageId);
+  if (store) {
+    return { ...base, publisher: getOrigin(store).label, categories: ["games"], iconUrl: isTauri() ? gameIconSrc(packageId) : null };
   }
   return base;
 }

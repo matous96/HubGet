@@ -67,13 +67,19 @@ export function holdByCommunity(pkg: InstalledPackage) {
 /** Chyby, které vypovídají o verzi (vadný instalátor, odkaz…), ne o počítači (síť, běžící aplikace…). */
 const VERSION_ERRORS = new Set(["installerFailed", "hashMismatch", "linkBroken", "noInstaller", "dependencies", "unknown"]);
 
-function report(source: SourceId, packageId: string, version: string, outcome: "success" | "failed" | "rolledBack") {
-  if (!supabase) return;
+/** Náhodné id této instalace HubGetu pro anonymní hlášení (spolehlivost verzí, žebříček instalací). */
+export function communityReporter(): string {
   let reporter = useReliability.getState().reporter;
   if (!reporter) {
     reporter = crypto.randomUUID();
     useReliability.setState({ reporter });
   }
+  return reporter;
+}
+
+function report(source: SourceId, packageId: string, version: string, outcome: "success" | "failed" | "rolledBack") {
+  if (!supabase) return;
+  const reporter = communityReporter();
   void supabase
     .rpc("report_update_outcome", { p_source: source, p_package_id: packageId, p_version: version, p_outcome: outcome, p_reporter: reporter })
     .then(undefined, () => undefined);

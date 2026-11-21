@@ -89,6 +89,8 @@ function versionsCommand(source: SourceId, id: string): string {
 function operationCommand(source: SourceId, request: OperationRequest): string {
   const { kind, packageId, version, options = {} } = request;
   if (kind === "download") return downloadCommand(source, packageId, version, options) ?? "";
+  // Opravu umí jen winget (backend winget.rs operation_args)
+  if (kind === "repair") return source === "winget" ? `winget repair --id ${packageId} --exact --silent` : "";
   return kind === "install" ? unattendedInstallCommand(source, packageId, version, options) : sourceCommand(source, kind, packageId);
 }
 

@@ -91,7 +91,7 @@ fn serve(dir: &Path, bundled: Option<&Path>, uri: &str) -> Result<(Vec<u8>, &'st
         "/app" => app_icon(dir, &param("id").ok_or("chybí AppID")?).map(|bytes| (bytes, "image/png")),
         "/file" => file_icon(dir, &param("p").ok_or("chybí cesta")?).map(|bytes| (bytes, "image/png")),
         "/steam" => steam_icon(dir, &param("app").ok_or("chybí číslo hry")?).map(|bytes| (bytes, "image/png")),
-        "/ea" => ea_icon(dir, &param("id").ok_or("chybí id hry")?).map(|bytes| (bytes, "image/png")),
+        "/game" => game_icon(dir, &param("id").ok_or("chybí id hry")?).map(|bytes| (bytes, "image/png")),
         _ => Err("neznámá cesta".into()),
     }
 }
@@ -465,17 +465,23 @@ fn steam_icon(dir: &Path, app: &str) -> Result<Vec<u8>, String> {
     Ok(png)
 }
 
-/// Ikona hry z EA app podle id záznamu v registru („ARP\Machine\X86\{…}“): DisplayIcon
-/// hry (.ico nebo spustitelný soubor). Jen záznamy, které jsou opravdu hrou z EA app.
-fn ea_icon(dir: &Path, package_id: &str) -> Result<Vec<u8>, String> {
-    let name = format!("ea-{}.png", hash(&package_id.to_lowercase()));
+/// Ikona hry z herního obchodu: u EA app, GOG, Ubisoft Connect a Battle.net podle id záznamu
+/// v registru („ARP\Machine\X86\{…}“) DisplayIcon hry (.ico nebo spustitelný soubor), jinak její
+/// hlavní EXE; u Epic Games („EPIC\<hra>“) spustitelný soubor z manifestu Epicu. Jen záznamy,
+/// které jsou opravdu hrou z některého obchodu.
+fn game_icon(dir: &Path, package_id: &str) -> Result<Vec<u8>, String> {
+    let name = format!("game-{}.png", hash(&package_id.to_lowercase()));
     let path = dir.join(&name);
     if is_fresh(&path, APP_ICON_TTL) {
         return std::fs::read(&path).map_err(|e| e.to_string());
     }
-    let registry = crate::arp::Registry::load();
-    let entry = registry.by_winget_id(package_id).filter(|entry| entry.is_ea_game()).ok_or("hra z EA app nenalezena")?;
-    let icon = entry.icon_file().ok_or("hra ikonu nemá")?;
+    let icon = if package_id.starts_with(r"EPIC\") {
+        crate::games::epic_game(package_id).ok_or("hra z Epic Games nenalezena")?.exe.ok_or("hra ikonu nemá")?
+    } else {
+        let registry = crate::arp::Registry::load();
+        let entry = registry.by_winget_id(package_id).filter(|entry| entry.game_store().is_some()).ok_or("hra nenalezena")?;
+        entry.icon_file().or_else(|| entry.main_executable()).ok_or("hra ikonu nemá")?
+    };
     if !icon.extension().is_some_and(|ext| ext.eq_ignore_ascii_case("ico")) {
         // Spustitelný soubor – ikona přes shell (stejně jako u programů z nabídky Start)
         return shell_icon(dir, &name, &icon.to_string_lossy());

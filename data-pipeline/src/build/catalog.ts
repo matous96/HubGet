@@ -197,7 +197,12 @@ export async function buildCatalog(
     .map((r) => ({ r, id: recordId(r) }))
     .map((x) => ({ ...x, popularity: popularity(x.r, maxDownloads, curated[x.id]) }))
     .sort((a, b) => b.popularity - a.popularity);
-  const chosen = options.limit ? ranked.slice(0, options.limit) : ranked;
+  // Dva balíčky se stejným id po převodu na slug (Chocolatey „ncrunch.vs2013“ a „ncrunch-vs2013“)
+  // – jen ten populárnější; stejné id by v aplikaci rozbilo karty, odkazy i oblíbené
+  const usedIds = new Set<string>();
+  const unique = ranked.filter((x) => !usedIds.has(x.id) && !!usedIds.add(x.id));
+  if (unique.length < ranked.length) log.info(`zdvojená id vynechána: ${ranked.length - unique.length}`);
+  const chosen = options.limit ? unique.slice(0, options.limit) : unique;
 
   // 2) Manifesty wingetu pro nejpopulárnější aplikace
   const detailTargets = chosen.filter((x) => x.r.winget).slice(0, options.details);

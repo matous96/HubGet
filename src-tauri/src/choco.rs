@@ -287,6 +287,7 @@ fn operation_args(request: &OperationRequest) -> Result<Vec<String>, String> {
         Kind::Uninstall => "uninstall",
         // `choco download` je jen v placených edicích
         Kind::Download => return Err("Stažení instalátoru Chocolatey neumí".into()),
+        Kind::Repair => return Err("Opravu aplikace Chocolatey neumí".into()),
     };
     let mut args: Vec<String> = vec![verb.into(), id.into(), "--yes".into()];
     // Uložené volby aplikace platí i pro aktualizace
@@ -356,6 +357,7 @@ pub async fn choco_operation(id: String, request: OperationRequest, on_event: Ch
         prefetch: None,
         pre_command,
         post_command,
+        signer_check: None,
     };
     operations::execute(id, spec, on_event).await
 }

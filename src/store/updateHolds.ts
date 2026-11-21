@@ -60,6 +60,11 @@ interface UpdateHoldsState {
   allowed: Record<string, string>;
   watched: Record<string, WatchedUpdate>;
   selfUpdating: Record<string, SelfUpdating>;
+  /**
+   * Známé aplikace, které se aktualizují samy (data/selfUpdating.ts), u kterých uživatel chce
+   * aktualizace hned („Nabídnout znovu“): klíč pinKey → kdy.
+   */
+  selfOffer: Record<string, string>;
   failed: Record<string, number>;
   /** Odložené kvůli právům správce: klíč verze → kdy. */
   needsAdmin: Record<string, string>;
@@ -92,6 +97,7 @@ export const useUpdateHolds = create<UpdateHoldsState>()(
       allowed: {},
       watched: {},
       selfUpdating: {},
+      selfOffer: {},
       failed: {},
       needsAdmin: {},
       clock: Date.now(),
@@ -192,18 +198,20 @@ export const useUpdateHolds = create<UpdateHoldsState>()(
       releaseSelfUpdating: (key) => {
         const selfUpdating = { ...get().selfUpdating };
         delete selfUpdating[key];
-        set({ selfUpdating });
+        // I u známé aplikace ze seznamu (data/selfUpdating.ts) – aktualizace nabízet hned
+        set({ selfUpdating, selfOffer: { ...get().selfOffer, [key]: new Date().toISOString() } });
       },
       tick: () => set({ clock: Date.now() }),
     }),
     {
       name: "unibox-update-holds",
-      partialize: ({ firstSeen, stuck, allowed, watched, selfUpdating, failed, needsAdmin }) => ({
+      partialize: ({ firstSeen, stuck, allowed, watched, selfUpdating, selfOffer, failed, needsAdmin }) => ({
         firstSeen,
         stuck,
         allowed,
         watched,
         selfUpdating,
+        selfOffer,
         failed,
         needsAdmin,
       }),

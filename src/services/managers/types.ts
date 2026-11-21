@@ -47,6 +47,8 @@ export interface OperationResult {
   errorKey?: string;
   /** Dokončení vyžaduje restart počítače. */
   restartRequired?: boolean;
+  /** Kdo podepsal stažený instalátor („“ = bez podpisu) – jen winget s instalátorem staženým předem. */
+  signer?: string;
 }
 
 /**

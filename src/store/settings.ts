@@ -47,6 +47,12 @@ interface SettingsState {
   autoCleanup: boolean;
   /** Sledovat instalace: snímek disku a registru před a po instalaci – podklad pro čisté odinstalování. */
   trackInstalls: boolean;
+  /** Přístupnost: velikost textu (násobek, 1 = výchozí), „system“ = podle Nastavení Windows (Velikost textu). */
+  textScale: TextScale;
+  /** Přístupnost: animace – „system“ = podle Windows (Efekty animace), „reduce“ = vždy omezit. */
+  motion: "system" | "reduce";
+  /** Přístupnost: podtrhávat odkazy (rozliší je i bez barvy). */
+  underlineLinks: boolean;
   setTheme: (theme: ThemeSetting) => void;
   setLanguage: (language: string) => void;
   setUserMode: (mode: UserMode) => void;
@@ -66,7 +72,14 @@ interface SettingsState {
   setAdvancedUninstall: (enabled: boolean) => void;
   setAutoCleanup: (enabled: boolean) => void;
   setTrackInstalls: (enabled: boolean) => void;
+  setTextScale: (scale: TextScale) => void;
+  setMotion: (motion: "system" | "reduce") => void;
+  setUnderlineLinks: (enabled: boolean) => void;
 }
+
+/** Volby velikosti textu (Nastavení → Vzhled → Přístupnost). */
+export const TEXT_SCALES = [0.9, 1, 1.1, 1.25, 1.5] as const;
+export type TextScale = (typeof TEXT_SCALES)[number] | "system";
 
 export const useSettings = create<SettingsState>()(
   persist(
@@ -92,6 +105,9 @@ export const useSettings = create<SettingsState>()(
       advancedUninstall: false,
       autoCleanup: false,
       trackInstalls: false,
+      textScale: "system",
+      motion: "system",
+      underlineLinks: false,
       setTheme: (theme) => set({ theme }),
       setLanguage: (language) => {
         set({ language });
@@ -119,6 +135,9 @@ export const useSettings = create<SettingsState>()(
       setAdvancedUninstall: (advancedUninstall) => set({ advancedUninstall }),
       setAutoCleanup: (autoCleanup) => set({ autoCleanup }),
       setTrackInstalls: (trackInstalls) => set({ trackInstalls }),
+      setTextScale: (textScale) => set({ textScale: textScale === "system" || TEXT_SCALES.includes(textScale) ? textScale : "system" }),
+      setMotion: (motion) => set({ motion }),
+      setUnderlineLinks: (underlineLinks) => set({ underlineLinks }),
     }),
     {
       name: "unibox-settings",

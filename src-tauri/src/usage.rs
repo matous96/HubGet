@@ -249,14 +249,18 @@ pub async fn app_last_used(apps: Vec<AppRef>) -> Result<Vec<AppUsage>, String> {
         let extensions = shell_extension_dlls();
         let running: Vec<String> = running::processes().into_iter().map(|p| p.path.to_lowercase()).collect();
         let registry = arp::Registry::load();
+        // Hry z Epic Games v registru nejsou – složka a velikost z manifestů Epicu (games.rs)
+        let epic = if apps.iter().any(|app| app.package_id.starts_with(r"EPIC\")) { crate::games::epic_games() } else { Vec::new() };
         Ok(apps
             .iter()
             .map(|app| {
+                let game = epic.iter().find(|game| game.package_id().eq_ignore_ascii_case(&app.package_id));
                 let matched = registry.matching(&app.package_id, &app.name, "");
-                let size = matched.iter().filter_map(|entry| entry.estimated_size).max();
+                let size = matched.iter().filter_map(|entry| entry.estimated_size).max().or_else(|| game.and_then(|game| game.size));
                 let dirs: Vec<String> = matched
                     .into_iter()
                     .flat_map(running::install_dirs)
+                    .chain(game.map(|game| game.folder.clone()))
                     .map(|d| format!("{}\\", d.to_string_lossy().trim_end_matches('\\').to_lowercase()))
                     .collect();
                 let (keys, _) = leftovers::name_keys(&app.name, &app.package_id);

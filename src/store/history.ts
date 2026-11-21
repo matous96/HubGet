@@ -5,6 +5,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { isSourceId } from "@/services/managers/sources";
+import { useYearStats } from "./yearStats";
 import type { InstallOptions, OperationKind, OperationOutcome, SourceId } from "@/types";
 
 export interface HistoryEntry {
@@ -42,8 +43,11 @@ export const useHistory = create<HistoryState>()(
   persist(
     (set, get) => ({
       items: [],
-      // Nejnovější první
-      add: (entry) => set({ items: [entry, ...get().items].slice(0, MAX_ITEMS) }),
+      // Nejnovější první; roční souhrn se počítá průběžně (historie drží jen MAX_ITEMS záznamů)
+      add: (entry) => {
+        useYearStats.getState().record(entry);
+        set({ items: [entry, ...get().items].slice(0, MAX_ITEMS) });
+      },
       clear: () => set({ items: [] }),
     }),
     {

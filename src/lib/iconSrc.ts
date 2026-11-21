@@ -20,8 +20,12 @@ export const appIconSrc = (appId: string) => `${ICON_HOST}/app?id=${encodeURICom
 /** Ikona nainstalované hry ze Steamu podle čísla hry (soubor .ico, který uložil Steam; jen desktop). */
 export const steamIconSrc = (appId: string) => `${ICON_HOST}/steam?app=${encodeURIComponent(appId)}`;
 
-/** Ikona nainstalované hry z EA app podle id záznamu v registru („ARP\Machine\X86\{…}“; jen desktop). */
-export const eaIconSrc = (packageId: string) => `${ICON_HOST}/ea?id=${encodeURIComponent(packageId)}`;
+/**
+ * Ikona nainstalované hry z EA app, GOG, Ubisoft Connect či Battle.net podle id záznamu
+ * v registru („ARP\Machine\X86\{…}“), u Epic Games („EPIC\<hra>“) z jejího spustitelného
+ * souboru (jen desktop).
+ */
+export const gameIconSrc = (packageId: string) => `${ICON_HOST}/game?id=${encodeURIComponent(packageId)}`;
 
 /** Ikona programu ze seznamu Po spuštění (jen desktop, jen programy z posledního výpisu). */
 export const fileIconSrc = (path: string) => `${ICON_HOST}/file?p=${encodeURIComponent(path)}`;

@@ -23,11 +23,41 @@ const rules = (over: Partial<UpdateRules> = {}): UpdateRules => ({
   stuck: {},
   allowed: {},
   selfUpdating: {},
+  knownSelfUpdating: () => false,
+  selfOffer: {},
+  selfUpdatingWait: true,
   stuckLimit: 3,
   now: NOW,
   security: () => false,
   securityNoWait: true,
   ...over,
+});
+
+describe("aplikace, které se aktualizují samy", () => {
+  const chrome = pkg({ packageId: "Google.Chrome", name: "Google Chrome", installedVersion: "142.0.1", availableVersion: "142.0.2" });
+  const known = (p: InstalledPackage) => p.packageId === "Google.Chrome";
+
+  it("známou aplikaci podrží 14 dní od vydání a pak nabídne", () => {
+    const [held] = applyUpdateRules([chrome], rules({ knownSelfUpdating: known, releasedAt: () => NOW - 2 * DAY }));
+    expect(held.availableVersion).toBeNull();
+    expect(held.pin).toBe("self");
+    expect(Date.parse(held.pinUntil!)).toBe(NOW + 12 * DAY);
+    const [offered] = applyUpdateRules([chrome], rules({ knownSelfUpdating: known, releasedAt: () => NOW - 15 * DAY }));
+    expect(offered.availableVersion).toBe("142.0.2");
+  });
+
+  it("bezpečnostní opravu nabídne už po 3 dnech", () => {
+    const [held] = applyUpdateRules([chrome], rules({ knownSelfUpdating: known, security: () => true, releasedAt: () => NOW - 2 * DAY }));
+    expect(Date.parse(held.pinUntil!)).toBe(NOW + DAY);
+    const [offered] = applyUpdateRules([chrome], rules({ knownSelfUpdating: known, security: () => true, releasedAt: () => NOW - 4 * DAY }));
+    expect(offered.availableVersion).toBe("142.0.2");
+  });
+
+  it("„Nabídnout znovu“ a vypnuté nastavení podržení zruší, jiné aplikace se netýká", () => {
+    expect(applyUpdateRules([chrome], rules({ knownSelfUpdating: known, selfOffer: { "winget:Google.Chrome": "x" } }))[0].availableVersion).toBe("142.0.2");
+    expect(applyUpdateRules([chrome], rules({ knownSelfUpdating: known, selfUpdatingWait: false }))[0].availableVersion).toBe("142.0.2");
+    expect(applyUpdateRules([pkg()], rules({ knownSelfUpdating: known }))[0].availableVersion).toBe("3.0.21");
+  });
 });
 
 describe("applyUpdateRules", () => {

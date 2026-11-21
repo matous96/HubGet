@@ -20,6 +20,8 @@ import { PackageIcon } from "@/components/package/PackageIcon";
 import { ArchitectureInfo } from "@/components/package/ArchitectureInfo";
 import { PrivacySection } from "@/components/package/PrivacySection";
 import { InstallSplitMenu } from "@/components/package/InstallMenu";
+import { AdoptNote } from "@/components/package/AdoptPanel";
+import { AbandonedNote } from "@/components/package/AbandonedNotice";
 import { RollbackButton } from "@/components/package/RollbackDialog";
 import { WatchButton } from "@/components/package/WatchlistWatcher";
 import { EndOfLifeNote } from "@/components/package/InstalledNotices";
@@ -36,7 +38,7 @@ import { ReportButton } from "@/components/package/ReportButton";
 import { ShareButton } from "@/components/package/ShareButton";
 import { OriginBadge, useOriginLabel, WebBadge } from "@/components/package/SourceBadge";
 import { UninstallButton } from "@/components/package/UninstallButton";
-import { AutoUpdateToggle, InstallerHostWarning, UpdatePinBar } from "@/components/package/UpdatePin";
+import { AutoUpdateToggle, InstallerHostWarning, InstallerSignerWarning, UpdatePinBar } from "@/components/package/UpdatePin";
 import { NameWithBadge, VerifiedBadge } from "@/components/package/VerifiedBadge";
 import { isVerified } from "@/lib/verified";
 import { isClosed, licenseKind, openSourceAlternatives } from "@/lib/alternatives";
@@ -56,12 +58,13 @@ import {
   usePackageState,
 } from "@/hooks/usePackages";
 import { useInstallActions } from "@/hooks/useInstallActions";
+import { isUnmanagedOrigin } from "@/hooks/useInstalledItems";
 import { overlayOpen } from "@/hooks/useOverlay";
 import { allArchitectures } from "@/lib/arch";
 import { cn, formatRelative, formatSize, formatSizeText } from "@/lib/utils";
 import { isWebOnly } from "@/lib/webOnly";
 import { useGithubStars } from "@/services/github";
-import { getSource, searchAll, sourcePackageUrl, steamAppId } from "@/services/managers";
+import { getOrigin, getSource, isGameStore, searchAll, sourcePackageUrl, steamAppId } from "@/services/managers";
 import { useInstallOptions } from "@/store/installOptions";
 import { useInstallUi } from "@/store/installUi";
 import { useRecent } from "@/store/recent";
@@ -153,7 +156,7 @@ function PackageDetailView({ entry: fullEntry, inCatalog }: { entry: CatalogEntr
   const [chosen, setChosen] = useState<SourceId | undefined>();
   const originLabel = useOriginLabel();
   // Hra ze Steamu / program mimo správce, který není v katalogu
-  const unmanaged = !!installed && !inCatalog && (installed.origin === "steam" || installed.origin === "ea" || installed.origin === "local");
+  const unmanaged = !!installed && !inCatalog && isUnmanagedOrigin(installed.origin);
   // Zdroj uložený v Možnostech instalace platí, dokud uživatel nezvolí jiný
   const savedSource = useInstallOptions((s) => s.byApp[entry.id]?.source);
   // Vypnutá kontrola součtu v Možnostech instalace – indikátor SHA-256 varuje
@@ -267,8 +270,9 @@ function PackageDetailView({ entry: fullEntry, inCatalog }: { entry: CatalogEntr
               </div>
               {/* Starší verze jde i spustit – Otevřít vedle Aktualizovat */}
               {actions.status === "updatable" && !job && !web && <LaunchButton entry={entry} installed={installed} size="lg" />}
-              {/* Možnosti instalace: jako správce, interaktivně, ruční instalace… */}
-              {canInstall && <InstallSplitMenu entry={entry} source={effective?.source} />}
+              {/* Možnosti instalace: jako správce, interaktivně, ruční instalace…; u nainstalované aplikace
+                  stejná nabídka jako pravým tlačítkem na kartě (Opravit, zámek verze, stažení instalátoru…) */}
+              {(canInstall || (!!installed && !job && !web && !lockedOut)) && <InstallSplitMenu entry={entry} source={effective?.source} />}
               {/* Instalace konkrétní (starší) verze ze zvoleného zdroje */}
               {/* Správce bez výběru verze (vcpkg) nabízí jen aktuální verzi */}
               {effective && getSource(effective.source).supportsVersions && !unmanaged && !web && !job && (
@@ -281,6 +285,8 @@ function PackageDetailView({ entry: fullEntry, inCatalog }: { entry: CatalogEntr
 
             {/* Nainstalovaná verze už nedostává bezpečnostní opravy (endoflife.date) */}
             <EndOfLifeNote pkg={installed} />
+            {/* Nainstalovaná aplikace se nejspíš už nevyvíjí – s náhradami */}
+            {installed && <AbandonedNote entry={entry} />}
 
             {/* Aplikace jen z webu výrobce: proč ji HubGet nespravuje */}
             {web && (
@@ -366,7 +372,9 @@ function PackageDetailView({ entry: fullEntry, inCatalog }: { entry: CatalogEntr
                     </a>
                   </p>
                 )}
-                {installed.origin === "ea" && <p className="text-xs text-muted">{t("package.managedByEa")}</p>}
+                {isGameStore(installed.origin) && installed.origin !== "steam" && (
+                  <p className="text-xs text-muted">{t("package.managedByStore", { store: getOrigin(installed.origin).label })}</p>
+                )}
                 {installed.diskLocation ? (
                   <p className="text-xs break-all text-muted">
                     {t(installed.portable ? "package.portableInstall" : "package.diskInstall", { folder: installed.diskLocation })}
@@ -374,8 +382,12 @@ function PackageDetailView({ entry: fullEntry, inCatalog }: { entry: CatalogEntr
                 ) : (
                   installed.origin === "local" && !web && <p className="text-xs text-muted">{t("package.localInstall")}</p>
                 )}
+                {/* Program mimo správce, který je i ve WinGetu – převzít do správy (u převzatého zrušit převzetí) */}
+                {!web && <AdoptNote pkg={installed} entry={entry} />}
                 {/* Instalátor nové verze z jiného serveru (winget) */}
                 <InstallerHostWarning installed={installed} />
+                {/* Instalátor nové verze podepsal jiný vydavatel – nespuštěno, změnu jde přijmout */}
+                <InstallerSignerWarning installed={installed} onTrust={actions.update} />
                 {/* Přeskočit nabízenou verzi / zamknout verzi; automatická aktualizace této aplikace */}
                 {!web && <UpdatePinBar installed={installed} appName={entry.name} />}
                 {!web && <AutoUpdateToggle installed={installed} />}

@@ -6,13 +6,14 @@
  *    Aktualizaci podrženou pravidly (minimální stáří, neprojevená aktualizace,
  *    aplikace, která se aktualizuje sama – store/updateRules.ts) jde nabídnout hned / znovu.
  */
-import { AlarmClock, ChevronDown, CircleSlash, Hourglass, Lock, LockOpen, RefreshCw, RefreshCwOff, SkipForward, TriangleAlert } from "lucide-react";
+import { AlarmClock, ChevronDown, CircleSlash, Hourglass, Lock, LockOpen, RefreshCw, RefreshCwOff, ShieldAlert, SkipForward, TriangleAlert } from "lucide-react";
 import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useDismiss } from "@/hooks/useDismiss";
 import { isUnmanagedOrigin } from "@/hooks/useInstalledItems";
 import { useAutoUpdates } from "@/store/autoUpdates";
 import { useInstallerHostChange } from "@/store/installerUrls";
+import { useSigners } from "@/store/signers";
 import { useUpdateHolds, versionKey } from "@/store/updateHolds";
 import { pinKey, SNOOZE_DAYS, useUpdatePins, type SnoozeDays } from "@/store/updatePins";
 import { useToasts } from "@/store/toasts";
@@ -149,6 +150,41 @@ export function InstallerHostWarning({ installed }: { installed: InstalledPackag
   );
 }
 
+/**
+ * Instalátor nové verze podepsal jiný vydavatel než minulý (nebo nemá podpis) – HubGet ho
+ * nespustil (store/signers.ts, signatures.rs). Po kontrole jde změnu přijmout a aktualizovat.
+ */
+export function InstallerSignerWarning({ installed, onTrust }: { installed: InstalledPackage | undefined; onTrust: () => void }) {
+  const { t } = useTranslation();
+  const key = installed ? pinKey(installed) : "";
+  const change = useSigners((s) => (key ? s.changed[key] : undefined));
+  const trust = useSigners((s) => s.trust);
+  if (!installed || !change) return null;
+  return (
+    <div className="flex max-w-xl gap-2.5 rounded-xl border border-danger/30 bg-danger/8 px-3 py-2.5 text-xs">
+      <ShieldAlert className="mt-0.5 size-4 shrink-0 text-danger" />
+      <div className="min-w-0">
+        <p className="font-semibold">{change.to ? t("signer.changedTitle") : t("signer.missingTitle")}</p>
+        <p className="mt-0.5">
+          {change.to
+            ? t("signer.changedText", { from: change.from, to: change.to, version: change.version ?? "" })
+            : t("signer.missingText", { from: change.from, version: change.version ?? "" })}
+        </p>
+        <button
+          type="button"
+          onClick={() => {
+            trust(key);
+            onTrust();
+          }}
+          className="mt-1.5 cursor-pointer font-semibold text-danger hover:underline"
+        >
+          {t("signer.trust")}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 const link = "inline-flex cursor-pointer items-center gap-1.5 font-medium text-muted transition-colors hover:text-fg";
 
 /** Řádek v detailu aplikace pod tlačítky akcí. */
@@ -169,7 +205,10 @@ export function UpdatePinBar({ installed, appName }: { installed: InstalledPacka
             : pin.pin === "stuck"
               ? t("pins.stuckState", { version: pin.held })
               : pin.pin === "self"
-                ? t("pins.selfState", { version: pin.held })
+                ? // Známá aplikace s vlastním aktualizátorem – do lhůty (data/selfUpdating.ts), pak se nabídne
+                  pin.until
+                  ? t("pins.selfWaitState", { version: pin.held, date })
+                  : t("pins.selfState", { version: pin.held })
               : t("pins.skippedState", { version: pin.held });
     const Icon =
       pin.pin === "snooze" ? AlarmClock : pin.pin === "age" ? Hourglass : pin.pin === "stuck" ? CircleSlash : pin.pin === "self" ? RefreshCwOff : Lock;

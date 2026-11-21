@@ -29,7 +29,9 @@ import { useMemo } from "react";
 import { create } from "zustand";
 import { queryClient, queryKeys } from "@/app/queryClient";
 import i18n from "@/i18n";
-import { getSource, managers, type OperationHandle, type OperationResult } from "@/services/managers";
+import { getSource, managers, type OperationHandle, type OperationRequest, type OperationResult } from "@/services/managers";
+import { adoptedIdOf } from "./adopted";
+import { checksSigner, useSigners } from "./signers";
 import type { LoadedCatalog } from "@/services/catalog";
 import { notifyEvent, type NotifyEventType } from "@/services/notify";
 import {
@@ -49,6 +51,7 @@ import { refreshAfterOperation } from "./afterOperation";
 import { appAllowed, sourceAllowed } from "./orgPolicy";
 import { usePackageIndex } from "./packageIndex";
 import { reportJobOutcome } from "./reliability";
+import { reportInstall } from "./installStats";
 import { useToasts } from "./toasts";
 import { useHistory } from "./history";
 import { useLeftovers } from "./leftovers";
@@ -196,11 +199,25 @@ async function backgroundReady(job: Job): Promise<boolean> {
 
 /** Nainstalovaný balíček úlohy podle posledního výpisu správců (mezipaměť dotazu „installed“). */
 function installedPackageOf(job: Pick<Job, "source" | "packageId">): InstalledPackage | undefined {
+  const adoptedFrom = adoptedIdOf(job);
   for (const [, data] of queryClient.getQueriesData<InstalledPackage[]>({ queryKey: queryKeys.installed })) {
-    const found = data?.find((p) => p.source === job.source && p.packageId === job.packageId);
+    const found = data?.find((p) => p.source === job.source && (p.packageId === job.packageId || p.packageId === adoptedFrom));
     if (found) return found;
   }
   return undefined;
+}
+
+/**
+ * Požadavek pro správce u převzatého programu: aktualizace = instalace nejnovější verze přes
+ * winget (instalátor ji nainstaluje přes starou – winget program pod id balíčku nezná, `upgrade`
+ * by ho nenašel), odinstalace a oprava přes původní záznam ve Windows.
+ */
+function adoptedRequest(job: Job, request: OperationRequest): OperationRequest {
+  const arp = adoptedIdOf(job);
+  if (!arp) return request;
+  if (job.kind === "update") return { ...request, kind: "install", version: undefined };
+  if (job.kind === "uninstall" || job.kind === "repair") return { ...request, packageId: arp };
+  return request;
 }
 
 /**
@@ -415,16 +432,20 @@ export const useJobs = create<JobsState>()((set, get) => {
     let phaseSince = Date.now();
     // Stahovalo se – instalace na kartě pokračuje v jednom procentu za stahováním
     let downloaded = false;
+    // Vydavatel minulého instalátoru (store/signers.ts) – jiný nebo chybějící podpis backend zastaví
+    const signerKey = `${job.source}:${job.packageId}`;
+    const expectedSigner = checksSigner(job.source, job.kind) ? useSigners.getState().known[signerKey] : undefined;
+    const options = expectedSigner !== undefined ? { ...job.options, expectedSigner } : job.options;
     const handle = managers[job.source].startOperation(
       // Vlastní argumenty, příkazy před / po instalaci a „jako správce“ jen podle Nastavení → Oprávnění správce
-      {
+      adoptedRequest(job, {
         kind: job.kind,
         packageId: job.packageId,
         version: job.version,
-        options: applySecurityPolicy(job.options),
+        options: applySecurityPolicy(options),
         name: job.appName,
         background: job.background,
-      },
+      }),
       (progress) => {
         if (progress.phase !== phase) {
           // Délka stahování pro příště – podíl stahování na celkovém procentu
@@ -439,6 +460,13 @@ export const useJobs = create<JobsState>()((set, get) => {
     handles.set(job.appId, handle);
     const result = await handle.done;
     handles.delete(job.appId);
+    // Vydavatel instalátoru: zapamatovat po úspěchu, zastavenou změnu nabídnout k přijetí v detailu
+    if (checksSigner(job.source, job.kind) && result.signer !== undefined) {
+      if (result.outcome === "success") useSigners.getState().remember(signerKey, result.signer);
+      else if (expectedSigner !== undefined && (result.errorKey === "signerChanged" || result.errorKey === "signatureMissing")) {
+        useSigners.getState().markChanged(signerKey, { from: expectedSigner, to: result.signer, version: job.targetVersion ?? before?.availableVersion ?? undefined });
+      }
+    }
     if (result.outcome === "success" && phase) recordPhaseDuration(job, phase, Date.now() - phaseSince);
     // Na pozadí přeskočeno kvůli právům správce – nic neproběhlo, do historie operací nepatří
     if (needsAdminLater(job, result)) return result;
@@ -556,6 +584,8 @@ export const useJobs = create<JobsState>()((set, get) => {
     }
     // Spolehlivost verzí od komunity (jen se zapnutým sdílením): výsledek aktualizace, vrácená verze
     reportJobOutcome(job, result, updateTarget);
+    // Žebříček instalací v HubGetu (dobrovolně, anonymně – store/installStats.ts)
+    reportInstall(job, result);
 
     // Úloha na pozadí (nikdo se nedívá): instalátor ze zdroje nejde stáhnout → stejná
     // aplikace u dalších nainstalovaných správců, dokud se instalace nepovede.

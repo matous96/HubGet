@@ -4,15 +4,18 @@
  * zařadí do fronty a běží na pozadí jedna po druhé (store/jobs.ts);
  * nainstalované a už zařazené aplikace se přeskočí.
  */
-import { Download, PackagePlus, RefreshCw, Trash2, X } from "lucide-react";
+import { Columns3, Download, PackagePlus, RefreshCw, Trash2, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { isUnmanagedOrigin } from "@/hooks/useInstalledItems";
 import { pickSource, useInstalledIndex } from "@/hooks/usePackages";
 import { isWebOnly } from "@/lib/webOnly";
+import { COMPARE_MAX } from "@/lib/compare";
 import { useBundle } from "@/store/bundle";
+import { useCompare } from "@/store/compare";
 import { updateOptionsFor } from "@/store/installOptions";
 import { useBusyAppIds, useJobs } from "@/store/jobs";
 import { useSelection } from "@/store/selection";
@@ -28,6 +31,8 @@ export function SelectionBar() {
   const addToBundle = useBundle((s) => s.add);
   const { enabled, preferred } = useSourceScope();
   const installedIndex = useInstalledIndex();
+  const navigate = useNavigate();
+  const setCompare = useCompare((s) => s.set);
 
   const selected = Object.values(items);
   const free = selected.filter((e) => !busy.has(e.id));
@@ -84,6 +89,14 @@ export function SelectionBar() {
     clear();
   };
 
+  // Porovnat 2–COMPARE_MAX vybraných aplikací vedle sebe (stránka Porovnat)
+  const canCompare = selected.length >= 2 && selected.length <= COMPARE_MAX;
+  const compare = () => {
+    setCompare(selected.map((e) => e.id));
+    clear();
+    navigate("/compare");
+  };
+
   const button =
     "inline-flex h-9 cursor-pointer items-center gap-2 rounded-full px-4 text-sm font-semibold transition disabled:cursor-default disabled:opacity-40";
 
@@ -121,6 +134,16 @@ export function SelectionBar() {
           <button type="button" onClick={toBundle} className={`${button} bg-surface-2 hover:bg-surface-3`}>
             <PackagePlus className="size-4" />
             {t("selection.toBundle")}
+          </button>
+          <button
+            type="button"
+            disabled={!canCompare}
+            onClick={compare}
+            title={canCompare ? undefined : t("selection.compareHint", { count: COMPARE_MAX })}
+            className={`${button} bg-surface-2 hover:bg-surface-3`}
+          >
+            <Columns3 className="size-4" />
+            {t("selection.compare")}
           </button>
           <button
             type="button"

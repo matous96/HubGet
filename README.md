@@ -69,7 +69,8 @@ Install in one click from the source you choose, with download progress right on
 ### Installed apps and updates
 
 An overview of every app on your computer – including programs installed outside WinGet,
-Microsoft Store apps and Steam games. Install updates with one **Update all** button or
+Microsoft Store apps and games from Steam, Epic Games, EA app, GOG, Ubisoft Connect and
+Battle.net. Install updates with one **Update all** button or
 automatically on a schedule. When an operation fails because of permissions, HubGet
 retries it with administrator rights by itself.
 
@@ -110,6 +111,29 @@ retries it with administrator rights by itself.
 - 📜 **What’s new since your version** – release notes for every version an update skips.
 - 🩺 **Diagnostics for support** and **Windows status** in PC overview (end of support, pending
   restart, disk space, restore points).
+- 🔧 **Repair an app** – when an app won’t start or shows errors, HubGet restores its files
+  from the installer (right-click the app → Repair).
+- 🧽 **Preinstalled Windows apps** – remove Candy Crush, Solitaire, News, Tips and more in one
+  click in PC overview; restore them any time from the Microsoft Store.
+- ⚖️ **Compare apps** – up to four side by side: ratings, license, size, ARM64 support, install sources.
+- ♿ **Accessibility** – text size that follows Windows, reduced motion, underlined links,
+  Windows contrast themes and full keyboard control.
+- 📥 **Manage with WinGet** – a program installed from the developer’s website that WinGet also has
+  gets HubGet updates after one click; the program stays where it is.
+- ✨ **New in catalog** – apps added to the catalog in the last 7, 30 or 90 days.
+- 🔁 **Self-updating apps** (Chrome, Steam, Discord…) – their updates aren’t counted; HubGet only
+  offers them when the app doesn’t update itself.
+- 🏆 **Most installed in HubGet** – a chart of real installs over 30, 90 and 365 days
+  (opt-in, anonymous).
+- ✍️ **Installer signature check** – HubGet shows who signed the installer and won’t run a new
+  version from a different publisher or without a signature.
+- 🚧 **Abandoned apps** – a heads-up about apps that are no longer developed, with replacements.
+- 🖥️ **New PC** – tick apps by category and HubGet installs them all at once.
+- 🔌 **Drivers from Windows Update** – offered drivers in PC overview.
+- 🔎 **Search by purpose** – “video editing”, “PDF reader” or “unzip” in Czech find the right apps.
+- 💡 **Suggested apps and developer replies** – suggest a missing app and others vote; developers
+  reply to reviews and see install statistics.
+- 🎉 **Your year with HubGet** – a summary of installs, updates and time saved.
 - 🌙 **A modern window** in the Windows 11 style, light and dark theme, seven languages (English, Czech, German, Spanish, French, Portuguese, Chinese);
   close the window and installs finish in the background.
 

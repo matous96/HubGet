@@ -6,6 +6,11 @@ import { CategoriesPage } from "@/pages/CategoriesPage";
 import { CategoryPage } from "@/pages/CategoryPage";
 import { FavoritesPage } from "@/pages/FavoritesPage";
 import { CommandsPage } from "@/pages/CommandsPage";
+import { NewPage } from "@/pages/NewPage";
+import { NewPcPage } from "@/pages/NewPcPage";
+import { YearPage } from "@/pages/YearPage";
+import { RequestsPage } from "@/pages/RequestsPage";
+import { ComparePage } from "@/pages/ComparePage";
 import { HelpPage } from "@/pages/HelpPage";
 import { HomePage } from "@/pages/HomePage";
 import { InstalledPage } from "@/pages/InstalledPage";
@@ -47,6 +52,10 @@ export function App() {
             {/* Sdílené odkazy (unibox://app/<id>, web …/app/<id>) vedou na detail aplikace */}
             <Route path="app/:packageId" element={<SharedAppRedirect />} />
             <Route path="top" element={<TopChartsPage />} />
+            <Route path="new" element={<NewPage />} />
+            <Route path="new-pc" element={<NewPcPage />} />
+            <Route path="year" element={<YearPage />} />
+            <Route path="requests" element={<RequestsPage />} />
             <Route path="recent" element={<RecentPage />} />
             <Route path="installed" element={<InstalledPage />} />
             <Route path="overview" element={<OverviewPage />} />
@@ -59,6 +68,7 @@ export function App() {
             <Route path="search" element={<SearchPage />} />
             {/* Čím otevřu tento soubor? (přetažení souboru na okno, hledání „.psd“) */}
             <Route path="open-with" element={<OpenWithPage />} />
+            <Route path="compare" element={<ComparePage />} />
             <Route path="settings" element={<SettingsPage />} />
             <Route path="publish" element={<PublishPage />} />
             <Route path="publish/winget" element={<PublishWingetPage />} />

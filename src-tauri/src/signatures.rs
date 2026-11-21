@@ -99,6 +99,99 @@ pub async fn check_signatures(apps: Vec<AppRef>) -> Result<Vec<AppSignature>, St
     .await
 }
 
+// ── Podpis staženého instalátoru (před spuštěním) ───────────────────────
+
+/// Podpis instalátoru: stav podle Get-AuthenticodeSignature („Valid“, „NotSigned“,
+/// „HashMismatch“…) a kdo ho podepsal (jméno z certifikátu, prázdné = bez podpisu).
+#[derive(Debug, Clone, PartialEq)]
+pub struct InstallerSignature {
+    pub status: String,
+    pub signer: String,
+}
+
+/// Podpis staženého instalátoru (Authenticode). None = nepodařilo se zjistit (operace pokračuje).
+pub fn installer_signature(path: &Path) -> Option<InstallerSignature> {
+    let script = format!(
+        "$s = Get-AuthenticodeSignature -LiteralPath {}; \
+         [pscustomobject]@{{ status = [string]$s.Status; \
+           signer = $(if ($s.SignerCertificate) {{ $s.SignerCertificate.GetNameInfo([System.Security.Cryptography.X509Certificates.X509NameType]::SimpleName, $false) }} else {{ '' }}) }}",
+        crate::powershell::ps_string(&path.to_string_lossy())
+    );
+    let value = crate::powershell::call(&script, std::time::Duration::from_secs(30)).ok()?;
+    let item = value.as_array()?.first()?;
+    Some(InstallerSignature {
+        status: item.get("status")?.as_str()?.to_string(),
+        signer: item.get("signer").and_then(|s| s.as_str()).unwrap_or_default().trim().to_string(),
+    })
+}
+
+/// Má se instalátor zastavit? Vrátí klíč chyby a podrobnost:
+///  - „signatureInvalid“ – podpis neodpovídá obsahu (soubor po podpisu někdo změnil),
+///  - „signatureMissing“ – minulý instalátor aplikace podepsaný byl, tento ne,
+///  - „signerChanged“ – podepsal ho někdo jiný než minule („Původní → Nový“).
+///
+/// `expected` = vydavatel z minulé instalace (frontend, store/signers.ts); bez něj se jen
+/// zapamatuje nový (první instalace, dříve bez podpisu, „Důvěřovat novému vydavateli“).
+pub fn signer_verdict(signature: &InstallerSignature, expected: Option<&str>) -> Option<(&'static str, String)> {
+    if signature.status.eq_ignore_ascii_case("HashMismatch") {
+        return Some(("signatureInvalid", signature.signer.clone()));
+    }
+    let expected = expected.map(str::trim).filter(|e| !e.is_empty())?;
+    if signature.signer.is_empty() {
+        return Some(("signatureMissing", expected.to_string()));
+    }
+    if !signature.signer.eq_ignore_ascii_case(expected) {
+        return Some(("signerChanged", format!("{expected} → {}", signature.signer)));
+    }
+    None
+}
+
+#[cfg(test)]
+mod verdict_tests {
+    use super::*;
+
+    fn sig(status: &str, signer: &str) -> InstallerSignature {
+        InstallerSignature { status: status.into(), signer: signer.into() }
+    }
+
+    #[test]
+    fn verdicts() {
+        // První instalace / bez minulého vydavatele: nic se nezastaví (jen změněný soubor)
+        assert_eq!(signer_verdict(&sig("Valid", "Mozilla Corporation"), None), None);
+        assert_eq!(signer_verdict(&sig("NotSigned", ""), None), None);
+        assert_eq!(signer_verdict(&sig("HashMismatch", "Evil"), None).map(|v| v.0), Some("signatureInvalid"));
+        // Stejný vydavatel (i jinak velkými písmeny)
+        assert_eq!(signer_verdict(&sig("Valid", "MOZILLA CORPORATION"), Some("Mozilla Corporation")), None);
+        // Jiný vydavatel, chybějící podpis
+        assert_eq!(
+            signer_verdict(&sig("Valid", "Someone Else Ltd"), Some("Mozilla Corporation")),
+            Some(("signerChanged", "Mozilla Corporation → Someone Else Ltd".to_string()))
+        );
+        assert_eq!(signer_verdict(&sig("NotSigned", ""), Some("Mozilla Corporation")).map(|v| v.0), Some("signatureMissing"));
+        // Minule bez podpisu („“), teď podepsaný – v pořádku
+        assert_eq!(signer_verdict(&sig("Valid", "Mozilla Corporation"), Some("")), None);
+    }
+
+    /// Skutečné zjištění vydavatele (sdílený PowerShell):
+    /// cargo test signatures::verdict_tests::live -- --ignored --nocapture
+    #[cfg(windows)]
+    #[test]
+    #[ignore]
+    fn live() {
+        let windows = std::env::var("SystemRoot").unwrap_or_else(|_| r"C:\Windows".into());
+        let signed = installer_signature(Path::new(&format!(r"{windows}\System32\notepad.exe"))).unwrap();
+        println!("{signed:?}");
+        assert_eq!(signed.status, "Valid");
+        assert!(signed.signer.contains("Microsoft"));
+        let plain = std::env::temp_dir().join(format!("hubget-unsigned-live-{}.exe", std::process::id()));
+        std::fs::write(&plain, b"MZ not really a program").unwrap();
+        let unsigned = installer_signature(&plain).unwrap();
+        println!("{unsigned:?}");
+        assert!(unsigned.signer.is_empty());
+        let _ = std::fs::remove_file(&plain);
+    }
+}
+
 #[cfg(all(test, windows))]
 mod tests {
     use super::*;

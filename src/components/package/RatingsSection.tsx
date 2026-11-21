@@ -20,6 +20,7 @@ import { useAuth } from "@/store/auth";
 import { useSettings } from "@/store/settings";
 import { useToasts } from "@/store/toasts";
 import type { CatalogEntry } from "@/types";
+import { MaintainerLink, ReplyBlock, useReviewReplies } from "./DeveloperReplies";
 
 /** Ve vývojovém režimu jde sekci s ukázkovými daty zapnout (vyzkoušení rozhraní bez Supabase). */
 function devSampleReviews(): boolean {
@@ -87,6 +88,8 @@ export function RatingsSection({ entry }: { entry: CatalogEntry }) {
     queryKey: queryKeys.myReview(entry.id, userId),
     queryFn: () => reviews.getMine(entry.id),
   });
+  // Odpovědi vývojářů u recenzí (Supabase – bez migrace komunity se nenačtou a nic se neukáže)
+  const { data: replies } = useReviewReplies(entry.id, withText && !reviews.isSample);
 
   const submit = useMutation({
     mutationFn: (draft: ReviewDraft) => reviews.submit(entry.id, draft),
@@ -165,7 +168,7 @@ export function RatingsSection({ entry }: { entry: CatalogEntry }) {
         (list && list.length > 0 ? (
           <Shelf title={t("reviews.mostHelpful")}>
             {list.map((review) => (
-              <ReviewCard key={review.id} review={review} onOpen={() => setReading(review)} />
+              <ReviewCard key={review.id} review={review} replied={!!replies?.has(review.id)} onOpen={() => setReading(review)} />
             ))}
           </Shelf>
         ) : (
@@ -203,6 +206,12 @@ export function RatingsSection({ entry }: { entry: CatalogEntry }) {
             </a>
           )}
         </div>
+        {/* Vývojář aplikace může po schválení odpovídat na recenze */}
+        {withText && !reviews.isSample && (
+          <div className="w-full">
+            <MaintainerLink entry={entry} />
+          </div>
+        )}
       </div>
 
       <WriteReviewDialog
@@ -237,6 +246,7 @@ export function RatingsSection({ entry }: { entry: CatalogEntry }) {
           <>
             <ReviewMeta review={reading} />
             <p className="mt-3 text-[15px] leading-7 whitespace-pre-line select-text">{reading.body}</p>
+            {!reviews.isSample && <ReplyBlock key={reading.id} appId={entry.id} reviewId={reading.id} reply={replies?.get(reading.id)} />}
           </>
         )}
       </Modal>
@@ -281,7 +291,8 @@ function ReviewMeta({ review }: { review: Review }) {
   );
 }
 
-function ReviewCard({ review, onOpen }: { review: Review; onOpen: () => void }) {
+function ReviewCard({ review, replied, onOpen }: { review: Review; replied: boolean; onOpen: () => void }) {
+  const { t } = useTranslation();
   return (
     <button
       type="button"
@@ -296,6 +307,7 @@ function ReviewCard({ review, onOpen }: { review: Review; onOpen: () => void }) 
         <ReviewMeta review={review} />
       </div>
       <p className="mt-2 line-clamp-5 text-[14px] leading-6 text-muted">{review.body}</p>
+      {replied && <p className="mt-auto pt-2 text-xs font-semibold text-accent">{t("devReplies.hasReply")}</p>}
     </button>
   );
 }

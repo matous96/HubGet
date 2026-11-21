@@ -44,6 +44,7 @@ import { SourceIcon } from "@/components/package/SourceIcon";
 import { ReleaseList } from "@/components/layout/ReleaseList";
 import { formatPinUntil, unpinLabel } from "@/components/package/UpdatePin";
 import { AccentColorRow } from "@/components/settings/AccentColorRow";
+import { AccessibilityCard } from "@/components/settings/AccessibilityCard";
 import { AppLooksRow } from "@/components/settings/AppLooksRow";
 import { CommandGuide } from "@/components/settings/CommandGuide";
 import { ContactSection } from "@/components/settings/ContactSection";
@@ -115,7 +116,12 @@ function SectionContent({ id }: { id: SectionId }) {
     case "general":
       return <GeneralSection />;
     case "appearance":
-      return <AppearanceSection />;
+      return (
+        <>
+          <AppearanceSection />
+          <AccessibilityCard />
+        </>
+      );
     case "updates":
       return (
         <>

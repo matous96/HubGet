@@ -13,7 +13,7 @@ import { Link } from "react-router";
 import { useEndOfLife, useEndOfLifeOf } from "@/hooks/useEndOfLife";
 import type { InstalledItem } from "@/hooks/useInstalledItems";
 import { nameKey } from "@/hooks/usePackages";
-import { getSource } from "@/services/managers";
+import { getSource, isGameStore } from "@/services/managers";
 import { useSettings } from "@/store/settings";
 import type { InstalledPackage } from "@/types";
 
@@ -76,7 +76,7 @@ export function useDuplicates(items: InstalledItem[]): InstalledItem[][] {
   return useMemo(() => {
     const groups = new Map<string, InstalledItem[]>();
     for (const item of items) {
-      if (item.pkg.origin === "steam" || item.pkg.origin === "ea" || item.pkg.diskLocation) continue;
+      if (isGameStore(item.pkg.origin) || item.pkg.diskLocation) continue;
       const key = nameKey(item.entry.name);
       if (!key) continue;
       groups.set(key, [...(groups.get(key) ?? []), item]);

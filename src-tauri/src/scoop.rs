@@ -345,6 +345,7 @@ fn operation_script(request: &OperationRequest, root: &Path, downloads: &Path) -
             command.push_str(" *>&1");
             lines.push(command);
         }
+        Kind::Repair => return Err("Opravu aplikace Scoop neumí".into()),
         Kind::Update => lines.push(format!("& $scoop update '{app}' *>&1")),
         Kind::Uninstall => lines.push(format!("& $scoop uninstall '{app}' *>&1")),
         Kind::Download => {
@@ -420,6 +421,7 @@ pub async fn scoop_operation(
         prefetch: None,
         pre_command,
         post_command,
+        signer_check: None,
     };
     operations::execute(id, spec, on_event).await
 }

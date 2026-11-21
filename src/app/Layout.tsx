@@ -1,11 +1,13 @@
-import { motion } from "motion/react";
+import { motion, MotionConfig } from "motion/react";
 import { useEffect, useLayoutEffect, useRef, type ComponentType, type ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 import { Outlet, useLocation, useNavigationType } from "react-router";
 import { LoginDialog } from "@/components/auth/LoginDialog";
 import { OnboardingDialog } from "@/components/layout/OnboardingDialog";
 import { DevSourceOverview } from "@/components/home/DevSourceOverview";
 import { OfflineBar } from "@/components/layout/OfflineBar";
 import { SelectionBar } from "@/components/layout/SelectionBar";
+import { CompareBar } from "@/components/layout/CompareBar";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { SourceLockBar } from "@/components/layout/SourceLockBar";
 import { TitleBar } from "@/components/layout/TitleBar";
@@ -42,6 +44,8 @@ import { useExternalLinks } from "@/hooks/useExternalLinks";
 import { usePackageIndexSync } from "@/hooks/usePackageIndexSync";
 import { ScrollContainerContext, scrollRestore } from "@/hooks/useScrollContainer";
 import { useTheme } from "@/hooks/useTheme";
+import { useAccessibility } from "@/hooks/useAccessibility";
+import { useSettings } from "@/store/settings";
 import { isTauri } from "@/lib/tauri";
 import { isDevLock, useSourceScope } from "@/store/sourceLock";
 
@@ -80,7 +84,11 @@ function PageContent({ pathname }: { pathname: string }) {
 
 /** Hlavní rozvržení okna: (titulková lišta) + postranní panel + horní lišta + obsah stránky. */
 export function Layout() {
+  const { t } = useTranslation();
   useTheme();
+  // Velikost textu, omezení animací a podtržené odkazy (Nastavení → Vzhled → Přístupnost)
+  useAccessibility();
+  const reduceMotion = useSettings((s) => s.motion === "reduce");
   // V desktopové aplikaci otevírat odkazy ven v systémovém prohlížeči
   useExternalLinks();
   const desktop = isTauri();
@@ -143,7 +151,20 @@ export function Layout() {
   }, [location.key]);
 
   return (
+    // Animace motion: „Podle Windows“ = Efekty animace (prefers-reduced-motion), jinak vždy omezit
+    <MotionConfig reducedMotion={reduceMotion ? "always" : "user"}>
     <div className="flex h-full flex-col overflow-hidden">
+      {/* Klávesnice: první Tab nabídne skok rovnou na obsah stránky (bez postranního panelu a lišty) */}
+      <a
+        href="#content"
+        className="skip-link"
+        onClick={(e) => {
+          e.preventDefault();
+          scroller.current?.focus();
+        }}
+      >
+        {t("a11y.skipToContent")}
+      </a>
       <Isolated name="BackgroundServices">
         <BackgroundServices />
         {/* Příkazy z terminálu (hubget install …) */}
@@ -164,7 +185,7 @@ export function Layout() {
           {/* Ztráta připojení – co funguje dál a co počká */}
           <OfflineBar />
           {/* Stálé místo pro posuvník – obsah při přechodu mezi krátkou a dlouhou stránkou neuskočí do strany */}
-          <main ref={scroller} className="min-h-0 flex-1 overflow-y-auto [scrollbar-gutter:stable]">
+          <main id="content" tabIndex={-1} ref={scroller} className="min-h-0 flex-1 overflow-y-auto outline-none [scrollbar-gutter:stable]">
             {/* Při změně stránky jen krátké prolnutí, bez posunu – okno reaguje svižně jako nativní
                 aplikace. Obsah využívá celou šířku okna – mřížky karet přidávají sloupce (auto-fill). */}
             <motion.div
@@ -196,6 +217,7 @@ export function Layout() {
         </Isolated>
       ))}
     </div>
+    </MotionConfig>
   );
 }
 
@@ -210,6 +232,7 @@ const OVERLAYS: [string, ComponentType][] = [
   ["Toasts", Toasts],
   ["Tooltips", Tooltips],
   ["SelectionBar", SelectionBar],
+  ["CompareBar", CompareBar],
   ["LoginDialog", LoginDialog],
   ["InstallOptionsDialog", InstallOptionsDialog],
   ["ManualInstallDialog", ManualInstallDialog],

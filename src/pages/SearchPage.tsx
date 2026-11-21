@@ -31,6 +31,8 @@ import { getSource, managers, sortBySourceOrder } from "@/services/managers";
 import { sourcePriority } from "@/store/settings";
 import { inLockedSource, isDevLock, useSourceScope } from "@/store/sourceLock";
 import type { CatalogEntry, PackageSource, RepoSearchResult } from "@/types";
+import { intentTerms, matchesIntent } from "@/lib/searchIntents";
+import { communityAvailable } from "@/services/community";
 
 /**
  * Relevance výsledku: shoda na začátku názvu > v názvu > v id/vydavateli > ve štítcích
@@ -90,9 +92,12 @@ export function SearchPage() {
   const catalogResults = useMemo(() => {
     const q = normalize(deferredQuery);
     if (!q || !catalogData) return [];
+    // Hledání podle účelu česky („stříhání videa“ → video editor – lib/searchIntents.ts)
+    const terms = intentTerms(q);
     const matches: Match[] = [];
     for (const record of catalogSearchIndex(catalogData)) {
-      const s = score(record, q);
+      // Shoda podle účelu pod přímými shodami (ty mají 1–4)
+      const s = score(record, q) || (terms.length && matchesIntent(record, terms) ? 0.5 : 0);
       if (s > 0 && inLockedSource(record.entry, lock)) matches.push({ p: record.entry, s, verified: isVerified(record.entry) });
     }
     return matches.sort(byRelevance).map((x) => x.p);
@@ -180,6 +185,14 @@ export function SearchPage() {
       {nothing ? (
         <EmptyState
           message={hiddenByArch > 0 && archFilter !== "all" ? t("filters.emptyForArch", { arch: ARCH_LABEL[archFilter] }) : t("search.empty")}
+          action={
+            // Aplikace chybí – navrhnout ji (Navržené aplikace, hlasování ostatních)
+            communityAvailable() && (
+              <Link to={`/requests?name=${encodeURIComponent(query)}`} className="text-sm font-semibold text-accent hover:underline">
+                {t("requests.missing")}
+              </Link>
+            )
+          }
         />
       ) : (
         <>
@@ -204,6 +217,14 @@ export function SearchPage() {
               repoResults.length > 0 && <PackageCollection packages={repoResults} />
             )}
           </section>
+          {communityAvailable() && (
+            <p className="mt-8 text-sm text-muted">
+              {t("requests.notFound")}{" "}
+              <Link to={`/requests?name=${encodeURIComponent(query)}`} className="font-semibold text-accent hover:underline">
+                {t("requests.suggest")}
+              </Link>
+            </p>
+          )}
         </>
       )}
     </>

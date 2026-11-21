@@ -444,6 +444,45 @@ impl ArpEntry {
         !location.is_empty() && Path::new(&location).join("__Installer").join("installerdata.xml").is_file()
     }
 
+    /// Číslo hry v Ubisoft Connect („Uplay Install 635“ → „635“).
+    pub fn ubisoft_id(&self) -> Option<&str> {
+        self.key.strip_prefix("Uplay Install ").filter(|id| !id.is_empty() && id.bytes().all(|b| b.is_ascii_digit()))
+    }
+
+    /// Herní obchod, jehož hru záznam popisuje (hry ze Steamu pozná frontend podle id):
+    ///  - Ubisoft Connect – klíč „Uplay Install <číslo>“,
+    ///  - Battle.net – odinstaluje ji Battle.net („Blizzard Uninstaller.exe“, „Battle.net Launcher.exe --uid=…“),
+    ///  - EA app – `__Installer\installerdata.xml` ve složce hry,
+    ///  - GOG – soubor `goggame-<číslo>.info` ve složce hry (zapisuje ho instalátor GOG i GOG Galaxy).
+    pub fn game_store(&self) -> Option<&'static str> {
+        if self.ubisoft_id().is_some() {
+            return Some("ubisoft");
+        }
+        let uninstall = self.uninstall.to_lowercase();
+        let battlenet = uninstall.contains("blizzard uninstaller.exe")
+            || (uninstall.contains("battle.net") && uninstall.contains("--uid=") && !uninstall.contains("--uid=battle.net"));
+        if battlenet {
+            return Some("battlenet");
+        }
+        if self.is_ea_game() {
+            return Some("ea");
+        }
+        let location = expand(self.install_location.trim().trim_matches('"'));
+        let gog = !location.trim().is_empty()
+            && std::fs::read_dir(location.trim()).is_ok_and(|entries| {
+                entries.flatten().any(|entry| {
+                    let name = entry.file_name().to_string_lossy().to_lowercase();
+                    name.starts_with("goggame-") && name.ends_with(".info")
+                })
+            });
+        gog.then_some("gog")
+    }
+
+    /// Odkaz, kterým hru spustí její obchod (Ubisoft Connect); ostatní hry se spouštějí přímo.
+    pub fn store_launch_uri(&self) -> Option<String> {
+        self.ubisoft_id().map(|id| format!("uplay://launch/{id}/0"))
+    }
+
     /// Existující soubor ikony programu z DisplayIcon (.ico nebo spustitelný soubor).
     pub fn icon_file(&self) -> Option<PathBuf> {
         executable_path(&self.display_icon).filter(|path| path.is_file())
@@ -723,6 +762,35 @@ pub(crate) mod tests {
         };
         assert!(is_leftover(&entry));
         let _ = std::fs::remove_dir_all(dir);
+    }
+
+    #[test]
+    fn game_stores() {
+        let gog_dir = temp_tree("gog", &[r"goggame-1207658924.info", r"Witcher.exe"]);
+        let ea_dir = temp_tree("ea", &[r"__Installer\installerdata.xml", r"FIFA.exe"]);
+        let plain_dir = temp_tree("plain", &[r"app.exe"]);
+        let game = |key: &str, location: &Path, uninstall: &str| ArpEntry {
+            key: key.into(),
+            install_location: location.display().to_string(),
+            uninstall: uninstall.into(),
+            ..Default::default()
+        };
+        let ubisoft = game("Uplay Install 635", &plain_dir, r#""C:\Program Files (x86)\Ubisoft\Ubisoft Game Launcher\Uplay.exe" uplay://uninstall/635"#);
+        assert_eq!(ubisoft.game_store(), Some("ubisoft"));
+        assert_eq!(ubisoft.store_launch_uri().as_deref(), Some("uplay://launch/635/0"));
+        // Spouštěč Ubisoft Connect sám hrou není
+        assert_eq!(game("Uplay", &plain_dir, r"C:\Program Files (x86)\Ubisoft\Ubisoft Game Launcher\Uninstall.exe").game_store(), None);
+        let blizzard = r#""C:\ProgramData\Battle.net\Agent\Blizzard Uninstaller.exe" --lang=enUS --uid=prometheus --displayname="Overwatch""#;
+        assert_eq!(game("Overwatch", &plain_dir, blizzard).game_store(), Some("battlenet"));
+        let launcher = r#""C:\Program Files (x86)\Battle.net\Battle.net Launcher.exe" --uid=battle.net --displayname="Battle.net""#;
+        assert_eq!(game("Battle.net", &plain_dir, launcher).game_store(), None);
+        assert_eq!(game("1207658924_is1", &gog_dir, r#""C:\GOG Games\Witcher\unins000.exe""#).game_store(), Some("gog"));
+        assert_eq!(game("{FIFA}", &ea_dir, "MsiExec.exe /X{FIFA}").game_store(), Some("ea"));
+        assert_eq!(game("{APP}", &plain_dir, "MsiExec.exe /X{APP}").game_store(), None);
+        assert_eq!(game("{APP}", &plain_dir, "MsiExec.exe /X{APP}").store_launch_uri(), None);
+        for dir in [gog_dir, ea_dir, plain_dir] {
+            let _ = std::fs::remove_dir_all(dir);
+        }
     }
 
     fn entry(key: &str, name: &str, version: &str) -> ArpEntry {

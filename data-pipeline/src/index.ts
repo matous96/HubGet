@@ -16,7 +16,7 @@ import { log } from "./lib/log.ts";
 import { reportMetric, writeReport } from "./lib/report.ts";
 import { githubRepoOf } from "../../src/lib/github.ts";
 import { loadChocolatey } from "./sources/chocolatey.ts";
-import { loadGithubStars } from "./sources/github.ts";
+import { loadGithubRepos } from "./sources/github.ts";
 import { loadRegistryCounts } from "./sources/registries.ts";
 import { loadScoopBuckets } from "./sources/scoop.ts";
 import { loadUnigetData } from "./sources/unigetui.ts";
@@ -85,14 +85,21 @@ const catalog = await buildCatalog(
   uniget,
 );
 
-log.step("GitHub – hvězdičky repozitářů");
+log.step("GitHub – hvězdičky, archivace a poslední změna repozitářů");
 const repoOf = new Map(catalog.packages.map((p) => [p, githubRepoOf(p)]));
-const githubStars = await loadGithubStars([...new Set([...repoOf.values()].filter((r): r is string => !!r))]);
+const githubRepos = await loadGithubRepos([...new Set([...repoOf.values()].filter((r): r is string => !!r))]);
 for (const [entry, repo] of repoOf) {
-  const stars = repo ? githubStars.get(repo) : undefined;
-  if (stars !== undefined && stars !== null) entry.githubStars = stars;
+  const info = repo ? githubRepos.get(repo) : undefined;
+  if (!info) continue;
+  entry.githubStars = info.stars;
+  // Opuštěné aplikace (HubGet: lib/abandoned.ts) – archivovaný repozitář, dlouho bez změn
+  if (info.archived) entry.archived = true;
+  if (info.pushedAt) entry.lastCommit = info.pushedAt;
 }
-log.info(`hvězdičky: ${catalog.packages.filter((p) => p.githubStars !== undefined).length} aplikací z ${githubStars.size} repozitářů`);
+log.info(
+  `GitHub: hvězdičky u ${catalog.packages.filter((p) => p.githubStars !== undefined).length} aplikací z ${githubRepos.size} repozitářů, ` +
+    `archivované ${catalog.packages.filter((p) => p.archived).length}`,
+);
 
 log.step("Zvětšení malých ikon");
 try {

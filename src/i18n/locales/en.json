@@ -107,7 +107,9 @@
     "startup": "Startup apps",
     "publish": "Publish",
     "about": "About HubGet",
-    "overview": "PC overview"
+    "overview": "PC overview",
+    "new": "New in catalog",
+    "newPc": "New PC"
   },
   "startup": {
     "title": "Startup apps",
@@ -420,26 +422,36 @@
       "popularity": "Most popular apps by catalog popularity score",
       "rating": "Top-rated apps by stars from HubGet users",
       "movers": "Apps whose downloads grew the most over the last 7 days",
-      "trending": "Popular apps with a fresh update"
+      "trending": "Popular apps with a fresh update",
+      "installs_one": "Apps HubGet users installed most in the last {{count}} day",
+      "installs_other": "Apps HubGet users installed most in the last {{count}} days"
     },
     "all": "All",
     "sortLabel": "Sort the chart",
     "sort": {
       "popularity": "Popularity",
       "rating": "Top rated",
-      "movers": "Weekly movers"
+      "movers": "Weekly movers",
+      "installs": "Most installed in HubGet"
     },
     "sortHint": {
       "popularity": "Catalog popularity score (default)",
       "rating": "Average stars from HubGet users",
-      "movers": "Biggest download growth over the last 7 days"
+      "movers": "Biggest download growth over the last 7 days",
+      "installs": "How many HubGet users installed the app in the selected period"
     },
     "moversPending": "Weekly movers appear once the catalog has collected a week of download data. Until then, popular apps with a fresh update are shown.",
     "noRatings": "No apps have user ratings yet.",
     "ratingCount_one": "{{count}} rating",
     "ratingCount_other": "{{count}} ratings",
     "weeklyDownloads_one": "{{formatted}} download in the last 7 days",
-    "weeklyDownloads_other": "{{formatted}} downloads in the last 7 days"
+    "weeklyDownloads_other": "{{formatted}} downloads in the last 7 days",
+    "period_one": "{{count}} day",
+    "period_other": "{{count}} days",
+    "noInstalls": "The chart fills up once HubGet users start sharing installs anonymously – an app appears from 3 installs.",
+    "installsUnavailable": "The install chart isn't available right now.",
+    "installCount_one": "{{formatted}} install",
+    "installCount_other": "{{formatted}} installs"
   },
   "recent": {
     "title": "Recently Viewed",
@@ -548,7 +560,8 @@
       "install": "Install",
       "update": "Update",
       "uninstall": "Uninstall",
-      "download": "Installer download"
+      "download": "Installer download",
+      "repair": "Repair"
     },
     "outcome": {
       "success": "Completed",
@@ -602,7 +615,8 @@
       "appClosing": "{{name}} asks to save work while closing – waiting for the user to close it.",
       "appCloseTimeout": "{{name}} stayed open for 15 minutes – operation cancelled.",
       "needsAdmin": "{{name}} needs administrator rights to update – it will wait for a manual update.",
-      "settingsBackupFailed": "Couldn’t back up the settings of {{name}} before the update: {{error}}"
+      "settingsBackupFailed": "Couldn’t back up the settings of {{name}} before the update: {{error}}",
+      "repairDone": "Repaired successfully ({{seconds}} s)."
     },
     "notice": {
       "prefetchFailed": "Couldn't download the installer in advance ({{detail}}) – WinGet will download it.",
@@ -610,7 +624,9 @@
       "preCommand": "Running the pre-install command: {{detail}}",
       "postCommand": "Running the post-install command: {{detail}}",
       "postCommandFailed": "The post-install command failed ({{detail}}) – the install itself succeeded.",
-      "needsAdmin": "Needs administrator rights – automatic updates in the background don’t open the UAC dialog."
+      "needsAdmin": "Needs administrator rights – automatic updates in the background don’t open the UAC dialog.",
+      "signedBy": "Installer signed by: {{detail}}",
+      "unsigned": "The installer isn't digitally signed."
     },
     "phase": {
       "queued": "Waiting in queue…",
@@ -618,7 +634,8 @@
       "downloading": "Downloading installer…",
       "interactive": "Waiting for you to finish the setup wizard…",
       "installing": "Running installer…",
-      "uninstalling": "Uninstalling…"
+      "uninstalling": "Uninstalling…",
+      "repairing": "Repairing the installation…"
     }
   },
   "help": {
@@ -851,7 +868,8 @@
       "title": "The best of {{category}}",
       "subtitle": "{{names}} and more popular apps.",
       "description": "Popular apps from the {{category}} category in the HubGet catalog – by popularity and user feedback. Install them one by one or all at once. Next time we'll pick different ones."
-    }
+    },
+    "seeAllNew": "All new apps"
   },
   "collection": {
     "open": "Open collection {{name}}",
@@ -928,7 +946,6 @@
     "installedVia": "Installed via",
     "managedBySteam": "This game is managed by Steam – updates and file verification happen in Steam.",
     "openInSteam": "Open in Steam",
-    "managedByEa": "This game is managed by the EA app – updates and file verification happen in the EA app.",
     "localInstall": "Installed outside package managers – HubGet can uninstall it, but not update it.",
     "webOnlyNote": "{{publisher}} offers {{name}} for download only on its own website, so HubGet can't install, update or uninstall it. Once it's installed, HubGet will still recognize it and open it.",
     "webSource": "Vendor website",
@@ -975,7 +992,8 @@
     "cliPin": "Pin version",
     "cliMore": "More commands and explanations",
     "cliUnsupported": "{{manager}} can't do this",
-    "openSourceAlternatives": "Open-source alternatives to {{name}}"
+    "openSourceAlternatives": "Open-source alternatives to {{name}}",
+    "managedByStore": "This game is managed by {{store}} – updates and file verification happen in {{store}}."
   },
   "report": {
     "button": "Report a problem",
@@ -1412,7 +1430,8 @@
     "remainingSeconds_one": "{{count}} s left",
     "remainingSeconds_other": "{{count}} s left",
     "remainingMinutes_one": "{{count}} min left",
-    "remainingMinutes_other": "{{count}} min left"
+    "remainingMinutes_other": "{{count}} min left",
+    "repairing": "Repairing"
   },
   "status": {
     "updates": "Updates",
@@ -1604,9 +1623,11 @@
     "skipHash": "Skip checksum",
     "download": "Download installer",
     "details": "Details",
-    "more": "More installation options",
+    "more": "More app options",
     "unsupported": "This package manager doesn't support it",
-    "sandbox": "Try in Windows Sandbox"
+    "sandbox": "Try in Windows Sandbox",
+    "repair": "Repair",
+    "repairHint": "Restores the app's damaged files from its installer – when it won't start or shows errors. Settings are kept."
   },
   "installOptions": {
     "title": "Installation options – {{name}}",
@@ -1836,7 +1857,10 @@
     "uninstallQueued_one": "{{count}} uninstall queued",
     "uninstallQueued_other": "{{count}} uninstalls queued",
     "uninstallConfirm_one": "Uninstall {{count}} app? {{names}}",
-    "uninstallConfirm_other": "Uninstall {{count}} apps? {{names}}"
+    "uninstallConfirm_other": "Uninstall {{count}} apps? {{names}}",
+    "compare": "Compare",
+    "compareHint_one": "Select 2 to {{count}} app",
+    "compareHint_other": "Select 2 to {{count}} apps"
   },
   "pins": {
     "title": "Ignored and postponed updates",
@@ -1869,7 +1893,8 @@
     "snoozedState": "Update to {{version}} postponed until {{date}}",
     "lockedAll": "Updates are ignored",
     "skippedVersion": "Skipped version {{version}}",
-    "snoozedUntil": "Postponed until {{date}}"
+    "snoozedUntil": "Postponed until {{date}}",
+    "selfWaitState": "Updates itself – HubGet offers {{version}} on {{date}} if it hasn't updated by then"
   },
   "toast": {
     "installDone": "{{name}} – installed ({{source}})",
@@ -1885,7 +1910,8 @@
     "endedProcesses": "{{name}} was running in the background – HubGet closed it and is continuing",
     "appClosed": "{{name}} was running – HubGet closed it and is continuing",
     "appClosing": "{{name}} is asking to save your work – save it and close the app, then HubGet will continue",
-    "appCloseTimeout": "{{name}} stayed open – operation cancelled"
+    "appCloseTimeout": "{{name}} stayed open – operation cancelled",
+    "repairDone": "{{name}} – repaired ({{source}})"
   },
   "notifications": {
     "title": "Notifications",
@@ -1913,7 +1939,8 @@
     "summary": "Operation queue finished – {{success}} succeeded, {{failed}} failed, {{cancelled}} cancelled.",
     "appClosed": "The app was running – closed (processes {{processes}}).",
     "appClosing": "The app is asking to save your work – HubGet will continue once it's closed.",
-    "appCloseTimeout": "The app stayed open for 15 minutes – the operation was cancelled. Try again once you've closed it."
+    "appCloseTimeout": "The app stayed open for 15 minutes – the operation was cancelled. Try again once you've closed it.",
+    "repairDone": "Repaired ({{source}})"
   },
   "tray": {
     "browse": "Browse packages",
@@ -1967,7 +1994,13 @@
     "linkBroken": "The installer download link is temporarily broken (Error {{status}}). Try choosing another install source (e.g. Chocolatey/Scoop).",
     "unknown": "WinGet finished with error {{code}}",
     "preCommandFailed": "The pre-install command failed ({{code}}) – the install didn't start.",
-    "needsAdmin": "The operation needs administrator rights – it doesn’t run in the background, start it manually ({{code}})."
+    "needsAdmin": "The operation needs administrator rights – it doesn’t run in the background, start it manually ({{code}}).",
+    "repairUnsupported": "This app's installer can't repair it – uninstall the app and install it again ({{code}}).",
+    "repairFailed": "The repair finished with an error ({{code}}).",
+    "repairUserScope": "An app installed just for you can't be repaired with administrator rights – try again without them ({{code}}).",
+    "signerChanged": "The new version's installer was signed by someone else than last time ({{detail}}) – HubGet didn't run it. See the app details.",
+    "signatureMissing": "Earlier installers were signed by “{{detail}}”, this one has no digital signature – HubGet didn't run it.",
+    "signatureInvalid": "The installer's digital signature doesn't match its content – the file was changed after signing. HubGet didn't run it."
   },
   "managerError": {
     "failed": "{{name}} finished with error {{code}}",
@@ -2197,7 +2230,9 @@
     "skipped_active_one": "Found {{count}} update – automatic installation waits until you take a break",
     "skipped_active_other": "Found {{count}} updates – automatic installation waits until you take a break",
     "restorePointName": "HubGet - before updating all apps",
-    "foundSecurity": "Security updates ({{security}} of {{total}}): {{names}}"
+    "foundSecurity": "Security updates ({{security}} of {{total}}): {{names}}",
+    "selfUpdatingWait": "Give self-updating apps time",
+    "selfUpdatingWaitHint": "Chrome, Firefox, Steam, Discord and others have their own updater. HubGet doesn't count their updates and only offers them after {{days}} days ({{securityDays}} days for a security fix) if they haven't updated themselves by then."
   },
   "security": {
     "warningTitle": "Warning!",
@@ -2288,7 +2323,8 @@
       "install": "The installation",
       "update": "The update",
       "uninstall": "The uninstall",
-      "download": "The download"
+      "download": "The download",
+      "repair": "Repair"
     }
   },
   "commandSearch": {
@@ -2568,5 +2604,250 @@
     "protectionOn": "System protection is on – restore points can be created",
     "protectionOff": "System protection is off – restore points can’t be created",
     "protectionHint": "Turn it on in Control Panel → System → System Protection → Configure (drive C:). HubGet can then create a restore point before a bulk update."
+  },
+  "recentlyUpdated": {
+    "title": "Recently updated",
+    "subtitle_one": "Apps HubGet updated in the last {{count}} day.",
+    "subtitle_other": "Apps HubGet updated in the last {{count}} days.",
+    "showAll_one": "Show all ({{count}})",
+    "showAll_other": "Show all ({{count}})",
+    "automatic": "automatically",
+    "more": "more"
+  },
+  "preinstalled": {
+    "title": "Preinstalled apps",
+    "hint": "Games, news, tips and partner apps that Windows or your PC maker installs with a new account. They're removed only for you and can be restored from the Microsoft Store.",
+    "review": "Review",
+    "failed": "The app list couldn't be loaded.",
+    "none": "None of the known preinstalled apps are here.",
+    "found_one": "{{count}} preinstalled app found",
+    "found_other": "{{count}} preinstalled apps found",
+    "recommendedCount_one": "{{count}} recommended to remove",
+    "recommendedCount_other": "{{count}} recommended to remove",
+    "intro": "They're removed only from your Windows account (no administrator rights) and you can restore them from the Microsoft Store at any time. Recommended are apps most people don't use – discontinued or promotional ones. Windows components and apps something depends on aren't listed.",
+    "group": {
+      "games": "Games",
+      "microsoft": "Microsoft apps",
+      "partners": "Partner apps"
+    },
+    "recommended": "Recommended to remove",
+    "selectRecommended_one": "Select recommended ({{count}})",
+    "selectRecommended_other": "Select recommended ({{count}})",
+    "remove_one": "Remove ({{count}})",
+    "remove_other": "Remove ({{count}})",
+    "confirm_one": "Remove {{count}} app? {{names}} – you can restore it from the Microsoft Store.",
+    "confirm_other": "Remove {{count}} apps? {{names}} – you can restore them from the Microsoft Store.",
+    "removed_one": "{{count}} app removed",
+    "removed_other": "{{count}} apps removed",
+    "removeFailed": "Couldn't remove: {{names}}. Details are in History.",
+    "removeError": "Removal failed: {{error}}",
+    "storeFailed": "Couldn't open the Microsoft Store: {{error}}",
+    "removedTitle": "Removed in HubGet",
+    "restore": "Restore from Microsoft Store"
+  },
+  "compare": {
+    "title": "Compare apps",
+    "subtitle_one": "Up to {{count}} app side by side – ratings, license, size, ARM64 support and more from the catalog.",
+    "subtitle_other": "Up to {{count}} apps side by side – ratings, license, size, ARM64 support and more from the catalog.",
+    "clear": "Clear comparison",
+    "empty": "Nothing to compare yet. Add apps by searching above, by right-clicking an app card (Add to comparison), or tick several apps and choose Compare.",
+    "caption": "Comparison: {{names}}",
+    "remove": "Remove {{name}} from the comparison",
+    "best": "Best",
+    "unknown": "Not specified",
+    "yes": "Yes",
+    "no": "No",
+    "rating": "Rating",
+    "license": "License",
+    "openSource": "Open source",
+    "version": "Latest version",
+    "released": "Released",
+    "size": "Installer size",
+    "installedSize": "Disk space",
+    "arm64": "Native ARM64",
+    "architectures": "Architectures",
+    "minOs": "Minimum Windows",
+    "sources": "Install sources",
+    "webOnly": "Developer's website only",
+    "stars": "GitHub stars",
+    "installed": "On this PC",
+    "installedVersion": "Installed ({{version}})",
+    "notInstalled": "Not installed",
+    "links": "Links",
+    "homepage": "Website",
+    "repository": "Source code",
+    "addPlaceholder": "Add an app to compare…",
+    "open_one": "Compare ({{count}})",
+    "open_other": "Compare ({{count}})",
+    "menuAdd": "Add to comparison",
+    "menuRemove": "Remove from comparison",
+    "added": "{{name}} – added to comparison ({{count}}/{{max}})",
+    "full_one": "You can compare at most {{count}} app.",
+    "full_other": "You can compare at most {{count}} apps."
+  },
+  "a11y": {
+    "skipToContent": "Skip to content",
+    "title": "Accessibility",
+    "textSize": "Text size",
+    "textSizeHint": "Makes text and controls in the whole window larger or smaller.",
+    "textSizeWindows": "Follows Windows Settings → Accessibility → Text size (now {{size}}).",
+    "textSizeSystem": "Same as Windows",
+    "textSizeDefault": "Default",
+    "motion": "Animations",
+    "motionHint": "“Same as Windows” follows Windows Settings → Accessibility → Animation effects. “Reduce” always turns off motion, fades and transitions in HubGet.",
+    "motionSystem": "Same as Windows",
+    "motionReduce": "Reduce",
+    "underlineLinks": "Underline links",
+    "underlineLinksHint": "Links stand out from other text even without color.",
+    "keyboardHint": "You can use HubGet entirely with the keyboard: Tab and Shift+Tab move between items, the first Tab offers Skip to content, Ctrl+K searches, Enter opens an app and the Menu key (Shift+F10) opens its menu. HubGet supports Windows contrast themes and Narrator on its own."
+  },
+  "adopt": {
+    "title_one": "{{count}} program from the developer's website can be managed by WinGet",
+    "title_other": "{{count}} programs from developers' websites can be managed by WinGet",
+    "text": "They were installed outside a package manager, but WinGet has them. Once managed, HubGet offers their updates – nothing changes on your PC and the program stays where it is.",
+    "show": "Show",
+    "hide": "Hide",
+    "adoptAll_one": "Manage all ({{count}})",
+    "adoptAll_other": "Manage all ({{count}})",
+    "adopt": "Manage with WinGet",
+    "adopted": "{{name}} – now managed by WinGet ({{id}})",
+    "adoptedAll_one": "{{count}} program is now managed by WinGet",
+    "adoptedAll_other": "{{count}} programs are now managed by WinGet",
+    "adoptedNote": "Managed by WinGet ({{id}}) – updates install the new version through WinGet.",
+    "release": "Stop managing",
+    "released": "{{name}} – no longer managed by WinGet",
+    "offer": "Installed outside a package manager, but WinGet has this app ({{id}}). Once managed, HubGet offers its updates – the program stays where it is."
+  },
+  "newApps": {
+    "title": "New in catalog",
+    "subtitle_one": "Apps added to the HubGet catalog in the last {{count}} day",
+    "subtitle_other": "Apps added to the HubGet catalog in the last {{count}} days",
+    "days_one": "{{count}} day",
+    "days_other": "{{count}} days",
+    "added": "Added: {{when}}",
+    "trackedSince": "The catalog has tracked new apps since {{date}} – there's no data for a longer period yet.",
+    "empty_one": "Nothing was added to the catalog in the last {{count}} day.",
+    "empty_other": "Nothing was added to the catalog in the last {{count}} days.",
+    "count_one": "{{count}} app",
+    "count_other": "{{count}} apps"
+  },
+  "selfUpdating": {
+    "waiting_one": "Updates itself ({{count}}): {{names}} – HubGet only offers its update if it hasn't updated within {{days}} days.",
+    "waiting_other": "Update themselves ({{count}}): {{names}} – HubGet only offers their updates if they haven't updated within {{days}} days."
+  },
+  "installStats": {
+    "setting": "Contribute to the install chart",
+    "settingHint": "After installing an app, HubGet anonymously sends only its catalog id and a random id of this HubGet installation. The reports make up the Most installed in HubGet chart.",
+    "contribute": "Contribute to the chart"
+  },
+  "signer": {
+    "changedTitle": "A different publisher signed the installer",
+    "changedText": "Version {{version}} was signed by “{{to}}”, earlier installers by “{{from}}”, so HubGet didn't install it. If you trust the change (the company was renamed or changed its certificate), update.",
+    "missingTitle": "The installer has no digital signature",
+    "missingText": "Earlier installers were signed by “{{from}}”, version {{version}} has no signature, so HubGet didn't install it.",
+    "trust": "Trust and update"
+  },
+  "abandoned": {
+    "title_one": "{{count}} app is probably no longer developed",
+    "title_other": "{{count}} apps are probably no longer developed",
+    "text": "They don't get bug fixes or security patches. Consider a replacement that's still developed.",
+    "archived": "the GitHub repository is archived – development has ended",
+    "noCommits_one": "no changes on GitHub since {{date}} (over {{count}} year)",
+    "noCommits_other": "no changes on GitHub since {{date}} (over {{count}} years)",
+    "noRelease_one": "the latest version is from {{date}} (over {{count}} year)",
+    "noRelease_other": "the latest version is from {{date}} (over {{count}} years)",
+    "instead": "Instead:",
+    "note": "This app is probably no longer developed: {{reason}}."
+  },
+  "newPc": {
+    "title": "New PC",
+    "subtitle": "Tick the apps you want and HubGet installs them all at once – one after another, no clicking through installers.",
+    "saveBundle": "Save as bundle",
+    "install_one": "Install selected ({{count}})",
+    "install_other": "Install selected ({{count}})",
+    "installed": "Installed",
+    "details": "Details of {{name}}",
+    "more": "More",
+    "hint": "Find more apps in the catalog and add them to a bundle; you can take the bundle to another PC too."
+  },
+  "drivers": {
+    "title": "Drivers from Windows Update",
+    "open": "Install in Windows Update",
+    "searching": "Searching…",
+    "check": "Check drivers",
+    "hint": "Drivers Windows Update offers that aren't installed. Windows Update installs them (Optional updates) – and can roll them back.",
+    "none": "Windows Update offers no new drivers."
+  },
+  "year": {
+    "title": "Your {{year}} with HubGet",
+    "subtitle": "What HubGet did on this PC during the year – from local history only, nothing is sent.",
+    "empty": "HubGet hasn't installed or updated anything this year yet.",
+    "installs": "Apps installed",
+    "updates": "Updates",
+    "automatic_one": "{{count}} of them automatic",
+    "automatic_other": "{{count}} of them automatic",
+    "saved": "Time saved (estimate)",
+    "hours": "hours",
+    "minutes": "minutes",
+    "uninstalls": "Apps uninstalled",
+    "repairs": "Repairs",
+    "topApps": "Most updated",
+    "updateCount_one": "{{count}} update",
+    "updateCount_other": "{{count}} updates",
+    "months": "By month",
+    "busiest": "Busiest month: {{month}}",
+    "note": "Counted since {{date}}. Time estimate: a manual install takes about 5 minutes, an update about 3.",
+    "link": "Your year with HubGet"
+  },
+  "requests": {
+    "title": "Suggested apps",
+    "subtitle": "Apps people miss in HubGet. Vote for the ones you want too – the most wanted get added to the catalog.",
+    "suggest": "Suggest an app",
+    "unavailable": "Suggested apps aren't available right now.",
+    "empty": "Nobody has suggested anything yet – be the first.",
+    "vote": "Vote for {{name}}",
+    "unvote": "Remove vote for {{name}}",
+    "added": "Added",
+    "web": "Website",
+    "failed": "Something went wrong: {{error}}",
+    "thanks": "Thanks! {{name}} is now among suggested apps.",
+    "suggestTitle": "Suggest an app",
+    "suggestText": "Tell us which app you miss in HubGet. If someone already suggested it, your vote is added.",
+    "send": "Suggest",
+    "name": "App name",
+    "url": "App website (optional)",
+    "note": "Note (optional)",
+    "missing": "Missing an app? Suggest it",
+    "notFound": "Didn't find what you're looking for?"
+  },
+  "devReplies": {
+    "saved": "Reply saved",
+    "deleted": "Reply deleted",
+    "failed": "Something went wrong: {{error}}",
+    "title": "Developer response ({{author}})",
+    "write": "Reply",
+    "save": "Save reply",
+    "edit": "Edit reply",
+    "approved": "You're a verified developer of this app",
+    "requested": "Request sent – once approved, you can reply to reviews.",
+    "githubOnly": "Replying to reviews requires a GitHub account – sign in with GitHub.",
+    "pending": "Your request to reply to reviews is waiting for approval.",
+    "youAreMaintainer": "You're a developer of this app – open a review to reply.",
+    "claim": "I'm a developer of this app",
+    "claimTitle": "Reply to reviews of {{name}}",
+    "claimText": "Once approved, you can reply under reviews. We check that your GitHub account belongs to the app's repository – enter it.",
+    "repo": "GitHub repository",
+    "send": "Send request",
+    "hasReply": "Developer response"
+  },
+  "devStats": {
+    "title": "Your app's statistics",
+    "text": "How many times people installed your app through HubGet – from opt-in anonymous reports. Fewer than 3 installs aren't shown.",
+    "search": "Find an app in the catalog…",
+    "unavailable": "Statistics aren't available right now.",
+    "few": "fewer than 3",
+    "days_one": "in {{count}} day",
+    "days_other": "in {{count}} days",
+    "requests": "What people miss in HubGet – Suggested apps"
   }
 }

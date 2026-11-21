@@ -20,7 +20,8 @@ interface UninstallButtonProps {
  * úlohy – ne u programu nalezeného jen podle složky na disku (žádný správce ani
  * záznam v registru ho odinstalovat neumí). Výjimkou je program rozbalený na ploše
  * (Tor Browser): backend jeho složku přesune do Koše. Aplikaci jen z webu výrobce
- * (DaVinci Resolve) HubGet nespravuje – odinstaluje se ve Windows.
+ * (DaVinci Resolve) HubGet nespravuje – odinstaluje se ve Windows. Hru z Epic Games
+ * (záznam v registru nemá) odinstaluje jen Epic Games Launcher.
  */
 export function UninstallButton({ entry, variant = "icon" }: UninstallButtonProps) {
   const { t } = useTranslation();
@@ -28,7 +29,7 @@ export function UninstallButton({ entry, variant = "icon" }: UninstallButtonProp
   const enqueue = useJobs((s) => s.enqueue);
   const [confirming, setConfirming] = useState(false);
 
-  if (!installed || job || isWebOnly(entry) || (installed.diskLocation && !installed.portable)) return null;
+  if (!installed || job || isWebOnly(entry) || (installed.diskLocation && !installed.portable) || installed.origin === "epic") return null;
 
   const open = (e: MouseEvent) => {
     e.preventDefault();

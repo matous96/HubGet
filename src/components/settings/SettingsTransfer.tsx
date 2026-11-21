@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { Spinner } from "@/components/ui/States";
 import { useInstalledItems } from "@/hooks/useInstalledItems";
+import { isGameStore } from "@/services/managers";
 import { formatSizeText } from "@/lib/utils";
 import { useSettings } from "@/store/settings";
 import { useToasts } from "@/store/toasts";
@@ -74,7 +75,7 @@ function ExportDialog({ open, onClose }: { open: boolean; onClose: () => void })
   const toast = useToasts((s) => s.push);
   const { items } = useInstalledItems();
   const apps = useMemo(
-    () => items.filter((i) => i.pkg.origin !== "steam" && i.pkg.origin !== "ea").map((i) => ({ appId: i.entry.id, name: i.entry.name, packageId: i.pkg.packageId })),
+    () => items.filter((i) => !isGameStore(i.pkg.origin)).map((i) => ({ appId: i.entry.id, name: i.entry.name, packageId: i.pkg.packageId })),
     [items],
   );
   // Které aplikace mají nastavení v AppData (jen s otevřeným dialogem)

@@ -9,8 +9,8 @@
  *  2. položka začíná názvem aplikace („OBS Studio“ → „OBS Studio (64bit)“),
  *  3. název aplikace končí názvem položky („Mozilla Thunderbird“ → „Thunderbird“).
  * Když položka podle názvu není, pomůže backend (`launch_info`) – složky programu
- * z registru nebo z disku, jeho EXE a hry ze Steamu:
- *  4. hra ze Steamu → spustí ji Steam,
+ * z registru nebo z disku, jeho EXE a hry z herních obchodů:
+ *  4. hra ze Steamu, Epic Games či Ubisoft Connect → spustí ji spouštěč obchodu,
  *  5. položka nabídky Start, která míří do složky programu (Git → „Git CMD“,
  *     Acrobat Reader → „Adobe Acrobat“),
  *  6. EXE programu s okny (Tor Browser rozbalený na ploše),
@@ -120,12 +120,12 @@ interface LaunchInfo {
   folders: string[];
   /** Program jde spustit přímo (EXE s okny). */
   exe: boolean;
-  /** Hra ze Steamu. */
-  steam: boolean;
+  /** Hra z herního obchodu (Steam, Epic Games, Ubisoft Connect) – spustí ji jeho spouštěč. */
+  store: boolean;
 }
 
-/** Jak aplikaci otevřít: položkou nabídky Start, nebo přes backend (EXE, Steam, složka). */
-export type LaunchTarget = { kind: "start"; app: StartApp } | { kind: "exe" | "steam" | "folder"; installed: InstalledPackage };
+/** Jak aplikaci otevřít: položkou nabídky Start, nebo přes backend (EXE, spouštěč herního obchodu, složka). */
+export type LaunchTarget = { kind: "start"; app: StartApp } | { kind: "exe" | "store" | "folder"; installed: InstalledPackage };
 
 const infoMaps = new WeakMap<LaunchInfo[], Map<string, LaunchInfo>>();
 
@@ -177,8 +177,9 @@ export function launchTargetFor(
   if (app) return { kind: "start", app };
   const info = infos?.get(installed.packageId);
   if (!info) return undefined;
-  // Hra ze Steamu před zástupci ve složkách – její odinstalátor je steam.exe a zástupce „Steam“ by hru nespustil
-  if (info.steam) return { kind: "steam", installed };
+  // Hra z herního obchodu před zástupci ve složkách – odinstalátor hry ze Steamu je steam.exe a zástupce
+  // „Steam“ by hru nespustil; hry z Epicu a Ubisoftu potřebují spouštěč (přihlášení, aktualizace)
+  if (info.store) return { kind: "store", installed };
   const own = apps.filter((a) => a.target && info.folders.some((dir) => a.target!.startsWith(`${dir}\\`)));
   if (own.length) {
     const best = findStartApp(own, [name, installed.name]) ?? [...own].sort((a, b) => a.name.length - b.name.length)[0];

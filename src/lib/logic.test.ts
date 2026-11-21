@@ -239,3 +239,259 @@ describe("poznámky z GitHubu – upozornění a konce řádků", async () => {
     expect(plainNotes("> [!IMPORTANT]\r\n> The certificate changed.\r\n\r\n### Fixes\r\n- One")).toBe("The certificate changed.\n\nFixes\n• One");
   });
 });
+
+describe("nedávno aktualizováno", async () => {
+  const { dayLabel, recentUpdates } = await import("./recentUpdates");
+  const now = new Date(2026, 10, 20, 16, 30).getTime();
+  const h = (appId: string, finished: Date, over: Record<string, unknown> = {}) =>
+    ({ id: `${appId}-${finished.getTime()}`, appId, appName: appId, source: "winget", packageId: appId, kind: "update", outcome: "success", startedAt: finished.toISOString(), finishedAt: finished.toISOString(), ...over }) as never;
+  it("jen úspěšné aktualizace za 30 dní, u aplikace poslední, od nejnovější", () => {
+    const history = [
+      h("vlc", new Date(2026, 10, 20, 9)),
+      h("git", new Date(2026, 10, 19, 22)),
+      h("vlc", new Date(2026, 10, 10)),
+      h("x", new Date(2026, 10, 20, 10), { outcome: "error" }),
+      h("y", new Date(2026, 10, 20, 11), { kind: "install" }),
+      h("old", new Date(2026, 9, 1)),
+    ];
+    const out = recentUpdates(history, now) as unknown as { appId: string; finishedAt: string }[];
+    expect(out.map((e) => e.appId)).toEqual(["vlc", "git"]);
+    expect(out[0].finishedAt).toBe(new Date(2026, 10, 20, 9).toISOString());
+  });
+  it("den jako v App Storu", () => {
+    const today = new Date(2026, 10, 20, 16, 30);
+    expect(dayLabel(new Date(2026, 10, 20, 0, 5).toISOString(), "cs", today)).toBe("Dnes");
+    expect(dayLabel(new Date(2026, 10, 19, 23, 59).toISOString(), "cs", today)).toBe("Včera");
+    expect(dayLabel(new Date(2026, 10, 16).toISOString(), "cs", today)).toBe("Před 4 dny");
+    expect(dayLabel(new Date(2026, 10, 1).toISOString(), "cs", today)).toBe("1. 11.");
+    expect(dayLabel(new Date(2026, 10, 20).toISOString(), "en", today)).toBe("Today");
+  });
+});
+
+describe("nedávno aktualizováno – bez aplikací s další aktualizací", async () => {
+  const { visibleRecentUpdates } = await import("./recentUpdates");
+  const now = new Date(2026, 10, 20, 16).getTime();
+  const h = (appId: string) =>
+    ({ id: appId, appId, appName: appId, source: "winget", packageId: appId, kind: "update", outcome: "success", startedAt: new Date(2026, 10, 19).toISOString(), finishedAt: new Date(2026, 10, 19).toISOString() }) as never;
+  it("aplikace s nabízenou aktualizací ani odinstalovaná tu nejsou", () => {
+    const installed = new Map([
+      ["gemini", { availableVersion: null }],
+      ["chatgpt", { availableVersion: "26.1117.3838.0" }],
+    ]);
+    const out = visibleRecentUpdates([h("gemini"), h("chatgpt"), h("odinstalovana")], installed, now) as unknown as { appId: string }[];
+    expect(out.map((e) => e.appId)).toEqual(["gemini"]);
+  });
+});
+
+describe("opravit aplikaci", async () => {
+  const { canRepair } = await import("./repair");
+  const pkg = (over: Partial<InstalledPackage>) => ({ source: "winget", packageId: "VideoLAN.VLC", name: "VLC", installedVersion: "3.0", availableVersion: null, origin: "winget", ...over }) as InstalledPackage;
+  it("jen winget a programy z Aplikací ve Windows", () => {
+    expect(canRepair(pkg({}))).toBe(true);
+    expect(canRepair(pkg({ packageId: String.raw`ARP\Machine\X64\{GUID}`, origin: "local" }))).toBe(true);
+    expect(canRepair(pkg({ source: "chocolatey", origin: "chocolatey" }))).toBe(false);
+    expect(canRepair(pkg({ packageId: String.raw`ARP\Machine\X64\Steam App 730`, origin: "steam" }))).toBe(false);
+    expect(canRepair(pkg({ packageId: String.raw`EPIC\Fortnite`, origin: "epic" }))).toBe(false);
+    expect(canRepair(pkg({ packageId: String.raw`DISK\C:\Tools\x`, origin: "local", diskLocation: String.raw`C:\Tools\x` }))).toBe(false);
+    expect(canRepair(pkg({ portable: true }))).toBe(false);
+    expect(canRepair(undefined)).toBe(false);
+  });
+});
+
+describe("hry z herních obchodů", async () => {
+  const { detectWingetOrigin, gameStoreOf, rememberGame } = await import("@/services/managers/sources");
+  it("Steam podle id, Epic podle předpony, ostatní podle výpisu backendu", () => {
+    const gog = String.raw`ARP\Machine\X86\1207658924_is1`;
+    expect(gameStoreOf(String.raw`ARP\Machine\X64\Steam App 730`)).toBe("steam");
+    expect(gameStoreOf(String.raw`EPIC\Fortnite`)).toBe("epic");
+    expect(gameStoreOf(gog)).toBeNull();
+    rememberGame(gog, "gog");
+    expect(detectWingetOrigin(gog, null)).toBe("gog");
+    expect(detectWingetOrigin("VideoLAN.VLC", "winget")).toBe("winget");
+    // Hru z Ubisoftu pozná backend (gameStore ve výpisu), ne frontend podle id
+    expect(detectWingetOrigin(String.raw`ARP\Machine\X64\Uplay Install 635`, null)).toBe("local");
+  });
+});
+
+describe("porovnání aplikací", async () => {
+  const { bestIndex, compareFacts } = await import("./compare");
+  it("nejlepší hodnota jen s jasným vítězem", () => {
+    expect(bestIndex([3, 5, 4], true)).toBe(1);
+    expect(bestIndex([3, 5, 4], false)).toBe(0);
+    expect(bestIndex([5, null, 5], true)).toBeNull();
+    expect(bestIndex([5, null, undefined], true)).toBeNull();
+    expect(bestIndex([null, 2, 9], false)).toBe(1);
+  });
+  it("údaje přes všechny zdroje", () => {
+    const facts = compareFacts(
+      entry("vlc", {
+        license: "GPL-2.0",
+        releaseDate: "2026-06-01",
+        sources: [
+          { source: "winget", packageId: "VideoLAN.VLC", version: "3.0", size: 44_000_000, architectures: ["x64", "x86"], minOsVersion: "10.0.17763.0", installedSize: 180_000_000 },
+          { source: "chocolatey", packageId: "vlc", version: "3.0", size: 40_000_000, architectures: ["arm64", "x64"], minOsVersion: "10.0.10240.0" },
+          { source: "winget", packageId: "VideoLAN.VLC.Nightly", version: "4.0" },
+        ],
+      }),
+    );
+    expect(facts.size).toBe(40_000_000);
+    expect(facts.installedSize).toBe(180_000_000);
+    expect(facts.architectures).toEqual(["x64", "arm64", "x86"]);
+    expect(facts.sources).toEqual(["winget", "chocolatey"]);
+    expect(facts.minOs).toBe("10.0.10240.0");
+    expect(facts.license).toBe("licenseOpen");
+  });
+});
+
+describe("porovnání – výběr aplikací", async () => {
+  const { useCompare } = await import("@/store/compare");
+  it("nejvýš 4 aplikace, opakované přidání odebere", () => {
+    const { toggle, clear } = useCompare.getState();
+    clear();
+    expect(["a", "b", "c", "d"].map((id) => toggle(id))).toEqual(["added", "added", "added", "added"]);
+    expect(toggle("e")).toBe("full");
+    expect(toggle("b")).toBe("removed");
+    expect(useCompare.getState().ids).toEqual(["a", "c", "d"]);
+    useCompare.getState().set(["x", "x", "y", "z", "w", "v"]);
+    expect(useCompare.getState().ids).toEqual(["x", "y", "z", "w"]);
+    clear();
+  });
+});
+
+describe("převzít do správy", async () => {
+  const { adoptionSource } = await import("./adopt");
+  const { withAdoptedPackages } = await import("@/hooks/usePackages");
+  const firefox = entry("mozilla-firefox", {
+    name: "Mozilla Firefox",
+    sources: [
+      { source: "winget", packageId: "Mozilla.Firefox", version: "146.0" },
+      { source: "chocolatey", packageId: "firefox", version: "146.0" },
+    ],
+  });
+  const arpId = "ARP" + String.fromCharCode(92) + "Machine" + String.fromCharCode(92) + "X64" + String.fromCharCode(92) + "Mozilla Firefox";
+  const local = { source: "winget", packageId: arpId, name: "Mozilla Firefox (x64 cs)", installedVersion: "144.0.2", availableVersion: null, origin: "local" } as InstalledPackage;
+  it("jen program mimo správce s balíčkem wingetu v katalogu", () => {
+    expect(adoptionSource(local, firefox)?.packageId).toBe("Mozilla.Firefox");
+    expect(adoptionSource({ ...local, origin: "winget" }, firefox)).toBeNull();
+    expect(adoptionSource({ ...local, diskLocation: "C:" }, firefox)).toBeNull();
+    // Bez verze programu nebo se starším balíčkem v katalogu (jiná řada – Windows SDK) převzetí nic nepřinese
+    expect(adoptionSource({ ...local, installedVersion: "" }, firefox)).toBeNull();
+    expect(adoptionSource({ ...local, installedVersion: "200.0" }, firefox)).toBeNull();
+    expect(adoptionSource({ ...local, installedVersion: "146.0" }, firefox)?.packageId).toBe("Mozilla.Firefox");
+    expect(adoptionSource(local, entry("web", { sources: [], downloadUrl: "https://example.com" }))).toBeNull();
+    expect(adoptionSource(local, entry("store", { sources: [{ source: "winget", packageId: "9NKSQGP7F2NH", version: "1" }] }))).toBeNull();
+  });
+  it("převzatý program pod id balíčku s aktualizací z katalogu", () => {
+    const catalog = { catalog: { packages: [firefox] } } as never;
+    const adopted = { [`winget:${arpId}`]: { wingetId: "Mozilla.Firefox", name: local.name, at: "" } };
+    const [out] = withAdoptedPackages([local], catalog, adopted);
+    expect(out).toMatchObject({ packageId: "Mozilla.Firefox", origin: "winget", adoptedFrom: arpId, availableVersion: "146.0" });
+    // Winget už program vidí sám – převzetí se neuplatní (aplikace by byla dvakrát)
+    const listed = { ...local, packageId: "Mozilla.Firefox", origin: "winget" } as InstalledPackage;
+    expect(withAdoptedPackages([local, listed], catalog, adopted)[0].packageId).toBe(arpId);
+    // Bez verze v registru se aktualizace nenabízí
+    expect(withAdoptedPackages([{ ...local, installedVersion: "" }], catalog, adopted)[0].availableVersion).toBeNull();
+  });
+});
+
+describe("nově v katalogu", async () => {
+  const { newInCatalog } = await import("./newApps");
+  it("za období, od nejnovější, bez data se vynechá", () => {
+    const now = Date.parse("2026-11-21T12:00:00Z");
+    const apps = [
+      { id: "a", addedAt: "2026-11-20T10:00:00Z" },
+      { id: "b", addedAt: "2026-11-01T10:00:00Z" },
+      { id: "c", addedAt: "2026-11-21T08:00:00Z" },
+      { id: "d" },
+      { id: "e", addedAt: "2026-08-01T10:00:00Z" },
+    ];
+    expect(newInCatalog(apps, 7, now).map((a) => a.id)).toEqual(["c", "a"]);
+    expect(newInCatalog(apps, 30, now).map((a) => a.id)).toEqual(["c", "a", "b"]);
+  });
+});
+
+describe("známé aplikace s vlastním aktualizátorem", async () => {
+  const { isKnownSelfUpdating } = await import("@/store/updateRules");
+  it("podle id wingetu (i varianty) a podle profilu v katalogu", () => {
+    const none = new Set<string>();
+    expect(isKnownSelfUpdating({ source: "winget", packageId: "Google.Chrome" }, none)).toBe(true);
+    expect(isKnownSelfUpdating({ source: "winget", packageId: "google.chrome.EXE" }, none)).toBe(true);
+    expect(isKnownSelfUpdating({ source: "winget", packageId: "VideoLAN.VLC" }, none)).toBe(false);
+    expect(isKnownSelfUpdating({ source: "chocolatey", packageId: "googlechrome" }, new Set(["chocolatey:googlechrome"]))).toBe(true);
+  });
+});
+
+describe("hledání podle účelu česky", async () => {
+  const { intentTerms, matchesIntent } = await import("./searchIntents");
+  const { normalize } = await import("./utils");
+  const terms = (q: string) => intentTerms(normalize(q));
+  it("české výrazy i se skloňováním", () => {
+    expect(terms("stříhání videa")).toContain("video editor");
+    expect(terms("střih videí")).toContain("video editor");
+    expect(terms("čtečka PDF")).toContain("pdf reader");
+    expect(terms("rozbalit zip")).toContain("archiver");
+    expect(terms("správce hesel")).toContain("password manager");
+    expect(terms("firefox")).toEqual([]);
+    // Rozepsané poslední slovo u víceslovného dotazu
+    expect(terms("nahrávání obraz")).toContain("screen recorder");
+  });
+  it("shoda v popisu nebo názvu", () => {
+    expect(matchesIntent({ name: "shotcut", extra: "free open source video editor" }, terms("střih videa"))).toBe(true);
+    expect(matchesIntent({ name: "vlc", extra: "media player" }, terms("střih videa"))).toBe(false);
+  });
+});
+
+describe("opuštěné aplikace", async () => {
+  const { abandonedReason } = await import("./abandoned");
+  const now = Date.parse("2026-11-22T12:00:00Z");
+  it("archivovaný repozitář, dlouho bez změn, stará verze; hry ne", () => {
+    expect(abandonedReason(entry("atom", { archived: true }), now)?.kind).toBe("archived");
+    expect(abandonedReason(entry("old", { lastCommit: "2023-05-01T00:00:00Z" }), now)?.kind).toBe("noCommits");
+    expect(abandonedReason(entry("fresh", { lastCommit: "2026-10-01T00:00:00Z", releaseDate: "2020-01-01" }), now)).toBeNull();
+    expect(abandonedReason(entry("norepo", { releaseDate: "2022-06-01" }), now)?.kind).toBe("noRelease");
+    expect(abandonedReason(entry("norepo2", { releaseDate: "2024-06-01" }), now)).toBeNull();
+    expect(abandonedReason(entry("game", { archived: true, categories: ["games"] }), now)).toBeNull();
+  });
+});
+
+describe("váš rok s HubGetem", async () => {
+  const { addToYear, savedMinutes } = await import("@/store/yearStats");
+  const h = (kind: string, finishedAt: string, over: Record<string, unknown> = {}) =>
+    ({ id: finishedAt + kind, appId: "vlc", appName: "VLC", source: "winget", packageId: "VideoLAN.VLC", kind, outcome: "success", startedAt: finishedAt, finishedAt, ...over }) as never;
+  it("počty po letech a měsících", () => {
+    let years = {};
+    years = addToYear(years, h("install", "2026-03-02T10:00:00Z"));
+    years = addToYear(years, h("update", "2026-05-02T10:00:00Z", { background: true }));
+    years = addToYear(years, h("update", "2026-05-09T10:00:00Z"));
+    years = addToYear(years, h("update", "2026-06-01T10:00:00Z", { outcome: "error" }));
+    years = addToYear(years, h("download", "2026-06-01T10:00:00Z"));
+    years = addToYear(years, h("install", "2025-12-30T10:00:00Z"));
+    const y = (years as Record<string, ReturnType<typeof Object>>)["2026"] as { installs: number; updates: number; automatic: number; failed: number; months: number[]; apps: Record<string, { updates: number }> };
+    expect([y.installs, y.updates, y.automatic, y.failed]).toEqual([1, 2, 1, 1]);
+    expect(y.months[4]).toBe(2);
+    expect(y.apps.vlc.updates).toBe(2);
+    expect(Object.keys(years).sort()).toEqual(["2025", "2026"]);
+    expect(savedMinutes(y as never)).toBe(1 * 5 + 2 * 3);
+  });
+});
+
+describe("komunita – pomocné funkce", async () => {
+  const { githubRepo } = await import("@/services/community");
+  it("repozitář z adresy", () => {
+    expect(githubRepo("https://github.com/videolan/vlc")).toBe("videolan/vlc");
+    expect(githubRepo("https://github.com/microsoft/PowerToys.git")).toBe("microsoft/PowerToys");
+    expect(githubRepo("https://github.com/owner/repo/releases")).toBe("owner/repo");
+    expect(githubRepo("https://example.com/x")).toBeNull();
+  });
+});
+
+describe("opuštěné aplikace – bez knihoven a runtime", async () => {
+  const { abandonedReason } = await import("./abandoned");
+  it("Redistributable, DirectX, OpenAL, Xaml se nehlásí", () => {
+    const now = Date.parse("2026-11-22T12:00:00Z");
+    for (const name of ["Microsoft Visual C++ 2013 Redistributable", "DirectX End-User Runtime Installer", "OpenAL", "Microsoft.UI.Xaml"]) {
+      expect(abandonedReason(entry(name.toLowerCase().replace(/\W+/g, "-"), { name, releaseDate: "2014-01-01" }), now)).toBeNull();
+    }
+    expect(abandonedReason(entry("icloud", { name: "iCloud (Legacy)", releaseDate: "2020-09-01" }), now)?.kind).toBe("noRelease");
+  });
+});

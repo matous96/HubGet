@@ -9,7 +9,7 @@ import { invoke } from "@tauri-apps/api/core";
 import i18n from "@/i18n";
 import type { InstalledPackage, ManagerStatus, RepoSearchResult } from "@/types";
 import { hex, startBackendOperation, type BackendResult } from "./backend";
-import { detectWingetOrigin, rememberEaGame } from "./sources";
+import { detectWingetOrigin, isGameStore, rememberGame } from "./sources";
 import type { CacheInfo, PackageManager } from "./types";
 
 /** Nainstalovaný balíček, jak ho vrací backend. */
@@ -26,8 +26,8 @@ interface BackendInstalled {
   portable?: boolean;
   /** Kdy byl program nainstalován (InstalledPackage.installedAt). */
   installedAt?: number;
-  /** Hra z EA app (backend ji pozná podle složky hry). */
-  eaGame?: boolean;
+  /** Hra z herního obchodu mimo Steam (backend: GameStore v arp.rs, Epic podle manifestů). */
+  gameStore?: string;
 }
 
 /** Backend nespustil hledání, protože ho nahradilo novější. */
@@ -41,7 +41,7 @@ function errorMessage(result: BackendResult): string {
   // status = stav HTTP u nefunkčního odkazu na instalátor (0x80190194 → 404);
   // u pádu instalátoru je v `detail` kód pádu (0xC0000005), ne HRESULT wingetu
   const code = key === "installerCrashed" && result.detail ? result.detail : hex(result.code);
-  const message = i18n.t(`wingetError.${key}`, { code, status: result.code & 0xffff });
+  const message = i18n.t(`wingetError.${key}`, { code, status: result.code & 0xffff, detail: result.detail ?? "" });
   return key === "unknown" && result.detail ? `${message} – ${result.detail}` : message;
 }
 
@@ -54,8 +54,8 @@ export const wingetManager: PackageManager = {
 
   async getInstalled(): Promise<InstalledPackage[]> {
     const items = await invoke<BackendInstalled[]>("winget_installed");
-    return items.map(({ wingetSource, eaGame, ...p }) => {
-      if (eaGame) rememberEaGame(p.packageId);
+    return items.map(({ wingetSource, gameStore, ...p }) => {
+      if (isGameStore(gameStore)) rememberGame(p.packageId, gameStore);
       return { ...p, source: "winget", origin: detectWingetOrigin(p.packageId, wingetSource) };
     });
   },

@@ -106,7 +106,9 @@ impl<'a> Tracker<'a> {
 
     /// Fáze po stažení instalátoru.
     fn install_phase(&self) -> Phase {
-        if self.spec.interactive {
+        if self.spec.kind == Kind::Repair {
+            Phase::Repairing
+        } else if self.spec.interactive {
             Phase::Interactive
         } else {
             Phase::Installing
@@ -154,6 +156,8 @@ impl<'a> Tracker<'a> {
     pub fn started(&mut self) {
         let (phase, percent) = match self.spec.kind {
             Kind::Uninstall => (Phase::Uninstalling, None),
+            // Oprava MSI nic nestahuje; instalátor EXE stáhne winget (adresa ve výstupu přepne na stahování)
+            Kind::Repair => (Phase::Repairing, None),
             _ if self.prefetched => self.after_download(),
             _ => (Phase::Downloading, None),
         };

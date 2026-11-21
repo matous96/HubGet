@@ -3,7 +3,7 @@
  * Čisté funkce bez vedlejších efektů – používá je UI i backend.
  */
 import { combinedInstallerArgs } from "@/lib/installArgs";
-import type { Arch, CommandKind, InstallOptions, InstallOrigin, SourceId } from "@/types";
+import type { Arch, CommandKind, GameStore, InstallOptions, InstallOrigin, SourceId } from "@/types";
 
 /**
  * Které volby instalace správce podporuje (ostatní se v dialogu nenabízí).
@@ -168,11 +168,19 @@ export const ORIGINS: OriginMeta[] = [
   { id: "msstore", label: "WinGet (Microsoft Store)", dot: "bg-sky-300" },
   ...SOURCES.filter((s) => s.id !== "winget").map((s) => ({ id: s.id, label: s.label, dot: s.dot })),
   { id: "steam", label: "Steam", dot: "bg-slate-400" },
+  { id: "epic", label: "Epic Games", dot: "bg-neutral-700" },
   { id: "ea", label: "EA app", dot: "bg-orange-500" },
+  { id: "gog", label: "GOG", dot: "bg-violet-500" },
+  { id: "ubisoft", label: "Ubisoft Connect", dot: "bg-blue-600" },
+  { id: "battlenet", label: "Battle.net", dot: "bg-cyan-500" },
   { id: "local", label: "", dot: "bg-zinc-500" },
 ];
 
 export const getOrigin = (id: InstallOrigin) => ORIGINS.find((o) => o.id === id)!;
+
+/** Herní obchody – hry v nich spravuje jejich spouštěč (aktualizace, ověření souborů). */
+export const GAME_STORES: readonly GameStore[] = ["steam", "epic", "ea", "gog", "ubisoft", "battlenet"];
+export const isGameStore = (value: string | null | undefined): value is GameStore => (GAME_STORES as readonly string[]).includes(value ?? "");
 
 /** Id hry ve Steamu z identifikátoru „ARP\Machine\X64\Steam App 730“ (i bez předpony ARP), jinak null. */
 export function steamAppId(packageId: string): string | null {
@@ -180,22 +188,25 @@ export function steamAppId(packageId: string): string | null {
 }
 
 /**
- * Hry z EA app – z id je nepoznáme (záznam v registru má GUID), pozná je backend podle
- * složky hry a výpis nainstalovaných je tu zapamatuje (karty, oblíbené, historie).
+ * Hry z ostatních obchodů – z id je většinou nepoznáme (záznam v registru má GUID), pozná je
+ * backend (GameStore v arp.rs, Epic podle jeho manifestů) a výpis nainstalovaných je tu
+ * zapamatuje (karty, oblíbené, historie).
  */
-const eaGames = new Set<string>();
-export const rememberEaGame = (packageId: string) => void eaGames.add(packageId.toLowerCase());
-export const isEaGame = (packageId: string) => eaGames.has(packageId.toLowerCase());
+const games = new Map<string, GameStore>();
+export const rememberGame = (packageId: string, store: GameStore) => void games.set(packageId.toLowerCase(), store);
+/** Obchod, ze kterého je hra (Steam podle id, ostatní podle výpisu nainstalovaných), jinak null. */
+export const gameStoreOf = (packageId: string): GameStore | null =>
+  steamAppId(packageId) ? "steam" : (games.get(packageId.toLowerCase()) ?? (/^EPIC\\/i.test(packageId) ? "epic" : null));
 
 /**
  * Určí původ balíčku nalezeného wingetem. Get-WinGetPackage vrací u každého
  * balíčku `Id` a `Source` („winget“, „msstore“, nebo prázdné u programů
  * nainstalovaných mimo winget). Hry ze Steamu mají Id „ARP\…\Steam App <číslo>“,
- * hry z EA app označí backend (rememberEaGame).
+ * hry z ostatních obchodů označí backend (rememberGame).
  */
 export function detectWingetOrigin(packageId: string, wingetSource: string | null): InstallOrigin {
-  if (steamAppId(packageId)) return "steam";
-  if (isEaGame(packageId)) return "ea";
+  const game = gameStoreOf(packageId);
+  if (game) return game;
   if (wingetSource === "msstore") return "msstore";
   if (wingetSource === "winget") return "winget";
   return "local";

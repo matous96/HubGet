@@ -69,7 +69,8 @@ Instalace jedním kliknutím z vybraného zdroje, s průběhem stahování pří
 ### Nainstalované a aktualizace
 
 Přehled všech aplikací v počítači – i programů instalovaných mimo WinGet, aplikací
-z Microsoft Storu a her ze Steamu. Aktualizace jedním tlačítkem **Aktualizovat vše**,
+z Microsoft Storu a her ze Steamu, Epic Games, EA app, GOG, Ubisoft Connect a Battle.net.
+Aktualizace jedním tlačítkem **Aktualizovat vše**,
 nebo automaticky podle plánu. Selže-li operace kvůli oprávněním, HubGet ji sám zopakuje
 s právy správce.
 
@@ -132,6 +133,31 @@ s právy správce.
 - 📜 **Co je nového od vaší verze** – poznámky ke všem vydáním, která aktualizace přeskočí.
 - 🩺 **Diagnostika pro podporu** a **stav Windows** v Přehledu počítače (konec podpory,
   čekající restart, místo na disku, body obnovení).
+- 🔧 **Opravit aplikaci** – když aplikace nejde spustit nebo hlásí chyby, HubGet obnoví její
+  soubory z instalátoru (pravé tlačítko na aplikaci → Opravit).
+- 🧽 **Předinstalované aplikace Windows** – Candy Crush, Solitaire, Zprávy, Tipy a další
+  odeberete jedním kliknutím v Přehledu počítače; vrátit je jde z Microsoft Storu.
+- ⚖️ **Porovnat aplikace** – až čtyři vedle sebe: hodnocení, licence, velikost, podpora
+  ARM64, zdroje instalace.
+- ♿ **Přístupnost** – velikost textu podle Windows, omezení animací, podtržené odkazy,
+  kontrastní motivy Windows a ovládání celé aplikace klávesnicí.
+- 📥 **Převzít do správy** – program nainstalovaný z webu výrobce, který je i ve WinGetu,
+  převezmete jedním kliknutím a HubGet mu začne nabízet aktualizace; program zůstane, kde je.
+- ✨ **Nově v katalogu** – aplikace, které do katalogu přibyly za posledních 7, 30 nebo 90 dní.
+- 🔁 **Aplikace, které se aktualizují samy** (Chrome, Steam, Discord…) – jejich aktualizace se
+  nepočítají; HubGet je nabídne, jen když se aplikace sama neaktualizuje.
+- 🏆 **Nejinstalovanější v HubGetu** – žebříček podle skutečných instalací za 30, 90 a 365 dní
+  (dobrovolné anonymní sdílení).
+- ✍️ **Ověření podpisu instalátoru** – HubGet ukáže, kdo instalátor podepsal, a když nová verze
+  přijde od jiného vydavatele nebo bez podpisu, nespustí ji.
+- 🚧 **Opuštěné aplikace** – upozornění na aplikace, které se už nevyvíjejí, s náhradou.
+- 🖥️ **Nový počítač** – zaškrtněte aplikace po kategoriích a HubGet je nainstaluje najednou.
+- 🔌 **Ovladače z Windows Update** – přehled nabízených ovladačů v Přehledu počítače.
+- 🔎 **Hledání podle účelu** – „stříhání videa“, „čtečka PDF“ nebo „rozbalit zip“ najdou
+  správné aplikace.
+- 💡 **Navržené aplikace a odpovědi vývojářů** – chybějící aplikaci navrhnete a ostatní hlasují;
+  vývojáři odpovídají na recenze a vidí statistiky instalací.
+- 🎉 **Váš rok s HubGetem** – souhrn instalací, aktualizací a ušetřeného času.
 - ⌨️ **Win+Shift+H** otevře HubGet odkudkoli s kurzorem ve vyhledávání; jednou týdně
   souhrn, co se nainstalovalo a co čeká.
 - 📦 **Sady balíčků a profily** – sdílitelná sada aplikací pro nový počítač, export
@@ -1260,6 +1286,95 @@ z deps.dev (Google Open Source Insights, čísla pár dní stará), s proměnnou
   a nabízenou verzí (`/repos/{repo}/releases`, bez konceptů a předběžných verzí, číslo verze
   ze značky), Markdown převedený na text, štítek bezpečnostní opravy. Limit GitHub API sdílí
   s hvězdičkami (`BLOCKED_KEY`).
+- **Nedávno aktualizováno** (Dostupné aktualizace, `components/package/RecentlyUpdated.tsx`,
+  `lib/recentUpdates.ts`): jako v App Storu pod seznamem aktualizací – aplikace, které HubGet
+  za posledních 30 dní aktualizoval (ručně i automaticky, z historie operací; u každé jen ta
+  poslední) a pořád jsou nainstalované. Aplikace, kterou čeká další aktualizace, tu není – je nahoře
+  mezi dostupnými aktualizacemi a po aktualizaci se sem hned přesune. Den („Dnes“, „Včera“,
+  pak datum), verze, Otevřít a poznámky z katalogu, pokud patří k verzi, na kterou se
+  aktualizovalo.
+- **Opravit aplikaci** (nabídka aplikace – pravé tlačítko na kartě, šipka v detailu;
+  `lib/repair.ts`, operace `repair` → `winget repair --id … --exact --silent` ve `winget.rs`):
+  MSI a MSIX opraví Windows, instalátor EXE winget spustí s parametry opravy z manifestu.
+  Jen balíčky wingetu a programy z Aplikací ve Windows (ne hry z obchodů, programy jen na
+  disku a rozbalené na ploše). Aplikace pro všechny uživatele se opravuje rovnou jako správce;
+  návratové kódy 0x8A150079–7D mají vlastní hlášky (oprava nepodporovaná, selhala, rozsah).
+- **Hry ze všech obchodů** (`games.rs`, `ArpEntry::game_store` v `arp.rs`, `GAME_STORES`
+  v `services/managers/sources.ts`): vedle Steamu i EA app, GOG (`goggame-*.info` ve složce
+  hry), Ubisoft Connect (klíč `Uplay Install <číslo>`, spuštění `uplay://launch/<číslo>/0`),
+  Battle.net (odinstalátor Battle.net) a Epic Games – ty v registru nejsou, najdou se
+  v manifestech `…\EpicGamesLauncher\Data\Manifests\*.item` (bez DLC a rozpracovaných
+  instalací) s id `EPIC\<AppName>` a spouští je Epic (`com.epicgames.launcher://apps/…`).
+  Hry aktualizuje jejich spouštěč; hru z Epicu HubGet ani neodinstaluje.
+- **Předinstalované aplikace Windows** (Přehled počítače; `preinstalled.rs`,
+  `components/home/PreinstalledPanel.tsx`, `store/preinstalled.ts`): pevný seznam bezpečně
+  odebratelných balíčků (hry, Zprávy, Počasí, Tipy, aplikace partnerů – žádné součásti Windows,
+  Store, winget ani Herní panel), názvy v jazyce systému přes WinRT `PackageManager`. Odebere
+  vybrané jen aktuálnímu uživateli (`Remove-AppxPackage` ve vlastním procesu PowerShellu, bez
+  práv správce), zapíše je do Historie a nabídne vrácení přes stránku v Microsoft Storu
+  (`ms-windows-store://pdp/?PFN=…`). „Vybrat doporučené“ vybere jen ukončené a reklamní aplikace.
+- **Porovnat aplikace** (`pages/ComparePage.tsx` na `/compare`, `lib/compare.ts`,
+  `store/compare.ts`, `components/layout/CompareBar.tsx`): až 4 aplikace z katalogu vedle sebe
+  v tabulce (hodnocení, licence, verze a vydání, velikost instalátoru a na disku, ARM64,
+  minimální Windows, zdroje, hvězdy na GitHubu, odkazy); nejlepší hodnota v řádku je
+  vyznačená, jen když jasně vede. Přidání z nabídky aplikace, z lišty hromadného výběru
+  (2–4 aplikace) nebo hledáním na stránce.
+- **Přístupnost** (Nastavení → Vzhled → Přístupnost; `hooks/useAccessibility.ts`,
+  `components/settings/AccessibilityCard.tsx`, `system.rs` → `text_scale_factor`): velikost
+  textu podle Windows (Velikost textu – WebView2 ji sám neuplatní) nebo vlastní 90–150 %
+  (na desktopu zoom WebView2, takže se přeskládá i rozvržení), omezení animací (třída
+  `reduce-motion` a `MotionConfig`), podtržené odkazy, „Přeskočit na obsah“ pro klávesnici
+  a styly pro kontrastní motivy Windows (`@media (forced-colors: active)` v `styles/index.css`).
+- **Převzít do správy** (Nainstalované → panel nad seznamem, detail aplikace; `lib/adopt.ts`,
+  `store/adopted.ts`, `components/package/AdoptPanel.tsx`): program mimo správce (štítek
+  Lokální) spárovaný podle názvu s aplikací z katalogu, která má balíček wingetu. Po převzetí
+  se vede pod id balíčku (`withAdoptedPackages` v `hooks/usePackages.ts`, původní id
+  v `adoptedFrom`), novější verze v katalogu se nabídne jako aktualizace a fronta úloh ji spustí
+  jako instalaci nové verze přes winget (`adoptedRequest` v `store/jobs.ts` – `winget upgrade`
+  by program nenašel); odinstalace a oprava jdou přes původní záznam ve Windows. V počítači
+  převzetí nic nemění; zrušit jde v detailu aplikace.
+- **Nově v katalogu** (`pages/NewPage.tsx` na `/new`, levý panel → Objevovat): aplikace podle
+  `addedAt` z data pipeline za 7, 30 nebo 90 dní, s dnem přidání; upozorní, od kdy katalog
+  nové aplikace sleduje. Záložka Nové na Domů odkazuje sem.
+- **Aplikace, které se aktualizují samy** (`data/selfUpdating.ts`, pravidlo v
+  `store/updateRules.ts`, Nastavení → Aktualizace balíčků): známé aplikace s vlastním
+  aktualizátorem (prohlížeče, komunikátory, herní obchody…) i nainstalované přes jiného
+  správce (stejný profil v katalogu). Jejich aktualizace se nepočítají (zámek `self` s datem)
+  a nabídnou se až po 14 dnech od vydání, bezpečnostní oprava po 3 dnech; „Nabídnout znovu“
+  v detailu je nabídne hned (`selfOffer` v `store/updateHolds.ts`).
+- **Nejinstalovanější v HubGetu** (Nejstahovanější → řazení; `store/installStats.ts`,
+  Supabase `20261121120000_install_reports.sql`): dobrovolné anonymní hlášení úspěšné instalace
+  aplikace z katalogu (jen id aplikace a náhodné id instalace HubGetu, nejvýš 200 za den)
+  a žebříček za 30, 90 nebo 365 dní z funkce `install_ranking` (aplikace od 3 instalací).
+  Instalace za rok přidají výchozí popularitě až 15 bodů (`usePopularityBoost` – Nejstahovanější
+  a záložka Populární na Domů).
+- **Ověření podpisu instalátoru** (`signatures.rs` → `installer_signature`, `signer_verdict`,
+  `store/signers.ts`): instalátor, který HubGet stáhl předem (winget), se před spuštěním ověří
+  přes Get-AuthenticodeSignature. Vydavatel se zapamatuje a při další instalaci či aktualizaci
+  musí sedět – jiný vydavatel, chybějící podpis (dříve podepsaný) nebo podpis neodpovídající
+  obsahu instalaci zastaví (`signerChanged`, `signatureMissing`, `signatureInvalid`). Změnu jde
+  přijmout v detailu aplikace („Důvěřovat a aktualizovat“). Chocolatey a Scoop ani balíčky ze
+  Storu se nekontrolují (instalátor stahuje správce sám).
+- **Opuštěné aplikace** (`lib/abandoned.ts`, `components/package/AbandonedNotice.tsx`): archivovaný
+  repozitář na GitHubu, 2 roky bez změn (`archived`, `lastCommit` – data pipeline, GraphQL
+  `isArchived`, `pushedAt` v `sources/github.ts`), bez GitHubu poslední verze starší 3 let;
+  s open-source náhradami, které se samy vyvíjejí. Hry se vynechávají.
+- **Nový počítač** (`pages/NewPcPage.tsx` na `/new-pc`, `data/newPc.ts`): oblíbené aplikace po
+  kategoriích k zaškrtnutí, instalace najednou přes frontu úloh nebo uložení jako sada.
+- **Ovladače z Windows Update** (Přehled počítače; `drivers.rs`, `components/home/DriversPanel.tsx`):
+  hledání `IsInstalled=0 and Type='Driver'` přes COM Microsoft.Update.Session ve vlastním procesu
+  PowerShellu; instalaci předá Volitelným aktualizacím ve Windows Update.
+- **Hledání podle účelu česky** (`lib/searchIntents.ts`): kmeny českých výrazů → anglické výrazy
+  v popisu, štítcích a názvu; výsledky pod přímými shodami.
+- **Navržené aplikace, odpovědi vývojářů a statistiky** (Supabase
+  `20261122120000_community.sql`, `services/community.ts`, `pages/RequestsPage.tsx` na `/requests`,
+  `components/package/DeveloperReplies.tsx`, `components/publish/DeveloperStats.tsx`): návrhy
+  s hlasováním (nejvýš 5 za den, stejný název = hlas), odpovědi pod recenzemi jen pro vývojáře
+  schválené správcem HubGetu (žádost s účtem GitHub a repozitářem, schválení SQL příkazem
+  z migrace) a počty instalací jedné aplikace za 30, 90 a 365 dní (méně než 3 = neukazuje se).
+- **Váš rok s HubGetem** (`pages/YearPage.tsx` na `/year`, `store/yearStats.ts`, odkaz z Historie):
+  průběžné počty operací po letech (historie drží jen 500 záznamů), nejčastěji aktualizované
+  aplikace, měsíce a odhad ušetřeného času; jen místně.
 - **Diagnostika pro podporu** (Nastavení → Kontaktovat HubGet; `lib/diagnostics.ts`,
   `components/settings/DiagnosticsCard.tsx`): verze, správci, disk, nastavení, firemní
   zásady, posledních 30 neúspěšných operací a 300 řádků protokolu do souboru nebo schránky;

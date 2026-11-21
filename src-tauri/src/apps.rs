@@ -174,6 +174,11 @@ fn explorer(target: impl AsRef<OsStr>) -> Result<(), String> {
         .map_err(|e| format!("Aplikaci se nepodařilo spustit: {e}"))
 }
 
+/// Otevře odkaz chráněného schématu (ms-windows-store:…) jako z Průzkumníka.
+pub(crate) fn open_uri(uri: &str) -> Result<(), String> {
+    explorer(uri)
+}
+
 /// Spustí aplikaci z nabídky Start.
 #[tauri::command]
 pub async fn launch_app(app_id: String) -> Result<(), String> {
@@ -216,15 +221,16 @@ pub struct LaunchInfo {
     folders: Vec<String>,
     /// Program jde spustit přímo (EXE s okny).
     exe: bool,
-    /// Hra ze Steamu – spustí ji Steam.
-    steam: bool,
+    /// Hra z herního obchodu (Steam, Epic Games, Ubisoft Connect) – spustí ji jeho spouštěč.
+    store: bool,
 }
 
 /// Co backend o programu zjistil (cesty zůstanou v backendu).
 struct Resolved {
     folders: Vec<PathBuf>,
     exe: Option<PathBuf>,
-    steam: Option<String>,
+    /// Odkaz spouštěče obchodu („steam://rungameid/730“, „uplay://launch/635/0“, „com.epicgames.launcher://…“).
+    store_uri: Option<String>,
 }
 
 /// EXE s okny (konzolový nástroj by se jen mihl), které není instalátorem – ikonou
@@ -247,22 +253,32 @@ fn is_installer(path: &Path) -> bool {
 }
 
 fn resolve(registry: &arp::Registry, package: &InstalledRef) -> Resolved {
+    // Hra z Epic Games – jen ta, kterou najdou manifesty Epicu (games.rs)
+    if package.package_id.starts_with(r"EPIC\") {
+        return match crate::games::epic_game(&package.package_id) {
+            Some(game) => Resolved { folders: vec![game.folder.clone()], exe: None, store_uri: Some(game.launch_uri()) },
+            None => Resolved { folders: Vec::new(), exe: None, store_uri: None },
+        };
+    }
     if let Some(folder) = package.package_id.strip_prefix(r"DISK\") {
         let folder = PathBuf::from(folder);
         // Jen složka, kterou by našlo hledání na disku – ne libovolná cesta od frontendu
         let exe = disk::program_exe_of(&folder);
         let folders = if exe.is_some() { vec![folder] } else { Vec::new() };
-        return Resolved { folders, exe: exe.filter(|exe| gui_exe(exe)), steam: None };
+        return Resolved { folders, exe: exe.filter(|exe| gui_exe(exe)), store_uri: None };
     }
     let entries = registry.matching(&package.package_id, &package.name, &package.version);
     // Program rozbalený na ploše pod id wingetu (Tor Browser – winget ho nevidí, registr nezná)
     if entries.is_empty() {
         if let Some(folder) = disk::portable_folder(&package.name) {
             let exe = disk::program_exe_of(&folder).filter(|exe| gui_exe(exe));
-            return Resolved { folders: vec![folder], exe, steam: None };
+            return Resolved { folders: vec![folder], exe, store_uri: None };
         }
     }
-    let steam = entries.iter().find_map(|entry| entry.steam_id());
+    // Hra ze Steamu či Ubisoft Connect: spustí ji spouštěč obchodu (přihlášení, aktualizace, DRM)
+    let store_uri = entries.iter().find_map(|entry| {
+        entry.steam_id().map(|id| format!("steam://rungameid/{id}")).or_else(|| entry.store_launch_uri())
+    });
     // Složky instalátorů (Package Cache, InstallShield) programem nejsou
     let mut folders: Vec<PathBuf> = Vec::new();
     for dir in entries.iter().flat_map(|entry| entry.folders()) {
@@ -270,8 +286,8 @@ fn resolve(registry: &arp::Registry, package: &InstalledRef) -> Resolved {
             folders.push(dir);
         }
     }
-    if steam.is_some() {
-        return Resolved { folders, exe: None, steam };
+    if store_uri.is_some() {
+        return Resolved { folders, exe: None, store_uri };
     }
     // EXE z ikony v registru, jinak ve složce programu pojmenované jako program
     let key = arp::name_key(&package.name);
@@ -280,10 +296,10 @@ fn resolve(registry: &arp::Registry, package: &InstalledRef) -> Resolved {
         .filter_map(|entry| entry.icon_file())
         .find(|path| gui_exe(path))
         .or_else(|| folders.iter().find_map(|dir| disk::named_exe(dir, &key).filter(|exe| gui_exe(exe))));
-    Resolved { folders, exe, steam: None }
+    Resolved { folders, exe, store_uri: None }
 }
 
-/// Složky, EXE a hry ze Steamu k nainstalovaným balíčkům (jen to, co frontend potřebuje vědět).
+/// Složky, EXE a hry z herních obchodů k nainstalovaným balíčkům (jen to, co frontend potřebuje vědět).
 #[tauri::command]
 pub async fn launch_info(packages: Vec<InstalledRef>) -> Result<Vec<LaunchInfo>, String> {
     background(move || {
@@ -296,7 +312,7 @@ pub async fn launch_info(packages: Vec<InstalledRef>) -> Result<Vec<LaunchInfo>,
                     package_id: package.package_id.clone(),
                     folders: resolved.folders.iter().map(|dir| arp::folder_key(dir)).collect(),
                     exe: resolved.exe.is_some(),
-                    steam: resolved.steam.is_some(),
+                    store: resolved.store_uri.is_some(),
                 }
             })
             .collect())
@@ -305,14 +321,14 @@ pub async fn launch_info(packages: Vec<InstalledRef>) -> Result<Vec<LaunchInfo>,
 }
 
 /// Otevře program bez položky v nabídce Start: `mode` „exe“ (spustí jeho EXE),
-/// „steam“ (hru přes Steam), nebo „folder“ (jeho složku v Průzkumníkovi).
+/// „store“ (hru přes spouštěč jejího obchodu), nebo „folder“ (jeho složku v Průzkumníkovi).
 #[tauri::command]
 pub async fn launch_installed(package: InstalledRef, mode: String) -> Result<(), String> {
     background(move || {
         let resolved = resolve(&arp::Registry::load(), &package);
         match mode.as_str() {
             "exe" => explorer(resolved.exe.ok_or("Program nemá spustitelný soubor s okny")?),
-            "steam" => explorer(format!("steam://rungameid/{}", resolved.steam.ok_or("Není to hra ze Steamu")?)),
+            "store" => explorer(resolved.store_uri.ok_or("Hru nespouští žádný herní obchod")?),
             "folder" => explorer(resolved.folders.into_iter().next().ok_or("Složka programu neexistuje")?),
             _ => Err("Neznámý způsob otevření".into()),
         }

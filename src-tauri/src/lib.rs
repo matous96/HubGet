@@ -38,7 +38,9 @@ mod choco;
 mod dev;
 mod disk;
 mod download;
+mod drivers;
 mod elevation;
+mod games;
 mod files;
 mod icons;
 mod jumplist;
@@ -48,6 +50,7 @@ mod offline;
 mod operations;
 mod org_policy;
 mod powershell;
+mod preinstalled;
 mod process;
 mod progress;
 mod publish;
@@ -197,6 +200,7 @@ pub fn run() {
             security::check_manager_path,
             system::power_network_status,
             system::disk_space,
+            system::text_scale_factor,
             system::windows_health,
             system::devolutions_agent_status,
             caches::cache_info,
@@ -205,6 +209,11 @@ pub fn run() {
             jumplist::set_jump_list,
             sandbox::sandbox_available,
             sandbox::sandbox_try,
+            preinstalled::preinstalled_apps,
+            drivers::driver_updates,
+            drivers::open_driver_updates,
+            preinstalled::remove_preinstalled,
+            preinstalled::preinstalled_store_page,
             offline::offline_bundle,
             offline::offline_cancel,
             settings_backup::settings_backup,

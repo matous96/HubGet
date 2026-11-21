@@ -107,7 +107,9 @@
     "startup": "Inicialização",
     "publish": "Publicar",
     "about": "Sobre o HubGet",
-    "overview": "Visão geral do PC"
+    "overview": "Visão geral do PC",
+    "new": "Novos no catálogo",
+    "newPc": "PC novo"
   },
   "startup": {
     "title": "Aplicativos de inicialização",
@@ -421,19 +423,24 @@
       "popularity": "Os apps mais populares pela pontuação de popularidade do catálogo",
       "rating": "Os apps mais bem avaliados pelas estrelas dos usuários do HubGet",
       "movers": "Apps cujos downloads mais cresceram nos últimos 7 dias",
-      "trending": "Apps populares com atualização recente"
+      "trending": "Apps populares com atualização recente",
+      "installs_one": "Aplicativos mais instalados pelos usuários do HubGet no último {{count}} dia",
+      "installs_many": "Aplicativos mais instalados pelos usuários do HubGet nos últimos {{count}} dias",
+      "installs_other": "Aplicativos mais instalados pelos usuários do HubGet nos últimos {{count}} dias"
     },
     "all": "Todos",
     "sortLabel": "Ordenar a lista",
     "sort": {
       "popularity": "Popularidade",
       "rating": "Mais bem avaliados",
-      "movers": "Em alta na semana"
+      "movers": "Em alta na semana",
+      "installs": "Mais instalados no HubGet"
     },
     "sortHint": {
       "popularity": "Pontuação de popularidade do catálogo (padrão)",
       "rating": "Média de estrelas dos usuários do HubGet",
-      "movers": "Maior crescimento de downloads nos últimos 7 dias"
+      "movers": "Maior crescimento de downloads nos últimos 7 dias",
+      "installs": "Quantos usuários do HubGet instalaram o aplicativo no período escolhido"
     },
     "moversPending": "Os apps em alta aparecem quando o catálogo tiver reunido uma semana de dados de download. Até lá, são mostrados apps populares com atualização recente.",
     "noRatings": "Nenhum app tem avaliações de usuários ainda.",
@@ -442,7 +449,15 @@
     "ratingCount_many": "{{count}} avaliações",
     "weeklyDownloads_one": "{{formatted}} download nos últimos 7 dias",
     "weeklyDownloads_other": "{{formatted}} downloads nos últimos 7 dias",
-    "weeklyDownloads_many": "{{formatted}} downloads nos últimos 7 dias"
+    "weeklyDownloads_many": "{{formatted}} downloads nos últimos 7 dias",
+    "period_one": "{{count}} dia",
+    "period_many": "{{count}} dias",
+    "period_other": "{{count}} dias",
+    "noInstalls": "O ranking será preenchido quando os usuários do HubGet começarem a compartilhar instalações anonimamente – um aplicativo aparece a partir de 3 instalações.",
+    "installsUnavailable": "O ranking de instalações não está disponível agora.",
+    "installCount_one": "{{formatted}} instalação",
+    "installCount_many": "{{formatted}} instalações",
+    "installCount_other": "{{formatted}} instalações"
   },
   "recent": {
     "title": "Vistos recentemente",
@@ -557,7 +572,8 @@
       "install": "Instalação",
       "update": "Atualização",
       "uninstall": "Desinstalação",
-      "download": "Download do instalador"
+      "download": "Download do instalador",
+      "repair": "Reparo"
     },
     "outcome": {
       "success": "Concluída",
@@ -614,7 +630,8 @@
       "appClosing": "{{name}} pergunta se quer salvar o trabalho ao fechar – aguardando o usuário fechá-lo.",
       "appCloseTimeout": "{{name}} ficou aberto por 15 minutos – operação cancelada.",
       "needsAdmin": "{{name}} precisa de direitos de administrador para atualizar – vai aguardar uma atualização manual.",
-      "settingsBackupFailed": "Não foi possível fazer backup das configurações de {{name}} antes da atualização: {{error}}"
+      "settingsBackupFailed": "Não foi possível fazer backup das configurações de {{name}} antes da atualização: {{error}}",
+      "repairDone": "Reparado com sucesso ({{seconds}} s)."
     },
     "notice": {
       "prefetchFailed": "Não foi possível baixar o instalador com antecedência ({{detail}}) – o WinGet vai baixá-lo.",
@@ -622,7 +639,9 @@
       "preCommand": "Executando o comando antes da instalação: {{detail}}",
       "postCommand": "Executando o comando depois da instalação: {{detail}}",
       "postCommandFailed": "O comando depois da instalação falhou ({{detail}}) – a instalação em si foi concluída.",
-      "needsAdmin": "Precisa de direitos de administrador – as atualizações automáticas em segundo plano não abrem a caixa de diálogo do UAC."
+      "needsAdmin": "Precisa de direitos de administrador – as atualizações automáticas em segundo plano não abrem a caixa de diálogo do UAC.",
+      "signedBy": "Instalador assinado por: {{detail}}",
+      "unsigned": "O instalador não tem assinatura digital."
     },
     "phase": {
       "queued": "Aguardando na fila…",
@@ -630,7 +649,8 @@
       "downloading": "Baixando o instalador…",
       "interactive": "Aguardando você concluir o assistente de instalação…",
       "installing": "Executando o instalador…",
-      "uninstalling": "Desinstalando…"
+      "uninstalling": "Desinstalando…",
+      "repairing": "Reparando a instalação…"
     }
   },
   "help": {
@@ -864,7 +884,8 @@
       "title": "O melhor de {{category}}",
       "subtitle": "{{names}} e mais aplicativos populares.",
       "description": "Aplicativos populares da categoria {{category}} no catálogo do HubGet – pela popularidade e pela opinião dos usuários. Instale um por um ou todos de uma vez. Na próxima vez escolheremos outros."
-    }
+    },
+    "seeAllNew": "Todos os novos aplicativos"
   },
   "collection": {
     "open": "Abrir a coleção {{name}}",
@@ -943,7 +964,6 @@
     "installedVia": "Instalado via",
     "managedBySteam": "Este jogo é gerenciado pela Steam – atualizações e verificação de arquivos acontecem na Steam.",
     "openInSteam": "Abrir na Steam",
-    "managedByEa": "Este jogo é gerenciado pelo EA app – atualizações e verificação de arquivos acontecem no EA app.",
     "localInstall": "Instalado fora dos gerenciadores de pacotes – o HubGet pode desinstalá-lo, mas não atualizá-lo.",
     "webOnlyNote": "A {{publisher}} disponibiliza o {{name}} apenas no próprio site, por isso o HubGet não pode instalá-lo, atualizá-lo nem desinstalá-lo. Depois de instalado, o HubGet o reconhece e consegue abri-lo.",
     "webSource": "Site do fabricante",
@@ -990,7 +1010,8 @@
     "cliPin": "Fixar a versão",
     "cliMore": "Mais comandos e explicações",
     "cliUnsupported": "O {{manager}} não faz isso",
-    "openSourceAlternatives": "Alternativas de código aberto ao {{name}}"
+    "openSourceAlternatives": "Alternativas de código aberto ao {{name}}",
+    "managedByStore": "O jogo é gerenciado pelo {{store}} – atualizações e verificação de arquivos acontecem no {{store}}."
   },
   "report": {
     "button": "Relatar um problema",
@@ -1438,7 +1459,8 @@
     "remainingSeconds_other": "faltam {{count}} s",
     "remainingMinutes_one": "falta {{count}} min",
     "remainingMinutes_many": "faltam {{count}} min",
-    "remainingMinutes_other": "faltam {{count}} min"
+    "remainingMinutes_other": "faltam {{count}} min",
+    "repairing": "Reparando"
   },
   "status": {
     "updates": "Atualizações",
@@ -1642,9 +1664,11 @@
     "skipHash": "Pular a soma de verificação",
     "download": "Baixar o instalador",
     "details": "Detalhes",
-    "more": "Mais opções de instalação",
+    "more": "Mais opções do aplicativo",
     "unsupported": "Este gerenciador de pacotes não oferece suporte a isso",
-    "sandbox": "Experimentar no Windows Sandbox"
+    "sandbox": "Experimentar no Windows Sandbox",
+    "repair": "Reparar",
+    "repairHint": "Restaura os arquivos danificados do aplicativo a partir do instalador – quando ele não abre ou mostra erros. As configurações são mantidas."
   },
   "installOptions": {
     "title": "Opções de instalação – {{name}}",
@@ -1889,7 +1913,11 @@
     "uninstallQueued_other": "{{count}} desinstalações na fila",
     "uninstallConfirm_one": "Desinstalar {{count}} aplicativo? {{names}}",
     "uninstallConfirm_many": "Desinstalar {{count}} aplicativos? {{names}}",
-    "uninstallConfirm_other": "Desinstalar {{count}} aplicativos? {{names}}"
+    "uninstallConfirm_other": "Desinstalar {{count}} aplicativos? {{names}}",
+    "compare": "Comparar",
+    "compareHint_one": "Selecione de 2 a {{count}} aplicativo",
+    "compareHint_many": "Selecione de 2 a {{count}} aplicativos",
+    "compareHint_other": "Selecione de 2 a {{count}} aplicativos"
   },
   "pins": {
     "title": "Atualizações ignoradas e adiadas",
@@ -1922,7 +1950,8 @@
     "snoozedState": "Atualização para {{version}} adiada até {{date}}",
     "lockedAll": "As atualizações são ignoradas",
     "skippedVersion": "Versão {{version}} pulada",
-    "snoozedUntil": "Adiada até {{date}}"
+    "snoozedUntil": "Adiada até {{date}}",
+    "selfWaitState": "Atualiza-se sozinho – o HubGet oferecerá a {{version}} em {{date}} se até lá não tiver se atualizado"
   },
   "toast": {
     "installDone": "{{name}} – instalado ({{source}})",
@@ -1938,7 +1967,8 @@
     "endedProcesses": "{{name}} estava rodando em segundo plano – o HubGet o fechou e está continuando",
     "appClosed": "{{name}} estava em execução – o HubGet o fechou e está continuando",
     "appClosing": "{{name}} pergunta se você quer salvar seu trabalho – salve e feche o aplicativo, e o HubGet continuará",
-    "appCloseTimeout": "{{name}} ficou aberto – operação cancelada"
+    "appCloseTimeout": "{{name}} ficou aberto – operação cancelada",
+    "repairDone": "{{name}} – reparado ({{source}})"
   },
   "notifications": {
     "title": "Notificações",
@@ -1967,7 +1997,8 @@
     "summary": "Fila de operações concluída – {{success}} com sucesso, {{failed}} com falha, {{cancelled}} canceladas.",
     "appClosed": "O aplicativo estava em execução – fechado (processos {{processes}}).",
     "appClosing": "O aplicativo pergunta se você quer salvar seu trabalho – o HubGet continuará quando ele for fechado.",
-    "appCloseTimeout": "O aplicativo ficou aberto por 15 minutos – a operação foi cancelada. Tente de novo depois de fechá-lo."
+    "appCloseTimeout": "O aplicativo ficou aberto por 15 minutos – a operação foi cancelada. Tente de novo depois de fechá-lo.",
+    "repairDone": "Reparado ({{source}})"
   },
   "tray": {
     "browse": "Explorar pacotes",
@@ -2023,7 +2054,13 @@
     "linkBroken": "O link de download do instalador está temporariamente quebrado (erro {{status}}). Tente escolher outra fonte de instalação (ex.: Chocolatey/Scoop).",
     "unknown": "O WinGet terminou com o erro {{code}}",
     "preCommandFailed": "O comando antes da instalação falhou ({{code}}) – a instalação não começou.",
-    "needsAdmin": "A operação precisa de direitos de administrador – não é executada em segundo plano, inicie-a manualmente ({{code}})."
+    "needsAdmin": "A operação precisa de direitos de administrador – não é executada em segundo plano, inicie-a manualmente ({{code}}).",
+    "repairUnsupported": "O instalador deste aplicativo não permite repará-lo – desinstale e instale novamente ({{code}}).",
+    "repairFailed": "O reparo terminou com erro ({{code}}).",
+    "repairUserScope": "Um aplicativo instalado só para você não pode ser reparado com direitos de administrador – tente novamente sem eles ({{code}}).",
+    "signerChanged": "O instalador da nova versão foi assinado por outra pessoa que da última vez ({{detail}}) – o HubGet não o executou. Veja os detalhes do aplicativo.",
+    "signatureMissing": "Os instaladores anteriores eram assinados por “{{detail}}”, este não tem assinatura digital – o HubGet não o executou.",
+    "signatureInvalid": "A assinatura digital do instalador não corresponde ao conteúdo – o arquivo foi alterado após a assinatura. O HubGet não o executou."
   },
   "managerError": {
     "failed": "{{name}} terminou com o erro {{code}}",
@@ -2268,7 +2305,9 @@
     "skipped_active_many": "{{count}} atualizações encontradas – a instalação automática espera uma pausa",
     "skipped_active_other": "{{count}} atualizações encontradas – a instalação automática espera uma pausa",
     "restorePointName": "HubGet - antes de atualizar tudo",
-    "foundSecurity": "Atualizações de segurança ({{security}} de {{total}}): {{names}}"
+    "foundSecurity": "Atualizações de segurança ({{security}} de {{total}}): {{names}}",
+    "selfUpdatingWait": "Dar tempo aos aplicativos que se atualizam sozinhos",
+    "selfUpdatingWaitHint": "Chrome, Firefox, Steam, Discord e outros têm atualizador próprio. O HubGet não conta as atualizações deles e só as oferece depois de {{days}} dias ({{securityDays}} dias para correção de segurança) se até lá não tiverem se atualizado."
   },
   "security": {
     "warningTitle": "Atenção!",
@@ -2361,7 +2400,8 @@
       "install": "A instalação",
       "update": "A atualização",
       "uninstall": "A desinstalação",
-      "download": "O download"
+      "download": "O download",
+      "repair": "Reparo"
     }
   },
   "commandSearch": {
@@ -2668,5 +2708,276 @@
     "protectionOn": "A proteção do sistema está ativada – é possível criar pontos de restauração",
     "protectionOff": "A proteção do sistema está desativada – não é possível criar pontos de restauração",
     "protectionHint": "Ative-a em Painel de Controle → Sistema → Proteção do Sistema → Configurar (unidade C:). Assim o HubGet pode criar um ponto de restauração antes de uma atualização em massa."
+  },
+  "recentlyUpdated": {
+    "title": "Atualizados recentemente",
+    "subtitle_one": "Aplicativos que o HubGet atualizou no último {{count}} dia.",
+    "subtitle_many": "Aplicativos que o HubGet atualizou nos últimos {{count}} dias.",
+    "subtitle_other": "Aplicativos que o HubGet atualizou nos últimos {{count}} dias.",
+    "showAll_one": "Ver todos ({{count}})",
+    "showAll_many": "Ver todos ({{count}})",
+    "showAll_other": "Ver todos ({{count}})",
+    "automatic": "automaticamente",
+    "more": "mais"
+  },
+  "preinstalled": {
+    "title": "Aplicativos pré-instalados",
+    "hint": "Jogos, notícias, dicas e aplicativos de parceiros que o Windows ou o fabricante do PC instala com uma nova conta. São removidos só para você e podem ser restaurados pela Microsoft Store.",
+    "review": "Revisar",
+    "failed": "Não foi possível carregar a lista de aplicativos.",
+    "none": "Nenhum dos aplicativos pré-instalados conhecidos está aqui.",
+    "found_one": "{{count}} aplicativo pré-instalado encontrado",
+    "found_many": "{{count}} aplicativos pré-instalados encontrados",
+    "found_other": "{{count}} aplicativos pré-instalados encontrados",
+    "recommendedCount_one": "{{count}} recomendados para remover",
+    "recommendedCount_many": "{{count}} recomendados para remover",
+    "recommendedCount_other": "{{count}} recomendados para remover",
+    "intro": "São removidos só da sua conta do Windows (sem direitos de administrador) e você pode restaurá-los pela Microsoft Store a qualquer momento. Os recomendados são aplicativos que a maioria não usa – descontinuados ou promocionais. Componentes do Windows e aplicativos dos quais algo depende não aparecem.",
+    "group": {
+      "games": "Jogos",
+      "microsoft": "Aplicativos da Microsoft",
+      "partners": "Aplicativos de parceiros"
+    },
+    "recommended": "Recomendado remover",
+    "selectRecommended_one": "Selecionar recomendados ({{count}})",
+    "selectRecommended_many": "Selecionar recomendados ({{count}})",
+    "selectRecommended_other": "Selecionar recomendados ({{count}})",
+    "remove_one": "Remover ({{count}})",
+    "remove_many": "Remover ({{count}})",
+    "remove_other": "Remover ({{count}})",
+    "confirm_one": "Remover {{count}} aplicativo? {{names}} – é possível restaurá-lo pela Microsoft Store.",
+    "confirm_many": "Remover {{count}} aplicativos? {{names}} – é possível restaurá-los pela Microsoft Store.",
+    "confirm_other": "Remover {{count}} aplicativos? {{names}} – é possível restaurá-los pela Microsoft Store.",
+    "removed_one": "{{count}} aplicativo removido",
+    "removed_many": "{{count}} aplicativos removidos",
+    "removed_other": "{{count}} aplicativos removidos",
+    "removeFailed": "Não foi possível remover: {{names}}. Os detalhes estão no Histórico.",
+    "removeError": "Falha ao remover: {{error}}",
+    "storeFailed": "Não foi possível abrir a Microsoft Store: {{error}}",
+    "removedTitle": "Removidos no HubGet",
+    "restore": "Restaurar pela Microsoft Store"
+  },
+  "compare": {
+    "title": "Comparar aplicativos",
+    "subtitle_one": "Até {{count}} aplicativo lado a lado – avaliações, licença, tamanho, suporte a ARM64 e mais dados do catálogo.",
+    "subtitle_many": "Até {{count}} aplicativos lado a lado – avaliações, licença, tamanho, suporte a ARM64 e mais dados do catálogo.",
+    "subtitle_other": "Até {{count}} aplicativos lado a lado – avaliações, licença, tamanho, suporte a ARM64 e mais dados do catálogo.",
+    "clear": "Limpar comparação",
+    "empty": "Nada para comparar ainda. Adicione aplicativos pela busca acima, clicando com o botão direito em um cartão (Adicionar à comparação) ou marque vários e escolha Comparar.",
+    "caption": "Comparação: {{names}}",
+    "remove": "Remover {{name}} da comparação",
+    "best": "Melhor",
+    "unknown": "Não informado",
+    "yes": "Sim",
+    "no": "Não",
+    "rating": "Avaliação",
+    "license": "Licença",
+    "openSource": "Código aberto",
+    "version": "Versão mais recente",
+    "released": "Lançada",
+    "size": "Tamanho do instalador",
+    "installedSize": "Espaço em disco",
+    "arm64": "ARM64 nativo",
+    "architectures": "Arquiteturas",
+    "minOs": "Windows mínimo",
+    "sources": "Fontes de instalação",
+    "webOnly": "Só no site do desenvolvedor",
+    "stars": "Estrelas no GitHub",
+    "installed": "Neste PC",
+    "installedVersion": "Instalado ({{version}})",
+    "notInstalled": "Não instalado",
+    "links": "Links",
+    "homepage": "Site",
+    "repository": "Código-fonte",
+    "addPlaceholder": "Adicionar um aplicativo para comparar…",
+    "open_one": "Comparar ({{count}})",
+    "open_many": "Comparar ({{count}})",
+    "open_other": "Comparar ({{count}})",
+    "menuAdd": "Adicionar à comparação",
+    "menuRemove": "Remover da comparação",
+    "added": "{{name}} – adicionado à comparação ({{count}}/{{max}})",
+    "full_one": "É possível comparar no máximo {{count}} aplicativo.",
+    "full_many": "É possível comparar no máximo {{count}} aplicativos.",
+    "full_other": "É possível comparar no máximo {{count}} aplicativos."
+  },
+  "a11y": {
+    "skipToContent": "Pular para o conteúdo",
+    "title": "Acessibilidade",
+    "textSize": "Tamanho do texto",
+    "textSizeHint": "Aumenta ou diminui o texto e os controles da janela inteira.",
+    "textSizeWindows": "Segue Configurações do Windows → Acessibilidade → Tamanho do texto (agora {{size}}).",
+    "textSizeSystem": "Igual ao Windows",
+    "textSizeDefault": "Padrão",
+    "motion": "Animações",
+    "motionHint": "“Igual ao Windows” segue Configurações do Windows → Acessibilidade → Efeitos de animação. “Reduzir” sempre desativa movimentos, esmaecimentos e transições no HubGet.",
+    "motionSystem": "Igual ao Windows",
+    "motionReduce": "Reduzir",
+    "underlineLinks": "Sublinhar links",
+    "underlineLinksHint": "Os links se destacam do restante do texto mesmo sem cor.",
+    "keyboardHint": "Dá para usar o HubGet totalmente pelo teclado: Tab e Shift+Tab passam entre os itens, o primeiro Tab oferece Pular para o conteúdo, Ctrl+K pesquisa, Enter abre um aplicativo e a tecla Menu (Shift+F10) abre o menu dele. O HubGet oferece suporte aos temas de contraste do Windows e ao Narrador."
+  },
+  "adopt": {
+    "title_one": "{{count}} programa do site do desenvolvedor pode ser gerenciado pelo WinGet",
+    "title_many": "{{count}} programas de sites de desenvolvedores podem ser gerenciados pelo WinGet",
+    "title_other": "{{count}} programas de sites de desenvolvedores podem ser gerenciados pelo WinGet",
+    "text": "Foram instalados fora de um gerenciador de pacotes, mas o WinGet os tem. Depois, o HubGet oferece as atualizações deles – nada muda no PC e o programa fica onde está.",
+    "show": "Mostrar",
+    "hide": "Ocultar",
+    "adoptAll_one": "Gerenciar todos ({{count}})",
+    "adoptAll_many": "Gerenciar todos ({{count}})",
+    "adoptAll_other": "Gerenciar todos ({{count}})",
+    "adopt": "Gerenciar com o WinGet",
+    "adopted": "{{name}} – agora gerenciado pelo WinGet ({{id}})",
+    "adoptedAll_one": "{{count}} programa agora é gerenciado pelo WinGet",
+    "adoptedAll_many": "{{count}} programas agora são gerenciados pelo WinGet",
+    "adoptedAll_other": "{{count}} programas agora são gerenciados pelo WinGet",
+    "adoptedNote": "Gerenciado pelo WinGet ({{id}}) – as atualizações instalam a nova versão pelo WinGet.",
+    "release": "Parar de gerenciar",
+    "released": "{{name}} – não é mais gerenciado pelo WinGet",
+    "offer": "Instalado fora de um gerenciador de pacotes, mas o WinGet tem este aplicativo ({{id}}). Depois, o HubGet oferece as atualizações – o programa fica onde está."
+  },
+  "newApps": {
+    "title": "Novos no catálogo",
+    "subtitle_one": "Aplicativos adicionados ao catálogo do HubGet no último {{count}} dia",
+    "subtitle_many": "Aplicativos adicionados ao catálogo do HubGet nos últimos {{count}} dias",
+    "subtitle_other": "Aplicativos adicionados ao catálogo do HubGet nos últimos {{count}} dias",
+    "days_one": "{{count}} dia",
+    "days_many": "{{count}} dias",
+    "days_other": "{{count}} dias",
+    "added": "Adicionado: {{when}}",
+    "trackedSince": "O catálogo acompanha os aplicativos novos desde {{date}} – ainda não há dados de um período maior.",
+    "empty_one": "Nada foi adicionado ao catálogo no último {{count}} dia.",
+    "empty_many": "Nada foi adicionado ao catálogo nos últimos {{count}} dias.",
+    "empty_other": "Nada foi adicionado ao catálogo nos últimos {{count}} dias.",
+    "count_one": "{{count}} aplicativo",
+    "count_many": "{{count}} aplicativos",
+    "count_other": "{{count}} aplicativos"
+  },
+  "selfUpdating": {
+    "waiting_one": "Atualiza-se sozinho ({{count}}): {{names}} – o HubGet só oferece a atualização se ele não se atualizar em {{days}} dias.",
+    "waiting_many": "Atualizam-se sozinhos ({{count}}): {{names}} – o HubGet só oferece as atualizações se eles não se atualizarem em {{days}} dias.",
+    "waiting_other": "Atualizam-se sozinhos ({{count}}): {{names}} – o HubGet só oferece as atualizações se eles não se atualizarem em {{days}} dias."
+  },
+  "installStats": {
+    "setting": "Contribuir para o ranking de instalações",
+    "settingHint": "Depois de instalar um aplicativo, o HubGet envia anonimamente só o id dele no catálogo e um id aleatório desta instalação do HubGet. Os envios formam o ranking Mais instalados no HubGet.",
+    "contribute": "Contribuir para o ranking"
+  },
+  "signer": {
+    "changedTitle": "Outro editor assinou o instalador",
+    "changedText": "A versão {{version}} foi assinada por “{{to}}”, as anteriores por “{{from}}”, por isso o HubGet não a instalou. Se confiar na mudança (a empresa mudou de nome ou de certificado), atualize.",
+    "missingTitle": "O instalador não tem assinatura digital",
+    "missingText": "Os instaladores anteriores eram assinados por “{{from}}”, a versão {{version}} não tem assinatura, por isso o HubGet não a instalou.",
+    "trust": "Confiar e atualizar"
+  },
+  "abandoned": {
+    "title_one": "{{count}} aplicativo provavelmente não é mais desenvolvido",
+    "title_many": "{{count}} aplicativos provavelmente não são mais desenvolvidos",
+    "title_other": "{{count}} aplicativos provavelmente não são mais desenvolvidos",
+    "text": "Não recebem correções de erros nem de segurança. Considere uma alternativa que ainda seja desenvolvida.",
+    "archived": "o repositório no GitHub está arquivado – o desenvolvimento terminou",
+    "noCommits_one": "sem mudanças no GitHub desde {{date}} (mais de {{count}} ano)",
+    "noCommits_many": "sem mudanças no GitHub desde {{date}} (mais de {{count}} anos)",
+    "noCommits_other": "sem mudanças no GitHub desde {{date}} (mais de {{count}} anos)",
+    "noRelease_one": "a versão mais recente é de {{date}} (mais de {{count}} ano)",
+    "noRelease_many": "a versão mais recente é de {{date}} (mais de {{count}} anos)",
+    "noRelease_other": "a versão mais recente é de {{date}} (mais de {{count}} anos)",
+    "instead": "Alternativas:",
+    "note": "Este aplicativo provavelmente não é mais desenvolvido: {{reason}}."
+  },
+  "newPc": {
+    "title": "PC novo",
+    "subtitle": "Marque os aplicativos que quiser e o HubGet instala todos de uma vez – um após o outro, sem clicar em instaladores.",
+    "saveBundle": "Salvar como pacote",
+    "install_one": "Instalar selecionados ({{count}})",
+    "install_many": "Instalar selecionados ({{count}})",
+    "install_other": "Instalar selecionados ({{count}})",
+    "installed": "Instalado",
+    "details": "Detalhes de {{name}}",
+    "more": "Mais",
+    "hint": "Encontre mais aplicativos no catálogo e adicione-os a um pacote; o pacote também pode ir para outro PC."
+  },
+  "drivers": {
+    "title": "Drivers do Windows Update",
+    "open": "Instalar no Windows Update",
+    "searching": "Procurando…",
+    "check": "Verificar drivers",
+    "hint": "Drivers oferecidos pelo Windows Update que não estão instalados. O Windows Update os instala (Atualizações opcionais) – e pode revertê-los.",
+    "none": "O Windows Update não oferece drivers novos."
+  },
+  "year": {
+    "title": "Seu {{year}} com o HubGet",
+    "subtitle": "O que o HubGet fez neste PC durante o ano – só pelo histórico local, nada é enviado.",
+    "empty": "O HubGet ainda não instalou nem atualizou nada este ano.",
+    "installs": "Aplicativos instalados",
+    "updates": "Atualizações",
+    "automatic_one": "{{count}} delas automáticas",
+    "automatic_many": "{{count}} delas automáticas",
+    "automatic_other": "{{count}} delas automáticas",
+    "saved": "Tempo economizado (estimativa)",
+    "hours": "horas",
+    "minutes": "minutos",
+    "uninstalls": "Aplicativos desinstalados",
+    "repairs": "Reparos",
+    "topApps": "Mais atualizados",
+    "updateCount_one": "{{count}} atualização",
+    "updateCount_many": "{{count}} atualizações",
+    "updateCount_other": "{{count}} atualizações",
+    "months": "Por mês",
+    "busiest": "Mês mais movimentado: {{month}}",
+    "note": "Contado desde {{date}}. Estimativa: uma instalação manual leva cerca de 5 minutos, uma atualização cerca de 3.",
+    "link": "Seu ano com o HubGet"
+  },
+  "requests": {
+    "title": "Aplicativos sugeridos",
+    "subtitle": "Aplicativos que faltam no HubGet. Vote nos que você também quer – os mais pedidos entram no catálogo.",
+    "suggest": "Sugerir um aplicativo",
+    "unavailable": "Os aplicativos sugeridos não estão disponíveis agora.",
+    "empty": "Ninguém sugeriu nada ainda – seja o primeiro.",
+    "vote": "Votar em {{name}}",
+    "unvote": "Remover voto em {{name}}",
+    "added": "Adicionado",
+    "web": "Site",
+    "failed": "Não foi possível: {{error}}",
+    "thanks": "Obrigado! {{name}} está entre os aplicativos sugeridos.",
+    "suggestTitle": "Sugerir um aplicativo",
+    "suggestText": "Diga qual aplicativo falta no HubGet. Se alguém já o sugeriu, seu voto é somado.",
+    "send": "Sugerir",
+    "name": "Nome do aplicativo",
+    "url": "Site do aplicativo (opcional)",
+    "note": "Observação (opcional)",
+    "missing": "Falta um aplicativo? Sugira",
+    "notFound": "Não encontrou o que procurava?"
+  },
+  "devReplies": {
+    "saved": "Resposta salva",
+    "deleted": "Resposta excluída",
+    "failed": "Não foi possível: {{error}}",
+    "title": "Resposta do desenvolvedor ({{author}})",
+    "write": "Responder",
+    "save": "Salvar resposta",
+    "edit": "Editar resposta",
+    "approved": "Você é um desenvolvedor verificado deste aplicativo",
+    "requested": "Solicitação enviada – após aprovação, você poderá responder às avaliações.",
+    "githubOnly": "Responder às avaliações exige uma conta do GitHub – entre com o GitHub.",
+    "pending": "Sua solicitação para responder às avaliações aguarda aprovação.",
+    "youAreMaintainer": "Você é desenvolvedor deste aplicativo – abra uma avaliação para responder.",
+    "claim": "Sou desenvolvedor deste aplicativo",
+    "claimTitle": "Responder às avaliações de {{name}}",
+    "claimText": "Após aprovação, você poderá responder abaixo das avaliações. Verificamos se sua conta do GitHub pertence ao repositório do aplicativo – informe-o.",
+    "repo": "Repositório no GitHub",
+    "send": "Enviar solicitação",
+    "hasReply": "Resposta do desenvolvedor"
+  },
+  "devStats": {
+    "title": "Estatísticas do seu aplicativo",
+    "text": "Quantas vezes seu aplicativo foi instalado pelo HubGet – a partir de relatórios anônimos voluntários. Menos de 3 instalações não são mostradas.",
+    "search": "Encontrar um aplicativo no catálogo…",
+    "unavailable": "As estatísticas não estão disponíveis agora.",
+    "few": "menos de 3",
+    "days_one": "em {{count}} dia",
+    "days_many": "em {{count}} dias",
+    "days_other": "em {{count}} dias",
+    "requests": "O que falta no HubGet – Aplicativos sugeridos"
   }
 }

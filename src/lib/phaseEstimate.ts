@@ -13,10 +13,10 @@ import type { LoadedCatalog } from "@/services/catalog";
 import type { Job, OperationPhase } from "@/types";
 
 /** Fáze s odhadem (ostatní buď procenta hlásí, nebo čekají na uživatele). */
-export const ESTIMATED_PHASES: ReadonlySet<OperationPhase> = new Set(["installing", "uninstalling"]);
+export const ESTIMATED_PHASES: ReadonlySet<OperationPhase> = new Set(["installing", "uninstalling", "repairing"]);
 
 /** Fáze, jejichž skutečná délka se pamatuje (odhad instalace, podíl stahování na celku). */
-const RECORDED_PHASES: ReadonlySet<OperationPhase> = new Set(["downloading", "installing", "uninstalling"]);
+const RECORDED_PHASES: ReadonlySet<OperationPhase> = new Set(["downloading", "installing", "uninstalling", "repairing"]);
 
 const STORAGE_KEY = "unibox-phase-durations";
 /** Kolik balíčků si pamatovat (nejstarší záznamy odpadnou). */

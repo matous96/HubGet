@@ -241,3 +241,91 @@ body,
 [aria-modal]:focus-visible {
   outline: none;
 }
+
+/* ── Přístupnost (hooks/useAccessibility.ts) ───────────────────────────── */
+
+/* Omezit animace: v Nastavení HubGetu, nebo Efekty animace ve Windows vypnuté */
+html.reduce-motion *,
+html.reduce-motion *::before,
+html.reduce-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+html.reduce-motion ::view-transition-old(root),
+html.reduce-motion ::view-transition-new(root) {
+  animation: none !important;
+}
+/* Neurčitý průběh místo běhajícího pruhu jen klidný pruh (jinak by po jediném „průběhu“ zmizel) */
+html.reduce-motion .animate-indeterminate {
+  animation: none !important;
+  opacity: 0.7;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-indeterminate {
+    animation: none;
+    opacity: 0.7;
+  }
+}
+
+/* Podtržené odkazy – rozliší se i bez barvy */
+html.underline-links a[href] {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Přeskočit na obsah (Layout) – vidět jen při ovládání klávesnicí */
+.skip-link {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 100;
+  transform: translateY(-200%);
+  border-radius: 9999px;
+  background: var(--accent);
+  color: var(--accent-fg);
+  padding: 8px 16px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+.skip-link:focus {
+  transform: none;
+}
+
+/* Kontrastní motivy Windows: barvy určuje systém. Tlačítka a karty bez rámečku by splynuly
+   s pozadím a vybraný stav vyznačený jen barvou pozadí by zmizel – vrátí je systémové barvy. */
+@media (forced-colors: active) {
+  button,
+  [role="button"],
+  [role="menuitem"],
+  [role="tab"],
+  input,
+  select,
+  textarea {
+    outline: 1px solid ButtonText;
+    outline-offset: -1px;
+  }
+  :focus-visible {
+    outline: 3px solid Highlight !important;
+    outline-offset: 2px !important;
+  }
+  [aria-pressed="true"],
+  [aria-selected="true"],
+  [aria-checked="true"],
+  [aria-current="page"],
+  .bg-accent {
+    forced-color-adjust: none;
+    background-color: Highlight !important;
+    color: HighlightText !important;
+  }
+  section,
+  [role="dialog"],
+  [role="menu"],
+  [role="toolbar"] {
+    border: 1px solid CanvasText;
+  }
+  svg {
+    forced-color-adjust: auto;
+  }
+}

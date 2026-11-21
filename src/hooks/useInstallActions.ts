@@ -3,6 +3,7 @@
  * Sdílí je tlačítko Instalovat, nabídka u tlačítka i kontextová nabídka karty.
  */
 import { resolveInstallOptions } from "@/lib/installArgs";
+import { canRepair } from "@/lib/repair";
 import { getSource } from "@/services/managers";
 import { installFlags, packageIdFor, updateOptionsFor, useInstallOptions } from "@/store/installOptions";
 import { useJobs } from "@/store/jobs";
@@ -43,6 +44,13 @@ export function useInstallActions(entry: CatalogEntry, chosen?: SourceId) {
       const job = base();
       // Uložené volby (jako správce, parametry, odinstalace předchozí verze…) platí i pro aktualizaci
       if (job) enqueue({ ...job, kind: "update", options: updateOptionsFor(entry.id, job, entry) });
+    },
+    /** Aplikaci jde opravit (lib/repair.ts). */
+    canRepair: canRepair(state.installed),
+    /** Oprava nainstalované aplikace (winget repair) – na nainstalovaný balíček, ne na zdroj z katalogu. */
+    repair: () => {
+      const pkg = state.installed;
+      if (pkg && canRepair(pkg)) enqueue({ appId: entry.id, appName: entry.name, source: pkg.source, packageId: pkg.packageId, kind: "repair" });
     },
     /** Stažení instalátoru bez instalace. */
     download: () => {

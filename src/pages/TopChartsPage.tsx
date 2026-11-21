@@ -1,10 +1,12 @@
-import { ArrowDownUp, Check, ChevronDown, Info, Star, TrendingUp } from "lucide-react";
+import { ArrowDownUp, Check, ChevronDown, Download, Info, Star, TrendingUp } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ArchFilter } from "@/components/package/ArchFilter";
 import { PackageRow } from "@/components/package/PackageRow";
 import { ratingsEnabled, useRatingFormat, useRatingSummaries } from "@/components/package/RatingsSection";
 import { matchesSource, SourceFilter, type SourceFilterValue } from "@/components/package/SourceFilter";
+import { Button } from "@/components/ui/Button";
+import { Segmented } from "@/components/ui/CollectionToolbar";
 import { CardSkeletons, EmptyState, PageHeader } from "@/components/ui/States";
 import { getSource, isSourceId } from "@/services/managers";
 import { CATEGORIES, inCategory } from "@/data/categories";
@@ -14,14 +16,19 @@ import { useUrlState } from "@/hooks/useUrlState";
 import { useArchFilter, useCatalog, useModeFilter } from "@/hooks/usePackages";
 import { trendingScore } from "@/lib/trending";
 import { cn, topN } from "@/lib/utils";
+import { useAutoUpdates } from "@/store/autoUpdates";
+import { INSTALL_PERIODS, installStatsAvailable, useInstallRanking, usePopularityBoost, type InstallPeriod } from "@/store/installStats";
 import { useSettings } from "@/store/settings";
 import { useSourceScope } from "@/store/sourceLock";
 import type { CategoryId } from "@/types";
 
 const LIMIT = 50;
 
-/** Řazení žebříčku: skóre popularity z katalogu, hodnocení uživatelů, Skokani týdne. */
-type TopSort = "popularity" | "rating" | "movers";
+/**
+ * Řazení žebříčku: skóre popularity z katalogu, hodnocení uživatelů, Skokani týdne,
+ * skutečné instalace v HubGetu za 30 / 90 / 365 dní (store/installStats.ts).
+ */
+type TopSort = "popularity" | "rating" | "movers" | "installs";
 
 /** Skokani týdne: nejméně stažení za týden – menší přírůstek je šum, i když je procentuálně velký. */
 const MIN_WEEKLY_DOWNLOADS = 100;
@@ -45,7 +52,13 @@ export function TopChartsPage() {
   // Kategorie, správce a řazení v adrese – po otevření detailu a návratu zpět zůstanou
   const [category, setCategory] = useUrlState<CategoryId | "all">("category", "all", (v) => CATEGORIES.some((c) => c.id === v));
   const [pickedFilter, setSourceFilter] = useUrlState<SourceFilterValue>("source", "all", isSourceId);
-  const [sort, setSort] = useUrlState<TopSort>("sort", "popularity", (v) => v === "rating" || v === "movers");
+  const [sort, setSort] = useUrlState<TopSort>("sort", "popularity", (v) => v === "rating" || v === "movers" || v === "installs");
+  const [periodText, setPeriod] = useUrlState<`${InstallPeriod}`>("period", "30", (v) => INSTALL_PERIODS.some((p) => String(p) === v));
+  const period = Number(periodText) as InstallPeriod;
+  const installs = useInstallRanking(period, sort === "installs");
+  const contributing = useAutoUpdates((s) => s.communityInstalls);
+  // Popularita i podle skutečných instalací v HubGetu (store/installStats.ts)
+  const boost = usePopularityBoost();
   // Zamčený zdroj (levý panel) má přednost – filtr stránky se pak neukazuje
   const { lock } = useSourceScope();
   const sourceFilter = lock ? "all" : pickedFilter;
@@ -82,6 +95,14 @@ export function TopChartsPage() {
         .sort((a, b) => score(b.id) - score(a.id) || summaries.get(b.id)!.count - summaries.get(a.id)!.count || b.popularity - a.popularity)
         .slice(0, LIMIT);
     }
+    if (sort === "installs") {
+      const counts = installs.data;
+      if (!counts) return [];
+      return filtered
+        .filter((p) => counts.has(p.id))
+        .sort((a, b) => counts.get(b.id)! - counts.get(a.id)! || b.popularity - a.popularity)
+        .slice(0, LIMIT);
+    }
     if (sort === "movers") {
       if (!hasMovers) {
         const now = Date.now();
@@ -92,11 +113,11 @@ export function TopChartsPage() {
         .sort((a, b) => (b.weeklyGrowth ?? 0) - (a.weeklyGrowth ?? 0) || (b.weeklyDownloads ?? 0) - (a.weeklyDownloads ?? 0))
         .slice(0, LIMIT);
     }
-    return [...filtered].sort((a, b) => b.popularity - a.popularity).slice(0, LIMIT);
-  }, [filtered, sort, summaries, hasMovers]);
+    return [...filtered].sort((a, b) => b.popularity + boost(b.id) - (a.popularity + boost(a.id))).slice(0, LIMIT);
+  }, [filtered, sort, summaries, hasMovers, installs.data, boost]);
 
-  const sorts: TopSort[] = ratingsEnabled ? ["popularity", "rating", "movers"] : ["popularity", "movers"];
-  const subtitle = sort === "movers" && !hasMovers ? t("top.subtitles.trending") : t(`top.subtitles.${sort}`);
+  const sorts: TopSort[] = ["popularity", ...(ratingsEnabled ? ["rating" as const] : []), "movers", ...(installStatsAvailable() ? ["installs" as const] : [])];
+  const subtitle = sort === "movers" && !hasMovers ? t("top.subtitles.trending") : t(`top.subtitles.${sort}`, { count: period });
 
   return (
     <>
@@ -105,6 +126,13 @@ export function TopChartsPage() {
         subtitle={subtitle}
         actions={
           <div className="flex flex-wrap items-center justify-end gap-2">
+            {sort === "installs" && (
+              <Segmented
+                value={periodText}
+                onChange={setPeriod}
+                options={INSTALL_PERIODS.map((p) => ({ value: `${p}` as const, label: t("top.period", { count: p }) }))}
+              />
+            )}
             <SortMenu value={sort} options={sorts} onChange={setSort} />
             {!lock && <SourceFilter value={sourceFilter} onChange={setSourceFilter} />}
             <ArchFilter />
@@ -140,16 +168,27 @@ export function TopChartsPage() {
         </p>
       )}
 
-      {isLoading ? (
+      {isLoading || (sort === "installs" && installs.isLoading) ? (
         <CardSkeletons count={6} />
       ) : ranked.length === 0 ? (
         <EmptyState
           message={
             sort === "rating"
               ? t("top.noRatings")
-              : sourceFilter === "all"
-                ? t("categories.empty")
-                : t("filters.emptyForSource", { source: getSource(sourceFilter).label })
+              : sort === "installs"
+                ? installs.isError
+                  ? t("top.installsUnavailable")
+                  : t("top.noInstalls")
+                : sourceFilter === "all"
+                  ? t("categories.empty")
+                  : t("filters.emptyForSource", { source: getSource(sourceFilter).label })
+          }
+          action={
+            sort === "installs" && !installs.isError && !contributing ? (
+              <Button variant="secondary" onClick={() => useAutoUpdates.getState().set({ communityInstalls: true })}>
+                {t("installStats.contribute")}
+              </Button>
+            ) : undefined
           }
         />
       ) : (
@@ -158,6 +197,7 @@ export function TopChartsPage() {
         <ol className="columns-[28rem] gap-x-8">
           {ranked.map((p, i) => {
             const rating = sort === "rating" ? summaries.get(p.id) : undefined;
+            const installCount = sort === "installs" ? installs.data?.get(p.id) : undefined;
             const growth = sort === "movers" && hasMovers ? p.weeklyGrowth : undefined;
             return (
               <li key={p.id} className="flex break-inside-avoid items-center gap-1 border-b border-line">
@@ -176,6 +216,15 @@ export function TopChartsPage() {
                     <Star className="size-3.5 fill-amber-400 text-amber-400" />
                     {ratingFormat.average(rating.average)}
                     <span className="text-xs font-normal text-muted">({ratingFormat.count(rating.count)})</span>
+                  </span>
+                )}
+                {installCount !== undefined && (
+                  <span
+                    title={t("top.installCount", { count: installCount, formatted: installCount.toLocaleString(language) })}
+                    className="flex shrink-0 items-center gap-1 pr-2 text-sm font-semibold tabular-nums"
+                  >
+                    <Download className="size-3.5 text-accent" aria-hidden />
+                    {installCount.toLocaleString(language)}
                   </span>
                 )}
                 {growth !== undefined && (

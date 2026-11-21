@@ -80,6 +80,13 @@ export interface AutoUpdatesSettings {
   communityReliability: boolean;
   /** Po kolika „úspěšných“ aktualizacích bez změny verze ji přestat nabízet (0 = nikdy). */
   stuckLimit: number;
+  /**
+   * Aplikacím, které se aktualizují samy (data/selfUpdating.ts), dát čas: jejich aktualizaci
+   * nabídnout až po lhůtě, pokud se mezitím neaktualizují samy (store/updateRules.ts).
+   */
+  selfUpdatingWait: boolean;
+  /** Anonymně přispívat do žebříčku instalací v HubGetu (store/installStats.ts). */
+  communityInstalls: boolean;
   /** Varovat, když se mezi nainstalovanou a novou verzí změní server instalátoru (winget); automaticky takovou aktualizaci neinstalovat. */
   warnHostChange: boolean;
   /** Na stránce aktualizací předem zaškrtnout všechny aktualizace. */
@@ -134,6 +141,8 @@ export const useAutoUpdates = create<AutoUpdatesState>()(
       osvCheck: false,
       communityReliability: false,
       stuckLimit: 3,
+      selfUpdatingWait: true,
+      communityInstalls: false,
       warnHostChange: true,
       preselectUpdates: false,
       checking: false,

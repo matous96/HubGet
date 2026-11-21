@@ -1,4 +1,4 @@
-import { CircleCheck, CircleSlash, CircleX, History, RotateCcw, SquareTerminal, Trash2 } from "lucide-react";
+import { CalendarHeart, CircleCheck, CircleSlash, CircleX, History, RotateCcw, SquareTerminal, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
@@ -66,6 +66,7 @@ export function HistorySection() {
     { id: "update", label: t("history.kind.update") },
     { id: "uninstall", label: t("history.kind.uninstall") },
     { id: "download", label: t("history.kind.download") },
+    { id: "repair", label: t("history.kind.repair") },
     { id: "failed", label: t("history.filterFailed") },
   ];
 
@@ -74,6 +75,14 @@ export function HistorySection() {
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-muted">{t("history.subtitle")}</p>
         <div className="flex gap-2">
+          {/* Souhrn roku z místních statistik (store/yearStats.ts) */}
+          <Link
+            to="/year"
+            className="inline-flex h-10 items-center gap-2 rounded-full border border-line bg-surface px-4 text-sm font-semibold transition-colors hover:bg-surface-2"
+          >
+            <CalendarHeart className="size-4" />
+            {t("year.link")}
+          </Link>
           <Link
             to="/logs"
             className="inline-flex h-10 items-center gap-2 rounded-full border border-line bg-surface px-4 text-sm font-semibold transition-colors hover:bg-surface-2"

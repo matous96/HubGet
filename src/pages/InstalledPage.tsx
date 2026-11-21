@@ -1,4 +1,4 @@
-import { Clock, RefreshCw, Search, ShieldAlert } from "lucide-react";
+import { Clock, RefreshCw, RefreshCwOff, Search, ShieldAlert } from "lucide-react";
 import { useEffect, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { PackageCollection } from "@/components/package/PackageCollection";
@@ -17,8 +17,12 @@ import { ORIGINS } from "@/services/managers";
 import { AdminPendingPanel } from "@/components/package/AdminPendingPanel";
 import { ListFailurePanel } from "@/components/package/ListFailurePanel";
 import { DuplicatesPanel, EndOfLifePanel } from "@/components/package/InstalledNotices";
+import { AdoptPanel } from "@/components/package/AdoptPanel";
+import { AbandonedPanel } from "@/components/package/AbandonedNotice";
+import { SELF_UPDATE_GRACE_DAYS } from "@/data/selfUpdating";
 import type { NoteTone } from "@/components/package/PackageCard";
 import { VulnerablePanel } from "@/components/package/VulnerabilityWatcher";
+import { RecentlyUpdated } from "@/components/package/RecentlyUpdated";
 import { OriginFilter, type OriginFilterValue } from "@/components/package/SourceFilter";
 import { useAutoUpdates } from "@/store/autoUpdates";
 import { problemShare, reliabilityWarning, useReliability } from "@/store/reliability";
@@ -32,6 +36,8 @@ type Filter = "all" | "updates" | "unused";
 export function InstalledPage() {
   const { t } = useTranslation();
   const { items, isLoading, isError, refetch, isFetching } = useInstalledItems();
+  // Aplikace, které se aktualizují samy a čekají na lhůtu (pin „self“ s datem)
+  const selfWaiting = useMemo(() => items.filter((i) => i.pkg.pin === "self" && i.pkg.pinUntil), [items]);
   const { updatable, pending: pendingUpdates, updateAll, updateItems } = useUpdates();
   // Aktualizace, které opravují bezpečnostní chybu – první v seznamu, se štítkem a vlastním tlačítkem
   const securityIds = useSecurityUpdateIds(updatable);
@@ -180,6 +186,7 @@ export function InstalledPage() {
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder={t("installed.filterPlaceholder")}
+            aria-label={t("installed.filterPlaceholder")}
             className="h-9 w-52 rounded-full border border-line bg-surface pr-3 pl-8 text-sm outline-none placeholder:text-muted focus:border-accent/50"
           />
         </div>
@@ -203,11 +210,26 @@ export function InstalledPage() {
           <EndOfLifePanel items={items} />
           <DuplicatesPanel items={items} />
           <VulnerablePanel items={items} />
+          {/* Programy z webu výrobce, které jsou i ve WinGetu – převzít do správy */}
+          <AdoptPanel items={items} />
+          {/* Aplikace, které se nejspíš už nevyvíjejí (archivovaný repozitář, dlouho bez změn) */}
+          <AbandonedPanel items={items} />
         </>
       )}
 
       {/* Aktualizace odložené kvůli právům správce – jedním potvrzením UAC */}
       {filter === "updates" && <AdminPendingPanel />}
+
+      {/* Aplikace s vlastním aktualizátorem (Chrome, Steam…) – do počtu aktualizací se nepočítají,
+          dokud nevyprší lhůta (store/updateRules.ts); v detailu aplikace jde nabídnout hned */}
+      {filter === "updates" && selfWaiting.length > 0 && !text && (
+        <p className="mb-5 flex items-start gap-2 text-sm text-muted">
+          <RefreshCwOff className="mt-0.5 size-4 shrink-0" />
+          <span>
+            {t("selfUpdating.waiting", { count: selfWaiting.length, days: SELF_UPDATE_GRACE_DAYS, names: selfWaiting.slice(0, 5).map((i) => i.entry.name).join(", ") + (selfWaiting.length > 5 ? "…" : "") })}
+          </span>
+        </p>
+      )}
 
       {/* Bezpečnostní aktualizace – opravují známé chyby, vyplatí se nainstalovat hned */}
       {filter === "updates" && securityItems.length > 0 && (
@@ -254,6 +276,9 @@ export function InstalledPage() {
           noteTones={filter === "updates" ? noteTones : undefined}
         />
       )}
+
+      {/* Nedávno aktualizováno (jako v App Storu) – i když je všechno aktuální */}
+      {filter === "updates" && !isLoading && !text && <RecentlyUpdated />}
     </>
   );
 }

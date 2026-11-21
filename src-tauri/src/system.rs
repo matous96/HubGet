@@ -21,6 +21,30 @@ pub struct SystemInfo {
     pub computer_name: Option<String>,
 }
 
+/// Velikost textu z Nastavení Windows (Přístupnost → Velikost textu) v procentech, 100–225.
+/// WebView2 ji sám neuplatní (řídí se jen měřítkem obrazovky) – frontend podle ní zvětší
+/// písmo okna, pokud uživatel v HubGetu nezvolil vlastní velikost (hooks/useAccessibility.ts).
+#[tauri::command]
+pub async fn text_scale_factor() -> Result<u32, String> {
+    crate::process::background(|| Ok(read_text_scale())).await
+}
+
+#[cfg(windows)]
+fn read_text_scale() -> u32 {
+    use winreg::enums::HKEY_CURRENT_USER;
+    use winreg::RegKey;
+    let value: Option<u32> = RegKey::predef(HKEY_CURRENT_USER)
+        .open_subkey(r"Software\Microsoft\Accessibility")
+        .and_then(|key| key.get_value("TextScaleFactor"))
+        .ok();
+    value.filter(|v| (100..=225).contains(v)).unwrap_or(100)
+}
+
+#[cfg(not(windows))]
+fn read_text_scale() -> u32 {
+    100
+}
+
 /// Registr se čte mimo vlákno okna (synchronní příkaz by běžel na hlavním vlákně).
 #[tauri::command]
 pub async fn system_info(app: tauri::AppHandle) -> Result<SystemInfo, String> {

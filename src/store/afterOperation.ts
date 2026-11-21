@@ -17,13 +17,16 @@ import type { CatalogEntry, InstalledPackage, Job } from "@/types";
 import type { LoadedCatalog } from "@/services/catalog";
 import { notifyEvent } from "@/services/notify";
 import { writeLog } from "./logs";
+import { adoptedIdOf } from "./adopted";
 import { useUpdateHolds, versionKey, type Revert } from "./updateHolds";
 
 /** Kdy znovu ověřit stav u správce (ms od konce operace). */
 const CHECKS = [0, 2500, 6000, 12000];
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-const samePackage = (p: InstalledPackage, job: Job) => p.source === job.source && p.packageId === job.packageId;
+// U převzatého programu (store/adopted.ts) i původní záznam ve Windows
+const samePackage = (p: InstalledPackage, job: Job) =>
+  p.source === job.source && (p.packageId === job.packageId || (p.origin === "local" && p.packageId === adoptedIdOf(job)));
 
 /** Nejnovější verze aplikace z katalogu (pro okamžité zobrazení „Máte …“ po instalaci). */
 function catalogVersion(job: Job): string {

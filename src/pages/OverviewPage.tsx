@@ -34,6 +34,9 @@ import { UNUSED_DAYS, useUnusedApps } from "@/hooks/useAppUsage";
 import { useEndOfLife } from "@/hooks/useEndOfLife";
 import { isUnmanagedOrigin, useInstalledItems, useUpdates } from "@/hooks/useInstalledItems";
 import { useCatalog, useCatalogIndex } from "@/hooks/usePackages";
+import { isGameStore } from "@/services/managers";
+import { PreinstalledPanel } from "@/components/home/PreinstalledPanel";
+import { DriversPanel } from "@/components/home/DriversPanel";
 import { isClosed, openSourceAlternatives } from "@/lib/alternatives";
 import { isTauri } from "@/lib/tauri";
 import { cn, formatRelative, formatSizeText } from "@/lib/utils";
@@ -185,6 +188,8 @@ export function OverviewPage() {
               <OpenSourcePanel items={items} />
             </div>
             <div>
+              <PreinstalledPanel />
+              <DriversPanel />
               <CachesPanel busy={busy} />
               <BackupsPanel />
               <SignaturesPanel items={items} />
@@ -385,7 +390,7 @@ function SignaturesPanel({ items }: { items: ReturnType<typeof useInstalledItems
       // Bez balíčků ze Storu (podepisuje je Microsoft) a her ze Steamu a EA (soubory ověřuje
       // jejich spouštěč; samotné hry podepsané často nejsou a seznam by jen zahltily)
       const apps = items.filter(
-        (i) => !i.pkg.diskLocation && !i.pkg.packageId.startsWith("MSIX\\") && i.pkg.origin !== "steam" && i.pkg.origin !== "ea",
+        (i) => !i.pkg.diskLocation && !i.pkg.packageId.startsWith("MSIX\\") && !isGameStore(i.pkg.origin),
       );
       const signatures = await invoke<{ status: SignatureStatus; file: string | null }[]>("check_signatures", {
         apps: apps.map((i) => ({ packageId: i.pkg.packageId, name: i.pkg.name })),

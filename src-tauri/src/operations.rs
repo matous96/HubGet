@@ -26,6 +26,8 @@ pub enum Kind {
     Update,
     Uninstall,
     Download,
+    /// Oprava poškozené instalace (winget repair).
+    Repair,
 }
 
 /// Volby instalace z frontendu (InstallOptions); neznámé položky se ignorují.
@@ -47,6 +49,9 @@ pub struct InstallOptions {
     pub post_command: Option<String>,
     /// Při aktualizaci odinstalovat předchozí verzi (winget --uninstall-previous).
     pub uninstall_previous: bool,
+    /// Kdo podepsal minulý instalátor aplikace (store/signers.ts; „“ = bez podpisu) – jiný
+    /// vydavatel nebo chybějící podpis instalaci zastaví (signatures.rs → signer_verdict).
+    pub expected_signer: Option<String>,
 }
 
 impl InstallOptions {
@@ -88,6 +93,7 @@ pub enum Phase {
     Interactive,
     Installing,
     Uninstalling,
+    Repairing,
 }
 
 /// Zpráva pro frontend během operace.
@@ -147,14 +153,17 @@ pub struct OperationResult {
     restart_required: bool,
     /// Poslední řádek výstupu – vodítko u neznámé chyby.
     detail: Option<String>,
+    /// Kdo podepsal stažený instalátor („“ = bez podpisu; None = nezjišťovalo se).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    signer: Option<String>,
 }
 
 impl OperationResult {
     /// Operace bez procesu správce (odinstalace rozbaleného programu): hotovo, nebo chyba s popisem.
     pub fn done(result: Result<(), String>) -> Self {
         match result {
-            Ok(()) => OperationResult { outcome: Outcome::Success, code: 0, error_key: None, restart_required: false, detail: None },
-            Err(detail) => OperationResult { outcome: Outcome::Error, code: 1, error_key: None, restart_required: false, detail: Some(detail) },
+            Ok(()) => OperationResult { outcome: Outcome::Success, code: 0, error_key: None, restart_required: false, detail: None, signer: None },
+            Err(detail) => OperationResult { outcome: Outcome::Error, code: 1, error_key: None, restart_required: false, detail: Some(detail), signer: None },
         }
     }
 
@@ -203,6 +212,9 @@ pub struct Spec {
     /// Vlastní příkazy před operací a po jejím úspěchu (z voleb instalace).
     pub pre_command: Option<String>,
     pub post_command: Option<String>,
+    /// Kontrola podpisu instalátoru staženého předem (`prefetch`): None = nekontrolovat,
+    /// Some(None) = jen zjistit vydavatele, Some(Some(jméno)) = musí ho podepsat on.
+    pub signer_check: Option<Option<String>>,
 }
 
 /// Příkazy před / po instalaci z voleb – jen u instalace a aktualizace.
@@ -298,16 +310,39 @@ pub async fn execute(id: String, spec: Spec, channel: Channel<OpEvent>) -> Resul
                     error_key: Some("preCommandFailed"),
                     restart_required: false,
                     detail: tracker.take_last_line(),
+                    signer: None,
                 });
             }
         }
 
         // 1) Instalátor stáhne HubGet sám (přesný průběh); když to nejde, stáhne ho správce
+        let mut signer: Option<String> = None;
         if let Some(resolve) = prefetch {
             tracker.prefetching();
             if let Some(job) = resolve() {
                 match prefetch_installer(&job, &token, &tracker) {
-                    Fetch::Done => tracker.prefetched(),
+                    Fetch::Done => {
+                        tracker.prefetched();
+                        // 1b) Podpis instalátoru před spuštěním: kdo ho podepsal – a jestli stejný
+                        //     vydavatel jako minule (jinak se instalátor nespustí)
+                        if let Some(expected) = spec.signer_check.clone() {
+                            if let Some(signature) = crate::signatures::installer_signature(&job.target) {
+                                let shown = if signature.signer.is_empty() { None } else { Some(signature.signer.clone()) };
+                                tracker.notice(if shown.is_some() { "signedBy" } else { "unsigned" }, shown);
+                                if let Some((key, detail)) = crate::signatures::signer_verdict(&signature, expected.as_deref()) {
+                                    return Ok(OperationResult {
+                                        outcome: Outcome::Error,
+                                        code: 0,
+                                        error_key: Some(key),
+                                        restart_required: false,
+                                        detail: Some(detail),
+                                        signer: Some(signature.signer),
+                                    });
+                                }
+                                signer = Some(signature.signer);
+                            }
+                        }
+                    }
                     Fetch::Cancelled => return cancelled(&spec),
                     Fetch::Failed(reason) => tracker.notice("prefetchFailed", Some(reason)),
                 }
@@ -339,7 +374,8 @@ pub async fn execute(id: String, spec: Spec, channel: Channel<OpEvent>) -> Resul
         }
 
         let detail = tracker.take_last_line();
-        let result = finish(&spec, exit, detail, tracker.crash());
+        // Vydavatel instalátoru jde do výsledku – frontend si ho zapamatuje pro příští aktualizaci
+        let result = OperationResult { signer, ..finish(&spec, exit, detail, tracker.crash()) };
 
         // 4) Vlastní příkaz po úspěšné instalaci – jeho selhání operaci nezmění, jen se zapíše
         if let (Some(command), Outcome::Success) = (spec.post_command.clone(), result.outcome) {
@@ -361,7 +397,7 @@ pub async fn execute(id: String, spec: Spec, channel: Channel<OpEvent>) -> Resul
 /// Operace na pozadí potřebuje práva správce – bez dialogu UAC ji nechat na uživateli.
 fn needs_admin(tracker: &Tracker, code: i32) -> OperationResult {
     tracker.notice("needsAdmin", None);
-    OperationResult { outcome: Outcome::Error, code, error_key: Some("needsAdmin"), restart_required: false, detail: None }
+    OperationResult { outcome: Outcome::Error, code, error_key: Some("needsAdmin"), restart_required: false, detail: None, signer: None }
 }
 
 /// Spustí příkaz správce – normálně, nebo s právy správce (UAC).
@@ -430,6 +466,7 @@ fn finish(spec: &Spec, exit: Exit, detail: Option<String>, crash: Option<u32>) -
             None if error => detail,
             None => None,
         },
+        signer: None,
     }
 }
 

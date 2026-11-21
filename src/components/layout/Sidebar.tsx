@@ -5,10 +5,12 @@ import {
   History,
   Home,
   LayoutGrid,
+  MonitorDown,
   PackagePlus,
   Power,
   RefreshCw,
   Settings,
+  Sparkles,
   TrendingUp,
   type LucideIcon,
 } from "lucide-react";
@@ -74,6 +76,7 @@ export function Sidebar() {
           <NavItem to="/" icon={Home} label={t("nav.home")} exact />
           <NavItem to="/categories" icon={LayoutGrid} label={t("nav.categories")} exact />
           <NavItem to="/top" icon={TrendingUp} label={t("nav.top")} />
+          <NavItem to="/new" icon={Sparkles} label={t("nav.new")} />
           <NavItem
             to="/recent"
             icon={History}
@@ -112,6 +115,8 @@ export function Sidebar() {
             label={t("nav.bundles")}
             badge={bundleCount > 0 && <Count>{bundleCount}</Count>}
           />
+          {/* Výběr oblíbených aplikací po kategoriích a instalace najednou (jako Ninite) */}
+          <NavItem to="/new-pc" icon={MonitorDown} label={t("nav.newPc")} />
           {/* Programy spouštěné po přihlášení (jen desktop) */}
           {isTauri() && <NavItem to="/startup" icon={Power} label={t("nav.startup")} />}
           {/* Přehled počítače: statistiky, úklid mezipamětí, podpisy (jen desktop) */}

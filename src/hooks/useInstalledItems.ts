@@ -7,6 +7,7 @@ import { useMemo } from "react";
 import i18n from "@/i18n";
 import { diskSpace, requiredSpace, RESERVE_BYTES, shortageOf } from "@/lib/diskSpace";
 import { isTauri } from "@/lib/tauri";
+import { isGameStore } from "@/services/managers";
 import { formatSizeText } from "@/lib/utils";
 import { useAutoUpdates } from "@/store/autoUpdates";
 import { useHistory } from "@/store/history";
@@ -46,8 +47,8 @@ export function useInstallOrder(): (items: InstalledItem[]) => InstalledItem[] {
   }, [history, seen]);
 }
 
-/** Původ, u kterého aplikaci HubGet nespravuje (hry ze Steamu, programy mimo správce). */
-export const isUnmanagedOrigin = (origin: InstallOrigin) => origin === "steam" || origin === "ea" || origin === "local";
+/** Původ, u kterého aplikaci HubGet nespravuje (hry z herních obchodů, programy mimo správce). */
+export const isUnmanagedOrigin = (origin: InstallOrigin) => isGameStore(origin) || origin === "local";
 
 /** Balíček MSIX ve výpisu wingetu („MSIX\Výrobce.Aplikace_verze_…“). */
 const isMsix = (p: InstalledPackage) => p.packageId.startsWith("MSIX\\");
