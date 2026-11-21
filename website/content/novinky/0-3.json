@@ -1,10 +1,10 @@
 {
   "version": "0.3",
   "date": "2026-11-21",
-  "releases": 3,
+  "releases": 4,
   "cs": {
     "title": "Přehled počítače, hry ze všech obchodů a bezpečnostní aktualizace napřed",
-    "lead": "Verze 0.3.0 až 0.3.2 (19.–21. 11. 2026).",
+    "lead": "Verze 0.3.0 až 0.3.3 (19.–21. 11. 2026).",
     "highlights": [
       {
         "title": "Přehled počítače",
@@ -63,6 +63,8 @@
       "U instalátoru v technických údajích je odkaz na kontrolu ve VirusTotalu."
     ],
     "fixed": [
+      "Aktualizace aplikací MSIX s vlastní službou Windows (nový ChatGPT s Codexem) končila chybou 0x80073D28 – teď se zopakuje s právy správce (0.3.3).",
+      "Když soubory aplikace držel jiný program (virtuální kameru OBS třeba prohlížeč nebo videohovor), HubGet hlásil, že běží aplikace sama. Teď napíše, který program to je, a nabídne ho zavřít (0.3.3).",
       "V Nainstalovaných se aplikace ze Storu ukazovaly dvakrát.",
       "Některé ikony ve formátu ICO se nezobrazovaly.",
       "Tlačítko Zpět po hledání nevedlo na předchozí stránku."
@@ -70,7 +72,7 @@
   },
   "en": {
     "title": "PC overview, games from every store and security updates first",
-    "lead": "Versions 0.3.0 to 0.3.2 (Nov 19–21, 2026).",
+    "lead": "Versions 0.3.0 to 0.3.3 (Nov 19–21, 2026).",
     "highlights": [
       {
         "title": "PC overview",
@@ -129,6 +131,8 @@
       "The installer’s technical details include a link to check it on VirusTotal."
     ],
     "fixed": [
+      "Updates of MSIX apps with their own Windows service (the new ChatGPT with Codex) failed with error 0x80073D28 – they’re now retried with administrator rights (0.3.3).",
+      "When another program held the app’s files (for example a browser or video call using the OBS virtual camera), HubGet said the app itself was running. Now it names the program and offers to close it (0.3.3).",
       "Microsoft Store apps appeared twice in Installed.",
       "Some ICO icons didn’t show.",
       "The Back button after a search didn’t return to the previous page."

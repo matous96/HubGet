@@ -78,7 +78,7 @@
         <div class="page-head__inner reveal">
           <p class="eyebrow" data-t="t1">What’s new</p>
           <h1 data-t="t2">What’s new in&nbsp;HubGet</h1>
-          <p class="lead" data-t="t3">What each series of HubGet versions brought, newest first. <!--obsah:updates-words-capital-->Twenty-eight<!--/obsah:updates-words-capital--> updates have shipped since the first version 0.1.0 came out on October&nbsp;21.</p>
+          <p class="lead" data-t="t3">What each series of HubGet versions brought, newest first. <!--obsah:updates-words-capital-->Twenty-nine<!--/obsah:updates-words-capital--> updates have shipped since the first version 0.1.0 came out on October&nbsp;21.</p>
           <nav class="versions-nav" aria-label="Jump to version">
             <!--obsah:versions-->
             <a class="chip" href="#v0-3">0.3</a>
@@ -88,8 +88,8 @@
           </nav>
         </div>
         <dl class="stats reveal">
-          <div><dt data-t="t4">Current version</dt><dd><!--obsah:version-->0.3.2<!--/obsah:version--></dd></div>
-          <div><dt data-t="t5">Updates since 0.1.0</dt><dd><!--obsah:updates-->28<!--/obsah:updates--></dd></div>
+          <div><dt data-t="t4">Current version</dt><dd><!--obsah:version-->0.3.3<!--/obsah:version--></dd></div>
+          <div><dt data-t="t5">Updates since 0.1.0</dt><dd><!--obsah:updates-->29<!--/obsah:updates--></dd></div>
           <div><dt data-t="t6">Apps in the catalog</dt><dd data-t="t7">25,100+</dd></div>
           <div><dt data-t="t8">Package managers for real</dt><dd data-t="t9">WinGet · Chocolatey · Scoop + 8 for developers</dd></div>
         </dl>
@@ -192,7 +192,7 @@
                 <h2>PC overview, games from every store and security updates first</h2>
                 <span class="badge badge--live">Latest</span>
               </div>
-              <p class="release__lead">Versions 0.3.0 to 0.3.2 (Nov 19–21, 2026).</p>
+              <p class="release__lead">Versions 0.3.0 to 0.3.3 (Nov 19–21, 2026).</p>
               <div class="changes changes--new">
                 <h3>New</h3>
                 <ul>
@@ -245,6 +245,8 @@
               <div class="changes changes--fix">
                 <h3>Fixed</h3>
                 <ul>
+                  <li>Updates of MSIX apps with their own Windows service (the new ChatGPT with Codex) failed with error 0x80073D28 – they’re now retried with administrator rights (0.3.3).</li>
+                  <li>When another program held the app’s files (for example a browser or video call using the OBS virtual camera), HubGet said the app itself was running. Now it names the program and offers to close it (0.3.3).</li>
                   <li>Microsoft Store apps appeared twice in Installed.</li>
                   <li>Some ICO icons didn’t show.</li>
                   <li>The Back button after a search didn’t return to the previous page.</li>
