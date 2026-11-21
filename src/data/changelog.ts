@@ -28,6 +28,36 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
   {
+    version: "0.3.3",
+    date: "2026-11-21",
+    highlights: [
+      {
+        cs: "Aktualizace aplikací MSIX s vlastní službou Windows (nový ChatGPT s Codexem) se zopakuje s právy správce – dřív skončila chybou 0x80073D28.",
+        en: "Updates of MSIX apps with their own Windows service (the new ChatGPT with Codex) are retried with administrator rights – before, they failed with error 0x80073D28.",
+      },
+      {
+        cs: "Když soubory aplikace drží jiný program (třeba virtuální kameru OBS prohlížeč nebo videohovor), HubGet napíše který a nabídne ho zavřít – dřív hlásil, že běží aplikace sama.",
+        en: "When another program holds the app’s files (for example a browser or video call using the OBS virtual camera), HubGet names it and offers to close it – before, it said the app itself was running.",
+      },
+    ],
+    featured: [
+      {
+        title: { cs: "Aktualizace, které potřebují správce", en: "Updates that need an administrator" },
+        text: {
+          cs: "Aplikace MSIX s vlastní službou (nový ChatGPT) se aktualizují s právy správce.",
+          en: "MSIX apps with their own service (the new ChatGPT) update with administrator rights.",
+        },
+      },
+      {
+        title: { cs: "Kdo blokuje aktualizaci", en: "What blocks an update" },
+        text: {
+          cs: "Když aktualizaci brání jiný program, HubGet napíše který a nabídne ho zavřít.",
+          en: "When another program blocks an update, HubGet names it and offers to close it.",
+        },
+      },
+    ],
+  },
+  {
     version: "0.3.2",
     date: "2026-11-21",
     highlights: [
