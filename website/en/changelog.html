@@ -78,7 +78,7 @@
         <div class="page-head__inner reveal">
           <p class="eyebrow" data-t="t1">What’s new</p>
           <h1 data-t="t2">What’s new in&nbsp;HubGet</h1>
-          <p class="lead" data-t="t3">What each series of HubGet versions brought, newest first. <!--obsah:updates-words-capital-->Twenty-seven<!--/obsah:updates-words-capital--> updates have shipped since the first version 0.1.0 came out on October&nbsp;21.</p>
+          <p class="lead" data-t="t3">What each series of HubGet versions brought, newest first. <!--obsah:updates-words-capital-->Twenty-eight<!--/obsah:updates-words-capital--> updates have shipped since the first version 0.1.0 came out on October&nbsp;21.</p>
           <nav class="versions-nav" aria-label="Jump to version">
             <!--obsah:versions-->
             <a class="chip" href="#v0-3">0.3</a>
@@ -88,8 +88,8 @@
           </nav>
         </div>
         <dl class="stats reveal">
-          <div><dt data-t="t4">Current version</dt><dd><!--obsah:version-->0.3.1<!--/obsah:version--></dd></div>
-          <div><dt data-t="t5">Updates since 0.1.0</dt><dd><!--obsah:updates-->27<!--/obsah:updates--></dd></div>
+          <div><dt data-t="t4">Current version</dt><dd><!--obsah:version-->0.3.2<!--/obsah:version--></dd></div>
+          <div><dt data-t="t5">Updates since 0.1.0</dt><dd><!--obsah:updates-->28<!--/obsah:updates--></dd></div>
           <div><dt data-t="t6">Apps in the catalog</dt><dd data-t="t7">25,100+</dd></div>
           <div><dt data-t="t8">Package managers for real</dt><dd data-t="t9">WinGet · Chocolatey · Scoop + 8 for developers</dd></div>
         </dl>
@@ -157,13 +157,13 @@
           </article>
           <article class="card highlight reveal">
             <span class="highlight__ver">Version 0.3</span>
-            <h3>Security updates first</h3>
-            <p>Updates that fix a security issue show first and don’t wait.</p>
+            <h3>Games from every store</h3>
+            <p>Steam, Epic, EA, GOG, Ubisoft and Battle.net in one Library.</p>
           </article>
           <article class="card highlight reveal">
             <span class="highlight__ver">Version 0.3</span>
-            <h3>What opens this file?</h3>
-            <p>Drop a file onto the window and HubGet offers apps that open it.</p>
+            <h3>Security updates first</h3>
+            <p>Updates that fix a security issue show first and don’t wait.</p>
           </article>
           <!--/obsah:highlights-->
         </div>
@@ -185,17 +185,27 @@
           <article class="release" id="v0-3">
             <div class="release__meta">
               <span class="release__ver">0.3</span>
-              <time class="release__date" datetime="2026-11-19">Nov 19, 2026</time>
+              <time class="release__date" datetime="2026-11-21">Nov 21, 2026</time>
             </div>
             <div class="card release__body">
               <div class="release__head">
-                <h2>PC overview, security updates first and the hubget command</h2>
+                <h2>PC overview, games from every store and security updates first</h2>
                 <span class="badge badge--live">Latest</span>
               </div>
-              <p class="release__lead">Versions 0.3.0 to 0.3.1 (Nov 19, 2026).</p>
+              <p class="release__lead">Versions 0.3.0 to 0.3.2 (Nov 19–21, 2026).</p>
               <div class="changes changes--new">
                 <h3>New</h3>
                 <ul>
+                  <li><strong>Games from every store</strong> (0.3.2) – besides Steam, the Library now shows games from Epic Games, EA app, GOG Galaxy, Ubisoft Connect and Battle.net with icon, size and launching through their store.</li>
+                  <li><strong>Installer signature check</strong> (0.3.2) – before installing or updating, HubGet verifies the digital signature of the downloaded installer; an invalid signature or a new publisher stops the installation and HubGet explains why.</li>
+                  <li><strong>Repair app</strong> (0.3.2) – a repair through winget in the menu of an installed app, when the installer supports it.</li>
+                  <li><strong>Take over</strong> (0.3.2) – apps installed outside HubGet that are in the catalog can be taken over in one click, and HubGet then watches their updates.</li>
+                  <li><strong>Compare apps</strong> (0.3.2) – up to four apps side by side: rating, size, license, last release and supported managers.</li>
+                  <li><strong>New in the catalog</strong> (0.3.2) – apps added to the catalog in the last 7, 30 or 90 days.</li>
+                  <li><strong>New PC</strong> (0.3.2) – popular apps by group (browsers, chat, media, office…) to tick and install all at once.</li>
+                  <li><strong>Preinstalled apps and drivers</strong> in PC overview (0.3.2) – clean up apps that came with Windows (they can be restored from the Microsoft Store) and optional driver updates from Windows Update.</li>
+                  <li><strong>Community</strong> (0.3.2) – suggest apps for the catalog and vote, developer replies to reviews, install statistics for developers and a chart by installs in HubGet over 30, 90 and 365 days (sharing is opt-in).</li>
+                  <li><strong>Your year with HubGet</strong> (0.3.2) – how much you installed and updated and how much time it saved you.</li>
                   <li><strong>Security updates first</strong> (0.3.1) – updates that fix a security issue get a red badge, come first in the list and don’t wait for the minimum age; developer packages can optionally be checked for known vulnerabilities on OSV.dev.</li>
                   <li><strong>What opens this file?</strong> (0.3.1) – drop a file onto the HubGet window or search for “.psd” and HubGet offers apps that open it.</li>
                   <li><strong>Try in Windows Sandbox</strong> (0.3.1) – the app installs into isolated Windows that are thrown away when closed.</li>
@@ -216,6 +226,10 @@
               <div class="changes changes--better">
                 <h3>Improved</h3>
                 <ul>
+                  <li>Apps that update themselves (Chrome, Firefox, Discord…) get 14 days to update on their own (3 days for a security fix) before HubGet offers the update (0.3.2).</li>
+                  <li>Search understands purpose too – “video editing”, “password manager”, “edit pdf” (0.3.2).</li>
+                  <li>Warnings about abandoned apps (archived project or years without changes) and Recently updated in the Library (0.3.2).</li>
+                  <li>Accessibility: text size (or follow Windows), reduced motion, underlined links, a Skip to content link and better high contrast support (0.3.2).</li>
                   <li>Installs show one percentage for download and install with time remaining; progress shows on the taskbar icon too, and right-clicking it offers quick actions (0.3.1).</li>
                   <li>Windows notifications have Update all, Open and Details buttons (0.3.1).</li>
                   <li>For an update that skips several versions, you see release notes for all of them; an install that wouldn’t fit on the disk doesn’t start and HubGet suggests a cleanup (0.3.1).</li>

@@ -1,25 +1,35 @@
 {
   "version": "0.3",
-  "date": "2026-11-19",
-  "releases": 2,
+  "date": "2026-11-21",
+  "releases": 3,
   "cs": {
-    "title": "Přehled počítače, bezpečnostní aktualizace napřed a příkaz hubget",
-    "lead": "Verze 0.3.0 až 0.3.1 (19. 11. 2026).",
+    "title": "Přehled počítače, hry ze všech obchodů a bezpečnostní aktualizace napřed",
+    "lead": "Verze 0.3.0 až 0.3.2 (19.–21. 11. 2026).",
     "highlights": [
       {
         "title": "Přehled počítače",
         "text": "Co zabírá místo, co se zbytečně spouští s Windows, úklid mezipamětí a kontrola podpisů programů."
       },
       {
-        "title": "Bezpečnostní aktualizace napřed",
-        "text": "Aktualizace, které opravují bezpečnostní chybu, jsou vidět první a nečekají."
+        "title": "Hry ze všech obchodů",
+        "text": "Steam, Epic, EA, GOG, Ubisoft i Battle.net v jedné Knihovně."
       },
       {
-        "title": "Čím otevřu tento soubor?",
-        "text": "Přetáhněte soubor do okna a HubGet nabídne aplikace, které ho otevřou."
+        "title": "Bezpečnostní aktualizace napřed",
+        "text": "Aktualizace, které opravují bezpečnostní chybu, jsou vidět první a nečekají."
       }
     ],
     "new": [
+      "**Hry ze všech obchodů** (0.3.2) – kromě Steamu ukáže Knihovna i hry z Epic Games, EA app, GOG Galaxy, Ubisoft Connect a Battle.net s ikonou, velikostí a spuštěním přes jejich obchod.",
+      "**Kontrola podpisu instalátoru** (0.3.2) – před instalací a aktualizací HubGet ověří digitální podpis staženého instalátoru; neplatný podpis nebo nový vydavatel instalaci zastaví a HubGet vysvětlí proč.",
+      "**Opravit aplikaci** (0.3.2) – oprava přes winget v nabídce nainstalované aplikace, pokud ji instalátor podporuje.",
+      "**Převzít do správy** (0.3.2) – aplikace nainstalované mimo HubGet, které jsou v katalogu, převezmete jedním kliknutím a HubGet pak hlídá jejich aktualizace.",
+      "**Porovnat aplikace** (0.3.2) – až čtyři aplikace vedle sebe: hodnocení, velikost, licence, poslední vydání a podporovaní správci.",
+      "**Nově v katalogu** (0.3.2) – aplikace, které do katalogu přibyly za posledních 7, 30 nebo 90 dní.",
+      "**Nový počítač** (0.3.2) – oblíbené aplikace po skupinách (prohlížeče, komunikace, multimédia, kancelář…) k zaškrtnutí a instalaci najednou.",
+      "**Předinstalované aplikace a ovladače** v Přehledu počítače (0.3.2) – úklid aplikací dodaných s Windows (dají se vrátit z Microsoft Store) a volitelné aktualizace ovladačů z Windows Update.",
+      "**Komunita** (0.3.2) – návrhy aplikací do katalogu s hlasováním, odpovědi vývojářů na recenze, statistiky instalací pro vývojáře a žebříček podle instalací v HubGetu za 30, 90 a 365 dní (sdílení je dobrovolné).",
+      "**Váš rok s HubGetem** (0.3.2) – kolik jste toho nainstalovali a aktualizovali a kolik času vám to ušetřilo.",
       "**Bezpečnostní aktualizace napřed** (0.3.1) – aktualizace, které opravují bezpečnostní chybu, mají červený štítek, jsou v seznamu první a nečekají na minimální stáří; u balíčků pro vývojáře volitelně známé zranitelnosti z OSV.dev.",
       "**Čím otevřu tento soubor?** (0.3.1) – přetáhněte soubor do okna HubGetu nebo hledejte „.psd“ a HubGet nabídne aplikace, které ho otevřou.",
       "**Vyzkoušet ve Windows Sandboxu** (0.3.1) – aplikace se nainstaluje do izolovaných Windows, která se po zavření zahodí.",
@@ -37,6 +47,10 @@
       "**Win+Shift+H** otevře HubGet odkudkoli s kurzorem ve vyhledávání a jednou týdně přijde **souhrn** aktualizací."
     ],
     "improved": [
+      "Aplikace, které se aktualizují samy (Chrome, Firefox, Discord…), dostanou na vlastní aktualizaci 14 dní (bezpečnostní opravu 3 dny), než ji nabídne HubGet (0.3.2).",
+      "Hledání rozumí i účelu – „střih videa“, „správce hesel“, „upravit pdf“ (0.3.2).",
+      "Upozornění na opuštěné aplikace (archivovaný projekt nebo roky bez změn) a v Knihovně přehled Nedávno aktualizováno (0.3.2).",
+      "Přístupnost: velikost textu (nebo podle Windows), omezení animací, podtržené odkazy, odkaz Přeskočit na obsah a lepší podpora vysokého kontrastu (0.3.2).",
       "Instalace ukazuje jedno procento za stahování i instalaci se zbývajícím časem; průběh je vidět i na ikoně v hlavním panelu a pravým tlačítkem na ní jsou rychlé akce (0.3.1).",
       "Oznámení Windows mají tlačítka Aktualizovat vše, Otevřít a Podrobnosti (0.3.1).",
       "U aktualizace přes víc verzí jsou poznámky ke všem vydáním, která přeskočí; instalace, na kterou by nestačilo místo na disku, se nespustí a HubGet poradí úklid (0.3.1).",
@@ -55,23 +69,33 @@
     ]
   },
   "en": {
-    "title": "PC overview, security updates first and the hubget command",
-    "lead": "Versions 0.3.0 to 0.3.1 (Nov 19, 2026).",
+    "title": "PC overview, games from every store and security updates first",
+    "lead": "Versions 0.3.0 to 0.3.2 (Nov 19–21, 2026).",
     "highlights": [
       {
         "title": "PC overview",
         "text": "What takes up space, what starts with Windows for nothing, cache cleanup and program signature checks."
       },
       {
-        "title": "Security updates first",
-        "text": "Updates that fix a security issue show first and don’t wait."
+        "title": "Games from every store",
+        "text": "Steam, Epic, EA, GOG, Ubisoft and Battle.net in one Library."
       },
       {
-        "title": "What opens this file?",
-        "text": "Drop a file onto the window and HubGet offers apps that open it."
+        "title": "Security updates first",
+        "text": "Updates that fix a security issue show first and don’t wait."
       }
     ],
     "new": [
+      "**Games from every store** (0.3.2) – besides Steam, the Library now shows games from Epic Games, EA app, GOG Galaxy, Ubisoft Connect and Battle.net with icon, size and launching through their store.",
+      "**Installer signature check** (0.3.2) – before installing or updating, HubGet verifies the digital signature of the downloaded installer; an invalid signature or a new publisher stops the installation and HubGet explains why.",
+      "**Repair app** (0.3.2) – a repair through winget in the menu of an installed app, when the installer supports it.",
+      "**Take over** (0.3.2) – apps installed outside HubGet that are in the catalog can be taken over in one click, and HubGet then watches their updates.",
+      "**Compare apps** (0.3.2) – up to four apps side by side: rating, size, license, last release and supported managers.",
+      "**New in the catalog** (0.3.2) – apps added to the catalog in the last 7, 30 or 90 days.",
+      "**New PC** (0.3.2) – popular apps by group (browsers, chat, media, office…) to tick and install all at once.",
+      "**Preinstalled apps and drivers** in PC overview (0.3.2) – clean up apps that came with Windows (they can be restored from the Microsoft Store) and optional driver updates from Windows Update.",
+      "**Community** (0.3.2) – suggest apps for the catalog and vote, developer replies to reviews, install statistics for developers and a chart by installs in HubGet over 30, 90 and 365 days (sharing is opt-in).",
+      "**Your year with HubGet** (0.3.2) – how much you installed and updated and how much time it saved you.",
       "**Security updates first** (0.3.1) – updates that fix a security issue get a red badge, come first in the list and don’t wait for the minimum age; developer packages can optionally be checked for known vulnerabilities on OSV.dev.",
       "**What opens this file?** (0.3.1) – drop a file onto the HubGet window or search for “.psd” and HubGet offers apps that open it.",
       "**Try in Windows Sandbox** (0.3.1) – the app installs into isolated Windows that are thrown away when closed.",
@@ -89,6 +113,10 @@
       "**Win+Shift+H** opens HubGet from anywhere with the cursor in search, and a weekly **summary** of updates."
     ],
     "improved": [
+      "Apps that update themselves (Chrome, Firefox, Discord…) get 14 days to update on their own (3 days for a security fix) before HubGet offers the update (0.3.2).",
+      "Search understands purpose too – “video editing”, “password manager”, “edit pdf” (0.3.2).",
+      "Warnings about abandoned apps (archived project or years without changes) and Recently updated in the Library (0.3.2).",
+      "Accessibility: text size (or follow Windows), reduced motion, underlined links, a Skip to content link and better high contrast support (0.3.2).",
       "Installs show one percentage for download and install with time remaining; progress shows on the taskbar icon too, and right-clicking it offers quick actions (0.3.1).",
       "Windows notifications have Update all, Open and Details buttons (0.3.1).",
       "For an update that skips several versions, you see release notes for all of them; an install that wouldn’t fit on the disk doesn’t start and HubGet suggests a cleanup (0.3.1).",
