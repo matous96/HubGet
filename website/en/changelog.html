@@ -78,7 +78,7 @@
         <div class="page-head__inner reveal">
           <p class="eyebrow" data-t="t1">What’s new</p>
           <h1 data-t="t2">What’s new in&nbsp;HubGet</h1>
-          <p class="lead" data-t="t3">What each series of HubGet versions brought, newest first. <!--obsah:updates-words-capital-->Thirty<!--/obsah:updates-words-capital--> updates have shipped since the first version 0.1.0 came out on October&nbsp;21.</p>
+          <p class="lead" data-t="t3">What each series of HubGet versions brought, newest first. <!--obsah:updates-words-capital-->Thirty-one<!--/obsah:updates-words-capital--> updates have shipped since the first version 0.1.0 came out on October&nbsp;21.</p>
           <nav class="versions-nav" aria-label="Jump to version">
             <!--obsah:versions-->
             <a class="chip" href="#v0-3">0.3</a>
@@ -88,8 +88,8 @@
           </nav>
         </div>
         <dl class="stats reveal">
-          <div><dt data-t="t4">Current version</dt><dd><!--obsah:version-->0.3.4<!--/obsah:version--></dd></div>
-          <div><dt data-t="t5">Updates since 0.1.0</dt><dd><!--obsah:updates-->30<!--/obsah:updates--></dd></div>
+          <div><dt data-t="t4">Current version</dt><dd><!--obsah:version-->0.3.5<!--/obsah:version--></dd></div>
+          <div><dt data-t="t5">Updates since 0.1.0</dt><dd><!--obsah:updates-->31<!--/obsah:updates--></dd></div>
           <div><dt data-t="t6">Apps in the catalog</dt><dd data-t="t7">25,100+</dd></div>
           <div><dt data-t="t8">Package managers for real</dt><dd data-t="t9">WinGet · Chocolatey · Scoop + 8 for developers</dd></div>
         </dl>
@@ -192,7 +192,7 @@
                 <h2>PC overview, games from every store and security updates first</h2>
                 <span class="badge badge--live">Latest</span>
               </div>
-              <p class="release__lead">Versions 0.3.0 to 0.3.4 (Nov 19–24, 2026).</p>
+              <p class="release__lead">Versions 0.3.0 to 0.3.5 (Nov 19–24, 2026).</p>
               <div class="changes changes--new">
                 <h3>New</h3>
                 <ul>
@@ -202,7 +202,7 @@
                   <li><strong>My computers</strong> (0.3.4) – Update there, Install on another PC and automatic install of apps added on your other PCs; after reinstalling Windows, an offer to bring the apps back.</li>
                   <li><strong>Install later</strong> and <strong>Try for a week</strong> (0.3.4) – install tonight or at a chosen time; if you never open the app, HubGet offers to uninstall it after a week.</li>
                   <li><strong>App privacy</strong> (0.3.4) – turn off telemetry in Firefox, Chrome, Edge, Brave, VS Code, Office, .NET and more using their official policies.</li>
-                  <li><strong>Defender installer scan</strong> (0.3.4) – Microsoft Defender scans a downloaded installer before it runs; if it finds something, the install doesn’t start.</li>
+                  <li><strong>Defender installer scan</strong> (0.3.4, optional since 0.3.5) – Microsoft Defender fully scans a downloaded installer before it runs; if it finds something, the install doesn’t start. Turn it on in Settings → Package updates.</li>
                   <li><strong>Like the App Store</strong> (0.3.4) – install progress stays visible while you scroll the details, downloads can be paused and resumed, previously installed apps get a cloud icon and an app can be offloaded (uninstalled while keeping its settings).</li>
                   <li><strong>Recommended for you</strong>, <strong>major updates</strong> and a <strong>rating prompt</strong> on Home (0.3.4).</li>
                   <li><strong>Preview versions</strong> and <strong>support the developers</strong> (0.3.4) – Beta, Insiders or Nightly next to the stable version and links to GitHub Sponsors, Open Collective or Ko-fi for open-source apps.</li>
@@ -256,6 +256,7 @@
               <div class="changes changes--fix">
                 <h3>Fixed</h3>
                 <ul>
+                  <li>The Defender installer scan delayed installs of large apps (like ChatGPT) by several minutes – it’s now off by default and can be cancelled when on (0.3.5).</li>
                   <li>OBS updates failed when a PC maker tool or the virtual camera service held its files – HubGet now closes them and finishes the update (0.3.4).</li>
                   <li>The ChatGPT update stayed unfinished while the app was running – HubGet now finishes it right away (0.3.4).</li>
                   <li>Updates of MSIX apps with their own Windows service (the new ChatGPT with Codex) failed with error 0x80073D28 – they’re now retried with administrator rights (0.3.3).</li>

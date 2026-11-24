@@ -1,10 +1,10 @@
 {
   "version": "0.3",
   "date": "2026-11-24",
-  "releases": 5,
+  "releases": 6,
   "cs": {
     "title": "Přehled počítače, hry ze všech obchodů a bezpečnostní aktualizace napřed",
-    "lead": "Verze 0.3.0 až 0.3.4 (19.–24. 11. 2026).",
+    "lead": "Verze 0.3.0 až 0.3.5 (19.–24. 11. 2026).",
     "highlights": [
       {
         "title": "Přehled počítače",
@@ -26,7 +26,7 @@
       "**Moje počítače** (0.3.4) – Aktualizovat tam, Nainstalovat na jiný počítač a automatická instalace aplikací přidaných na ostatních počítačích; po přeinstalování Windows nabídka vrátit aplikace.",
       "**Nainstalovat později** a **Vyzkoušet na týden** (0.3.4) – instalace v noci nebo ve zvolený čas; nespuštěnou aplikaci HubGet po týdnu nabídne odinstalovat.",
       "**Soukromí aplikací** (0.3.4) – vypnutí telemetrie Firefoxu, Chromu, Edge, Brave, VS Code, Office, .NET a dalších jejich oficiálními zásadami.",
-      "**Kontrola instalátoru Defenderem** (0.3.4) – stažený instalátor před spuštěním prověří Microsoft Defender; když něco najde, instalace se nespustí.",
+      "**Kontrola instalátoru Defenderem** (0.3.4, od 0.3.5 volitelná) – stažený instalátor před spuštěním celý prověří Microsoft Defender; když něco najde, instalace se nespustí. Zapnout jde v Nastavení → Aktualizace balíčků.",
       "**Jako v App Storu** (0.3.4) – průběh instalace zůstane vidět i při posunu detailu, stahování jde pozastavit a navázat, dřív nainstalované aplikace mají ikonu mráčku a aplikaci jde uvolnit (odinstalovat a nechat si nastavení).",
       "**Doporučeno pro vás**, **významné aktualizace** a **výzva k hodnocení** na Domů (0.3.4).",
       "**Předběžné verze** a **podpora vývojářů** (0.3.4) – Beta, Insiders či Nightly vedle stabilní verze a odkazy na GitHub Sponsors, Open Collective nebo Ko-fi u open-source aplikací.",
@@ -74,6 +74,7 @@
       "U instalátoru v technických údajích je odkaz na kontrolu ve VirusTotalu."
     ],
     "fixed": [
+      "Kontrola instalátoru Defenderem zdržela instalaci velkých aplikací (třeba ChatGPT) i o několik minut – teď je výchozí vypnutá a zapnutou jde zrušit (0.3.5).",
       "Aktualizace OBS selhávala, když její soubory držel nástroj výrobce počítače nebo služba virtuální kamery – teď je HubGet zavře a aktualizaci dokončí (0.3.4).",
       "Aktualizace ChatGPT zůstala nedokončená, dokud aplikace běžela – teď ji HubGet dokončí hned (0.3.4).",
       "Aktualizace aplikací MSIX s vlastní službou Windows (nový ChatGPT s Codexem) končila chybou 0x80073D28 – teď se zopakuje s právy správce (0.3.3).",
@@ -85,7 +86,7 @@
   },
   "en": {
     "title": "PC overview, games from every store and security updates first",
-    "lead": "Versions 0.3.0 to 0.3.4 (Nov 19–24, 2026).",
+    "lead": "Versions 0.3.0 to 0.3.5 (Nov 19–24, 2026).",
     "highlights": [
       {
         "title": "PC overview",
@@ -107,7 +108,7 @@
       "**My computers** (0.3.4) – Update there, Install on another PC and automatic install of apps added on your other PCs; after reinstalling Windows, an offer to bring the apps back.",
       "**Install later** and **Try for a week** (0.3.4) – install tonight or at a chosen time; if you never open the app, HubGet offers to uninstall it after a week.",
       "**App privacy** (0.3.4) – turn off telemetry in Firefox, Chrome, Edge, Brave, VS Code, Office, .NET and more using their official policies.",
-      "**Defender installer scan** (0.3.4) – Microsoft Defender scans a downloaded installer before it runs; if it finds something, the install doesn’t start.",
+      "**Defender installer scan** (0.3.4, optional since 0.3.5) – Microsoft Defender fully scans a downloaded installer before it runs; if it finds something, the install doesn’t start. Turn it on in Settings → Package updates.",
       "**Like the App Store** (0.3.4) – install progress stays visible while you scroll the details, downloads can be paused and resumed, previously installed apps get a cloud icon and an app can be offloaded (uninstalled while keeping its settings).",
       "**Recommended for you**, **major updates** and a **rating prompt** on Home (0.3.4).",
       "**Preview versions** and **support the developers** (0.3.4) – Beta, Insiders or Nightly next to the stable version and links to GitHub Sponsors, Open Collective or Ko-fi for open-source apps.",
@@ -155,6 +156,7 @@
       "The installer’s technical details include a link to check it on VirusTotal."
     ],
     "fixed": [
+      "The Defender installer scan delayed installs of large apps (like ChatGPT) by several minutes – it’s now off by default and can be cancelled when on (0.3.5).",
       "OBS updates failed when a PC maker tool or the virtual camera service held its files – HubGet now closes them and finishes the update (0.3.4).",
       "The ChatGPT update stayed unfinished while the app was running – HubGet now finishes it right away (0.3.4).",
       "Updates of MSIX apps with their own Windows service (the new ChatGPT with Codex) failed with error 0x80073D28 – they’re now retried with administrator rights (0.3.3).",

@@ -78,7 +78,7 @@
         <div class="page-head__inner reveal">
           <p class="eyebrow" data-t="t1">Novinky</p>
           <h1 data-t="t2">Co je nového v&nbsp;HubGetu</h1>
-          <p class="lead" data-t="t3">Co přinesly jednotlivé řady verzí HubGetu, nejnovější nahoře. Od první veřejné verze 0.1.0 z&nbsp;21.&nbsp;10. vyšlo <!--obsah:updates-words-->třicet<!--/obsah:updates-words--> aktualizací.</p>
+          <p class="lead" data-t="t3">Co přinesly jednotlivé řady verzí HubGetu, nejnovější nahoře. Od první veřejné verze 0.1.0 z&nbsp;21.&nbsp;10. vyšlo <!--obsah:updates-words-->jednaatřicet<!--/obsah:updates-words--> aktualizací.</p>
           <nav class="versions-nav" aria-label="Přejít na verzi">
             <!--obsah:versions-->
             <a class="chip" href="#v0-3">0.3</a>
@@ -88,8 +88,8 @@
           </nav>
         </div>
         <dl class="stats reveal">
-          <div><dt data-t="t4">Aktuální verze</dt><dd><!--obsah:version-->0.3.4<!--/obsah:version--></dd></div>
-          <div><dt data-t="t5">Aktualizací od verze 0.1.0</dt><dd><!--obsah:updates-->30<!--/obsah:updates--></dd></div>
+          <div><dt data-t="t4">Aktuální verze</dt><dd><!--obsah:version-->0.3.5<!--/obsah:version--></dd></div>
+          <div><dt data-t="t5">Aktualizací od verze 0.1.0</dt><dd><!--obsah:updates-->31<!--/obsah:updates--></dd></div>
           <div><dt data-t="t6">Aplikací v&nbsp;katalogu</dt><dd data-t="t7">25&nbsp;100+</dd></div>
           <div><dt data-t="t8">Správci naostro</dt><dd data-t="t9">WinGet · Chocolatey · Scoop + 8 pro vývojáře</dd></div>
         </dl>
@@ -192,7 +192,7 @@
                 <h2>Přehled počítače, hry ze všech obchodů a&nbsp;bezpečnostní aktualizace napřed</h2>
                 <span class="badge badge--live">Nejnovější</span>
               </div>
-              <p class="release__lead">Verze 0.3.0 až 0.3.4 (19.–24. 11. 2026).</p>
+              <p class="release__lead">Verze 0.3.0 až 0.3.5 (19.–24. 11. 2026).</p>
               <div class="changes changes--new">
                 <h3>Nové</h3>
                 <ul>
@@ -202,7 +202,7 @@
                   <li><strong>Moje počítače</strong> (0.3.4) – Aktualizovat tam, Nainstalovat na jiný počítač a&nbsp;automatická instalace aplikací přidaných na ostatních počítačích; po přeinstalování Windows nabídka vrátit aplikace.</li>
                   <li><strong>Nainstalovat později</strong> a&nbsp;<strong>Vyzkoušet na týden</strong> (0.3.4) – instalace v&nbsp;noci nebo ve zvolený čas; nespuštěnou aplikaci HubGet po týdnu nabídne odinstalovat.</li>
                   <li><strong>Soukromí aplikací</strong> (0.3.4) – vypnutí telemetrie Firefoxu, Chromu, Edge, Brave, VS Code, Office, .NET a&nbsp;dalších jejich oficiálními zásadami.</li>
-                  <li><strong>Kontrola instalátoru Defenderem</strong> (0.3.4) – stažený instalátor před spuštěním prověří Microsoft Defender; když něco najde, instalace se nespustí.</li>
+                  <li><strong>Kontrola instalátoru Defenderem</strong> (0.3.4, od 0.3.5 volitelná) – stažený instalátor před spuštěním celý prověří Microsoft Defender; když něco najde, instalace se nespustí. Zapnout jde v&nbsp;Nastavení → Aktualizace balíčků.</li>
                   <li><strong>Jako v&nbsp;App Storu</strong> (0.3.4) – průběh instalace zůstane vidět i&nbsp;při posunu detailu, stahování jde pozastavit a&nbsp;navázat, dřív nainstalované aplikace mají ikonu mráčku a&nbsp;aplikaci jde uvolnit (odinstalovat a&nbsp;nechat si nastavení).</li>
                   <li><strong>Doporučeno pro vás</strong>, <strong>významné aktualizace</strong> a&nbsp;<strong>výzva k&nbsp;hodnocení</strong> na Domů (0.3.4).</li>
                   <li><strong>Předběžné verze</strong> a&nbsp;<strong>podpora vývojářů</strong> (0.3.4) – Beta, Insiders či Nightly vedle stabilní verze a&nbsp;odkazy na GitHub Sponsors, Open Collective nebo Ko-fi u&nbsp;open-source aplikací.</li>
@@ -256,6 +256,7 @@
               <div class="changes changes--fix">
                 <h3>Opraveno</h3>
                 <ul>
+                  <li>Kontrola instalátoru Defenderem zdržela instalaci velkých aplikací (třeba ChatGPT) i&nbsp;o&nbsp;několik minut – teď je výchozí vypnutá a&nbsp;zapnutou jde zrušit (0.3.5).</li>
                   <li>Aktualizace OBS selhávala, když její soubory držel nástroj výrobce počítače nebo služba virtuální kamery – teď je HubGet zavře a&nbsp;aktualizaci dokončí (0.3.4).</li>
                   <li>Aktualizace ChatGPT zůstala nedokončená, dokud aplikace běžela – teď ji HubGet dokončí hned (0.3.4).</li>
                   <li>Aktualizace aplikací MSIX s&nbsp;vlastní službou Windows (nový ChatGPT s&nbsp;Codexem) končila chybou 0x80073D28 – teď se zopakuje s&nbsp;právy správce (0.3.3).</li>
