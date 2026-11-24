@@ -28,6 +28,64 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
   {
+    version: "0.3.4",
+    date: "2026-11-24",
+    highlights: [
+      {
+        cs: "Aktualizovat jde každá aplikace: programy a služby, které drží její soubory (virtuální kamera, grafické doplňky, nástroje výrobce počítače), HubGet během aktualizace zavře a hlídá, aby se nespustily znovu. Aplikace MSIX čekající na zavření (ChatGPT) dokončí hned.",
+        en: "Every app can be updated: programs and services holding its files (virtual camera, graphics overlays, PC maker tools) are closed during the update and kept from starting again. MSIX apps waiting to close (ChatGPT) are finished right away.",
+      },
+      {
+        cs: "Proč aktualizace selhala? – průvodce najde příčinu a jedním kliknutím ji opraví. K tomu Zkusit neúspěšné znovu, Po dokončení uspat nebo vypnout, Dokončit při příštím přihlášení a předvyplněné hlášení chyby v manifestu wingetu.",
+        en: "Why did the update fail? – a guide finds the cause and fixes it in one click. Plus Retry failed, Sleep or shut down when done, Finish at next sign-in and a prefilled report of a winget manifest problem.",
+      },
+      {
+        cs: "Aktualizace pod kontrolou: pozastavení automatických aktualizací na 1–7 dní, velké verze jen ručně, přehled před Aktualizovat vše (verze, velikost, novinky), stahování předem, kontrola po aktualizaci a limit rychlosti stahování.",
+        en: "Updates under control: pause automatic updates for 1–7 days, major versions manually only, an overview before Update all (versions, size, what’s new), downloading ahead, a post-update check and a download speed limit.",
+      },
+      {
+        cs: "Moje počítače: Aktualizovat tam, Nainstalovat na jiný počítač a automatická instalace aplikací přidaných na ostatních počítačích – provede se, jakmile tam HubGet poběží. Po přeinstalování Windows HubGet nabídne vrátit aplikace počítače.",
+        en: "My computers: Update there, Install on another PC and automatic install of apps added on your other PCs – done as soon as HubGet runs there. After reinstalling Windows, HubGet offers to bring the PC’s apps back.",
+      },
+      {
+        cs: "Nainstalovat později (v noci, za hodinu, ve zvolený čas – počítač do té doby neusne) a Vyzkoušet na týden: nespuštěnou aplikaci HubGet po týdnu nabídne odinstalovat.",
+        en: "Install later (tonight, in an hour, at a chosen time – the PC won’t sleep until then) and Try for a week: if you never open the app, HubGet offers to uninstall it after a week.",
+      },
+      {
+        cs: "Soukromí aplikací: vypnutí telemetrie Firefoxu, Chromu, Edge, Brave, VS Code, Office, .NET a dalších jejich oficiálními zásadami. Stažené instalátory před spuštěním prověří Microsoft Defender.",
+        en: "App privacy: turn off telemetry in Firefox, Chrome, Edge, Brave, VS Code, Office, .NET and more using their official policies. Downloaded installers are scanned by Microsoft Defender before they run.",
+      },
+      {
+        cs: "Jako v App Storu: průběh instalace zůstane vidět i při posunu detailu, stahování jde pozastavit a navázat, dřív nainstalované aplikace mají ikonu mráčku (i vlastní stránku) a aplikaci jde uvolnit – odinstalovat a nechat si nastavení.",
+        en: "Like the App Store: install progress stays visible while you scroll the details, downloads can be paused and resumed, previously installed apps get a cloud icon (and their own page) and an app can be offloaded – uninstalled while keeping its settings.",
+      },
+      {
+        cs: "Domů: významné aktualizace nainstalovaných aplikací, Doporučeno pro vás podle toho, co máte, a výzva k hodnocení pár dní po instalaci.",
+        en: "Home: major updates of installed apps, Recommended for you based on what you have, and a rating prompt a few days after installing.",
+      },
+      {
+        cs: "Předběžné verze (Beta, Insiders, Nightly) vedle stabilní, odkazy na podporu vývojářů open-source aplikací a rychlé akce na ikoně s počtem aktualizací, Nainstalovanými a Hledáním.",
+        en: "Preview versions (Beta, Insiders, Nightly) next to the stable one, links to support developers of open-source apps, and taskbar quick actions with the update count, Installed and Search.",
+      },
+    ],
+    featured: [
+      {
+        title: { cs: "Aktualizovat jde cokoli", en: "Anything can be updated" },
+        text: {
+          cs: "Programy, které drží soubory aplikace, HubGet zavře a aktualizaci dokončí.",
+          en: "Programs holding the app’s files are closed and the update finishes.",
+        },
+      },
+      {
+        title: { cs: "Všechny vaše počítače", en: "All your PCs" },
+        text: {
+          cs: "Aktualizujte a instalujte i na ostatních počítačích na účtu.",
+          en: "Update and install on your other PCs on the account too.",
+        },
+      },
+    ],
+  },
+  {
     version: "0.3.3",
     date: "2026-11-21",
     highlights: [
