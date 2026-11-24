@@ -28,6 +28,36 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
   {
+    version: "0.3.5",
+    date: "2026-11-24",
+    highlights: [
+      {
+        cs: "Kontrola instalátoru Microsoft Defenderem je výchozí vypnutá – u velkých instalátorů (třeba ChatGPT) zdržela instalaci i o několik minut. Zapnout jde v Nastavení → Aktualizace balíčků; Defender instalátor prověřuje při spuštění i bez ní.",
+        en: "The Microsoft Defender installer scan is now off by default – for large installers (like ChatGPT) it delayed the install by several minutes. Turn it on in Settings → Package updates; Defender checks the installer when it runs even without it.",
+      },
+      {
+        cs: "Zapnutou kontrolu Defenderem jde zrušit tlačítkem Zrušit – dřív se čekalo, až sken doběhne.",
+        en: "A running Defender scan can be cancelled with the Cancel button – before, you had to wait for the scan to finish.",
+      },
+    ],
+    featured: [
+      {
+        title: { cs: "Rychlejší instalace velkých aplikací", en: "Faster installs of large apps" },
+        text: {
+          cs: "Úplný sken instalátoru Defenderem už instalaci nezdržuje – je volitelný.",
+          en: "A full Defender scan of the installer no longer slows the install – it’s optional.",
+        },
+      },
+      {
+        title: { cs: "Sken jde zrušit", en: "The scan can be cancelled" },
+        text: {
+          cs: "Když kontrolu Defenderem zapnete, jde ji kdykoli zrušit.",
+          en: "If you turn the Defender scan on, you can cancel it any time.",
+        },
+      },
+    ],
+  },
+  {
     version: "0.3.4",
     date: "2026-11-24",
     highlights: [
