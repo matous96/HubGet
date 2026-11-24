@@ -34,6 +34,8 @@ export interface CacheInfo {
 export interface OperationHandle {
   done: Promise<OperationResult>;
   cancel: () => void;
+  /** Pozastaví stahování instalátoru (jen když ho stahuje HubGet sám); true = pozastaveno. */
+  pause?: () => Promise<boolean>;
 }
 
 /** Výsledek dokončené operace. */
@@ -49,6 +51,8 @@ export interface OperationResult {
   restartRequired?: boolean;
   /** Kdo podepsal stažený instalátor („“ = bez podpisu) – jen winget s instalátorem staženým předem. */
   signer?: string;
+  /** Stahování uživatel pozastavil (outcome „cancelled“) – rozstažený soubor zůstal, úloha čeká na Pokračovat. */
+  paused?: boolean;
 }
 
 /**

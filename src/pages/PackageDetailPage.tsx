@@ -8,7 +8,7 @@
  */
 import { useQuery } from "@tanstack/react-query";
 import { ExternalLink, Info, UserSquare2 } from "lucide-react";
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useParams } from "react-router";
 import { queryKeys } from "@/app/queryClient";
@@ -19,6 +19,11 @@ import { PackageCommand } from "@/components/package/PackageCommand";
 import { PackageIcon } from "@/components/package/PackageIcon";
 import { ArchitectureInfo } from "@/components/package/ArchitectureInfo";
 import { PrivacySection } from "@/components/package/PrivacySection";
+import { ChannelLinks } from "@/components/package/ChannelLinks";
+import { FloatingJobProgress } from "@/components/package/FloatingJobProgress";
+import { FundingButton } from "@/components/package/FundingButton";
+import { PrivacySwitch } from "@/components/home/PrivacyPanel";
+import { privacyIdFor } from "@/lib/privacy";
 import { InstallSplitMenu } from "@/components/package/InstallMenu";
 import { AdoptNote } from "@/components/package/AdoptPanel";
 import { AbandonedNote } from "@/components/package/AbandonedNotice";
@@ -142,7 +147,7 @@ function PackageDetailView({ entry: fullEntry, inCatalog }: { entry: CatalogEntr
   const enabledSources = useSettings((s) => s.enabledSources);
   const { data: catalogData } = useCatalog();
   const catalogIndex = useCatalogIndex();
-  const { installed, job } = usePackageState(fullEntry.id);
+  const { installed, job, paused } = usePackageState(fullEntry.id);
   // Režim jednoho zdroje (levý panel): ostatní zdroje jako by u aplikace nebyly – výběr
   // zdroje, příkazy i technické údaje jen ze zamčeného. Aplikace, která v něm není,
   // zůstane celá, jen ji nejde nainstalovat (upozornění se zrušením filtru).
@@ -169,6 +174,8 @@ function PackageDetailView({ entry: fullEntry, inCatalog }: { entry: CatalogEntr
   const actions = useInstallActions(entry, effective?.source);
   const openOptions = useInstallUi((s) => s.openOptions);
   const canInstall = actions.status === "available" && !job && !!effective;
+  // Tlačítko s průběhem v hlavičce – po posunu dolů průběh ukáže plovoucí pilulka
+  const actionRef = useRef<HTMLDivElement>(null);
 
   // Klávesové zkratky jako v UniGetUI: Ctrl+Enter = instalovat, Alt+Enter = možnosti instalace
   useEffect(() => {
@@ -221,6 +228,8 @@ function PackageDetailView({ entry: fullEntry, inCatalog }: { entry: CatalogEntr
     <article className="@container">
       {/* ── Banner ───────────────────────────────────────────────── */}
       <PackageBanner entry={entry} />
+      {/* Průběh instalace i po posunu dolů (jako App Store) */}
+      <FloatingJobProgress entry={entry} job={job} paused={paused} anchor={actionRef} />
 
       {/* ── Hlavička ─────────────────────────────────────────────── */}
       {/* Mřížka: ikona přes obě řádky, vpravo nahoře oblíbené a sdílení. Široký detail
@@ -265,7 +274,7 @@ function PackageDetailView({ entry: fullEntry, inCatalog }: { entry: CatalogEntr
           <div className={cn("col-span-2 col-start-2 row-start-2 mt-6 flex min-w-0 flex-col gap-4 @6xl:col-span-1 @6xl:col-start-2", lockedOut && "hidden")}>
             <div className="flex flex-wrap items-center gap-3">
               {/* Při běžící úloze potřebuje průběh pevnou šířku */}
-              <div className={cn(job && "w-80")}>
+              <div ref={actionRef} className={cn((job || paused) && "w-80")}>
                 <PackageAction entry={entry} source={effective?.source} size="lg" />
               </div>
               {/* Starší verze jde i spustit – Otevřít vedle Aktualizovat */}
@@ -282,6 +291,9 @@ function PackageDetailView({ entry: fullEntry, inCatalog }: { entry: CatalogEntr
               {!web && !job && <RollbackButton entry={entry} installed={installed} />}
               <UninstallButton entry={entry} variant="full" />
             </div>
+
+            {/* Předběžné verze (Beta, Insiders…) a cesta zpět na stabilní – jako TestFlight */}
+            {inCatalog && <ChannelLinks entry={entry} />}
 
             {/* Nainstalovaná verze už nedostává bezpečnostní opravy (endoflife.date) */}
             <EndOfLifeNote pkg={installed} />
@@ -340,6 +352,8 @@ function PackageDetailView({ entry: fullEntry, inCatalog }: { entry: CatalogEntr
           <WatchButton entry={entry} />
           <ReportButton entry={entry} pkg={shownSource} installedVersion={installed?.installedVersion} />
           <ShareButton entry={entry} pkg={shownSource} />
+          {/* Podpořit vývojáře (FUNDING.yml na GitHubu) – jen když nějaké odkazy jsou */}
+          {inCatalog && <FundingButton entry={entry} />}
         </div>
 
         {/* Panel: odkud a jak je aplikace nainstalovaná, pravidla aktualizací a ověření instalátoru */}
@@ -391,6 +405,8 @@ function PackageDetailView({ entry: fullEntry, inCatalog }: { entry: CatalogEntr
                 {/* Přeskočit nabízenou verzi / zamknout verzi; automatická aktualizace této aplikace */}
                 {!web && <UpdatePinBar installed={installed} appName={entry.name} />}
                 {!web && <AutoUpdateToggle installed={installed} />}
+                {/* Soukromí aplikací – Neodesílat telemetrii (Firefox, Chrome, VS Code…) */}
+                {privacyIdFor(installed.name) && <PrivacySwitch id={privacyIdFor(installed.name)!} />}
               </div>
             )}
             {/* Ujištění o bezpečné instalaci (ne u programů mimo správce a her ze Steamu) */}

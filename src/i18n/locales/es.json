@@ -109,7 +109,8 @@
     "about": "Acerca de HubGet",
     "overview": "Resumen del PC",
     "new": "Novedades del catálogo",
-    "newPc": "Equipo nuevo"
+    "newPc": "Equipo nuevo",
+    "previous": "Instaladas antes"
   },
   "startup": {
     "title": "Aplicaciones de inicio",
@@ -194,8 +195,8 @@
     "disclaimer": "HubGet es un proyecto independiente de código abierto y no está afiliado a Microsoft ni a los proyectos de los gestores de paquetes que admite. Windows, WinGet, .NET, PowerShell y vcpkg son marcas de Microsoft; Chocolatey es una marca de Chocolatey Software, Inc.; npm es una marca de npm, Inc.; Python y PyPI son marcas de la Python Software Foundation; Rust y Cargo son marcas de la Rust Foundation. Las aplicaciones y los paquetes pertenecen a sus autores."
   },
   "privacy": {
-    "title": "Privacidad de la app",
-    "intro": "El desarrollador, <b>{{publisher}}</b>, indicó que las prácticas de privacidad de la app pueden incluir el tratamiento de datos que se describe a continuación. Para más información, consulta la <policy>política de privacidad del desarrollador</policy>.",
+    "title": "Privacidad de las aplicaciones",
+    "intro": "Desactiva la telemetría de las aplicaciones instaladas con las directivas y opciones oficiales de sus fabricantes. Se puede deshacer en cualquier momento.",
     "introNoLink": "El desarrollador, <b>{{publisher}}</b>, indicó que las prácticas de privacidad de la app pueden incluir el tratamiento de datos que se describe a continuación.",
     "notProvided": "El desarrollador aún no ha proporcionado detalles sobre los datos que trata esta app.",
     "policyLink": "Política de privacidad del desarrollador",
@@ -221,6 +222,21 @@
       "identifiers": "Identificadores",
       "usage": "Datos de uso",
       "diagnostics": "Diagnóstico"
+    },
+    "row": "{{name}}: no enviar telemetría",
+    "machine": "Se aplica a todos los usuarios del PC; confirmará un aviso de UAC.",
+    "failed": "No se pudo cambiar la opción de privacidad ({{error}}).",
+    "hint": {
+      "firefox": "Directiva DisableTelemetry: Firefox no envía datos técnicos ni de uso.",
+      "thunderbird": "Directiva DisableTelemetry: Thunderbird no envía datos técnicos ni de uso.",
+      "chrome": "Directiva MetricsReportingEnabled: Chrome no envía estadísticas de uso ni informes de bloqueos.",
+      "edge": "Directiva DiagnosticData: Edge no envía datos de diagnóstico.",
+      "brave": "Directivas MetricsReportingEnabled, BraveP3AEnabled y BraveStatsPingEnabled: sin estadísticas ni mediciones anónimas.",
+      "vscode": "Directiva TelemetryLevel: VS Code no envía telemetría (las extensiones pueden tener la suya).",
+      "visualStudio": "El Programa para la mejora de la experiencia del cliente (SQM) está desactivado.",
+      "office": "Directiva SendTelemetry: Office no envía datos de diagnóstico del cliente.",
+      "dotnet": "Variable DOTNET_CLI_TELEMETRY_OPTOUT: el comando dotnet no envía telemetría.",
+      "powershell": "Variable POWERSHELL_TELEMETRY_OPTOUT: PowerShell 7 no envía telemetría al iniciarse."
     }
   },
   "arch": {
@@ -627,11 +643,13 @@
       "traced": "Monitor de instalación de {{name}}: se registraron {{count}} elementos nuevos (carpetas, accesos directos, registro). Se ofrecerá eliminarlos después de una desinstalación.",
       "skippedRunning": "{{name}} se está ejecutando: la actualización automática esperará a que la cierres.",
       "appClosed": "{{name}} se estaba ejecutando: se cerró (procesos {{processes}}) para que el instalador pueda sobrescribirlo.",
+      "otherAppsClosed": "Otros programas tenían abiertos archivos de {{name}} ({{processes}}): se cerraron para que el instalador pueda sobrescribirlos; se repite la operación.",
       "appClosing": "{{name}} pregunta si guardar el trabajo al cerrarse: esperando a que el usuario la cierre.",
       "appCloseTimeout": "{{name}} siguió abierta 15 minutos: operación cancelada.",
       "needsAdmin": "{{name}} necesita derechos de administrador para actualizarse: esperará a una actualización manual.",
       "settingsBackupFailed": "No se pudo hacer copia de la configuración de {{name}} antes de actualizar: {{error}}",
-      "repairDone": "Reparada correctamente ({{seconds}} s)."
+      "repairDone": "Reparada correctamente ({{seconds}} s).",
+      "paused": "{{name}}: descarga en pausa; el instalador parcial se conserva y se reanudará al continuar."
     },
     "notice": {
       "prefetchFailed": "No se pudo descargar el instalador por adelantado ({{detail}}): lo descargará WinGet.",
@@ -641,7 +659,10 @@
       "postCommandFailed": "El comando posterior a la instalación falló ({{detail}}): la instalación en sí se completó.",
       "needsAdmin": "Necesita derechos de administrador: las actualizaciones automáticas en segundo plano no abren el diálogo UAC.",
       "signedBy": "Instalador firmado por: {{detail}}",
-      "unsigned": "El instalador no tiene firma digital."
+      "unsigned": "El instalador no tiene firma digital.",
+      "finishingUpdate": "La nueva versión ({{detail}}) espera a que se cierre la aplicación: HubGet la cierra y termina la actualización ahora, sin reiniciar.",
+      "scanClean": "Microsoft Defender no ha encontrado nada en el instalador.",
+      "scanUnavailable": "No se pudo analizar el instalador con Microsoft Defender ({{detail}}); probablemente hay otro antivirus activo."
     },
     "phase": {
       "queued": "En cola…",
@@ -650,7 +671,8 @@
       "interactive": "Esperando a que termines el asistente de instalación…",
       "installing": "Ejecutando el instalador…",
       "uninstalling": "Desinstalando…",
-      "repairing": "Reparando la instalación…"
+      "repairing": "Reparando la instalación…",
+      "scanning": "Microsoft Defender está analizando el instalador…"
     }
   },
   "help": {
@@ -940,6 +962,8 @@
   },
   "package": {
     "install": "Instalar",
+    "reinstall": "Reinstalar",
+    "reinstallHint": "Instalada antes: volver a instalar",
     "update": "Actualizar",
     "uninstall": "Desinstalar",
     "installed": "Instalada",
@@ -947,6 +971,7 @@
     "openFolder": "Abrir carpeta",
     "webDownload": "Descargar de la web",
     "cancel": "Cancelar",
+    "showProgress": "Ir al progreso",
     "back": "Atrás",
     "publisher": "Editor",
     "latestVersion": "Última versión",
@@ -1011,7 +1036,10 @@
     "cliMore": "Más comandos y explicaciones",
     "cliUnsupported": "{{manager}} no puede hacer esto",
     "openSourceAlternatives": "Alternativas de código abierto a {{name}}",
-    "managedByStore": "El juego lo gestiona {{store}}: las actualizaciones y la verificación de archivos se hacen en {{store}}."
+    "managedByStore": "El juego lo gestiona {{store}}: las actualizaciones y la verificación de archivos se hacen en {{store}}.",
+    "pause": "Pausar descarga",
+    "resume": "Reanudar descarga",
+    "paused": "En pausa"
   },
   "report": {
     "button": "Informar de un problema",
@@ -1460,7 +1488,8 @@
     "remainingMinutes_one": "queda {{count}} min",
     "remainingMinutes_many": "quedan {{count}} min",
     "remainingMinutes_other": "quedan {{count}} min",
-    "repairing": "Reparando"
+    "repairing": "Reparando",
+    "scanning": "Análisis de Defender"
   },
   "status": {
     "updates": "Actualizaciones",
@@ -1668,7 +1697,9 @@
     "unsupported": "Este gestor de paquetes no lo admite",
     "sandbox": "Probar en Windows Sandbox",
     "repair": "Reparar",
-    "repairHint": "Restaura los archivos dañados de la aplicación desde su instalador, cuando no se inicia o muestra errores. Se conservan los ajustes."
+    "repairHint": "Restaura los archivos dañados de la aplicación desde su instalador, cuando no se inicia o muestra errores. Se conservan los ajustes.",
+    "offload": "Liberar aplicación",
+    "offloadHint": "La desinstala pero conserva su configuración y sus datos; volverán al reinstalarla."
   },
   "installOptions": {
     "title": "Opciones de instalación: {{name}}",
@@ -1966,6 +1997,7 @@
     "fallbackFailed": "No se pudo instalar {{name}}: el instalador de {{from}} no está disponible y la alternativa mediante {{sources}} falló: {{error}}",
     "endedProcesses": "{{name}} se estaba ejecutando en segundo plano: HubGet lo cerró y continúa",
     "appClosed": "{{name}} se estaba ejecutando: HubGet la cerró y continúa",
+    "otherAppsClosed": "{{name}}: HubGet cerró {{processes}} porque bloqueaban el instalador y lo intenta de nuevo",
     "appClosing": "{{name}} pregunta si quieres guardar tu trabajo: guárdalo y cierra la aplicación, y HubGet continuará",
     "appCloseTimeout": "{{name}} siguió abierta: operación cancelada",
     "repairDone": "{{name}}: reparada ({{source}})"
@@ -1996,6 +2028,7 @@
     "selfUpdating": "Tras actualizarse a {{target}}, la aplicación volvió sola a la versión {{version}}: usa su propio actualizador. Ya no se ofrecerán actualizaciones del gestor de paquetes (puedes cambiarlo en la página de la aplicación).",
     "summary": "Cola de operaciones terminada: {{success}} correctas, {{failed}} con error, {{cancelled}} canceladas.",
     "appClosed": "La aplicación se estaba ejecutando: se cerró (procesos {{processes}}).",
+    "otherAppsClosed": "Cerrado: {{processes}}. Tenían abiertos archivos de la aplicación y el instalador no podía sobrescribirlos. Se intenta de nuevo.",
     "appClosing": "La aplicación pregunta si quieres guardar tu trabajo: HubGet continuará cuando se cierre.",
     "appCloseTimeout": "La aplicación siguió abierta 15 minutos: se canceló la operación. Vuelve a intentarlo cuando la hayas cerrado.",
     "repairDone": "Reparada ({{source}})"
@@ -2064,7 +2097,8 @@
     "repairUserScope": "Una aplicación instalada solo para ti no se puede reparar con permisos de administrador: inténtalo sin ellos ({{code}}).",
     "signerChanged": "El instalador de la nueva versión lo firmó alguien distinto que la última vez ({{detail}}); HubGet no lo ejecutó. Consulta los detalles de la aplicación.",
     "signatureMissing": "Los instaladores anteriores los firmaba «{{detail}}»; este no tiene firma digital y HubGet no lo ejecutó.",
-    "signatureInvalid": "La firma digital del instalador no coincide con su contenido: el archivo se modificó tras firmarse. HubGet no lo ejecutó."
+    "signatureInvalid": "La firma digital del instalador no coincide con su contenido: el archivo se modificó tras firmarse. HubGet no lo ejecutó.",
+    "threatFound": "Microsoft Defender ha encontrado una amenaza en el instalador ({{detail}}); HubGet no lo ha ejecutado."
   },
   "managerError": {
     "failed": "{{name}} terminó con el error {{code}}",
@@ -2462,7 +2496,22 @@
     "updates_one": "{{count}} actualización",
     "updates_many": "{{count}} actualizaciones",
     "updates_other": "{{count}} actualizaciones",
-    "installHere": "Instalar aquí ({{count}})"
+    "installHere": "Instalar aquí ({{count}})",
+    "autoInstall": "{{name}}: se instala automáticamente; se añadió en {{device}}.",
+    "autoInstallSetting": "Instalar automáticamente aplicaciones de otros PC",
+    "autoInstallHint": "Lo que instales en otro PC de tu cuenta, HubGet lo instalará también aquí en segundo plano. Solo instalaciones nuevas desde que lo actives, no aplicaciones que desinstalaste aquí.",
+    "updateThere": "Actualizar allí",
+    "updateThereHint": "{{device}} actualizará todas las aplicaciones en cuanto HubGet se ejecute en él.",
+    "updateRequested": "Enviado: se hará en cuanto HubGet se ejecute allí",
+    "remoteUpdate_one": "{{device}} ha pedido una actualización: se actualiza {{count}} aplicación.",
+    "remoteUpdate_many": "{{device}} ha pedido una actualización: se actualizan {{count}} aplicaciones.",
+    "remoteUpdate_other": "{{device}} ha pedido una actualización: se actualizan {{count}} aplicaciones.",
+    "remoteUpdateNone": "{{device}} ha pedido una actualización: aquí ya está todo al día.",
+    "remoteInstall_one": "{{device}} ha enviado {{count}} aplicación para instalar: {{names}}.",
+    "remoteInstall_many": "{{device}} ha enviado {{count}} aplicaciones para instalar: {{names}}.",
+    "remoteInstall_other": "{{device}} ha enviado {{count}} aplicaciones para instalar: {{names}}.",
+    "remoteInstallPresent": "{{name}}: {{device}} la ha enviado para instalar, pero ya está aquí.",
+    "remoteInstallUnavailable": "{{name}}: {{device}} la ha enviado para instalar, pero ninguna fuente activada puede instalarla aquí."
   },
   "eol": {
     "title_one": "{{count}} programa sin actualizaciones de seguridad",
@@ -2563,7 +2612,11 @@
   },
   "jumpList": {
     "updates": "Actualizaciones disponibles",
-    "updateAll": "Actualizar todo"
+    "updateAll": "Actualizar todo",
+    "updatesCount_one": "Actualizaciones disponibles ({{count}})",
+    "updatesCount_many": "Actualizaciones disponibles ({{count}})",
+    "updatesCount_other": "Actualizaciones disponibles ({{count}})",
+    "search": "Buscar"
   },
   "sandbox": {
     "unavailable": "Windows Sandbox no está activado. Actívalo en Panel de control → Programas → Activar o desactivar las características de Windows → Espacio aislado de Windows (solo Windows Pro y Enterprise; después reinicia).",
@@ -2990,5 +3043,227 @@
     "days_many": "en {{count}} días",
     "days_other": "en {{count}} días",
     "requests": "Lo que falta en HubGet: Aplicaciones sugeridas"
+  },
+  "previous": {
+    "title": "Instaladas antes",
+    "subtitle": "Aplicaciones que ya tuviste: vuelve a instalarlas con un clic en la nube.",
+    "here": "Este PC ({{n}})",
+    "devices": "Otros PC ({{n}})",
+    "hidden": "Ocultas ({{n}})",
+    "empty": "Aún no hay nada. Cuando desinstales una aplicación, la encontrarás aquí.",
+    "hide": "Ocultar",
+    "unhide": "Mostrar",
+    "offloaded": "Liberada {{when}}: la configuración está guardada y volverá al reinstalar",
+    "offloadedNoBackup": "Liberada {{when}}: la configuración quedó en la carpeta de la aplicación",
+    "onDevices": "En {{names}}",
+    "hint": {
+      "here": "Aplicaciones que estuvieron instaladas aquí y ya no lo están.",
+      "devices": "Aplicaciones de tus otros PC (Mis PC) que no están en este.",
+      "hidden": "Aplicaciones ocultas: el botón del ojo las devuelve a la lista."
+    }
+  },
+  "offload": {
+    "done": "{{name}} se ha liberado: su configuración está guardada. Reinstálala desde Instaladas antes.",
+    "restored": "La configuración de {{name}} ha vuelto, como antes de liberarla."
+  },
+  "majorUpdate": {
+    "title": "Actualizaciones importantes",
+    "label": "Actualización importante",
+    "badge": "Importante",
+    "version": "Nueva versión {{version}}",
+    "noNotes": "Nueva versión principal {{to}} (tienes {{from}}): mira las novedades.",
+    "manual": "Versiones principales solo a mano",
+    "manualHint": "Una nueva versión principal (p. ej. OBS 32 → 33) suele cambiar los controles y la configuración: no se instala automáticamente y espera un clic en Actualizaciones disponibles.",
+    "skippedAuto": "{{name}} {{version}} es una nueva versión principal: no se instala automáticamente, espera una actualización manual."
+  },
+  "ratePrompt": {
+    "title": "¿Qué te parece {{name}}?",
+    "never": "No preguntar",
+    "later": "Ahora no",
+    "setting": "Pedir valoración de aplicaciones nuevas",
+    "settingHint": "Unos días después de instalarla, Inicio te pregunta qué te parece la aplicación; una valoración con un clic ayuda a otros.",
+    "text_one": "La tienes desde hace {{count}} día. Tu valoración ayuda a otros a elegir.",
+    "text_many": "La tienes desde hace {{count}} días. Tu valoración ayuda a otros a elegir.",
+    "text_other": "La tienes desde hace {{count}} días. Tu valoración ayuda a otros a elegir.",
+    "thanks": "¡Gracias por tu valoración!",
+    "writeHint": "¿Quieres escribir unas palabras sobre {{name}}? Una reseña ayuda aún más a otros."
+  },
+  "forYou": {
+    "because": "Porque tienes {{name}}"
+  },
+  "channels": {
+    "try": "Prueba una versión preliminar:",
+    "prerelease": "Esta es una versión preliminar ({{channel}}): funciones nuevas antes, pero puede tener errores. Se instala junto a la versión estable.",
+    "stable": "Versión estable: {{name}}",
+    "name": {
+      "beta": "Beta",
+      "preview": "Preview",
+      "insiders": "Insiders",
+      "dev": "Dev",
+      "canary": "Canary",
+      "nightly": "Nightly",
+      "ptb": "PTB",
+      "alpha": "Alfa",
+      "rc": "RC",
+      "eap": "EAP"
+    }
+  },
+  "downloadLimit": {
+    "label": "Limitar la velocidad de descarga",
+    "hint": "Los instaladores que descarga HubGet no saturan tu conexión: útil en redes lentas o durante una videollamada.",
+    "none": "Sin límite",
+    "kbps": "{{n}} KB/s",
+    "mbps": "{{n}} MB/s"
+  },
+  "funding": {
+    "button": "Apoyar a los desarrolladores",
+    "title": "Apoyar a los desarrolladores de {{name}}",
+    "hint": "Enlaces del repositorio de la aplicación en GitHub. HubGet no se queda nada de las donaciones: van directamente a los desarrolladores."
+  },
+  "restore": {
+    "title": "¿Has reinstalado Windows?",
+    "text_one": "Este PC ({{name}}, visto por última vez {{when}}) tenía {{count}} aplicación que ahora falta. ¿La recuperas con un clic?",
+    "text_many": "Este PC ({{name}}, visto por última vez {{when}}) tenía {{count}} aplicaciones que ahora faltan. ¿Las recuperas con un clic?",
+    "text_other": "Este PC ({{name}}, visto por última vez {{when}}) tenía {{count}} aplicaciones que ahora faltan. ¿Las recuperas con un clic?",
+    "action_one": "Recuperar {{count}} aplicación",
+    "action_many": "Recuperar {{count}} aplicaciones",
+    "action_other": "Recuperar {{count}} aplicaciones"
+  },
+  "doctor": {
+    "button": "¿Por qué falló?",
+    "title": "¿Por qué no funcionó {{name}}?",
+    "checking": "Comprobando qué detuvo la operación…",
+    "fix": "Corregir e intentar de nuevo",
+    "defer": "Terminar al iniciar sesión",
+    "deferHint": "Al iniciar sesión la próxima vez, las aplicaciones que bloquean los archivos aún no se ejecutan: la actualización termina sola (HubGet debe iniciarse con Windows; si no, la próxima vez que lo abras).",
+    "running": "{{name}} se está ejecutando",
+    "runningHint": "Se cierra antes de volver a intentarlo, primero de forma normal para que pueda pedirte que guardes el trabajo.",
+    "holders": "Los archivos de la aplicación los usa: {{names}}",
+    "holdersHint": "El instalador no puede sobrescribirlos. Al reintentar se cierran y se evita que se reinicien durante la instalación. Cierra tú un programa con permisos de administrador o un servicio, o reinicia el PC.",
+    "reboot": "Windows espera un reinicio",
+    "rebootHint": "Tras reiniciar, la instalación suele funcionar: las actualizaciones de Windows sin terminar pueden bloquear los instaladores.",
+    "admin": "La operación necesita permisos de administrador",
+    "adminHint": "El reintento se ejecuta directamente como administrador: confirma el aviso de UAC.",
+    "network": "No se puede descargar el instalador",
+    "networkHint": "Comprueba la conexión a internet (o la VPN / el proxy) e inténtalo de nuevo.",
+    "disk": "Queda poco espacio en el disco",
+    "diskLink": "Liberar espacio en el resumen del PC",
+    "signature": "La firma del instalador no coincide",
+    "signatureHint": "Por seguridad, HubGet no ejecutó el instalador. Los detalles y la opción de aceptar el cambio están en la página de la aplicación.",
+    "manifest": "El problema probablemente está en el manifiesto de winget",
+    "manifestHint": "Un enlace, la suma de comprobación o los códigos del instalador del catálogo de winget no coinciden. Ayuda informar a los responsables:",
+    "manifestReport": "rellenar un informe en GitHub",
+    "nothing": "No encontré nada evidente",
+    "nothingHint": "Inténtalo de nuevo: pudo ser un fallo momentáneo."
+  },
+  "failedRetry": {
+    "text_one": "Falló {{count}} operación ({{names}}).",
+    "text_many": "Fallaron {{count}} operaciones ({{names}}).",
+    "text_other": "Fallaron {{count}} operaciones ({{names}}).",
+    "retry": "Reintentar las fallidas"
+  },
+  "afterBatch": {
+    "label": "Al terminar las actualizaciones",
+    "none": "Al terminar: nada",
+    "sleep": "Al terminar: suspender",
+    "shutdown": "Al terminar: apagar",
+    "title": {
+      "sleep": "¿Suspender el PC?",
+      "shutdown": "¿Apagar el PC?"
+    },
+    "now": {
+      "sleep": "Suspender ahora",
+      "shutdown": "Apagar ahora"
+    },
+    "text": {
+      "sleep_one": "Las actualizaciones han terminado. El PC se suspenderá en {{count}} segundo.",
+      "sleep_many": "Las actualizaciones han terminado. El PC se suspenderá en {{count}} segundos.",
+      "sleep_other": "Las actualizaciones han terminado. El PC se suspenderá en {{count}} segundos.",
+      "shutdown_one": "Las actualizaciones han terminado. El PC se apagará en {{count}} segundo.",
+      "shutdown_many": "Las actualizaciones han terminado. El PC se apagará en {{count}} segundos.",
+      "shutdown_other": "Las actualizaciones han terminado. El PC se apagará en {{count}} segundos."
+    }
+  },
+  "deferred": {
+    "running_one": "Terminando una actualización aplazada: {{names}}.",
+    "running_many": "Terminando {{count}} actualizaciones aplazadas: {{names}}.",
+    "running_other": "Terminando {{count}} actualizaciones aplazadas: {{names}}."
+  },
+  "autoPause": {
+    "label": "Pausar las actualizaciones automáticas",
+    "hint": "No instalar nada por sí solo durante unos días, por ejemplo antes de una presentación o de viaje. La comprobación y los avisos siguen funcionando.",
+    "until": "En pausa hasta {{until}}; después las actualizaciones automáticas se reanudan solas.",
+    "resume": "Reanudar",
+    "days_one": "{{count}} día",
+    "days_many": "{{count}} días",
+    "days_other": "{{count}} días",
+    "skipped": "Las actualizaciones automáticas están en pausa hasta {{until}}: no se instala nada."
+  },
+  "prefetchUpdates": {
+    "label": "Descargar las actualizaciones por adelantado",
+    "hint": "Los instaladores de las actualizaciones pendientes de winget se descargan en segundo plano (no con conexión de uso medido); Actualizar todo luego casi solo instala."
+  },
+  "updatesOverview": {
+    "title_one": "Actualizar {{count}} aplicación",
+    "title_many": "Actualizar {{count}} aplicaciones",
+    "title_other": "Actualizar {{count}} aplicaciones",
+    "dontShow": "No mostrar la próxima vez",
+    "start_one": "Actualizar {{count}}",
+    "start_many": "Actualizar {{count}}",
+    "start_other": "Actualizar {{count}}",
+    "size": "{{size}} para descargar en total.",
+    "sizeAtLeast": "Al menos {{size}} para descargar (de algunas aplicaciones no conocemos el tamaño).",
+    "sizeUnknown": "Tamaño de descarga desconocido.",
+    "setting": "Resumen antes de Actualizar todo",
+    "settingHint": "Antes de una actualización masiva muestra qué se actualiza, de qué versión a cuál y cuánto se descargará; se pueden desmarcar aplicaciones."
+  },
+  "postCheck": {
+    "ok": "{{name}}: la comprobación tras la actualización es correcta.",
+    "missing": "{{name}}: tras la actualización falta el programa principal ({{file}}). Es posible que la aplicación no arranque; en sus detalles se puede volver a la versión anterior.",
+    "invalid": "{{name}}: el programa principal tiene una firma no válida tras la actualización ({{file}}). El archivo podría estar dañado o manipulado; considere volver a la versión anterior en los detalles de la aplicación.",
+    "unsigned": "{{name}}: el programa principal estaba firmado, pero tras la actualización no tiene firma ({{file}}). Considere volver a la versión anterior en los detalles de la aplicación."
+  },
+  "sendToDevice": {
+    "menu": "Instalar en otro PC…",
+    "title": "Instalar {{name}} en otro PC",
+    "intro": "El PC instalará la aplicación en cuanto HubGet se ejecute en él con la misma cuenta.",
+    "present": "Ya está allí",
+    "oldVersion": "Necesita un HubGet más nuevo",
+    "waiting": "Enviado: esperando a HubGet",
+    "send": "Enviar"
+  },
+  "schedule": {
+    "menu": "Instalar más tarde…",
+    "menuCancel": "Cancelar la instalación programada ({{when}})",
+    "title": "¿Cuándo instalar {{name}}?",
+    "night": "Por la noche ({{when}})",
+    "hour": "Dentro de una hora",
+    "custom": "Hora personalizada",
+    "hint": "HubGet tiene que estar en ejecución (basta con que esté junto al reloj). Hasta entonces el PC no entrará en suspensión por sí solo; si está apagado, la instalación se hará al volver a iniciar HubGet.",
+    "submit": "Programar",
+    "done": "Instalación de {{name}} programada: {{when}}.",
+    "running_one": "Empieza la instalación programada: {{names}}.",
+    "running_many": "Empiezan las instalaciones programadas: {{names}}.",
+    "running_other": "Empiezan las instalaciones programadas: {{names}}.",
+    "banner": "Instalaciones programadas",
+    "cancel": "Cancelar la instalación programada de {{name}}"
+  },
+  "trial": {
+    "menu": "Probar una semana",
+    "menuHint": "Instala la aplicación; si no la abre ni una vez en una semana, HubGet le ofrecerá desinstalarla.",
+    "kept": "{{name}}: terminó la semana de prueba; usa la aplicación, así que se queda.",
+    "notify_one": "Terminó la semana de prueba: no ha abierto nunca {{names}}. ¿Conservar o desinstalar? (Inicio)",
+    "notify_many": "Terminó la semana de prueba: no ha abierto nunca {{names}}. ¿Conservar o desinstalar? (Inicio)",
+    "notify_other": "Terminó la semana de prueba: no ha abierto nunca {{names}}. ¿Conservar o desinstalar? (Inicio)",
+    "title": "¿Ha probado {{name}}?",
+    "text_one": "En {{count}} día desde la instalación no ha abierto la aplicación ni una vez.",
+    "text_many": "En {{count}} días desde la instalación no ha abierto la aplicación ni una vez.",
+    "text_other": "En {{count}} días desde la instalación no ha abierto la aplicación ni una vez.",
+    "keep": "Conservar",
+    "uninstall": "Desinstalar"
+  },
+  "installerScan": {
+    "label": "Analizar los instaladores con Microsoft Defender",
+    "hint": "Defender analiza los instaladores que descarga HubGet antes de ejecutarlos (en el PC, gratis). Si encuentra algo, la instalación no empieza."
   }
 }

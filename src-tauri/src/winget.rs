@@ -6,10 +6,10 @@
 //!   stahování z výstupu a výsledek z návratového kódu (HRESULT).
 
 use serde::{Deserialize, Serialize};
-use std::collections::{BTreeMap, BTreeSet, HashSet};
+use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU64, Ordering};
-use std::sync::Mutex;
+use std::sync::{LazyLock, Mutex};
 use std::time::Duration;
 use tauri::ipc::Channel;
 use tauri::{AppHandle, Manager};
@@ -791,6 +791,8 @@ pub async fn winget_operation(
 ) -> Result<OperationResult, String> {
     // Firemní zásady: povolené zdroje a aplikace (org_policy.rs)
     crate::org_policy::check("winget", &request)?;
+    // Začátek operace – odloženou registraci MSIX hledá protokol nasazení od této chvíle
+    let started = std::time::Instant::now();
     // Program rozbalený na ploše (Tor Browser) winget po instalaci nevidí: aktualizace
     // = instalace nové verze (instalátor ji rozbalí do stejné složky), odinstalace =
     // jeho složka do Koše (obnovitelná). Složku najde backend sám podle názvu.
@@ -859,15 +861,25 @@ pub async fn winget_operation(
         // s minulým (store/signers.ts); stažení instalátoru do Stažených souborů nic nespouští
         signer_check: matches!(request.kind, Kind::Install | Kind::Update).then(|| options.and_then(|o| o.expected_signer.clone())),
     };
-    let mut result = operations::execute(id, spec, on_event).await?;
+    // Opakování po chybě „soubory aplikace drží jiný program“: po celou operaci ukončovat pomocné
+    // procesy, které soubory znovu načtou (služba kamery v Edgi / Claude) – konec s operací
+    let watch = options
+        .is_some_and(|o| o.close_file_users)
+        .then(|| crate::running::HolderWatch::start(request.package_id.clone(), request.name.clone().unwrap_or_default()));
+    let mut result = operations::execute(id.clone(), spec, on_event.clone()).await?;
+    drop(watch);
     if request.kind == Kind::Download {
         return Ok(result);
     }
     // Soubory aplikace drží jiný program – do chyby jeho název („Microsoft Edge, Claude“)
-    if result.error_key() == Some("inUseByOther") {
+    if may_be_locked(request.kind, result.error_key()) {
         let (package_id, name) = (request.package_id.clone(), request.name.clone().unwrap_or_default());
         let names = background(move || Ok(crate::running::file_user_names(&crate::running::file_users(&package_id, &name)))).await?;
-        result = result.with_detail(names);
+        if result.error_key() == Some("inUseByOther") {
+            result = result.with_detail(names);
+        } else if names.is_some() {
+            result = result.with_error("inUseByOther", names);
+        }
     }
     // „Není co aktualizovat“ (0x8A15002B): buď aplikace už nejnovější verzi má (nabídka vznikla
     // ze zastaralého stavu serveru wingetu, viz CHANGED), nebo nová verze potřebuje jiný typ
@@ -882,7 +894,22 @@ pub async fn winget_operation(
         // Úspěch, po kterém winget nabízí pořád novou verzi: aplikace MSIX ji jen připravila
         // a použije ji po zavření nebo restartu počítače (viz PENDING)
         let package_id = request.package_id.clone();
-        let current = background(move || Ok(cli_listed(&package_id))).await?;
+        let mut current = background(move || Ok(cli_listed(&package_id))).await?;
+        // Windows registraci odložily, protože balíček používá běžící aplikace (ChatGPT – služba
+        // Codexu, kterou Windows při nasazení samy spustí): dokončit ji hned s vynuceným zavřením
+        // aplikace (package_services.rs). Na pozadí ne – potřebuje práva správce (UAC).
+        if let Some(Some(Listed { available: Some(available), .. })) = &current {
+            let (available, seconds) = (available.clone(), started.elapsed().as_secs() + 60);
+            let staged = if request.background || crate::security::policy().elevation_prohibited {
+                Vec::new()
+            } else {
+                background(move || Ok(crate::package_services::deferred_packages(seconds, &available))).await?
+            };
+            if !staged.is_empty() && finish_deferred(staged, &on_event).await? {
+                let package_id = request.package_id.clone();
+                current = background(move || Ok(cli_listed(&package_id))).await?;
+            }
+        }
         if let Some(Some(Listed { available: Some(version), .. })) = current {
             let (app, package_id) = (app.clone(), request.package_id.clone());
             background(move || {
@@ -897,6 +924,77 @@ pub async fn winget_operation(
         mark_changed(&request.package_id);
     }
     Ok(result)
+}
+
+/// Mohl operaci zablokovat cizí program, který má načtené soubory aplikace? Winget to pozná
+/// jen podle manifestu (návratový kód instalátoru → packageInUseByApplication, 0x8A150111);
+/// manifest bez toho převodu (OBS 33.0.3: kód 6 → obecné „instalátor selhal“, 0x8A150006)
+/// dá jen obecnou chybu – rozhodne, jestli nějaký cizí program knihovny aplikace opravdu má
+/// načtené (running::file_users).
+fn may_be_locked(kind: Kind, error_key: Option<&str>) -> bool {
+    match error_key {
+        Some("inUseByOther") => true,
+        Some("installerFailed") => matches!(kind, Kind::Install | Kind::Update | Kind::Uninstall),
+        _ => false,
+    }
+}
+
+/// Dokončí odloženou registraci připravených balíčků MSIX s právy správce a s vynuceným zavřením
+/// aplikace (Add-AppxPackage -ForceApplicationShutdown – povýšený pomocník ho přijme jen pro balíček
+/// ve WindowsApps, package_services.rs). Jako ostatní povýšení: s „Požádat o práva správce jen
+/// jednou“ přes pomocníka relace, jinak dialog UAC. False = nepovedlo se (odmítnutý UAC, chyba).
+async fn finish_deferred(staged: Vec<String>, on_event: &Channel<OpEvent>) -> Result<bool, String> {
+    let _ = on_event.send(OpEvent::Notice { key: "finishingUpdate", detail: Some(staged.join(", ")) });
+    let events = on_event.clone();
+    background(move || {
+        let cancel = process::CancelToken::default();
+        for package in &staged {
+            let (program, args) = crate::package_services::register_command(package);
+            let on_output = |output: process::Output| {
+                if let process::Output::Line(text) = output {
+                    let _ = events.send(OpEvent::Line { text: text.to_string() });
+                }
+            };
+            let exit = if crate::security::policy().cache_elevation || crate::elevation::batch_active() {
+                crate::elevation::run_elevated_cached(&program, &args, &cancel, on_output)
+            } else {
+                crate::elevation::run_elevated(&program, &args, &cancel, on_output)
+            };
+            if !exit.is_ok_and(|e| !e.cancelled && e.code == 0) {
+                return Ok(false);
+            }
+        }
+        Ok(true)
+    })
+    .await
+}
+
+/// Stahování dopředu (fronta úloh a čekající aktualizace – store/jobs.ts): instalátor balíčku se
+/// stáhne do pracovní složky wingetu dřív, než na něj ve frontě přijde řada, nebo hned po nalezení
+/// aktualizace (Nastavení → Stahovat aktualizace předem). Operace ho pak jen ověří a nainstaluje;
+/// když na něj narazí během stahování, počká (operations::prefetch_installer).
+static AHEAD: LazyLock<Mutex<HashMap<String, process::CancelToken>>> = LazyLock::new(Default::default);
+
+/// Stáhne instalátor operace předem (jen winget, ne Microsoft Store). True = je připravený.
+#[tauri::command]
+pub async fn prefetch_ahead(request: OperationRequest) -> Result<bool, String> {
+    if is_store_id(&request.package_id) || !matches!(request.kind, Kind::Install | Kind::Update) {
+        return Ok(false);
+    }
+    let key = request.package_id.to_lowercase();
+    let token = process::CancelToken::default();
+    AHEAD.lock().unwrap_or_else(|e| e.into_inner()).insert(key.clone(), token.clone());
+    let done = background(move || Ok(resolve_installer(&show_args(&request)).is_some_and(|job| operations::prefetch_only(&job, &token)))).await;
+    AHEAD.lock().unwrap_or_else(|e| e.into_inner()).remove(&key);
+    done
+}
+
+/// Zruší stahování dopředu (úloha zrušena, připojení se změnilo na měřené).
+#[tauri::command]
+pub fn cancel_prefetch_ahead(package_id: String) {
+    if let Some(token) = AHEAD.lock().unwrap_or_else(|e| e.into_inner()).get(&package_id.to_lowercase()) {
+        token.cancel();
+    }
 }
 
 /// Program rozbalený na ploše, který winget nevidí: v registru k balíčku nic
@@ -1247,6 +1345,12 @@ mod tests {
         assert_eq!(other.error_key, Some("inUseByOther"));
         assert!(!other.retry_elevated);
         assert_eq!(interpret(Kind::Update, 0x8A15_0101_u32 as i32).error_key, Some("inUse"));
+        // OBS 33.0.3: manifest bez převodu kódu 6 – obecná chyba instalátoru, cizí program se hledá i tak
+        assert_eq!(interpret(Kind::Update, 0x8A15_0006_u32 as i32).error_key, Some("installerFailed"));
+        assert!(may_be_locked(Kind::Update, Some("installerFailed")));
+        assert!(may_be_locked(Kind::Update, Some("inUseByOther")));
+        assert!(!may_be_locked(Kind::Download, Some("installerFailed")));
+        assert!(!may_be_locked(Kind::Update, Some("hashMismatch")));
         // ChatGPT 26.1117 (MSIX se službou Codex): „Administrator privileges required to install packaged service“
         let packaged_service = interpret(Kind::Update, 0x8007_3D28_u32 as i32);
         assert_eq!(packaged_service.error_key, Some("requiresAdmin"));

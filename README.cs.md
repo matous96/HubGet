@@ -107,7 +107,7 @@ s právy správce.
   `hubget search …` v příkazovém řádku i PowerShellu; průběh ukáže HubGet.
 - 📶 **Jedno procento za celou instalaci** – stahování i instalace v jednom pruhu se
   zbývajícím časem; průběh je vidět i na ikoně v hlavním panelu, pravým tlačítkem na ní
-  rychlé akce (Dostupné aktualizace, Aktualizovat vše, Přehled počítače).
+  rychlé akce (Dostupné aktualizace s počtem, Aktualizovat vše, Nainstalované, Hledat, Přehled počítače).
 - 🧪 **Vyzkoušet ve Windows Sandboxu** – aplikaci nainstalujete do izolovaných Windows,
   která se po zavření zahodí; do počítače se nic nedostane.
 - 💼 **Záloha nastavení před aktualizací** – když aktualizaci vrátíte, vrátí se i nastavení.
@@ -158,6 +158,44 @@ s právy správce.
 - 💡 **Navržené aplikace a odpovědi vývojářů** – chybějící aplikaci navrhnete a ostatní hlasují;
   vývojáři odpovídají na recenze a vidí statistiky instalací.
 - 🎉 **Váš rok s HubGetem** – souhrn instalací, aktualizací a ušetřeného času.
+- ☁️ **Dříve nainstalované** – aplikace, které jste už měli (i na ostatních počítačích), mají
+  místo Instalovat mráček; v Knihovně je najdete všechny a jde je skrýt.
+- 📤 **Uvolnit aplikaci** – odinstaluje ji, ale nastavení nechá; po opětovné instalaci se vrátí.
+- ⏸️ **Pozastavit stahování** – stahování instalátoru jde pozastavit a později navázat.
+- 🌟 **Významné aktualizace** – nové hlavní verze nainstalovaných aplikací na Domů.
+- ⭐ **Výzva k hodnocení** – pár dní po instalaci hodnocení jedním kliknutím.
+- 🔁 **Automaticky z ostatních počítačů** – co nainstalujete jinde, nainstaluje se i tady.
+- 💡 **Doporučeno pro vás** – „Protože máte OBS…“ podle nainstalovaných aplikací, jen místně.
+- 🧪 **Předběžné verze** – u aplikací s Beta, Insiders či Nightly ve WinGetu je vyzkoušíte
+  vedle stabilní (jako TestFlight).
+- 🐢 **Limit rychlosti stahování** – instalátory nezahltí připojení.
+- 💖 **Podpořit vývojáře** – odkazy na GitHub Sponsors, Open Collective, Ko-fi… u open-source aplikací.
+- ♻️ **Obnova po přeinstalování Windows** – HubGet pozná počítač podle názvu a vrátí jeho aplikace.
+- 🩺 **Proč aktualizace selhala?** – průvodce najde, co ji zastavilo (programy držící soubory, služby,
+  restart, místo, manifest), a jedním kliknutím ji opraví a zopakuje.
+- 🔁 **Zkusit neúspěšné znovu** – po dávce aktualizací jen ty, které selhaly.
+- 🌙 **Po dokončení uspat nebo vypnout** – u Aktualizovat vše, s odpočtem, který jde zrušit.
+- 🔑 **Dokončit při příštím přihlášení** – než se spustí aplikace, které aktualizaci blokují.
+- 🐞 **Nahlásit chybu v manifestu wingetu** – předvyplněné hlášení do winget-pkgs.
+- ⏸️ **Pozastavit automatické aktualizace** na 1, 3 nebo 7 dní (třeba před prezentací).
+- 🧭 **Velké verze jen ručně** – nová hlavní verze (OBS 32 → 33) počká na kliknutí.
+- 📋 **Přehled před Aktualizovat vše** – co se aktualizuje, z jaké na jakou verzi a kolik se stáhne;
+  jednotlivé aplikace jde odškrtnout.
+- ⚡ **Stahovat aktualizace předem** – instalátory čekajících aktualizací se stáhnou na pozadí
+  a fronta si stahuje dvě další operace dopředu, takže se pak skoro jen instaluje.
+- ✅ **Kontrola po aktualizaci** – hlavní program musí být na místě a s platným podpisem,
+  jinak varování s radou vrátit předchozí verzi.
+- 🖥️ **Aktualizovat i ostatní počítače** – v Moje počítače „Aktualizovat tam“; druhý počítač
+  to provede, jakmile na něm HubGet poběží.
+- 📲 **Nainstalovat na jiný počítač** – z nabídky u Instalovat; aplikace se nainstaluje, jakmile
+  na tom počítači poběží HubGet.
+- 🌙 **Nainstalovat později** – v noci, za hodinu nebo ve zvolený čas; do té doby počítač neusne.
+- 🧪 **Vyzkoušet na týden** – když aplikaci za týden ani jednou nespustíte, HubGet nabídne ji
+  odinstalovat.
+- 🕵️ **Soukromí aplikací** – vypnutí telemetrie Firefoxu, Chromu, Edge, VS Code, Office, .NET
+  a dalších jejich oficiálními zásadami (Přehled počítače i detail aplikace).
+- 🛡️ **Kontrola instalátoru Defenderem** – stažený instalátor před spuštěním prověří Microsoft
+  Defender; když něco najde, instalace se nespustí.
 - ⌨️ **Win+Shift+H** otevře HubGet odkudkoli s kurzorem ve vyhledávání; jednou týdně
   souhrn, co se nainstalovalo a co čeká.
 - 📦 **Sady balíčků a profily** – sdílitelná sada aplikací pro nový počítač, export
@@ -338,6 +376,37 @@ Když operace i tak selže s „inUse“ (aplikace naběhla během operace), se 
 dotazu ji fronta stejně zavře a operaci jednou zopakuje bez dialogu (`retryAfterClosing`);
 teprve když selže i to, nebo se aplikace ptá na uložení práce, `AppInUseDialog` nabídne
 aplikaci zavřít a operaci zopakovat.
+
+Soubory aplikace může držet i cizí program – instalátor OBS skončí kódem 6, když má modul
+virtuální kamery OBS načtený Edge nebo Claude (jejich služba kamery `video_capture`).
+Winget to pozná jen z manifestu (0x8A150111, `inUseByOther`); manifest bez převodu kódu
+(OBS 33.0.3) dá obecné „instalátor selhal“ (0x8A150006) – backend pak sám zjistí, jestli
+nějaký cizí program má načtené knihovny ze složky aplikace (`running::file_users`, výčet
+modulů procesů, ~0,1 s), a chybu přepíše na `inUseByOther` s jeho názvem. Fronta takový
+program zavře stejně jako aplikaci (`retryAfterClosing` → `closeRunningApp`; pomocný proces
+bez okna natvrdo – okno programu zůstane a službu si spustí znovu) a operaci zopakuje;
+neúspěšný první pokus z historie zmizí. Automatická aktualizace na pozadí takto zavře jen
+procesy bez okna (vypínač „Ukončit aplikaci běžící na pozadí bez dotazu“), program s oknem nechá být a zkusí
+to při příští kontrole. HubGet ani jeho podřízené procesy (WebView2) se nezavírají nikdy
+(`own_tree`).
+
+Hledá se i ve sdílených složkách aplikace mimo složku instalace (`related_data_dirs` – složky
+v ProgramData a AppData, jejichž název začíná názvem složky instalace: `obs-studio-hook` k
+`obs-studio`; hák OBS pro záznam her se načítá i do grafických procesů jiných aplikací, třeba
+ASUS Armoury Crate). Pomocné procesy (služba kamery v Edgi / Claude, grafický proces Electronu)
+se po ukončení do pár sekund spustí znovu – opakování proto nese `closeFileUsers` a backend je
+po celou operaci ukončuje znovu a znovu (`running::HolderWatch`, procesy s oknem vynechá).
+Instalátor, který winget po ověření přejmenoval, se při opakování najde podle SHA-256
+(`download::reuse_renamed`) – nestahuje se znovu.
+
+**Odložená registrace MSIX** (`package_services.rs`): když balíček používá běžící aplikace (ChatGPT
+= balíček OpenAI.Codex se službou Windows, kterou Windows při nasazení samy spustí), winget
+registraci odloží („Restart the application to complete the upgrade“) a s vynuceným zavřením ji
+nikdy nezkusí. HubGet připravený balíček najde v protokolu nasazení (AppXDeploymentServer, událost
+638 „Directly serviced packages“ s nabízenou verzí) a zaregistruje ho s právy správce:
+`Add-AppxPackage -DisableDevelopmentMode -ForceApplicationShutdown -Register '…\WindowsApps\<balíček>\AppxManifest.xml'`.
+Povýšený pomocník přijme jen přesně tento příkaz a jen pro balíček, který ve WindowsApps leží
+(`is_register_command`). Na pozadí (bez UAC) zůstává čekání na restart (`PENDING`).
 Automatické aktualizace na pozadí aplikace nezavírají. Obecná slova
 („app“, „client“, „launcher“…) se jako název aplikace nepoužijí – „NVIDIA App“
 tak nechytí cizí složku `app`.
@@ -1248,8 +1317,9 @@ z deps.dev (Google Open Source Insights, čísla pár dní stará), s proměnnou
   `setProgressBar`, oprávnění `core:window:allow-set-progress-bar`): stejné procento jako
   karta, žlutě (Paused), když se čeká na uživatele, běžící pruh u neurčitého průběhu.
 - **Rychlé akce na ikoně** (`src-tauri/src/jumplist.rs`, `ICustomDestinationList`): zástupci
-  na HubGet s `--cli updates` / `--cli update` / `--cli overview` (projdou cestou příkazu
-  `hubget`), názvy v jazyce aplikace posílá frontend (`set_jump_list`, jen povolené příkazy).
+  na HubGet s `--cli updates` / `update` / `installed` / `search` / `overview` (projdou cestou příkazu
+  `hubget`; `search` bez textu dá kurzor do vyhledávání), názvy v jazyce aplikace posílá frontend
+  (`set_jump_list`, jen povolené příkazy) – u Dostupných aktualizací s počtem, obnoví se s každou změnou.
 - **Vyzkoušet ve Windows Sandboxu** (nabídka u Instalovat, jen WinGet; `src-tauri/src/sandbox.rs`,
   `lib/sandbox.ts`): `winget download` stáhne a ověří instalátor do
   `%LOCALAPPDATA%\<id aplikace>\sandbox`, konfigurace `.wsb` ho připojí do `C:\HubGet`
@@ -1375,6 +1445,115 @@ z deps.dev (Google Open Source Insights, čísla pár dní stará), s proměnnou
 - **Váš rok s HubGetem** (`pages/YearPage.tsx` na `/year`, `store/yearStats.ts`, odkaz z Historie):
   průběžné počty operací po letech (historie drží jen 500 záznamů), nejčastěji aktualizované
   aplikace, měsíce a odhad ušetřeného času; jen místně.
+- **Dříve nainstalované** (`pages/PreviousPage.tsx` na `/previous`, `store/everInstalled.ts`): každá
+  aplikace z katalogu, kterou HubGet viděl nainstalovanou (PackageIndexSync), a jednou i aplikace
+  z historie operací (instalace, aktualizace, oprava, odinstalace); `elsewhere` = aplikace z ostatních
+  počítačů na účtu (Moje počítače). Nenainstalovaná aplikace, která tu (nebo jinde) byla, má
+  v `PackageAction` mráček – v seznamech jen ikona široká jako tlačítko Instalovat, v detailu
+  „Nainstalovat znovu“. Skryté položky (`hidden`); Vymazat historii zapomene vše kromě nainstalovaných.
+- **Uvolnit aplikaci** (nabídka nainstalované aplikace; `store/offloaded.ts`, `Job.offload`):
+  před odinstalací se nastavení zálohuje vždy (`settings_backup`, i s vypnutou zálohou před
+  aktualizací), zbytky se nenabízejí ke smazání; po úspěšné instalaci téže aplikace
+  `restoreOffloaded` vrátí zálohu (`settings_restore`) a záznam smaže.
+- **Pozastavit stahování** (`operations.rs` → `pause_operation`, `download.rs`, `store/pausedJobs.ts`):
+  jen když instalátor stahuje HubGet sám (předstažení wingetu – událost `pausable`). Pozastavení
+  ukončí curl a nechá `.unibox-part`; operace skončí jako `cancelled` s klíčem `paused`, úloha
+  čeká mimo frontu (fronta pokračuje). Pokračovat ji zařadí znovu a curl naváže
+  (`--continue-at -`; curl pak hlásí procenta jen ze zbytku – `overall_percent` přičte
+  stažené); server bez navázání (curl 33) = celý soubor znovu. Zrušení rozstažený soubor smaže.
+- **Významné aktualizace** (`lib/majorUpdate.ts`, `components/home/MajorUpdates.tsx`): nová hlavní
+  verze (první číslo verze; rok a sestavení ≥ 1000 se nepočítají) – karty na Domů s první větou
+  poznámek k vydání, štítek v seznamu aktualizací a v Co je nového.
+- **Výzva k hodnocení** (`components/home/RatePrompt.tsx`, `lib/ratePrompt.ts`, `store/ratePrompts.ts`):
+  instalace přes HubGet starší 3 dnů a mladší 60 dnů, aplikace je pořád nainstalovaná a není
+  ohodnocená; nejvýš jedna výzva denně, „Neptat se“ (zpět v Nastavení → Aktualizace balíčků).
+- **Automaticky z ostatních počítačů** (Nastavení → Moje počítače; `DeviceAutoInstaller`,
+  `store/deviceInstalls.ts`): aplikace, která na jiném počítači přibyla po zapnutí (výchozí stav
+  se při zapnutí i u nového počítače jen zapamatuje), se nainstaluje na pozadí – přes stejného
+  správce, jinak přes jiný zapnutý zdroj; ne aplikace, kterou tu uživatel odinstaloval. Na měřeném
+  připojení (volba „přeskočit na měřeném připojení“ automatických aktualizací) počká.
+- **Doporučeno pro vás** (`components/home/ForYou.tsx`, `lib/recommendations.ts`): výchozí aplikace
+  = nainstalované přes HubGet (nejnovější první), pak ostatní nainstalované podle popularity; každá
+  kategorie jen jednou (bez Systém), kandidáti ze stejné hlavní kategorie – víc společných štítků,
+  pak popularita; bez nainstalovaných a dřív nainstalovaných (`everInstalled`). Jen místně.
+- **Předběžné verze** (`lib/channels.ts`, `components/package/ChannelLinks.tsx`): samostatné balíčky
+  WinGetu s příponou id (`.Beta`, `.Insiders`, `.Nightly`, `.Canary`, `.PTB`…) – stabilní detail
+  nabídne kanály, detail předběžné verze upozorní a odkáže na stabilní.
+- **Limit rychlosti stahování** (Nastavení → Aktualizace balíčků; `downloadLimit` v
+  `store/autoUpdates.ts`, `DownloadLimitSync` → `set_download_limit`): curl předstažení dostane
+  `--limit-rate`; instalátory, které stahuje správce sám, omezení nemají.
+- **Podpořit vývojáře** (`components/package/FundingButton.tsx`, `lib/funding.ts`,
+  `services/funding.ts`): odkazy z katalogu (data pipeline – GraphQL `fundingLinks`, pole `funding`),
+  jinak živě z FUNDING.yml na raw.githubusercontent.com (`.github/FUNDING.yml`, `FUNDING.yml`,
+  repozitář `.github` vlastníka); vlastní adresy jen http(s).
+- **Obnova po přeinstalování Windows** (`components/home/RestoreFromDevice.tsx`): záznam jiného
+  počítače se stejným názvem jako tento (Moje počítače) a aspoň 5 aplikací, které tu chybí –
+  nabídka na Domů otevře dialog importu profilu (`deviceMissingApps`); zavřená se u záznamu
+  neukáže (`dismissedRestore`).
+- **Výzva k hodnocení → recenze**: po hodnocení z výzvy nabídka „Napsat recenzi“ – detail
+  s `?review=write` otevře psaní recenze (`RatingsSection`).
+- **Proč aktualizace selhala?** (Historie operací → u chyby; `components/package/UpdateDoctorDialog.tsx`):
+  `app_blockers` (running.rs) spojí načtené knihovny (`file_users`) s Restart Managerem
+  (`RmGetList` nad DLL/EXE ze složek aplikace, nejvýš 3000 souborů – vidí i služby a otevřené
+  soubory), k tomu běžící aplikace, čekající restart (`windows_health`) a klíč chyby z historie
+  (`errorKey`): připojení, místo, práva správce, podpis, manifest. „Opravit a zkusit znovu“ zavře,
+  co jde (`closeApp`), a operaci zařadí s `closeFileUsers` (u práv správce i `asAdmin`).
+- **Zkusit neúspěšné znovu** (`FailedRetryBanner`, `useFailedBatch`): fronta si v dávce pamatuje
+  neúspěšné operace spuštěné uživatelem; na konci dávky nabídka nad aktualizacemi a v historii.
+- **Po dokončení uspat / vypnout** (`AfterBatchSelect`, `PowerCountdownDialog`, `power_action`):
+  volba platí pro jednu dávku; po doběhnutí fronty odpočet 60 s (jde zrušit), pak
+  `SetSuspendState` nebo `shutdown /s /t 0`.
+- **Dokončit při příštím přihlášení** (`useDeferredUpdates` – ukládá se, `DeferredUpdatesRunner`,
+  `session_info`): odložené operace se po načtení nainstalovaných aplikací zařadí, když HubGet
+  spustily Windows (`--autostart`) nebo když se od odložení změnil čas startu počítače.
+- **Nahlásit chybu v manifestu** (`lib/manifestIssue.ts`): u chyb, za které nejspíš může manifest
+  (odkaz, součet, neznámý kód instalátoru), odkaz na nové hlášení v microsoft/winget-pkgs
+  s předvyplněným nadpisem a textem podle šablony Package Issue (bez osobních údajů); odeslání
+  je na uživateli.
+- **Pozastavit automatické aktualizace** (Nastavení → Aktualizace balíčků; `pausedUntil`
+  v `store/autoUpdates.ts`): do zvoleného času `useAutoUpdates` nic nezařadí (jen záznam
+  v protokolu), kontrola a oznámení běží dál; „Obnovit“ pauzu zruší.
+- **Velké verze jen ručně** (`majorManual`, výchozí zapnuto; `lib/majorUpdate.ts`): automatické
+  aktualizace vynechají změnu hlavní verze (`isMajorUpdate`) a jednou za běh to zapíšou do protokolu.
+- **Přehled před Aktualizovat vše** (`components/package/UpdatesOverviewDialog.tsx`,
+  `overviewBeforeUpdateAll`): bezpečnostní a velké aktualizace první, velikost instalátoru ze
+  zdroje, přes který je aplikace nainstalovaná, a první věta novinek; „Příště neukazovat“ volbu vypne.
+- **Stahovat dopředu** (`prefetch_ahead` / `cancel_prefetch_ahead` ve winget.rs, `prefetchQueued`
+  v `store/jobs.ts`): fronta stáhne instalátory dalších dvou čekajících operací současně s během
+  aktuální (`IN_FLIGHT` v operations.rs zabrání dvojímu stahování téhož souboru); zrušení operace
+  ve frontě stahování zastaví. `UpdatePrefetcher` (`prefetchUpdates`) mimo frontu a ne na
+  měřeném připojení stáhne předem instalátory všech čekajících aktualizací z wingetu.
+- **Kontrola po aktualizaci** (`checkAfterUpdate` v `store/jobs.ts`): před aktualizací
+  `check_signatures` zjistí hlavní program aplikace a jeho podpis; 15 s po úspěchu se porovná –
+  chybějící soubor, neplatný podpis nebo ztracený podpis dají oznámení s radou vrátit verzi.
+- **Aktualizovat tam** (Moje počítače; `store/devices.ts`): žádost `{ id, target, kind: "updateAll" }`
+  jde do záznamu počítače, který žádá (každý počítač píše jen do svého, platí 7 dní);
+  `DeviceCommandRunner` na cílovém počítači ji po načtení nainstalovaných aplikací vyřídí jednou
+  (`handled`) jako Aktualizovat vše a obnoví „naposledy vidět“, aby žádající počítač viděl, že
+  došla. Tlačítko se nabídne jen počítačům, které žádosti umí (`accepts`, starší HubGet ne).
+- **Nainstalovat na jiný počítač** (nabídka instalace; `components/package/SendToDeviceDialog.tsx`):
+  žádost `{ kind: "install", app: { appId, name, source, packageId } }` stejnou cestou jako Aktualizovat
+  tam (stejná aplikace pro stejný počítač nahradí předchozí, nejvýš 20 žádostí). Cílový počítač ji
+  nainstaluje přes stejného správce, jinak přes jiný zapnutý zdroj z katalogu (`pickSource`); co tam
+  už je, jen zapíše do protokolu. Synchronizace přijme jen známé druhy a platnou aplikaci (`syncKinds.ts`).
+- **Nainstalovat později** (`store/scheduled.ts`, `components/package/ScheduleInstall.tsx`): v noci
+  (nejbližší 2:00), za hodinu nebo vlastní čas; `ScheduledInstallsRunner` kontroluje každých 30 s
+  a dokud nějaká instalace čeká, `keep_awake` (system.rs) drží `SetThreadExecutionState` ve vlastním
+  vlákně – počítač sám neusne. Propásnutý čas (vypnutý počítač) se doplní po spuštění HubGetu.
+- **Vyzkoušet na týden** (`store/trials.ts`, `components/home/TrialPrompt.tsx`): po 7 dnech
+  `TrialWatcher` zjistí z `app_last_used` (UserAssist), jestli se aplikace od začátku zkoušky
+  spustila (nebo právě běží) – pak zůstane bez ptaní, jinak nabídka Ponechat / Odinstalovat na Domů.
+- **Soukromí aplikací** (`src-tauri/src/privacy.rs`, `lib/privacy.ts`, `components/home/PrivacyPanel.tsx`):
+  jen zdokumentované zásady výrobců – Firefox / Thunderbird `DisableTelemetry`, Chrome
+  `MetricsReportingEnabled`, Edge `DiagnosticData`, Brave (i P3A a statistický ping), VS Code
+  `TelemetryLevel`, Visual Studio SQM, Office `SendTelemetry`, proměnné `DOTNET_CLI_TELEMETRY_OPTOUT`
+  a `POWERSHELL_TELEMETRY_OPTOUT`. Uživatelské zapíše HubGet sám (proměnné rozešle `WM_SETTINGCHANGE`),
+  zásady v HKLM přes PowerShell jako správce – povýšit jde jen skript přesně podle seznamu
+  (`is_policy_command`). Vrácení smaže jen hodnoty HubGetu, ne celý klíč.
+- **Kontrola instalátoru Defenderem** (`src-tauri/src/defender.rs`, Nastavení → Aktualizace balíčků):
+  po stažení a ověření podpisu `MpCmdRun -Scan -ScanType 3 -File … -DisableRemediation` (bez práv
+  správce); kód 2 = hrozba → chyba `threatFound` s názvem hrozby, jiný kód (jiný antivirus) jen
+  zápis do protokolu. Průběh ukazuje fázi „Kontrola Defenderem“.
 - **Diagnostika pro podporu** (Nastavení → Kontaktovat HubGet; `lib/diagnostics.ts`,
   `components/settings/DiagnosticsCard.tsx`): verze, správci, disk, nastavení, firemní
   zásady, posledních 30 neúspěšných operací a 300 řádků protokolu do souboru nebo schránky;

@@ -40,6 +40,8 @@ export const queryKeys = {
   /** Snímky aplikace od uživatelů – podle uživatele (vlastní čekající vidí jen autor). */
   appScreenshots: (id: string, userId?: string | null) => ["app-screenshots", id, userId ?? null] as const,
   githubStars: (repo: string) => ["github-stars", repo] as const,
+  /** Odkazy na podporu vývojáře z FUNDING.yml (services/funding.ts). */
+  funding: (repo: string) => ["funding", repo] as const,
   /** Aplikace po spuštění Windows (stránka Po spuštění). */
   startup: ["startup"] as const,
   /** Zaznamenané instalace (sledování instalace). */

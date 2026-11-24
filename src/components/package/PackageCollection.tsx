@@ -1,5 +1,5 @@
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { scrollRestore, useScrollContainer } from "@/hooks/useScrollContainer";
 import { useSettings } from "@/store/settings";
 import type { CatalogEntry } from "@/types";
@@ -14,6 +14,8 @@ interface PackageCollectionProps {
   noteTone?: NoteTone;
   /** Jiný vzhled poznámky u jednotlivých aplikací (bezpečnostní aktualizace červeně). */
   noteTones?: ReadonlyMap<string, NoteTone>;
+  /** Tlačítko navíc vedle hlavní akce (Dříve nainstalované: Skrýt) – stabilní funkce (useCallback), řádky jsou memo. */
+  extra?: (entry: CatalogEntry) => ReactNode;
 }
 
 /** Mřížka: nejmenší šířka karty a mezera – sloupce přibývají se šířkou okna (jako auto-fill). */
@@ -42,7 +44,7 @@ let lastWidth = 0;
  * každého řádku virtualizér změří (karty s delším popisem jsou vyšší).
  * Seznam leží uvnitř stránky – obsah nad ním (záhlaví, filtry) je scrollMargin.
  */
-export function PackageCollection({ packages, showUninstall, notes, noteTone, noteTones }: PackageCollectionProps) {
+export function PackageCollection({ packages, showUninstall, notes, noteTone, noteTones, extra }: PackageCollectionProps) {
   const mode = useSettings((s) => s.viewMode) === "list" ? "list" : "grid";
   const scroller = useScrollContainer();
   const container = useRef<HTMLDivElement>(null);
@@ -100,10 +102,10 @@ export function PackageCollection({ packages, showUninstall, notes, noteTone, no
             }}
           >
             {mode === "list" ? (
-              <PackageRow entry={packages[first]} showUninstall={showUninstall} note={notes?.get(packages[first].id)} noteTone={noteTones?.get(packages[first].id) ?? noteTone} />
+              <PackageRow entry={packages[first]} showUninstall={showUninstall} note={notes?.get(packages[first].id)} noteTone={noteTones?.get(packages[first].id) ?? noteTone} extra={extra} />
             ) : (
               // Karty bez vlastních animací – při přeskládání mřížky (filtr, šířka okna) nepřejíždějí do strany
-              packages.slice(first, first + columns).map((p) => <PackageCard key={p.id} entry={p} showUninstall={showUninstall} note={notes?.get(p.id)} noteTone={noteTones?.get(p.id) ?? noteTone} />)
+              packages.slice(first, first + columns).map((p) => <PackageCard key={p.id} entry={p} showUninstall={showUninstall} note={notes?.get(p.id)} noteTone={noteTones?.get(p.id) ?? noteTone} extra={extra} />)
             )}
           </div>
         );

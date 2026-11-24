@@ -292,6 +292,49 @@ pub struct WindowsHealth {
     pub system_protection: Option<bool>,
 }
 
+/// Relace Windows pro „Dokončit při příštím přihlášení“ (store/deferredUpdates.ts): spustil
+/// HubGet Windows po přihlášení (`--autostart`) a kdy naposledy nastartoval počítač (s od 1970).
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SessionInfo {
+    autostart: bool,
+    boot: u64,
+}
+
+#[tauri::command]
+pub fn session_info() -> SessionInfo {
+    #[cfg(windows)]
+    // SAFETY: GetTickCount64 nemá parametry ani vedlejší účinky
+    let uptime = unsafe { windows_sys::Win32::System::SystemInformation::GetTickCount64() };
+    #[cfg(not(windows))]
+    let uptime = 0;
+    let now = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map_or(0, |d| d.as_millis() as u64);
+    // Zaokrouhleno na minuty – doba běhu a hodiny se mezi voláními o pár ms rozcházejí
+    let boot = now.saturating_sub(uptime) / 60_000 * 60;
+    SessionInfo { autostart: std::env::args().any(|arg| arg == "--autostart"), boot }
+}
+
+/// Po dokončení aktualizací (Aktualizovat vše → Po dokončení): „sleep“ uspí počítač,
+/// „shutdown“ ho vypne. Frontend se předtím zeptá s odpočtem a jde to zrušit.
+#[tauri::command]
+pub async fn power_action(kind: String) -> Result<(), String> {
+    crate::process::background(move || match kind.as_str() {
+        "shutdown" => {
+            let mut command = crate::process::hidden_command(&crate::process::system_tool("shutdown.exe").to_string_lossy());
+            command.args(["/s", "/t", "0"]);
+            crate::process::run(command, std::time::Duration::from_secs(15)).map(|_| ())
+        }
+        #[cfg(windows)]
+        "sleep" => {
+            // SAFETY: SetSuspendState nemá ukazatele; false = uspat (ne hibernovat), bez vynucení
+            let ok = unsafe { windows_sys::Win32::System::Power::SetSuspendState(false, false, false) };
+            if ok { Ok(()) } else { Err("Uspání se nepovedlo".into()) }
+        }
+        other => Err(format!("Neznámá akce: {other}")),
+    })
+    .await
+}
+
 #[tauri::command]
 pub async fn windows_health() -> Result<WindowsHealth, String> {
     crate::process::background(|| Ok(read_windows_health())).await
@@ -328,4 +371,41 @@ mod health_tests {
         let health = super::read_windows_health();
         assert!(health.uptime_days < 10_000);
     }
+}
+
+/// Vlákno, které drží počítač vzhůru (naplánované instalace) – jeho odesílač; zahození vlákno ukončí.
+static AWAKE: std::sync::Mutex<Option<std::sync::mpsc::Sender<()>>> = std::sync::Mutex::new(None);
+
+/// Naplánované instalace (Nainstalovat později…): dokud nějaká čeká, počítač neusne sám od sebe
+/// (uspání ručně nebo zavřením víka zůstává na uživateli). SetThreadExecutionState s ES_CONTINUOUS
+/// platí, dokud běží vlákno, které ho nastavilo – proto vlastní vlákno, které čeká na vypnutí.
+#[tauri::command]
+pub fn keep_awake(on: bool) {
+    let mut guard = AWAKE.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    if on == guard.is_some() {
+        return;
+    }
+    if !on {
+        // Zahozený odesílač ukončí čekání vlákna – to stav vrátí
+        guard.take();
+        return;
+    }
+    let (sender, receiver) = std::sync::mpsc::channel::<()>();
+    std::thread::spawn(move || {
+        #[cfg(windows)]
+        // SAFETY: SetThreadExecutionState mění jen stav napájení tohoto vlákna, bez ukazatelů
+        unsafe {
+            use windows_sys::Win32::System::Power::{SetThreadExecutionState, ES_CONTINUOUS, ES_SYSTEM_REQUIRED};
+            SetThreadExecutionState(ES_CONTINUOUS | ES_SYSTEM_REQUIRED);
+        }
+        // Čeká, dokud odesílač nezahodí keep_awake(false) (nic se neposílá)
+        let _ = receiver.recv();
+        #[cfg(windows)]
+        // SAFETY: jako výše – návrat k výchozímu stavu
+        unsafe {
+            use windows_sys::Win32::System::Power::{SetThreadExecutionState, ES_CONTINUOUS};
+            SetThreadExecutionState(ES_CONTINUOUS);
+        }
+    });
+    *guard = Some(sender);
 }

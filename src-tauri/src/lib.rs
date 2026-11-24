@@ -50,6 +50,9 @@ mod offline;
 mod operations;
 mod org_policy;
 mod powershell;
+mod package_services;
+mod privacy;
+mod defender;
 mod preinstalled;
 mod process;
 mod progress;
@@ -155,6 +158,8 @@ pub fn run() {
             tray::set_tray_status,
             tray::show_window,
             operations::cancel_operation,
+            operations::pause_operation,
+            download::set_download_limit,
             operations::elevated_batch_begin,
             operations::elevated_batch_end,
             oauth::oauth_listen,
@@ -174,6 +179,8 @@ pub fn run() {
             winget::winget_cache,
             winget::winget_clear_cache,
             winget::winget_operation,
+            winget::prefetch_ahead,
+            winget::cancel_prefetch_ahead,
             winget::winget_installer_url,
             choco::choco_outdated,
             choco::choco_status,
@@ -231,6 +238,13 @@ pub fn run() {
             usage::app_last_used,
             running::app_processes,
             running::app_file_users,
+            running::app_blockers,
+            system::session_info,
+            system::power_action,
+            system::keep_awake,
+            privacy::privacy_status,
+            privacy::privacy_set,
+            defender::set_installer_scan,
             running::close_processes,
             running::close_app,
             running::app_close_state,

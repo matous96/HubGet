@@ -29,6 +29,8 @@ interface YearStatsState {
   /** Doplněno z historie (jednou). */
   seeded: boolean;
   record: (entry: HistoryEntry) => void;
+  /** Odečte neúspěšnou operaci, kterou fronta hned zopakovala (zavřela, co blokovalo instalátor). */
+  retract: (entry: HistoryEntry) => void;
   seed: (entries: HistoryEntry[]) => void;
 }
 
@@ -66,6 +68,12 @@ export const useYearStats = create<YearStatsState>()(
       years: {},
       seeded: false,
       record: (entry) => set({ years: addToYear(get().years, entry) }),
+      retract: (entry) => {
+        const key = String(new Date(entry.finishedAt).getFullYear());
+        const stats = get().years[key];
+        if (entry.outcome !== "error" || !stats?.failed) return;
+        set({ years: { ...get().years, [key]: { ...stats, failed: stats.failed - 1 } } });
+      },
       seed: (entries) => {
         if (get().seeded) return;
         // Historie je od nejnovějšího – započítat od nejstaršího

@@ -8,8 +8,8 @@
 //! - Operaci jde zrušit podle id, které přidělí frontend.
 
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
-use std::path::PathBuf;
+use std::collections::{HashMap, HashSet};
+use std::path::{Path, PathBuf};
 use std::sync::{LazyLock, Mutex};
 use tauri::ipc::Channel;
 
@@ -52,6 +52,9 @@ pub struct InstallOptions {
     /// Kdo podepsal minulý instalátor aplikace (store/signers.ts; „“ = bez podpisu) – jiný
     /// vydavatel nebo chybějící podpis instalaci zastaví (signatures.rs → signer_verdict).
     pub expected_signer: Option<String>,
+    /// Opakování po chybě „soubory aplikace drží jiný program“: po celou operaci ukončovat
+    /// pomocné procesy bez okna, které soubory aplikace znovu načtou (running::HolderWatch).
+    pub close_file_users: bool,
 }
 
 impl InstallOptions {
@@ -94,6 +97,8 @@ pub enum Phase {
     Installing,
     Uninstalling,
     Repairing,
+    /// Microsoft Defender prověřuje stažený instalátor (defender.rs).
+    Scanning,
 }
 
 /// Zpráva pro frontend během operace.
@@ -101,6 +106,8 @@ pub enum Phase {
 #[serde(tag = "type", rename_all = "camelCase")]
 pub enum OpEvent {
     Progress { phase: Phase, percent: Option<f64> },
+    /// Stahování instalátoru jde pozastavit (stahuje ho HubGet sám – `pause_operation`).
+    Pausable { pausable: bool },
     /// Řádek výstupu správce balíčků.
     Line { text: String },
     /// Hláška HubGetu pro protokol; text podle klíče přeloží frontend (logs.notice.*).
@@ -178,6 +185,11 @@ impl OperationResult {
     /// Chyba s upřesněním od správce (u „inUseByOther“ názvy programů, které drží soubory aplikace).
     pub fn with_detail(self, detail: Option<String>) -> Self {
         OperationResult { detail, ..self }
+    }
+
+    /// Přesnější výklad chyby, než dal návratový kód (návratový kód zůstává).
+    pub fn with_error(self, key: &'static str, detail: Option<String>) -> Self {
+        OperationResult { error_key: Some(key), detail, ..self }
     }
 
     /// Úspěch, který se projeví až po restartu (winget jen připravil novou verzi MSIX).
@@ -261,6 +273,24 @@ pub async fn elevated_batch_end() -> Result<(), String> {
     .await
 }
 
+/// Operace, které právě stahují instalátor samy (jde je pozastavit), a ty, které uživatel pozastavil.
+static PAUSABLE: LazyLock<Mutex<HashSet<String>>> = LazyLock::new(Default::default);
+static PAUSED: LazyLock<Mutex<HashSet<String>>> = LazyLock::new(Default::default);
+
+/// Pozastaví stahování instalátoru: curl se ukončí, rozstažený soubor zůstane a operace skončí
+/// jako „paused“ – fronta pokračuje dalšími úlohami a po „Pokračovat“ stahování naváže
+/// (download::fetch). False = operace teď nestahuje (instaluje, stahuje správce sám).
+#[tauri::command]
+pub fn pause_operation(id: String) -> bool {
+    if !PAUSABLE.lock().unwrap_or_else(|e| e.into_inner()).contains(&id) {
+        return false;
+    }
+    let Some(token) = OPERATIONS.lock().unwrap_or_else(|e| e.into_inner()).get(&id).cloned() else { return false };
+    PAUSED.lock().unwrap_or_else(|e| e.into_inner()).insert(id);
+    token.cancel();
+    true
+}
+
 #[tauri::command]
 pub fn cancel_operation(id: String) {
     if let Some(token) = OPERATIONS.lock().unwrap_or_else(|e| e.into_inner()).get(&id) {
@@ -273,6 +303,7 @@ pub async fn execute(id: String, spec: Spec, channel: Channel<OpEvent>) -> Resul
     let token = CancelToken::default();
     OPERATIONS.lock().unwrap_or_else(|e| e.into_inner()).insert(id.clone(), token.clone());
 
+    let op_id = id.clone();
     let result = process::background(move || {
         let mut spec = spec;
         let prefetch = spec.prefetch.take();
@@ -325,7 +356,19 @@ pub async fn execute(id: String, spec: Spec, channel: Channel<OpEvent>) -> Resul
         if let Some(resolve) = prefetch {
             tracker.prefetching();
             if let Some(job) = resolve() {
-                match prefetch_installer(&job, &token, &tracker) {
+                PAUSABLE.lock().unwrap_or_else(|e| e.into_inner()).insert(op_id.clone());
+                tracker.pausable(true);
+                let fetched = prefetch_installer(&job, &token, &tracker);
+                PAUSABLE.lock().unwrap_or_else(|e| e.into_inner()).remove(&op_id);
+                tracker.pausable(false);
+                // Pozastaveno: rozstažený soubor zůstane, operace skončí – po „Pokračovat“ se naváže
+                if matches!(fetched, Fetch::Cancelled) && PAUSED.lock().unwrap_or_else(|e| e.into_inner()).remove(&op_id) {
+                    return Ok(OperationResult { outcome: Outcome::Cancelled, code: 0, error_key: Some("paused"), restart_required: false, detail: None, signer: None });
+                }
+                if matches!(fetched, Fetch::Cancelled) {
+                    download::discard_partial(&job.target);
+                }
+                match fetched {
                     Fetch::Done => {
                         tracker.prefetched();
                         // 1b) Podpis instalátoru před spuštěním: kdo ho podepsal – a jestli stejný
@@ -345,6 +388,27 @@ pub async fn execute(id: String, spec: Spec, channel: Channel<OpEvent>) -> Resul
                                     });
                                 }
                                 signer = Some(signature.signer);
+                            }
+                        }
+                        // 1c) Kontrola Microsoft Defenderem – nález instalaci zastaví, nedostupný
+                        //     Defender (jiný antivirus) jen zmíní průběh
+                        if crate::defender::enabled() {
+                            tracker.scanning();
+                            let verdict = crate::defender::scan(&job.target);
+                            tracker.prefetched();
+                            match verdict {
+                                crate::defender::Verdict::Clean => tracker.notice("scanClean", None),
+                                crate::defender::Verdict::Threat(name) => {
+                                    return Ok(OperationResult {
+                                        outcome: Outcome::Error,
+                                        code: 0,
+                                        error_key: Some("threatFound"),
+                                        restart_required: false,
+                                        detail: Some(name),
+                                        signer,
+                                    });
+                                }
+                                crate::defender::Verdict::Unavailable(reason) => tracker.notice("scanUnavailable", Some(reason)),
                             }
                         }
                     }
@@ -396,6 +460,8 @@ pub async fn execute(id: String, spec: Spec, channel: Channel<OpEvent>) -> Resul
     .await;
 
     OPERATIONS.lock().unwrap_or_else(|e| e.into_inner()).remove(&id);
+    // Pozastavení přišlo, až když stahování skončilo – nic nečeká
+    PAUSED.lock().unwrap_or_else(|e| e.into_inner()).remove(&id);
     result
 }
 
@@ -440,10 +506,50 @@ fn run_command(command: &str, token: &CancelToken, tracker: &mut Tracker) -> Res
     })
 }
 
+/// Instalátory, které se právě stahují předem (stahování dopředu – winget.rs `prefetch_ahead`):
+/// operace, která na takový instalátor narazí, počká na jeho dokončení místo druhého stahování.
+static IN_FLIGHT: LazyLock<Mutex<HashSet<PathBuf>>> = LazyLock::new(Default::default);
+
+/// Začne stahování dopředu; false = tentýž instalátor se už stahuje.
+pub fn begin_prefetch(target: &Path) -> bool {
+    IN_FLIGHT.lock().unwrap_or_else(|e| e.into_inner()).insert(target.to_path_buf())
+}
+
+pub fn end_prefetch(target: &Path) {
+    IN_FLIGHT.lock().unwrap_or_else(|e| e.into_inner()).remove(target);
+}
+
+/// Stáhne instalátor (bez spuštění) a ověří SHA-256 – stahování dopředu.
+pub fn prefetch_only(job: &Prefetch, token: &CancelToken) -> bool {
+    if download::sha256_matches(&job.target, &job.sha256) || download::reuse_renamed(&job.target, &job.sha256) {
+        return true;
+    }
+    if !begin_prefetch(&job.target) {
+        return false;
+    }
+    let done = match download::fetch(&job.url, &job.target, token, |_| {}) {
+        Fetch::Done => download::sha256_matches(&job.target, &job.sha256),
+        // Zrušené / nepovedené: rozstažený soubor zůstane – operace na něj naváže
+        _ => false,
+    };
+    if !done && job.target.exists() && !download::sha256_matches(&job.target, &job.sha256) {
+        let _ = std::fs::remove_file(&job.target);
+    }
+    end_prefetch(&job.target);
+    done
+}
+
 /// Stáhne instalátor předem a ověří jeho SHA-256. Už stažený (stejný) soubor
 /// se nestahuje znovu – třeba při opakování operace.
 fn prefetch_installer(job: &Prefetch, token: &CancelToken, tracker: &Tracker) -> Fetch {
-    if download::sha256_matches(&job.target, &job.sha256) {
+    // Tentýž instalátor se právě stahuje dopředu – počkat na něj (průběh jako stahování)
+    while IN_FLIGHT.lock().unwrap_or_else(|e| e.into_inner()).contains(&job.target) {
+        if token.is_cancelled() {
+            return Fetch::Cancelled;
+        }
+        std::thread::sleep(std::time::Duration::from_millis(300));
+    }
+    if download::sha256_matches(&job.target, &job.sha256) || download::reuse_renamed(&job.target, &job.sha256) {
         return Fetch::Done;
     }
     match download::fetch(&job.url, &job.target, token, |percent| tracker.download_percent(percent)) {

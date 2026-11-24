@@ -134,6 +134,42 @@ retries it with administrator rights by itself.
 - 💡 **Suggested apps and developer replies** – suggest a missing app and others vote; developers
   reply to reviews and see install statistics.
 - 🎉 **Your year with HubGet** – a summary of installs, updates and time saved.
+- ☁️ **Previously installed** – apps you’ve had before (on any of your PCs) show a cloud instead
+  of Install; find them all in the Library and hide the ones you don’t want.
+- 📤 **Offload app** – uninstalls an app but keeps its settings; they come back when you reinstall.
+- ⏸️ **Pause downloads** – pause an installer download and resume it later.
+- 🌟 **Major updates** – new major versions of your installed apps on Home.
+- ⭐ **Rating prompt** – a one-click rating a few days after installing.
+- 🔁 **Automatically from other PCs** – what you install elsewhere gets installed here too.
+- 💡 **Recommended for you** – “Because you have OBS…” based on your installed apps, computed locally.
+- 🧪 **Pre-releases** – try Beta, Insiders or Nightly builds from WinGet next to the stable app (like TestFlight).
+- 🐢 **Download speed limit** – installers won’t saturate your connection.
+- 💖 **Support the developers** – GitHub Sponsors, Open Collective, Ko-fi… links for open-source apps.
+- ♻️ **Restore after reinstalling Windows** – HubGet recognizes the PC by name and brings its apps back.
+- 🩺 **Why did the update fail?** – a guide finds what stopped it (programs holding files, services,
+  pending restart, disk space, manifest) and fixes and retries it in one click.
+- 🔁 **Retry failed** – after a batch of updates, only the ones that failed.
+- 🌙 **Sleep or shut down when done** – next to Update all, with a countdown you can cancel.
+- 🔑 **Finish at next sign-in** – before the apps that block the update start.
+- 🐞 **Report a winget manifest problem** – a prefilled report for winget-pkgs.
+- ⏸️ **Pause automatic updates** for 1, 3 or 7 days (before a presentation, say).
+- 🧭 **Major versions manually only** – a new major version (OBS 32 → 33) waits for a click.
+- 📋 **Overview before Update all** – what gets updated, from which version to which and how much
+  is downloaded; untick individual apps.
+- ⚡ **Download updates in advance** – installers for pending updates download in the background
+  and the queue fetches the next two operations ahead, so it mostly just installs.
+- ✅ **Post-update check** – the main program must be in place with a valid signature,
+  otherwise a warning suggests rolling back.
+- 🖥️ **Update your other PCs** – “Update there” in My computers; the other PC does it as soon as
+  HubGet runs on it.
+- 📲 **Install on another PC** – from the menu next to Install; the app is installed as soon as
+  HubGet runs on that PC.
+- 🌙 **Install later** – tonight, in an hour or at a chosen time; the PC won’t sleep until then.
+- 🧪 **Try for a week** – if you don’t open the app once within a week, HubGet offers to uninstall it.
+- 🕵️ **App privacy** – turn off telemetry in Firefox, Chrome, Edge, VS Code, Office, .NET and more
+  using their official policies (PC overview and app details).
+- 🛡️ **Defender installer scan** – Microsoft Defender scans a downloaded installer before it runs;
+  if it finds something, the install doesn’t start.
 - 🌙 **A modern window** in the Windows 11 style, light and dark theme, seven languages (English, Czech, German, Spanish, French, Portuguese, Chinese);
   close the window and installs finish in the background.
 

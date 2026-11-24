@@ -129,6 +129,11 @@ impl<'a> Tracker<'a> {
         self.sender.download_percent(percent);
     }
 
+    /// Microsoft Defender prověřuje stažený instalátor (operations.rs → defender::scan).
+    pub fn scanning(&self) {
+        self.sender.set(Phase::Scanning, None);
+    }
+
     /// Instalátor je stažený – správce ho najde a jen ověří a nainstaluje
     /// (u „Stáhnout instalátor“ ho jen přesune do složky Stažené soubory).
     pub fn prefetched(&mut self) {
@@ -148,6 +153,11 @@ impl<'a> Tracker<'a> {
     }
 
     /// Hláška pro protokol, kterou přeloží frontend (např. „retryElevated“).
+    /// Stahování instalátoru jde pozastavit (stahuje HubGet sám) – tlačítko Pozastavit na kartě.
+    pub fn pausable(&self, pausable: bool) {
+        let _ = self.sender.channel.send(OpEvent::Pausable { pausable });
+    }
+
     pub fn notice(&self, key: &'static str, detail: Option<String>) {
         let _ = self.sender.channel.send(OpEvent::Notice { key, detail });
     }

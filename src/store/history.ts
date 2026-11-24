@@ -5,6 +5,8 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { isSourceId } from "@/services/managers/sources";
+import { useEverInstalled } from "./everInstalled";
+import { usePackageIndex } from "./packageIndex";
 import { useYearStats } from "./yearStats";
 import type { InstallOptions, OperationKind, OperationOutcome, SourceId } from "@/types";
 
@@ -24,6 +26,8 @@ export interface HistoryEntry {
   options?: InstallOptions;
   outcome: OperationOutcome;
   error?: string;
+  /** Klíč chyby od backendu (inUseByOther, linkBroken…) – průvodce „Proč aktualizace selhala?“. */
+  errorKey?: string;
   /** Automatická aktualizace na pozadí – její selhání se hlásí jen sem, ne na ikoně u hodin. */
   background?: boolean;
   startedAt: string;
@@ -33,6 +37,8 @@ export interface HistoryEntry {
 interface HistoryState {
   items: HistoryEntry[];
   add: (entry: HistoryEntry) => void;
+  /** Odebere neúspěšný pokus, který fronta hned zopakovala – v historii zůstane jen opakování. */
+  remove: (id: string) => void;
   clear: () => void;
 }
 
@@ -48,7 +54,17 @@ export const useHistory = create<HistoryState>()(
         useYearStats.getState().record(entry);
         set({ items: [entry, ...get().items].slice(0, MAX_ITEMS) });
       },
-      clear: () => set({ items: [] }),
+      remove: (id) => {
+        const entry = get().items.find((item) => item.id === id);
+        if (!entry) return;
+        useYearStats.getState().retract(entry);
+        set({ items: get().items.filter((item) => item.id !== id) });
+      },
+      // Vymazaná historie = zapomenout i dřív nainstalované aplikace (mráček u karet), kromě právě nainstalovaných
+      clear: () => {
+        useEverInstalled.getState().reset(usePackageIndex.getState().installed.keys());
+        set({ items: [] });
+      },
     }),
     {
       name: "unibox-history",

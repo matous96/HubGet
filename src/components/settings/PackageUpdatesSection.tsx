@@ -10,7 +10,8 @@
  * Logika: hooks/useAutoUpdates.ts, pravidla: store/updateRules.ts, stav: store/autoUpdates.ts.
  */
 import { ChevronDown, Play, X } from "lucide-react";
-import { useState } from "react";
+import { invoke } from "@tauri-apps/api/core";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/Button";
 import { Segmented } from "@/components/ui/CollectionToolbar";
@@ -41,8 +42,27 @@ import type { SourceId } from "@/types";
 import { Card, Row, SwitchRow } from "./SettingsUi";
 import { SELF_UPDATE_GRACE_DAYS, SELF_UPDATE_SECURITY_GRACE_DAYS } from "@/data/selfUpdating";
 import { installStatsAvailable } from "@/store/installStats";
+import { useRatePrompts } from "@/store/ratePrompts";
+import { ratingsEnabled } from "@/components/package/RatingsSection";
 
 /** Záloha nastavení aplikací před aktualizací (settings_backup.rs) – obnoví se při vrácení aktualizace. */
+/** Nabídka omezení rychlosti stahování (kB/s, 0 = bez omezení). */
+const DOWNLOAD_LIMITS = [0, 256, 512, 1024, 2048, 5120, 10240];
+
+/** Předá omezení rychlosti stahování backendu (po spuštění a při změně). */
+export function DownloadLimitSync() {
+  const limit = useAutoUpdates((s) => s.downloadLimit);
+  const scan = useAutoUpdates((s) => s.installerScan);
+  useEffect(() => {
+    if (isTauri()) void invoke("set_download_limit", { kbps: limit }).catch(() => undefined);
+  }, [limit]);
+  // Kontrola instalátorů Defenderem (defender.rs) – volba platí pro všechny operace
+  useEffect(() => {
+    if (isTauri()) void invoke("set_installer_scan", { enabled: scan }).catch(() => undefined);
+  }, [scan]);
+  return null;
+}
+
 function BackupSettingsRow() {
   const { t } = useTranslation();
   const backupSettings = useSettings((s) => s.backupSettings);
@@ -147,6 +167,45 @@ export function PackageUpdatesSection() {
             options={(["off", "all", "selected"] as const).map((v) => ({ value: v, label: t(`autoUpdates.mode_${v}`) }))}
           />
         </Row>
+        {/* Pozastavit na pár dní (prezentace, stream, uzávěrka) – jako ve Windows Update */}
+        <Row
+          label={t("autoPause.label")}
+          hint={auto.pausedUntil && auto.pausedUntil > Date.now() ? t("autoPause.until", { until: formatAt(auto.pausedUntil) }) : t("autoPause.hint")}
+        >
+          {auto.pausedUntil && auto.pausedUntil > Date.now() ? (
+            <Button variant="secondary" size="sm" onClick={() => auto.set({ pausedUntil: null })} disabled={auto.autoInstall === "off"}>
+              {t("autoPause.resume")}
+            </Button>
+          ) : (
+            <Segmented<string>
+              value=""
+              onChange={(days) => auto.set({ pausedUntil: Date.now() + Number(days) * 24 * 60 * 60_000 })}
+              options={["1", "3", "7"].map((days) => ({ value: days, label: t("autoPause.days", { count: Number(days) }) }))}
+            />
+          )}
+        </Row>
+        {/* Nová hlavní verze jen na kliknutí (lib/majorUpdate) */}
+        <SwitchRow
+          label={t("majorUpdate.manual")}
+          hint={t("majorUpdate.manualHint")}
+          checked={auto.majorManual}
+          onChange={(majorManual) => auto.set({ majorManual })}
+          disabled={auto.autoInstall === "off"}
+        />
+        {/* Instalátory čekajících aktualizací stáhnout předem (ne na měřeném připojení) */}
+        <SwitchRow
+          label={t("prefetchUpdates.label")}
+          hint={t("prefetchUpdates.hint")}
+          checked={auto.prefetchUpdates}
+          onChange={(prefetchUpdates) => auto.set({ prefetchUpdates })}
+        />
+        {/* Přehled před Aktualizovat vše (velikost, novinky, výběr) */}
+        <SwitchRow
+          label={t("updatesOverview.setting")}
+          hint={t("updatesOverview.settingHint")}
+          checked={auto.overviewBeforeUpdateAll}
+          onChange={(overviewBeforeUpdateAll) => auto.set({ overviewBeforeUpdateAll })}
+        />
         {auto.autoInstall === "selected" && (
           <div className="px-4 py-3.5">
             <p className="text-sm font-medium">{t("autoUpdates.selectedTitle")}</p>
@@ -222,6 +281,16 @@ export function PackageUpdatesSection() {
           onChange={(skipOnMetered) => auto.set({ skipOnMetered })}
           disabled={auto.autoInstall === "off"}
         />
+        {/* Rychlost stahování instalátorů, které stahuje HubGet sám (předstažení wingetu) – i u ruční instalace */}
+        <Row label={t("downloadLimit.label")} hint={t("downloadLimit.hint")}>
+          <select value={auto.downloadLimit} onChange={(e) => auto.set({ downloadLimit: Number(e.target.value) })} aria-label={t("downloadLimit.label")} className={select}>
+            {DOWNLOAD_LIMITS.map((kbps) => (
+              <option key={kbps} value={kbps}>
+                {kbps === 0 ? t("downloadLimit.none") : kbps >= 1024 ? t("downloadLimit.mbps", { n: kbps / 1024 }) : t("downloadLimit.kbps", { n: kbps })}
+              </option>
+            ))}
+          </select>
+        </Row>
         <SwitchRow
           label={t("autoUpdates.skipWhileBusy")}
           hint={t("autoUpdates.skipWhileBusyHint")}
@@ -333,6 +402,8 @@ function TimeRows({
 function UpdateSecurityCard() {
   const { t } = useTranslation();
   const auto = useAutoUpdates();
+  const rateOff = useRatePrompts((s) => s.off);
+  const setRateOff = useRatePrompts((s) => s.setOff);
   const enabled = useSettings((s) => s.enabledSources);
   const userMode = useSettings((s) => s.userMode);
   const [perSource, setPerSource] = useState(() => Object.keys(auto.minAgeBySource).length > 0);
@@ -350,6 +421,12 @@ function UpdateSecurityCard() {
 
   return (
     <Card title={t("autoUpdates.securityTitle")}>
+      <SwitchRow
+        label={t("installerScan.label")}
+        hint={t("installerScan.hint")}
+        checked={auto.installerScan}
+        onChange={(installerScan) => auto.set({ installerScan })}
+      />
       <Row label={t("autoUpdates.minAge")} hint={t("autoUpdates.minAgeHint")}>
         <div className="flex items-center gap-2">
           <select
@@ -448,6 +525,10 @@ function UpdateSecurityCard() {
           checked={auto.communityInstalls}
           onChange={(communityInstalls) => auto.set({ communityInstalls })}
         />
+      )}
+      {/* Výzva k hodnocení na Domů (components/home/RatePrompt) – „Neptat se“ ji vypne, tady zase zapne */}
+      {ratingsEnabled && (
+        <SwitchRow label={t("ratePrompt.setting")} hint={t("ratePrompt.settingHint")} checked={!rateOff} onChange={(on) => setRateOff(!on)} />
       )}
       <SwitchRow
         label={t("autoUpdates.warnHostChange")}

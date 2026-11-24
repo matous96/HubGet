@@ -1,5 +1,5 @@
 import { ArrowRight, ShieldAlert, TriangleAlert } from "lucide-react";
-import { memo } from "react";
+import { memo, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { usePackageState } from "@/hooks/usePackages";
@@ -19,6 +19,7 @@ import { OriginBadge, SourceDots, WebBadge } from "./SourceBadge";
 import { VerifiedBadge } from "./VerifiedBadge";
 import { isVerified } from "@/lib/verified";
 import { isWebOnly } from "@/lib/webOnly";
+import { isMajorUpdate } from "@/lib/majorUpdate";
 import { UninstallButton } from "./UninstallButton";
 
 interface PackageRowProps {
@@ -30,15 +31,19 @@ interface PackageRowProps {
   note?: string;
   /** Vzhled poznámky: upozornění (oranžová), informace (Co je nového), bezpečnostní oprava (červená). */
   noteTone?: NoteTone;
+  /** Tlačítko navíc vedle hlavní akce (Dříve nainstalované: Skrýt). */
+  extra?: (entry: CatalogEntry) => ReactNode;
 }
 
 /**
  * Řádek balíčku pro zobrazení „seznam“. Memo: stránka se stovkami řádků
  * (Nainstalované) překreslí jen řádky, kterých se změna týká.
  */
-export const PackageRow = memo(function PackageRow({ entry, showUninstall, compact, note, noteTone = "warning" }: PackageRowProps) {
+export const PackageRow = memo(function PackageRow({ entry, showUninstall, compact, note, noteTone = "warning", extra }: PackageRowProps) {
   const { t } = useTranslation();
-  const { installed, job } = usePackageState(entry.id);
+  const { installed, job, paused } = usePackageState(entry.id);
+  // Pozastavené stahování zabírá místo jako běžící úloha (pruh s Pokračovat)
+  const busy = !!job || !!paused;
   const hostChange = useInstallerHostChange(installed);
   const security = useIsSecurityUpdate(installed);
   // Pravé tlačítko = nabídka instalace, Ctrl+Enter / Alt+Enter = instalovat / možnosti
@@ -124,6 +129,10 @@ export const PackageRow = memo(function PackageRow({ entry, showUninstall, compa
               ) : (
                 <span className="font-semibold text-accent">{installed.availableVersion}</span>
               )}
+              {/* Nová hlavní verze (OBS 32 → 33) */}
+              {isMajorUpdate(installed.installedVersion, installed.availableVersion) && (
+                <span className="rounded-full bg-accent/12 px-1.5 py-0.5 text-[10px] font-bold tracking-wide text-accent uppercase">{t("majorUpdate.badge")}</span>
+              )}
             </>
           )}
         </div>
@@ -142,8 +151,9 @@ export const PackageRow = memo(function PackageRow({ entry, showUninstall, compa
         />
       )}
 
-      <div className={cn("flex shrink-0 items-center justify-end gap-1", job ? "w-56" : "min-w-28")}>
+      <div className={cn("flex shrink-0 items-center justify-end gap-1", busy ? "w-56" : "min-w-28")}>
         {showUninstall && <UninstallButton entry={entry} />}
+        {!busy && extra?.(entry)}
         <PackageAction entry={entry} className="relative z-10" />
       </div>
     </article>

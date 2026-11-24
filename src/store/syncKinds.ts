@@ -15,7 +15,7 @@ import type { SyncMap } from "@/lib/syncMerge";
 import type { SortMode, SourceId, ThemeSetting, UserMode, ViewMode } from "@/types";
 import { MAX_ICON_LENGTH, useAppLooks, type AppLook } from "./appLooks";
 import { parseBundleFile, useBundle, type BundleItem } from "./bundle";
-import { freshDevices, useDevices, type DeviceApp, type DeviceRecord } from "./devices";
+import { DEVICE_COMMAND_KINDS, freshDevices, MAX_DEVICE_COMMANDS, useDevices, type DeviceApp, type DeviceCommand, type DeviceCommandApp, type DeviceCommandKind, type DeviceRecord } from "./devices";
 import { useFavorites, type FavoriteItem } from "./favorites";
 import { useNotificationPrefs, type NotificationPrefs } from "./notificationPrefs";
 import { useSettings } from "./settings";
@@ -181,6 +181,22 @@ const looksKind: SyncKind = {
 /** Nejvíc aplikací v přehledu jednoho počítače (záznam má v databázi limit velikosti). */
 const MAX_DEVICE_APPS = 1500;
 
+const isCommandKind = (k: unknown): k is DeviceCommandKind => DEVICE_COMMAND_KINDS.includes(k as DeviceCommandKind);
+
+/** Aplikace v žádosti o instalaci – krátké texty a známý zdroj. */
+function isCommandApp(a: unknown): a is DeviceCommandApp {
+  const v = a as Partial<DeviceCommandApp> | null;
+  return !!v && isString(v.appId) && v.appId.length <= 300 && isString(v.name) && v.name.length <= 300 && isString(v.source) && isSourceId(v.source) && isString(v.packageId) && v.packageId.length <= 300;
+}
+
+function isCommand(c: unknown): c is DeviceCommand {
+  const v = c as Partial<DeviceCommand> | null;
+  if (!v || !isString(v.id) || v.id.length > 64 || !isString(v.target) || v.target.length > 64 || !isCommandKind(v.kind)) return false;
+  if (!isString(v.at) || Number.isNaN(Date.parse(v.at))) return false;
+  // Instalace musí nést aplikaci, Aktualizovat tam žádnou
+  return v.kind === "install" ? isCommandApp(v.app) : v.app === undefined;
+}
+
 function parseDevice(value: unknown): DeviceRecord | null {
   const v = value as Partial<DeviceRecord> | null;
   if (!v || !isString(v.name) || !isString(v.seen) || Number.isNaN(Date.parse(v.seen)) || !Array.isArray(v.apps)) return null;
@@ -203,6 +219,9 @@ function parseDevice(value: unknown): DeviceRecord | null {
     ...(isString(v.os) && { os: v.os.slice(0, 80) }),
     ...(isString(v.version) && { version: v.version.slice(0, 20) }),
     apps,
+    // Žádosti pro jiné počítače (Aktualizovat tam, Nainstalovat na…) – jen známé druhy, krátká id
+    ...(Array.isArray(v.commands) && { commands: v.commands.filter(isCommand).slice(-MAX_DEVICE_COMMANDS) }),
+    ...(Array.isArray(v.accepts) && { accepts: [...new Set(v.accepts.filter(isCommandKind))] }),
   };
 }
 

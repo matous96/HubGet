@@ -16,6 +16,7 @@ import { compareVersions } from "@/lib/version";
 import { loadCatalog, type LoadedCatalog } from "@/services/catalog";
 import { gameStoreOf, getAllInstalled, getOrigin, getSource, isSourceId, sortBySourceOrder, steamAppId } from "@/services/managers";
 import { useJobs } from "@/store/jobs";
+import { usePausedJobs, type PausedJob } from "@/store/pausedJobs";
 import { usePackageIndex } from "@/store/packageIndex";
 import { activeSources, sourcePriority, useSettings } from "@/store/settings";
 import { inLockedSource, useSourceScope } from "@/store/sourceLock";
@@ -393,14 +394,17 @@ export interface PackageState {
   status: PackageStatus;
   installed: InstalledPackage | undefined;
   job: Job | undefined;
+  /** Pozastavené stahování (store/pausedJobs) – karta ukáže Pokračovat. */
+  paused: PausedJob | undefined;
 }
 
 /** Spojí nainstalovaný stav a případnou běžící úlohu pro jednu aplikaci. */
 export function usePackageState(appId: string): PackageState {
   const installed = useInstalledEntry(appId);
   const job = useJobs((s) => s.jobs[appId]);
+  const paused = usePausedJobs((s) => s.items[appId]);
   const status: PackageStatus = !installed ? "available" : installed.availableVersion ? "updatable" : "installed";
-  return { status, installed, job };
+  return { status, installed, job, paused };
 }
 
 /**

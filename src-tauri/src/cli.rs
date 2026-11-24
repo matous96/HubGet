@@ -26,7 +26,7 @@ const EVENT: &str = "hubget-cli";
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct CliCommand {
-    /// install | update | search | show | updates | overview | open
+    /// install | update | search | show | updates | installed | overview | open
     pub command: String,
     pub args: Vec<String>,
 }
@@ -63,18 +63,14 @@ fn parse(args: &[String]) -> Parsed {
             let apps: Vec<String> = rest.into_iter().filter(|a| !matches!(a.as_str(), "--all" | "-a" | "all")).collect();
             forward("update", apps)
         }
-        "search" | "find" | "s" => {
-            if rest.is_empty() {
-                Parsed::Error("search".into())
-            } else {
-                forward("search", vec![rest.join(" ")])
-            }
-        }
+        // Bez textu otevře HubGet s kurzorem ve vyhledávání (i rychlá akce na ikoně – jumplist.rs)
+        "search" | "find" | "s" => forward("search", if rest.is_empty() { vec![] } else { vec![rest.join(" ")] }),
         "show" | "info" | "open" => match rest.first() {
             Some(app) => forward("show", vec![app.clone()]),
             None => forward("open", vec![]),
         },
         "updates" | "outdated" | "list" => forward("updates", vec![]),
+        "installed" | "apps" => forward("installed", vec![]),
         "overview" | "pc" => forward("overview", vec![]),
         other => Parsed::Error(other.to_string()),
     }
@@ -99,12 +95,13 @@ impl Texts {
     }
 
     fn usage(&self) -> String {
-        let rows: [(&str, &str, &str); 8] = [
+        let rows: [(&str, &str, &str); 9] = [
             ("hubget install <aplikace…>", "Nainstaluje aplikace (název, id z katalogu nebo balíček WinGetu)", "Installs apps (name, catalog id or WinGet package)"),
             ("hubget update [aplikace…]", "Aktualizuje aplikace, bez názvu všechny s aktualizací", "Updates apps; without a name all with an update"),
-            ("hubget search <text>", "Vyhledá aplikace v HubGetu", "Searches for apps in HubGet"),
+            ("hubget search [text]", "Vyhledá aplikace v HubGetu, bez textu otevře hledání", "Searches for apps in HubGet; without text opens search"),
             ("hubget show <aplikace>", "Otevře detail aplikace", "Opens the app's details"),
             ("hubget updates", "Ukáže dostupné aktualizace", "Shows available updates"),
+            ("hubget installed", "Ukáže nainstalované aplikace", "Shows installed apps"),
             ("hubget overview", "Otevře Přehled počítače", "Opens the PC overview"),
             ("hubget", "Otevře HubGet", "Opens HubGet"),
             ("hubget version", "Verze HubGetu", "HubGet version"),
@@ -133,7 +130,9 @@ impl Texts {
             "install" => format!("{} {list}", self.pick("HubGet instaluje:", "HubGet is installing:")),
             "update" if command.args.is_empty() => self.pick("HubGet aktualizuje všechny aplikace s aktualizací.", "HubGet is updating all apps with an update.").into(),
             "update" => format!("{} {list}", self.pick("HubGet aktualizuje:", "HubGet is updating:")),
+            "search" if command.args.is_empty() => self.pick("HubGet otevírá hledání.", "HubGet is opening search.").into(),
             "search" => format!("{} {list}", self.pick("HubGet hledá:", "HubGet is searching for:")),
+            "installed" => self.pick("HubGet ukazuje nainstalované aplikace.", "HubGet is showing installed apps.").into(),
             "show" => format!("{} {list}", self.pick("HubGet otevírá:", "HubGet is opening:")),
             "updates" => self.pick("HubGet ukazuje dostupné aktualizace.", "HubGet is showing available updates.").into(),
             "overview" => self.pick("HubGet ukazuje Přehled počítače.", "HubGet is showing the PC overview.").into(),
@@ -209,7 +208,6 @@ pub fn cli_main(args: &[String]) -> i32 {
         Parsed::Error(what) => {
             let message = match what.as_str() {
                 "install" => texts.pick("Zadejte, co nainstalovat: hubget install <aplikace>", "Specify what to install: hubget install <app>").to_string(),
-                "search" => texts.pick("Zadejte, co hledat: hubget search <text>", "Specify what to search for: hubget search <text>").to_string(),
                 other => format!("{} „{other}“", texts.pick("Neznámý příkaz", "Unknown command")),
             };
             eprintln!("\n{message}\n\n{}", texts.usage());
@@ -334,6 +332,9 @@ mod tests {
         assert_eq!(forwarded("upgrade --all").unwrap().args, Vec::<String>::new());
         assert_eq!(forwarded("update firefox").unwrap().args, args("firefox"));
         assert_eq!(forwarded("search visual studio code").unwrap().args, vec!["visual studio code".to_string()]);
+        // Bez textu = otevřít hledání
+        assert_eq!(forwarded("find").unwrap(), CliCommand { command: "search".into(), args: vec![] });
+        assert_eq!(forwarded("installed").unwrap().command, "installed");
         assert_eq!(forwarded("show vlc").unwrap().command, "show");
         assert_eq!(forwarded("").unwrap().command, "open");
         assert_eq!(forwarded("UPDATES").unwrap().command, "updates");

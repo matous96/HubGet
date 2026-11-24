@@ -1,4 +1,5 @@
 import {
+  CloudDownload,
   Gauge,
   Download,
   Heart,
@@ -103,6 +104,8 @@ export function Sidebar() {
             label={t("nav.updates")}
             badge={updates > 0 && <Count highlight>{updates}</Count>}
           />
+          {/* Aplikace, které tu (nebo na jiném počítači na účtu) dřív byly – jako Zakoupené v App Storu */}
+          <NavItem to="/previous" icon={CloudDownload} label={t("nav.previous")} />
           <NavItem
             to="/favorites"
             icon={Heart}

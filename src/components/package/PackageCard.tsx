@@ -1,5 +1,5 @@
 import { ArrowUpCircle, Heart, ShieldAlert, Star, TriangleAlert } from "lucide-react";
-import { memo } from "react";
+import { memo, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { GitHubIcon } from "@/components/ui/BrandIcons";
@@ -32,6 +32,8 @@ interface PackageCardProps {
   note?: string;
   /** Vzhled poznámky: upozornění (oranžová), informace (Co je nového), bezpečnostní oprava (červená). */
   noteTone?: NoteTone;
+  /** Tlačítko navíc vedle hlavní akce (Dříve nainstalované: Skrýt). */
+  extra?: (entry: CatalogEntry) => ReactNode;
 }
 
 export type NoteTone = "warning" | "info" | "danger";
@@ -51,9 +53,9 @@ export const noteToneClass = (tone: NoteTone) =>
  * zkrátí, tlačítka ne. Memo: při překreslení mřížky se překreslí jen karty,
  * kterých se změna týká (vlastní stav si každá karta sleduje sama).
  */
-export const PackageCard = memo(function PackageCard({ entry, showUninstall, className, note, noteTone = "warning" }: PackageCardProps) {
+export const PackageCard = memo(function PackageCard({ entry, showUninstall, className, note, noteTone = "warning", extra }: PackageCardProps) {
   const { t } = useTranslation();
-  const { status, installed, job } = usePackageState(entry.id);
+  const { status, installed, job, paused } = usePackageState(entry.id);
   const hostChange = useInstallerHostChange(installed);
   // Aktualizace opravuje bezpečnostní chybu (poznámky k verzi, OSV.dev) – červený odznak
   const security = useIsSecurityUpdate(installed);
@@ -170,7 +172,7 @@ export const PackageCard = memo(function PackageCard({ entry, showUninstall, cla
       {/* Patička u spodního okraje: zdroj + akce, nebo živý průběh přes celou šířku */}
       <div className="mt-auto pt-4">
         <div className="flex h-9 min-w-0 items-center justify-between gap-2">
-          {job ? (
+          {job || paused ? (
             <PackageAction entry={entry} className="min-w-0 flex-1" />
           ) : (
             <>
@@ -190,6 +192,7 @@ export const PackageCard = memo(function PackageCard({ entry, showUninstall, cla
               </div>
               <div className="flex shrink-0 items-center gap-1">
                 {showUninstall && <UninstallButton entry={entry} />}
+                {extra?.(entry)}
                 <PackageAction entry={entry} className="relative z-10" />
               </div>
             </>

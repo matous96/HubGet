@@ -35,6 +35,7 @@ import { pinKey, useUpdatePins } from "@/store/updatePins";
 import { applyUpdateRules, currentUpdateRules } from "@/store/updateRules";
 import { isSecurityUpdate } from "./useSecurityUpdates";
 import { holdByCommunity } from "@/store/reliability";
+import { isMajorUpdate } from "@/lib/majorUpdate";
 import { writeLog } from "@/store/logs";
 import type { InstalledPackage } from "@/types";
 import { isUnmanagedOrigin, useInstalledItems, type InstalledItem } from "./useInstalledItems";
@@ -75,6 +76,8 @@ let retryAt: number | null = null;
 const hostWarned = new Set<string>();
 /** Verze, které automatické aktualizace přeskočily kvůli hlášením komunity (zápis do protokolu jednou). */
 const communityWarned = new Set<string>();
+/** Nové hlavní verze, u kterých už protokol hlásil, že čekají na ruční aktualizaci (jednou za běh). */
+const majorWarned = new Set<string>();
 
 /** Aktualizace k instalaci z posledního načtení (s pravidly: zámky, minimální stáří…). */
 function currentUpdatable(): InstalledPackage[] {
@@ -156,8 +159,22 @@ async function installUpdates(updatable: InstalledPackage[]): Promise<Omit<Check
   // Verze, jejichž automatická aktualizace už AUTO_FAILURE_LIMIT× selhala nebo potřebuje práva
   // správce (Čeká na potvrzení), zůstanou na uživateli
   const { failed, needsAdmin } = useUpdateHolds.getState();
+  const { pausedUntil, majorManual } = useAutoUpdates.getState();
+  // Pozastaveno (1 / 3 / 7 dní) – nic neinstalovat, kontrola a oznámení běží dál
+  if (pausedUntil && pausedUntil > Date.now()) {
+    writeLog("winget", "info", i18n.t("autoPause.skipped", { until: new Date(pausedUntil).toLocaleString(i18n.language) }));
+    return { queued: 0 };
+  }
   const chosen = (autoInstall === "all" ? updatable : updatable.filter((p) => selected.includes(pinKey(p)))).filter((p) => {
     const key = versionKey(p, p.availableVersion!);
+    // Nová hlavní verze (OBS 32 → 33) jen na kliknutí – mění ovládání i nastavení nejčastěji
+    if (majorManual && isMajorUpdate(p.installedVersion, p.availableVersion)) {
+      if (!majorWarned.has(key)) {
+        majorWarned.add(key);
+        writeLog(p.source, "info", i18n.t("majorUpdate.skippedAuto", { name: p.name, version: p.availableVersion }));
+      }
+      return false;
+    }
     // Verze, se kterou má komunita problémy (store/reliability.ts), počká – bezpečnostní ne
     if (holdByCommunity(p) && !isSecurityUpdate(p)) {
       if (!communityWarned.has(key)) {

@@ -7,6 +7,7 @@ import { CategoryPage } from "@/pages/CategoryPage";
 import { FavoritesPage } from "@/pages/FavoritesPage";
 import { CommandsPage } from "@/pages/CommandsPage";
 import { NewPage } from "@/pages/NewPage";
+import { PreviousPage } from "@/pages/PreviousPage";
 import { NewPcPage } from "@/pages/NewPcPage";
 import { YearPage } from "@/pages/YearPage";
 import { RequestsPage } from "@/pages/RequestsPage";
@@ -53,6 +54,7 @@ export function App() {
             <Route path="app/:packageId" element={<SharedAppRedirect />} />
             <Route path="top" element={<TopChartsPage />} />
             <Route path="new" element={<NewPage />} />
+            <Route path="previous" element={<PreviousPage />} />
             <Route path="new-pc" element={<NewPcPage />} />
             <Route path="year" element={<YearPage />} />
             <Route path="requests" element={<RequestsPage />} />

@@ -37,6 +37,7 @@ import { useCatalog, useCatalogIndex } from "@/hooks/usePackages";
 import { isGameStore } from "@/services/managers";
 import { PreinstalledPanel } from "@/components/home/PreinstalledPanel";
 import { DriversPanel } from "@/components/home/DriversPanel";
+import { PrivacyPanel } from "@/components/home/PrivacyPanel";
 import { isClosed, openSourceAlternatives } from "@/lib/alternatives";
 import { isTauri } from "@/lib/tauri";
 import { cn, formatRelative, formatSizeText } from "@/lib/utils";
@@ -190,6 +191,7 @@ export function OverviewPage() {
             <div>
               <PreinstalledPanel />
               <DriversPanel />
+              <PrivacyPanel />
               <CachesPanel busy={busy} />
               <BackupsPanel />
               <SignaturesPanel items={items} />

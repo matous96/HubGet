@@ -30,7 +30,7 @@ import { useToasts } from "@/store/toasts";
 import type { CatalogEntry } from "@/types";
 
 export interface CliCommand {
-  command: "install" | "update" | "search" | "show" | "updates" | "overview" | "open";
+  command: "install" | "update" | "search" | "show" | "updates" | "installed" | "overview" | "open";
   args: string[];
 }
 
@@ -200,7 +200,12 @@ function CliRunner({ command, onDone }: { command: CliCommand; onDone: () => voi
         break;
       }
       case "search":
-        navigate(searchUrl(args[0] ?? ""));
+        // Bez textu (rychlá akce na ikoně, „hubget search“) – kurzor do vyhledávání
+        if (args[0]) navigate(searchUrl(args[0]));
+        else window.dispatchEvent(new Event("hubget:focus-search"));
+        break;
+      case "installed":
+        navigate("/installed");
         break;
       case "show": {
         const entry = args[0] ? findApp(args[0], catalog, byId, bySource) : undefined;

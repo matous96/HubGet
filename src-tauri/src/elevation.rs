@@ -60,10 +60,15 @@ struct Job {
     cancel: PathBuf,
 }
 
-/// Smí příkaz běžet s právy správce? Povolené programy, oficiální instalace Chocolatey
-/// a operace s moduly PowerShellu v podobě, jakou sestaví HubGet (dev.rs).
+/// Smí příkaz běžet s právy správce? Povolené programy, oficiální instalace Chocolatey,
+/// operace s moduly PowerShellu v podobě, jakou sestaví HubGet (dev.rs), a dokončení odložené
+/// registrace připravené aktualizace MSIX (package_services.rs – jen balíček ve WindowsApps).
 fn may_elevate(program: &str, args: &[String]) -> bool {
-    is_allowed(program) || is_setup_command(program, args) || crate::dev::is_module_command(program, args)
+    is_allowed(program)
+        || is_setup_command(program, args)
+        || crate::dev::is_module_command(program, args)
+        || crate::package_services::is_register_command(program, args)
+        || crate::privacy::is_policy_command(program, args)
 }
 
 /// Je program na seznamu povolených („C:\…\winget.exe“ → „winget“)?
@@ -446,7 +451,10 @@ fn safe_session_args(program: &str, args: &[String]) -> bool {
 /// Příkaz, který smí obsloužit pomocník relace bez dalšího dialogu UAC: bezpečný tvar příkazu
 /// wingetu či Chocolatey, nebo operace s modulem PowerShellu v podobě, jakou sestaví HubGet.
 fn session_safe(program: &str, args: &[String]) -> bool {
-    (is_allowed(program) && safe_session_args(program, args)) || crate::dev::is_module_command(program, args)
+    (is_allowed(program) && safe_session_args(program, args))
+        || crate::dev::is_module_command(program, args)
+        || crate::package_services::is_register_command(program, args)
+        || crate::privacy::is_policy_command(program, args)
 }
 
 /// Proběhne povýšení bez dialogu UAC? Jen s volbou „Požádat … pouze jednou“, už běžícím

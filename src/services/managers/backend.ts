@@ -17,7 +17,9 @@ type BackendEvent =
   | { type: "progress"; phase: OperationPhase; percent: number | null }
   | { type: "line"; text: string }
   /** Hláška HubGetu (předstažení selhalo, opakování jako správce…). */
-  | { type: "notice"; key: string; detail: string | null };
+  | { type: "notice"; key: string; detail: string | null }
+  /** Stahování instalátoru jde pozastavit (stahuje ho HubGet sám). */
+  | { type: "pausable"; pausable: boolean };
 
 export interface BackendResult {
   outcome: OperationOutcome;
@@ -50,10 +52,17 @@ export function startBackendOperation(
 ): OperationHandle {
   const id = crypto.randomUUID();
   const channel = new Channel<BackendEvent>();
+  // Poslední průběh – změna „jde pozastavit“ ho pošle znovu s příznakem
+  let last: OperationProgress = { phase: "queued", percent: null };
+  let pausable = false;
   channel.onmessage = (event) => {
-    if (event.type === "progress") onProgress({ phase: event.phase, percent: event.percent });
+    if (event.type === "progress") onProgress((last = { phase: event.phase, percent: event.percent, ...(pausable && { pausable }) }));
+    else if (event.type === "pausable") {
+      pausable = event.pausable;
+      onProgress((last = { phase: last.phase, percent: last.percent, ...(pausable && { pausable }) }));
+    }
     else if (event.type === "line") writeLog(source, "output", event.text);
-    else writeLog(source, event.key === "signedBy" ? "info" : "warning", i18n.t(`logs.notice.${event.key}`, { detail: event.detail ?? "" }));
+    else writeLog(source, event.key === "signedBy" || event.key === "scanClean" ? "info" : "warning", i18n.t(`logs.notice.${event.key}`, { detail: event.detail ?? "" }));
   };
 
   const done = invoke<BackendResult>(command, { ...extra, id, request, onEvent: channel }).then(
@@ -63,10 +72,11 @@ export function startBackendOperation(
       errorKey: result.outcome === "error" ? (result.errorKey ?? undefined) : undefined,
       restartRequired: result.restartRequired,
       signer: result.signer,
+      paused: result.outcome === "cancelled" && result.errorKey === "paused" ? true : undefined,
     }),
     (e: unknown) => ({ outcome: "error" as const, error: String(e) }),
   );
-  return { done, cancel: () => void invoke("cancel_operation", { id }) };
+  return { done, cancel: () => void invoke("cancel_operation", { id }), pause: () => invoke<boolean>("pause_operation", { id }).catch(() => false) };
 }
 
 /** Chyba Chocolatey / Scoopu: obecná zpráva s kódem a posledním řádkem výstupu. */

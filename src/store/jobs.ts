@@ -41,6 +41,7 @@ import {
   closeProcesses,
   endProcesses,
   findAppProcesses,
+  findFileUsers,
   type RunningProcess,
 } from "@/services/processes";
 import { traceBegin, traceDiscard, traceEnd, traceKey } from "@/services/tracker";
@@ -55,6 +56,9 @@ import { reportInstall } from "./installStats";
 import { useToasts } from "./toasts";
 import { useHistory } from "./history";
 import { useLeftovers } from "./leftovers";
+import { useOffloaded } from "./offloaded";
+import { usePausedJobs } from "./pausedJobs";
+import { useAfterBatch, useFailedBatch } from "./updateFixes";
 import { skipBadVersion } from "./rollback";
 import { writeLog } from "./logs";
 import { diskShortage } from "@/lib/diskSpace";
@@ -90,6 +94,8 @@ export interface EnqueueRequest {
   track?: boolean;
   /** Automatická aktualizace: nabízená verze. */
   targetVersion?: string;
+  /** Uvolnit aplikaci – odinstalovat a nechat nastavení (Job.offload). */
+  offload?: boolean;
 }
 
 interface JobsState {
@@ -97,6 +103,12 @@ interface JobsState {
   jobs: Record<string, Job>;
   enqueue: (request: EnqueueRequest) => void;
   cancel: (appId: string) => void;
+  /** Pozastaví stahování instalátoru (jen když ho stahuje HubGet sám – progress.pausable). */
+  pause: (appId: string) => void;
+  /** Pozastavené stahování znovu do fronty – naváže, kde skončilo (store/pausedJobs). */
+  resume: (appId: string) => void;
+  /** Zahodí pozastavené stahování. */
+  discardPaused: (appId: string) => void;
 }
 
 // Mimo React stav – nemusí vyvolávat překreslení.
@@ -105,6 +117,28 @@ const handles = new Map<string, OperationHandle>();
 let running = false;
 /** Výsledky právě probíhající dávky operací (do vyprázdnění fronty) – pro souhrnné oznámení. */
 let batch: Record<OperationOutcome, number> = { success: 0, error: 0, cancelled: 0 };
+/**
+ * Stahování dopředu (winget.rs → prefetch_ahead): zatímco běží jedna úloha, další dvě ve frontě si
+ * stáhnou instalátor – postupně, jedna za druhou (souběžně s právě běžící operací). Úloha, která na
+ * instalátor narazí během stahování, počká, až doběhne (operations.rs → IN_FLIGHT).
+ */
+const AHEAD_COUNT = 2;
+const aheadStarted = new Set<string>();
+let aheadChain: Promise<unknown> = Promise.resolve();
+
+function prefetchQueued() {
+  if (!isTauri()) return;
+  for (const appId of queue.slice(0, AHEAD_COUNT)) {
+    const job = useJobs.getState().jobs[appId];
+    if (!job || job.source !== "winget" || (job.kind !== "install" && job.kind !== "update") || aheadStarted.has(job.id)) continue;
+    aheadStarted.add(job.id);
+    const request = adoptedRequest(job, { kind: job.kind, packageId: job.packageId, version: job.version, options: applySecurityPolicy(job.options), name: job.appName });
+    aheadChain = aheadChain.then(() => (useJobs.getState().jobs[appId] ? invoke("prefetch_ahead", { request }).catch(() => false) : false));
+  }
+}
+
+/** Neúspěšné operace spuštěné uživatelem v této dávce – na konci do „Zkusit neúspěšné znovu“. */
+let batchFailed: EnqueueRequest[] = [];
 
 /**
  * Chyby, kdy instalátor ze zdroje nejde získat, ale jiný správce může aplikaci
@@ -168,8 +202,8 @@ async function fallbackSources(job: Job): Promise<PackageSource[]> {
   return usable;
 }
 
-/** Názvy procesů bez opakování („obs64.exe, obs-ffmpeg-mux.exe“). */
-const processNames = (processes: { name: string }[]) => [...new Set(processes.map((p) => p.name))].join(", ");
+/** Názvy procesů bez opakování („obs64.exe, obs-ffmpeg-mux.exe“; cizí programy jménem – „Microsoft Edge“). */
+const processNames = (processes: { name: string; description?: string }[]) => [...new Set(processes.map((p) => p.description ?? p.name))].join(", ");
 
 /**
  * Před instalací, aktualizací a odinstalací zavře běžící procesy aplikace –
@@ -232,6 +266,77 @@ async function backupSettings(job: Job) {
   );
 }
 
+/**
+ * Uvolnit aplikaci: nastavení zálohovat vždy (i s vypnutou zálohou před aktualizací) –
+ * odinstalátor ho mohl smazat; po Nainstalovat znovu se vrátí (restoreOffloaded).
+ */
+async function offloadBackup(job: Job): Promise<{ version: string; backup: boolean } | null> {
+  const version = installedPackageOf(job)?.installedVersion;
+  if (!version) return null;
+  if (!isTauri()) return { version, backup: false };
+  const result = await invoke<{ outcome: string }>("settings_backup", { appId: job.appId, name: job.appName, packageId: job.packageId, version }).catch((error) => {
+    writeLog(job.source, "warning", i18n.t("logs.msg.settingsBackupFailed", { name: job.appName, error: String(error) }));
+    return null;
+  });
+  return { version, backup: result?.outcome === "saved" };
+}
+
+/** Hlavní program aplikace a stav jeho podpisu (signatures.rs → check_signatures). */
+interface AppSignature {
+  status: "signed" | "unsigned" | "invalid" | "unknown";
+  file: string | null;
+}
+
+async function mainProgram(job: Job): Promise<AppSignature | null> {
+  if (!isTauri()) return null;
+  const result = await invoke<AppSignature[]>("check_signatures", { apps: [{ packageId: job.packageId, name: job.appName }] }).catch(() => null);
+  return result?.[0] ?? null;
+}
+
+/** Za jak dlouho po aktualizaci kontrolovat program (zápisy instalátoru, první spuštění aplikace). */
+const POST_CHECK_MS = 15_000;
+
+/**
+ * Kontrola po aktualizaci: hlavní program aplikace, který před aktualizací existoval, musí být
+ * na místě, a když byl podepsaný, musí mít platný podpis. Jinak varování s radou vrátit aplikaci
+ * na předchozí verzi (detail aplikace → Vrátit). Bez nálezu jen záznam do protokolu.
+ */
+async function checkAfterUpdate(job: Job, before: AppSignature) {
+  if (!before.file) return;
+  await sleep(POST_CHECK_MS);
+  const after = await mainProgram(job);
+  if (!after) return;
+  const problem = after.status === "unknown" || !after.file ? "missing" : before.status === "signed" && after.status === "invalid" ? "invalid" : before.status === "signed" && after.status === "unsigned" ? "unsigned" : null;
+  if (!problem) {
+    writeLog(job.source, "info", i18n.t("postCheck.ok", { name: job.appName }));
+    return;
+  }
+  const message = i18n.t(`postCheck.${problem}`, { name: job.appName, file: before.file });
+  writeLog(job.source, "warning", message);
+  notifyEvent({ type: "info", tone: "error", title: job.appName, message, toast: message, record: { kind: job.kind, source: job.source, appId: job.appId } });
+}
+
+/** Uvolněná aplikace: zapamatovat a oznámit, že nastavení zůstalo. */
+function reportOffloaded(job: Job, info: { version: string; backup: boolean }) {
+  useOffloaded.getState().add(job.appId, { ...info, at: Date.now() });
+  const message = i18n.t("offload.done", { name: job.appName });
+  writeLog(job.source, "info", message);
+  useToasts.getState().push("success", message);
+}
+
+/** Opětovná instalace uvolněné aplikace: nastavení ze zálohy zpět na místo. */
+async function restoreOffloaded(job: Job) {
+  const offloaded = useOffloaded.getState().items[job.appId];
+  if (!offloaded) return;
+  useOffloaded.getState().remove(job.appId);
+  if (!offloaded.backup || !isTauri()) return;
+  const restored = await invoke<boolean>("settings_restore", { appId: job.appId, version: offloaded.version }).catch(() => false);
+  if (!restored) return;
+  const message = i18n.t("offload.restored", { name: job.appName });
+  writeLog(job.source, "info", message);
+  notifyEvent({ type: "info", tone: "success", title: job.appName, message, toast: message, record: { kind: job.kind, source: job.source, appId: job.appId } });
+}
+
 /** Po vrácení aktualizace obnoví nastavení zálohované před ní (je-li záloha k této verzi). */
 async function restoreSettings(job: Job, version: string) {
   if (!isTauri()) return;
@@ -259,8 +364,8 @@ const CLOSE_WAIT_LIMIT_MS = 15 * 60_000;
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /** Záznam do protokolu a oznámení (v rohu okna a ve zvonečku) o zavírání aplikace. */
-function reportClosing(job: Job, key: "appClosed" | "appClosing" | "appCloseTimeout", params: Record<string, string>) {
-  writeLog(job.source, key === "appClosed" ? "warning" : "info", i18n.t(`logs.msg.${key}`, params));
+function reportClosing(job: Job, key: "appClosed" | "otherAppsClosed" | "appClosing" | "appCloseTimeout", params: Record<string, string>) {
+  writeLog(job.source, key === "appClosed" || key === "otherAppsClosed" ? "warning" : "info", i18n.t(`logs.msg.${key}`, params));
   notifyEvent({
     type: "info",
     tone: "info",
@@ -280,8 +385,14 @@ function reportClosing(job: Job, key: "appClosed" | "appClosing" | "appCloseTime
  * zavře (zbylé procesy bez okna pak natvrdo). `onWaiting` přepne kartu do čekání.
  * False = operace se nespustí (uživatel ji zrušil, nebo vypršelo čekání).
  * `retry`: po chybě „aplikace běží“ – aplikace se ptá na uložení → nečekat (nabídne se dialog).
+ * `closed`: oznámení o zavření – aplikace sama, nebo cizí programy, které držely její soubory.
  */
-async function closeRunningApp(job: Job, found: RunningProcess[], onWaiting?: () => void): Promise<boolean> {
+async function closeRunningApp(
+  job: Job,
+  found: RunningProcess[],
+  onWaiting?: () => void,
+  closed: "appClosed" | "otherAppsClosed" = "appClosed",
+): Promise<boolean> {
   const pids = found.map((p) => p.pid);
   let state = await closeApp(pids).catch(() => ({ alive: pids, waiting: [] as number[] }));
   const params = { name: job.appName, processes: "" };
@@ -307,7 +418,7 @@ async function closeRunningApp(job: Job, found: RunningProcess[], onWaiting?: ()
     }
   }
   const ended = found.filter((p) => !state.alive.includes(p.pid));
-  if (ended.length) reportClosing(job, "appClosed", { ...params, processes: processNames(ended) });
+  if (ended.length) reportClosing(job, closed, { ...params, processes: processNames(ended) });
   return true;
 }
 
@@ -315,17 +426,37 @@ async function closeRunningApp(job: Job, found: RunningProcess[], onWaiting?: ()
  * Chyba „aplikace běží“ se zavíráním bez dotazu: aplikace mohla naběhnout až během
  * operace, nebo ji předem nešlo najít – zavřít ji a operaci jednou zopakovat, bez
  * dialogu. Když se aplikace ptá na uložení práce, nic se nezavře a nabídne se dialog.
+ *
+ * Chyba „soubory aplikace drží jiný program“ (inUseByOther): ten se zavře stejně a operace
+ * se zopakuje. Nejčastěji je to jen pomocný proces bez okna – služba kamery v Edgi nebo
+ * v aplikaci Claude s načtenou virtuální kamerou OBS; jeho ukončení okno programu nezavře
+ * a program si službu spustí znovu. Takové procesy zavře i automatická aktualizace na pozadí;
+ * program s oknem jen aktualizace spuštěná uživatelem (na pozadí se počká na příští pokus).
  * True = zařazeno znovu.
  */
 async function retryAfterClosing(job: Job, result: OperationResult, enqueue: (request: EnqueueRequest) => void): Promise<boolean> {
   const retried = inUseRetried.delete(inUseKey(job));
-  if (retried || result.outcome !== "error" || result.errorKey !== "inUse" || job.background) return false;
-  if (!useSettings.getState().forceCloseRunning) return false;
-  const found = await findAppProcesses(job.packageId, job.appName).catch(() => []);
-  if (!found.length || !(await closeRunningApp(job, found))) return false;
+  const otherApps = result.errorKey === "inUseByOther";
+  if (retried || result.outcome !== "error" || (result.errorKey !== "inUse" && !otherApps)) return false;
+  const settings = useSettings.getState();
+  if (!(job.background ? settings.closeBackgroundProcesses : settings.forceCloseRunning)) return false;
+  if (otherApps) {
+    const found = await findFileUsers(job.packageId, job.appName).catch(() => []);
+    if (!found.length || (job.background && found.some((p) => p.visible))) return false;
+    if (!(await closeRunningApp(job, found, undefined, "otherAppsClosed"))) return false;
+  } else {
+    if (job.background) return false;
+    const found = await findAppProcesses(job.packageId, job.appName).catch(() => []);
+    if (!found.length || !(await closeRunningApp(job, found))) return false;
+  }
   inUseRetried.add(inUseKey(job));
-  const { appId, appName, source, packageId, kind, version, options, track, targetVersion } = job;
-  enqueue({ appId, appName, source, packageId, kind, version, options, track, targetVersion });
+  // Neúspěšný pokus do historie nepatří – zapíše se až opakování
+  useHistory.getState().remove(job.id);
+  const { appId, appName, source, packageId, kind, version, options, track, targetVersion, background } = job;
+  // Pomocné procesy (služba kamery v Edgi / Claude) se po ukončení do pár sekund spustí znovu –
+  // při opakování je backend ukončuje po celou dobu operace (running::HolderWatch)
+  const retryOptions = otherApps ? { ...options, closeFileUsers: true } : options;
+  enqueue({ appId, appName, source, packageId, kind, version, options: retryOptions, track, targetVersion, background });
   return true;
 }
 
@@ -470,6 +601,8 @@ export const useJobs = create<JobsState>()((set, get) => {
     if (result.outcome === "success" && phase) recordPhaseDuration(job, phase, Date.now() - phaseSince);
     // Na pozadí přeskočeno kvůli právům správce – nic neproběhlo, do historie operací nepatří
     if (needsAdminLater(job, result)) return result;
+    // Pozastavené stahování do historie nepatří – úloha bude pokračovat
+    if (result.paused) return result;
 
     useHistory.getState().add({
       id: job.id,
@@ -484,6 +617,7 @@ export const useJobs = create<JobsState>()((set, get) => {
       options: job.options,
       outcome: result.outcome,
       error: result.error,
+      ...(result.errorKey && { errorKey: result.errorKey }),
       background: job.background,
       startedAt,
       finishedAt: new Date().toISOString(),
@@ -519,6 +653,8 @@ export const useJobs = create<JobsState>()((set, get) => {
     if (!job) return processNext();
 
     running = true;
+    // Další úlohy ve frontě si zatím stáhnou instalátor (winget) – pak se jen ověří a nainstalují
+    prefetchQueued();
     // Automatická aktualizace běžící aplikace počká na příští kontrolu – bez oznámení
     if (job.background && job.kind === "update" && !(await backgroundReady(job))) {
       writeLog(job.source, "info", i18n.t("logs.msg.skippedRunning", { name: job.appName }));
@@ -532,6 +668,10 @@ export const useJobs = create<JobsState>()((set, get) => {
     // Chybějící správce (Chocolatey, Scoop) – nejdřív výzva k jeho instalaci;
     // běžící aplikaci zavřít (nebo se zeptat), ať ji instalátor může přepsat
     let result: OperationResult = { outcome: "cancelled" };
+    // Uvolnění aplikace: verze a jestli se nastavení podařilo zálohovat (po úspěchu do store/offloaded)
+    let offloadInfo: { version: string; backup: boolean } | null = null;
+    // Kontrola po aktualizaci: hlavní program a jeho podpis před aktualizací (checkAfterUpdate)
+    let beforeSignature: AppSignature | null = null;
     // Snímek systému před instalací (sledování instalace)
     let trace: number | null = null;
     // Čekání, až uživatel uloží práci a zavře běžící aplikaci – fáze na kartě (zrušit jde křížkem)
@@ -579,6 +719,8 @@ export const useJobs = create<JobsState>()((set, get) => {
         }
       } else {
         if (job.kind === "update") await backupSettings(job);
+        if (job.kind === "update") beforeSignature = await mainProgram(job);
+        if (job.kind === "uninstall" && job.offload) offloadInfo = await offloadBackup(job);
         result = await attempt(job);
       }
     }
@@ -630,8 +772,19 @@ export const useJobs = create<JobsState>()((set, get) => {
     // Druhý snímek a uložení rozdílu (zdroj a id podle toho, přes kterého správce se instalovalo)
     if (trace !== null) await finishTrace(trace, job, result.outcome === "success");
 
+    const lastProgress = get().jobs[appId]?.progress;
     remove(appId);
     running = false;
+
+    // Pozastavené stahování: úloha čeká mimo frontu na Pokračovat (rozstažený instalátor zůstal).
+    // Starší verze místo novější už je po odinstalaci – pokračuje se jen instalací.
+    if (result.paused) {
+      const { appName, source, packageId, kind, version, options, track, targetVersion } = job;
+      const request: EnqueueRequest = { appId, appName, source, packageId, kind, version, options, track, targetVersion };
+      usePausedJobs.getState().add(appId, { request, percent: lastProgress?.percent ?? null, at: Date.now() });
+      writeLog(job.source, "info", i18n.t("logs.msg.paused", { name: job.appName }));
+      return processNext();
+    }
 
     // Aplikace naběhla během operace (nebo ji předem nešlo najít) a instalátor ji nemohl přepsat –
     // se zavíráním bez dotazu ji zavřít a operaci jednou zopakovat, bez dialogu
@@ -694,6 +847,10 @@ export const useJobs = create<JobsState>()((set, get) => {
       }
     }
     if (!quietFailure) batch[outcome]++;
+    if (outcome === "error" && !job.background) {
+      const { appName, source, packageId, kind, version, options } = job;
+      batchFailed.push({ appId, appName, source, packageId, kind, version, options });
+    }
     const batchTotal = batch.success + batch.error + batch.cancelled;
     const more = queue.length > 0;
     // Během dávky víc operací jednotlivé úspěchy jen do historie – na konci přijde souhrn
@@ -728,11 +885,19 @@ export const useJobs = create<JobsState>()((set, get) => {
         });
       }
       batch = { success: 0, error: 0, cancelled: 0 };
+      // Zkusit neúspěšné znovu (s hlídáním programů, které drží soubory) – nabídka nad aktualizacemi
+      if (batchFailed.length) useFailedBatch.getState().set(batchFailed);
+      batchFailed = [];
+      // Po dokončení uspat / vypnout počítač (Aktualizovat vše → Po dokončení)
+      useAfterBatch.getState().batchEnded();
     }
 
     // Přes kterého správce je aplikace nainstalovaná (štítek a správa i po restartu)
     if (outcome === "success" && job.kind === "install") useInstalledVia.getState().installed(job.source, job.packageId);
     if (outcome === "success" && job.kind === "uninstall") useInstalledVia.getState().removed(job.source, job.packageId);
+    // Uvolněná aplikace: zapamatovat (Dříve nainstalované); po opětovné instalaci vrátit nastavení
+    if (outcome === "success" && job.kind === "uninstall" && job.offload && offloadInfo) reportOffloaded(job, offloadInfo);
+    if (outcome === "success" && job.kind === "install") void restoreOffloaded(job);
     // Aplikace běží (OBS při aktualizaci…) – nabídnout ji zavřít a zkusit znovu; soubory aplikace
     // drží jiný program (virtuální kamera OBS v prohlížeči) – nabídnout zavřít ten
     const inUse = result.errorKey === "inUse" || result.errorKey === "inUseByOther";
@@ -743,10 +908,15 @@ export const useJobs = create<JobsState>()((set, get) => {
 
     // Stav v UI hned podle výsledku, pak ověření u správce (na pozadí – další úloha nečeká)
     void refreshAfterOperation(job, outcome === "success");
+    // Po aktualizaci ověřit, že hlavní program je na místě a jeho podpis platí
+    if (outcome === "success" && job.kind === "update" && beforeSignature) void checkAfterUpdate(job, beforeSignature);
     // Po odinstalaci ukončit procesy, které ze složky aplikace dál běží, pak najít zbytky
     // (složky, při pokročilé odinstalaci i registr) a nabídnout je smazat / smazat je
     if (job.kind === "uninstall" && outcome === "success") {
-      void endLeftoverProcesses(job).then(() => useLeftovers.getState().check(job.appName, job.packageId, job.source));
+      // Uvolněná aplikace si nastavení a data nechává – zbytky se nenabízejí ke smazání
+      void endLeftoverProcesses(job).then(() => {
+        if (!job.offload) return useLeftovers.getState().check(job.appName, job.packageId, job.source);
+      });
     }
     void processNext();
   };
@@ -754,7 +924,7 @@ export const useJobs = create<JobsState>()((set, get) => {
   return {
     jobs: {},
 
-    enqueue: ({ appId, appName, source, packageId, kind, version, replaceInstalled, skipVersion, options, background, track, targetVersion }) => {
+    enqueue: ({ appId, appName, source, packageId, kind, version, replaceInstalled, skipVersion, options, background, track, targetVersion, offload }) => {
       if (get().jobs[appId]) return; // už ve frontě nebo běží
       // Firemní zásady: neschválená aplikace / zakázaný správce (backend ji odmítne i sám)
       if ((kind === "install" || kind === "update") && (!sourceAllowed(source) || (kind === "install" && !appAllowed(source, packageId)))) {
@@ -778,13 +948,29 @@ export const useJobs = create<JobsState>()((set, get) => {
             background,
             track,
             targetVersion,
+            offload,
             progress: { phase: "queued", percent: null },
           },
         },
       });
+      // Pozastavené stahování téže aplikace: nová úloha na rozstažený instalátor naváže sama
+      usePausedJobs.getState().remove(appId);
       queue.push(appId);
       void processNext();
     },
+
+    pause: (appId) => {
+      void handles.get(appId)?.pause?.();
+    },
+
+    resume: (appId) => {
+      const paused = usePausedJobs.getState().items[appId];
+      if (!paused) return;
+      usePausedJobs.getState().remove(appId);
+      get().enqueue(paused.request);
+    },
+
+    discardPaused: (appId) => usePausedJobs.getState().remove(appId),
 
     cancel: (appId) => {
       const handle = handles.get(appId);
@@ -792,9 +978,11 @@ export const useJobs = create<JobsState>()((set, get) => {
         handle.cancel(); // běžící úloha – výsledek dořeší processNext
         return;
       }
-      // Čekající úloha – jen ji vyřadíme z fronty
+      // Čekající úloha – jen ji vyřadíme z fronty (a zastavíme stahování dopředu)
       const index = queue.indexOf(appId);
       if (index >= 0) queue.splice(index, 1);
+      const waiting = get().jobs[appId];
+      if (waiting && isTauri()) void invoke("cancel_prefetch_ahead", { packageId: waiting.packageId }).catch(() => undefined);
       remove(appId);
     },
   };

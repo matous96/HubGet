@@ -22,7 +22,14 @@ import { Tooltips } from "@/components/ui/Tooltip";
 import { AppInUseDialog, AppRunningDialog } from "@/components/package/AppInUseDialog";
 import { RollbackDialog } from "@/components/package/RollbackDialog";
 import { WatchlistWatcher } from "@/components/package/WatchlistWatcher";
-import { DeviceReporter } from "@/components/settings/DevicesSection";
+import { DeviceAutoInstaller, DeviceCommandRunner, DeviceReporter } from "@/components/settings/DevicesSection";
+import { DownloadLimitSync } from "@/components/settings/PackageUpdatesSection";
+import { UpdateDoctorDialog } from "@/components/package/UpdateDoctorDialog";
+import { UpdatesOverviewDialog } from "@/components/package/UpdatesOverviewDialog";
+import { ScheduledInstallsRunner, ScheduleInstallDialog } from "@/components/package/ScheduleInstall";
+import { SendToDeviceDialog } from "@/components/package/SendToDeviceDialog";
+import { TrialWatcher } from "@/components/home/TrialPrompt";
+import { DeferredUpdatesRunner, PowerCountdownDialog, UpdatePrefetcher } from "@/components/package/UpdateFixes";
 import { WeeklySummary } from "@/components/layout/WeeklySummary";
 import { CliCommands } from "@/components/layout/CliCommands";
 import { TaskbarProgress } from "@/components/layout/TaskbarProgress";
@@ -241,11 +248,23 @@ const OVERLAYS: [string, ComponentType][] = [
   ["ProfileImportDialog", ProfileImportDialog],
   ["ManagerSetupDialog", ManagerSetupDialog],
   ["AppInUseDialog", AppInUseDialog],
+  ["UpdateDoctorDialog", UpdateDoctorDialog],
+  ["UpdatesOverviewDialog", UpdatesOverviewDialog],
+  ["SendToDeviceDialog", SendToDeviceDialog],
+  ["ScheduleInstallDialog", ScheduleInstallDialog],
+  ["ScheduledInstallsRunner", ScheduledInstallsRunner],
+  ["TrialWatcher", TrialWatcher],
+  ["PowerCountdownDialog", PowerCountdownDialog],
+  ["DeferredUpdatesRunner", DeferredUpdatesRunner],
+  ["UpdatePrefetcher", UpdatePrefetcher],
   ["RollbackDialog", RollbackDialog],
   ["WatchlistWatcher", WatchlistWatcher],
   ["VulnerabilityWatcher", VulnerabilityWatcher],
   ["ReliabilityWatcher", ReliabilityWatcher],
   ["DeviceReporter", DeviceReporter],
+  ["DeviceAutoInstaller", DeviceAutoInstaller],
+  ["DeviceCommandRunner", DeviceCommandRunner],
+  ["DownloadLimitSync", DownloadLimitSync],
   ["WeeklySummary", WeeklySummary],
   ["AppRunningDialog", AppRunningDialog],
   ["FallbackOfferDialog", FallbackOfferDialog],

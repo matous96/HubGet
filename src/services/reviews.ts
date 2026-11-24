@@ -49,7 +49,7 @@ export interface ReviewDraft {
 export interface ReviewsService {
   /** true = data jsou ukázková (UI to viditelně označí). */
   readonly isSample: boolean;
-  /** Umí služba i textové recenze (nadpis, text)? Supabase zatím ukládá jen hvězdičky. */
+  /** Umí služba i textové recenze (nadpis, text)? Supabase ano (migrace reviews), ukázková také. */
   readonly supportsText: boolean;
   getSummary(packageId: string, popularity: number): Promise<RatingSummary>;
   /** Souhrny všech hodnocených aplikací najednou (karty v mřížce). */

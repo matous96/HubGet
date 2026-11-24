@@ -1,7 +1,7 @@
 import type { ButtonHTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
 
-type Variant = "primary" | "secondary" | "ghost" | "danger";
+type Variant = "primary" | "secondary" | "ghost" | "accentGhost" | "danger";
 type Size = "sm" | "md" | "lg";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -13,6 +13,8 @@ const variants: Record<Variant, string> = {
   primary: "bg-accent text-accent-fg hover:brightness-110 shadow-sm shadow-accent/30",
   secondary: "bg-surface-2 text-fg hover:bg-surface-3 border border-line",
   ghost: "text-muted hover:text-fg hover:bg-surface-2",
+  /** Bez pozadí v barvě zvýraznění (mráček Nainstalovat znovu). */
+  accentGhost: "text-accent hover:bg-accent/12",
   danger: "bg-danger/10 text-danger hover:bg-danger/20",
 };
 

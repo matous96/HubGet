@@ -236,6 +236,8 @@ export interface CatalogEntry {
   archived?: boolean;
   /** Poslední push do repozitáře na GitHubu (ISO) – dlouho bez změn = možná opuštěná. */
   lastCommit?: string | null;
+  /** Jak podpořit vývojáře (FUNDING.yml repozitáře na GitHubu – data pipeline, GraphQL fundingLinks). */
+  funding?: FundingLink[];
   /** Hlášení chyb vývojářům (issue tracker). */
   issuesUrl?: string | null;
   /** Oficiální dokumentace (winget: Documentations). */
@@ -385,6 +387,12 @@ export interface InstallOptions {
    * backend instalátor jiného vydavatele nebo bez podpisu nespustí (signatures.rs).
    */
   expectedSigner?: string;
+  /**
+   * Opakování po chybě „soubory aplikace drží jiný program“ (store/jobs.ts → retryAfterClosing):
+   * backend po celou operaci ukončuje pomocné procesy bez okna, které soubory aplikace znovu
+   * načtou (služba kamery v Edgi a Claude se po ukončení do pár sekund spustí znovu).
+   */
+  closeFileUsers?: boolean;
   architecture?: Arch;
   scope?: InstallScope;
   /** Cílová složka instalace. */
@@ -422,7 +430,14 @@ export type OperationPhase =
   | "interactive" // čeká se na uživatele v průvodci instalací
   | "installing"
   | "uninstalling"
-  | "repairing";
+  | "repairing"
+  | "scanning"; // Microsoft Defender prověřuje stažený instalátor
+
+/** Odkaz na podporu vývojáře: platforma (github, patreon, open_collective, ko_fi… nebo custom) a adresa. */
+export interface FundingLink {
+  platform: string;
+  url: string;
+}
 
 export interface OperationProgress {
   phase: OperationPhase;
@@ -432,6 +447,8 @@ export interface OperationProgress {
   since?: number;
   /** Operace už stahovala – instalace pokračuje v celkovém procentu za stahováním (JobProgress). */
   downloaded?: boolean;
+  /** Stahování instalátoru jde pozastavit (stahuje ho HubGet sám – tlačítko Pozastavit). */
+  pausable?: boolean;
 }
 
 /** Výsledný stav dokončené operace. */
@@ -463,6 +480,8 @@ export interface Job {
   track?: boolean;
   /** Automatická aktualizace: nabízená verze (počítadlo neúspěchů v updateHolds). */
   targetVersion?: string;
+  /** Uvolnit aplikaci: odinstalace se zálohou nastavení, bez úklidu zbytků (store/offloaded). */
+  offload?: boolean;
   progress: OperationProgress;
   error?: string;
 }

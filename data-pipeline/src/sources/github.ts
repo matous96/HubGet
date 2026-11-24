@@ -1,6 +1,7 @@
 /**
  * Údaje o repozitářích na GitHubu pro katalog: hvězdičky (pole `githubStars`) a u GraphQL
- * i archivace a poslední změna (`archived`, `lastCommit` – opuštěné aplikace v HubGetu).
+ * i archivace a poslední změna (`archived`, `lastCommit` – opuštěné aplikace v HubGetu)
+ * a odkazy na podporu vývojáře z FUNDING.yml (`funding` – Podpořit vývojáře v detailu).
  *
  * Dva zdroje:
  *  - s tokenem (proměnná prostředí GITHUB_TOKEN, osobní token bez oprávnění)
@@ -28,6 +29,8 @@ export interface RepoInfo {
   archived?: boolean;
   /** Poslední push do repozitáře (ISO). */
   pushedAt?: string;
+  /** Odkazy na podporu vývojáře (FUNDING.yml) – platforma malými písmeny a adresa. */
+  funding?: { platform: string; url: string }[];
 }
 
 interface StarsCache {
@@ -51,7 +54,7 @@ async function queryGraphql(token: string, repos: string[]): Promise<Record<stri
   const fields = repos
     .map((repo, i) => {
       const [owner, name] = repo.split("/");
-      return `r${i}: repository(owner: ${literal(owner)}, name: ${literal(name)}) { stargazerCount isArchived pushedAt }`;
+      return `r${i}: repository(owner: ${literal(owner)}, name: ${literal(name)}) { stargazerCount isArchived pushedAt fundingLinks { platform url } }`;
     })
     .join("\n");
   const response = await fetch("https://api.github.com/graphql", {
@@ -61,12 +64,15 @@ async function queryGraphql(token: string, repos: string[]): Promise<Record<stri
   });
   if (!response.ok) throw new Error(`GitHub GraphQL: HTTP ${response.status}`);
   // Neexistující repozitář vrátí null a chybu NOT_FOUND – zbytek dávky platí
-  const body = (await response.json()) as { data?: Record<string, { stargazerCount: number; isArchived: boolean; pushedAt: string | null } | null> };
+  const body = (await response.json()) as {
+    data?: Record<string, { stargazerCount: number; isArchived: boolean; pushedAt: string | null; fundingLinks?: { platform: string; url: string }[] } | null>;
+  };
   if (!body.data) throw new Error("GitHub GraphQL: odpověď bez dat");
   return Object.fromEntries(
     repos.map((repo, i) => {
       const r = body.data![`r${i}`];
-      return [repo, r ? { stars: r.stargazerCount, archived: r.isArchived, ...(r.pushedAt ? { pushedAt: r.pushedAt } : {}) } : null];
+      const funding = (r?.fundingLinks ?? []).map((link) => ({ platform: link.platform.toLowerCase(), url: link.url }));
+      return [repo, r ? { stars: r.stargazerCount, archived: r.isArchived, ...(r.pushedAt ? { pushedAt: r.pushedAt } : {}), ...(funding.length ? { funding } : {}) } : null];
     }),
   );
 }

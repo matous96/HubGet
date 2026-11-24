@@ -6,8 +6,9 @@
  */
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { CircleHelp, Flag, FlaskConical, SquarePen, Star, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useSearchParams } from "react-router";
 import { queryClient, queryKeys } from "@/app/queryClient";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
@@ -75,6 +76,18 @@ export function RatingsSection({ entry }: { entry: CatalogEntry }) {
   const requireAuth = useAuth((s) => s.requireAuth);
   const userId = useAuth((s) => s.user?.id);
   const [writing, setWriting] = useState(false);
+  // Odkaz „Napsat recenzi“ z výzvy k hodnocení na Domů (?review=write) – rovnou otevřít psaní
+  const [params, setParams] = useSearchParams();
+  const section = useRef<HTMLElement>(null);
+  useEffect(() => {
+    if (params.get("review") !== "write" || !reviews.supportsText) return;
+    setParams((p) => {
+      p.delete("review");
+      return p;
+    }, { replace: true });
+    section.current?.scrollIntoView({ block: "start" });
+    requireAuth(() => setWriting(true), "review");
+  }, [params, setParams, requireAuth]);
   const [reading, setReading] = useState<Review | null>(null);
   const withText = reviews.supportsText;
 
@@ -124,7 +137,7 @@ export function RatingsSection({ entry }: { entry: CatalogEntry }) {
     submit.mutate({ rating, title: mine?.title ?? "", body: mine?.body ?? "" });
 
   return (
-    <section className="border-t border-line pt-6">
+    <section ref={section} className="scroll-mt-6 border-t border-line pt-6">
       <div className="flex items-center gap-3">
         <h2 className="font-display text-2xl font-bold">{t(withText ? "reviews.title" : "reviews.titleRatings")}</h2>
         {reviews.isSample && (

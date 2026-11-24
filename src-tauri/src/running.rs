@@ -111,6 +111,8 @@ fn in_windows(path: &str) -> bool {
 /// Běžící proces: id, název a cesta ke spustitelnému souboru.
 pub(crate) struct Process {
     pid: u32,
+    /// Rodičovský proces (kvůli procesům HubGetu – jeho WebView2 se nikdy nezavírá).
+    parent: u32,
     name: String,
     pub(crate) path: String,
 }
@@ -136,6 +138,7 @@ pub(crate) fn processes() -> Vec<Process> {
         let mut ok = Process32FirstW(snapshot, &mut entry) != 0;
         while ok {
             let pid = entry.th32ProcessID;
+            let parent = entry.th32ParentProcessID;
             let name_len = entry.szExeFile.iter().position(|&c| c == 0).unwrap_or(entry.szExeFile.len());
             let name = String::from_utf16_lossy(&entry.szExeFile[..name_len]);
             let handle = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, 0, pid);
@@ -143,7 +146,7 @@ pub(crate) fn processes() -> Vec<Process> {
                 let mut buffer = [0u16; 1024];
                 let mut size = buffer.len() as u32;
                 if QueryFullProcessImageNameW(handle, 0, buffer.as_mut_ptr(), &mut size) != 0 {
-                    list.push(Process { pid, name, path: String::from_utf16_lossy(&buffer[..size as usize]) });
+                    list.push(Process { pid, parent, name, path: String::from_utf16_lossy(&buffer[..size as usize]) });
                 }
                 CloseHandle(handle);
             }
@@ -263,6 +266,39 @@ fn app_dirs(package_id: &str, name: &str) -> Vec<String> {
     dirs
 }
 
+/// Sdílené složky aplikace mimo složku instalace, ze kterých si cizí programy mohou načíst
+/// knihovny: v ProgramData a AppData složka, jejíž název začíná názvem složky instalace –
+/// „C:\ProgramData\obs-studio-hook“ k „obs-studio“ (hák OBS pro záznam her se načte do her
+/// i do grafických procesů jiných aplikací, třeba ASUS Armoury Crate; instalátor OBS ho
+/// kontroluje taky).
+fn related_data_dirs(install_dirs: &[String]) -> Vec<String> {
+    let keys: Vec<String> = install_dirs
+        .iter()
+        .filter_map(|dir| Path::new(dir.trim_end_matches('\\')).file_name().map(|n| compact(&n.to_string_lossy())))
+        .filter(|key| key.len() >= 4)
+        .collect();
+    if keys.is_empty() {
+        return Vec::new();
+    }
+    let roots = ["ProgramData", "APPDATA", "LOCALAPPDATA"].into_iter().filter_map(|var| std::env::var_os(var).map(PathBuf::from));
+    let mut found = Vec::new();
+    for root in roots {
+        let Ok(entries) = std::fs::read_dir(&root) else { continue };
+        for entry in entries.flatten().filter(|e| e.path().is_dir()) {
+            let name = compact(&entry.file_name().to_string_lossy());
+            if keys.iter().any(|key| name.starts_with(key.as_str())) {
+                found.push(format!("{}\\", arp::folder_key(&entry.path())));
+            }
+        }
+    }
+    found
+}
+
+/// Název složky jen z písmen a číslic, malými písmeny („obs-studio-hook“ → „obsstudiohook“).
+fn compact(name: &str) -> String {
+    name.chars().filter(|c| c.is_alphanumeric()).flat_map(char::to_lowercase).collect()
+}
+
 /// Cesty knihoven (DLL) načtených v procesu; proces, do kterého nejde nahlédnout
 /// (běží s právy správce, chráněný), nemá žádné.
 #[cfg(windows)]
@@ -309,15 +345,16 @@ fn module_paths(_pid: u32) -> Vec<String> {
 /// v Discordu nebo ve videohovoru. Programy aplikace samotné (spustitelný soubor v její
 /// složce) a procesy Windows sem nepatří.
 pub(crate) fn file_users(package_id: &str, name: &str) -> Vec<RunningProcess> {
-    let dirs = app_dirs(package_id, name);
+    let mut dirs = app_dirs(package_id, name);
     if dirs.is_empty() {
         return Vec::new();
     }
-    let own = std::process::id();
+    dirs.extend(related_data_dirs(&dirs));
+    let all = processes();
+    let own = own_tree(std::process::id(), &all);
     let windows = visible_window_pids();
-    processes()
-        .into_iter()
-        .filter(|p| p.pid != own && !in_windows(&p.path) && !dirs.iter().any(|dir| inside(&p.path, dir)))
+    all.into_iter()
+        .filter(|p| !own.contains(&p.pid) && !in_windows(&p.path) && !dirs.iter().any(|dir| inside(&p.path, dir)))
         .filter(|p| module_paths(p.pid).iter().any(|module| dirs.iter().any(|dir| inside(module, dir))))
         .map(|p| {
             let description = crate::version_info::fields(Path::new(&p.path), &["FileDescription"])
@@ -334,6 +371,172 @@ pub(crate) fn file_users(package_id: &str, name: &str) -> Vec<RunningProcess> {
             }
         })
         .collect()
+}
+
+/// HubGet a všechny jeho podřízené procesy (WebView2, pomocníci) – ty se nikdy nezavírají.
+fn own_tree(own: u32, all: &[Process]) -> HashSet<u32> {
+    let mut tree = HashSet::from([own]);
+    // Rodič má (skoro vždy) nižší pořadí ve výpisu, ale jistota je opakovat, dokud něco přibývá
+    loop {
+        let before = tree.len();
+        for p in all {
+            if tree.contains(&p.parent) && p.pid != 0 {
+                tree.insert(p.pid);
+            }
+        }
+        if tree.len() == before {
+            return tree;
+        }
+    }
+}
+
+/// Knihovny a programy ve složkách aplikace (pro Restart Manager) – nejvýš MAX_RM_FILES.
+const MAX_RM_FILES: usize = 3000;
+
+fn binaries_in(dirs: &[String]) -> Vec<PathBuf> {
+    let mut files = Vec::new();
+    let mut stack: Vec<(PathBuf, u32)> = dirs.iter().map(|d| (PathBuf::from(d.trim_end_matches('\\')), 0)).collect();
+    while let Some((dir, depth)) = stack.pop() {
+        let Ok(entries) = std::fs::read_dir(&dir) else { continue };
+        for entry in entries.flatten() {
+            let path = entry.path();
+            if path.is_dir() {
+                if depth < 6 {
+                    stack.push((path, depth + 1));
+                }
+            } else if path.extension().is_some_and(|e| e.eq_ignore_ascii_case("dll") || e.eq_ignore_ascii_case("exe")) {
+                files.push(path);
+                if files.len() >= MAX_RM_FILES {
+                    return files;
+                }
+            }
+        }
+    }
+    files
+}
+
+/// Kdo drží soubory podle Restart Manageru (jako instalátory – OBS): vidí i otevřené soubory
+/// a služby, nejen načtené knihovny. Vrací (pid, název programu, krátký název služby).
+#[cfg(windows)]
+fn restart_manager_users(files: &[PathBuf]) -> Vec<(u32, String, Option<String>)> {
+    use std::os::windows::ffi::OsStrExt;
+    use windows_sys::Win32::System::RestartManager::{
+        RmEndSession, RmGetList, RmRegisterResources, RmStartSession, CCH_RM_SESSION_KEY, RM_PROCESS_INFO,
+    };
+    if files.is_empty() {
+        return Vec::new();
+    }
+    let wide: Vec<Vec<u16>> = files.iter().map(|f| f.as_os_str().encode_wide().chain([0]).collect()).collect();
+    let pointers: Vec<*const u16> = wide.iter().map(|w| w.as_ptr()).collect();
+    let text = |buffer: &[u16]| String::from_utf16_lossy(&buffer[..buffer.iter().position(|&c| c == 0).unwrap_or(buffer.len())]);
+    let mut found = Vec::new();
+    // SAFETY: řetězce i pole žijí po celou relaci; RmGetList dostane pole o velikosti, kterou sám vrátil
+    unsafe {
+        let mut session = 0u32;
+        let mut key = [0u16; CCH_RM_SESSION_KEY as usize + 1];
+        if RmStartSession(&mut session, 0, key.as_mut_ptr()) != 0 {
+            return found;
+        }
+        if RmRegisterResources(session, pointers.len() as u32, pointers.as_ptr(), 0, std::ptr::null(), 0, std::ptr::null()) == 0 {
+            let (mut needed, mut count, mut reasons) = (0u32, 0u32, 0u32);
+            let _ = RmGetList(session, &mut needed, &mut count, std::ptr::null_mut(), &mut reasons);
+            if needed > 0 {
+                let mut info: Vec<RM_PROCESS_INFO> = vec![std::mem::zeroed(); needed as usize];
+                count = needed;
+                if RmGetList(session, &mut needed, &mut count, info.as_mut_ptr(), &mut reasons) == 0 {
+                    for item in info.iter().take(count as usize) {
+                        let service = text(&item.strServiceShortName);
+                        found.push((item.Process.dwProcessId, text(&item.strAppName), (!service.is_empty()).then_some(service)));
+                    }
+                }
+            }
+        }
+        RmEndSession(session);
+    }
+    found
+}
+
+#[cfg(not(windows))]
+fn restart_manager_users(_files: &[PathBuf]) -> Vec<(u32, String, Option<String>)> {
+    Vec::new()
+}
+
+/// Co drží soubory aplikace – pro průvodce „Proč aktualizace selhala?“: načtené knihovny
+/// (`file_users`) i Restart Manager (otevřené soubory, služby, procesy, do kterých bez práv
+/// správce nevidíme). Bez procesů HubGetu; služba má popis „název (služba)“.
+#[tauri::command]
+pub async fn app_blockers(package_id: String, name: String) -> Result<Vec<RunningProcess>, String> {
+    background(move || Ok(blockers(&package_id, &name))).await
+}
+
+fn blockers(package_id: &str, name: &str) -> Vec<RunningProcess> {
+    {
+        let mut users = file_users(package_id, name);
+        let mut dirs = app_dirs(package_id, name);
+        if dirs.is_empty() {
+            return users;
+        }
+        dirs.extend(related_data_dirs(&dirs));
+        let all = processes();
+        let own = own_tree(std::process::id(), &all);
+        let windows = visible_window_pids();
+        for (pid, app_name, service) in restart_manager_users(&binaries_in(&dirs)) {
+            if pid == 0 || own.contains(&pid) || users.iter().any(|u| u.pid == pid) {
+                continue;
+            }
+            let process = all.iter().find(|p| p.pid == pid);
+            let path = process.map(|p| p.path.clone()).unwrap_or_default();
+            users.push(RunningProcess {
+                pid,
+                name: process.map(|p| p.name.clone()).unwrap_or_else(|| app_name.clone()),
+                visible: windows.contains(&pid),
+                gui: !path.is_empty() && is_gui_program(&path),
+                certain: false,
+                description: Some(match service {
+                    Some(service) => format!("{app_name} ({service})"),
+                    None => app_name,
+                }),
+                path,
+            });
+        }
+        users
+    }
+}
+
+/// Hlídání během operace (opakování po chybě „inUseByOther“): pomocné procesy bez okna, které
+/// mají načtené soubory aplikace, se ukončují znovu a znovu, dokud operace běží. Služba kamery
+/// v Edgi a v aplikaci Claude (modul virtuální kamery OBS) se po ukončení do pár sekund spustí
+/// znovu – instalátor, který si načtené soubory kontroluje (OBS), by na ni narazil zase. Okna
+/// programů se nezavírají (proces s viditelným oknem hlídání vynechá). Konec = drop.
+pub(crate) struct HolderWatch {
+    stop: std::sync::Arc<std::sync::atomic::AtomicBool>,
+}
+
+/// Jak často hlídání hledá znovu spuštěné procesy (výčet modulů trvá ~0,1 s).
+const WATCH_EVERY: Duration = Duration::from_millis(300);
+
+impl HolderWatch {
+    pub(crate) fn start(package_id: String, name: String) -> Self {
+        use std::sync::atomic::{AtomicBool, Ordering};
+        let stop = std::sync::Arc::new(AtomicBool::new(false));
+        let flag = stop.clone();
+        std::thread::spawn(move || {
+            while !flag.load(Ordering::Relaxed) {
+                let helpers: Vec<u32> = file_users(&package_id, &name).into_iter().filter(|p| !p.visible).map(|p| p.pid).collect();
+                if !helpers.is_empty() {
+                    terminate(&helpers, true, Duration::from_secs(2));
+                }
+                std::thread::sleep(WATCH_EVERY);
+            }
+        });
+        HolderWatch { stop }
+    }
+}
+
+impl Drop for HolderWatch {
+    fn drop(&mut self) {
+        self.stop.store(true, std::sync::atomic::Ordering::Relaxed);
+    }
 }
 
 /// Názvy programů z `file_users` bez opakování („Microsoft Edge, Claude“); None = žádné.
@@ -386,8 +589,8 @@ pub async fn app_processes(package_id: String, name: String) -> Result<Vec<Runni
 /// Pošle procesům požadavek na zavření (taskkill; s `force` natvrdo) a počká
 /// nejvýš `wait`, než skončí. Vrátí ty, které běží dál.
 fn terminate(pids: &[u32], force: bool, wait: Duration) -> Vec<u32> {
-    let own = std::process::id();
-    let pids: Vec<u32> = pids.iter().copied().filter(|&p| p != own).collect();
+    let own = own_tree(std::process::id(), &processes());
+    let pids: Vec<u32> = pids.iter().copied().filter(|p| !own.contains(p)).collect();
     for pid in &pids {
         let mut command = hidden_command(&system_tool("taskkill.exe").to_string_lossy());
         command.args(["/PID", &pid.to_string(), "/T"]);
@@ -495,8 +698,8 @@ fn next_step(state: &AfterRequest, elapsed: Duration) -> NextStep {
 #[tauri::command]
 pub async fn close_app(pids: Vec<u32>) -> Result<CloseState, String> {
     background(move || {
-        let own = std::process::id();
-        let pids: Vec<u32> = pids.into_iter().filter(|&p| p != own).collect();
+        let own = own_tree(std::process::id(), &processes());
+        let pids: Vec<u32> = pids.into_iter().filter(|p| !own.contains(p)).collect();
         let before: HashSet<isize> = top_windows().iter().filter(|w| pids.contains(&w.pid)).map(|w| w.hwnd).collect();
         // Jen žádost o zavření, bez čekání
         terminate(&pids, false, Duration::ZERO);
@@ -585,6 +788,35 @@ mod tests {
         ];
         assert_eq!(file_user_names(&users).as_deref(), Some("Microsoft Edge, Claude"));
         assert_eq!(file_user_names(&[]), None);
+    }
+
+    #[test]
+    fn nazev_slozky_bez_znaku() {
+        assert_eq!(compact("obs-studio-hook"), "obsstudiohook");
+        assert!(compact("obs-studio-hook").starts_with(&compact("obs-studio")));
+        assert!(!compact("OBS Settings").starts_with(&compact("obs-studio")));
+        // Krátký název složky („App“) by chytil cizí složky – related_data_dirs ho vynechá
+        assert!(compact("app").len() < 4);
+    }
+
+    #[test]
+    fn vlastni_procesy_hubgetu() {
+        let p = |pid: u32, parent: u32| Process { pid, parent, name: String::new(), path: String::new() };
+        // HubGet 10 → WebView2 11 → jeho podprocesy 12, 13; cizí 20 → 21
+        let all = [p(13, 11), p(10, 1), p(11, 10), p(12, 11), p(20, 1), p(21, 20)];
+        let tree = own_tree(10, &all);
+        assert_eq!(tree, HashSet::from([10, 11, 12, 13]));
+    }
+
+    /// Co drží soubory OBS včetně Restart Manageru: cargo test --lib running::tests::live_blockers -- --ignored --nocapture
+    #[test]
+    #[ignore]
+    fn live_blockers() {
+        let start = Instant::now();
+        for user in blockers("OBSProject.OBSStudio", "OBS Studio") {
+            println!("{} ({}) {:?} okno={}", user.name, user.pid, user.description, user.visible);
+        }
+        println!("za {:?}", start.elapsed());
     }
 
     /// Kdo má načtené soubory OBS (virtuální kamera): cargo test --lib running -- --ignored --nocapture

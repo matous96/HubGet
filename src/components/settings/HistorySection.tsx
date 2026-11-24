@@ -1,4 +1,4 @@
-import { CalendarHeart, CircleCheck, CircleSlash, CircleX, History, RotateCcw, SquareTerminal, Trash2 } from "lucide-react";
+import { CalendarHeart, CircleCheck, CircleSlash, CircleX, History, RotateCcw, SquareTerminal, Stethoscope, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
@@ -11,6 +11,8 @@ import { fallbackEntry, useCatalogIndex } from "@/hooks/usePackages";
 import { cn } from "@/lib/utils";
 import { useHistory, type HistoryEntry } from "@/store/history";
 import { useJobs } from "@/store/jobs";
+import { useUpdateDoctor } from "@/store/updateFixes";
+import { FailedRetryBanner } from "@/components/package/UpdateFixes";
 import { useSettings } from "@/store/settings";
 import type { OperationKind } from "@/types";
 
@@ -72,6 +74,8 @@ export function HistorySection() {
 
   return (
     <>
+      {/* Poslední dávka měla chyby – zkusit je znovu s opravou */}
+      <FailedRetryBanner />
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-muted">{t("history.subtitle")}</p>
         <div className="flex gap-2">
@@ -175,6 +179,7 @@ function HistoryRow({ entry }: { entry: HistoryEntry }) {
   const catalogIndex = useCatalogIndex();
   const enqueue = useJobs((s) => s.enqueue);
   const running = useJobs((s) => !!s.jobs[entry.appId]);
+  const openDoctor = useUpdateDoctor((s) => s.open);
   const app = catalogIndex.get(entry.appId) ?? fallbackEntry(entry.source, entry.packageId, entry.appName, entry.version ?? "");
   const { Icon, className } = OUTCOME[entry.outcome];
   const durationSec = Math.max(1, Math.round((Date.parse(entry.finishedAt) - Date.parse(entry.startedAt)) / 1000));
@@ -211,6 +216,22 @@ function HistoryRow({ entry }: { entry: HistoryEntry }) {
       <div className="w-24 text-right text-xs text-muted tabular-nums">
         <p>{new Date(entry.finishedAt).toLocaleTimeString(language, { hour: "2-digit", minute: "2-digit" })}</p>
         <p>{t("history.duration", { seconds: durationSec })}</p>
+      </div>
+
+      {/* Proč to selhalo? – průvodce s opravou (UpdateDoctorDialog) */}
+      <div className="w-9">
+        {entry.outcome === "error" && (
+          <button
+            type="button"
+            disabled={running}
+            aria-label={`${t("doctor.button")} – ${entry.appName}`}
+            title={t("doctor.button")}
+            onClick={() => openDoctor(entry)}
+            className="flex size-9 cursor-pointer items-center justify-center rounded-full text-accent transition-colors hover:bg-accent/12 disabled:cursor-default disabled:opacity-40"
+          >
+            <Stethoscope className="size-4" />
+          </button>
+        )}
       </div>
 
       {/* Zopakovat neúspěšnou nebo zrušenou operaci */}

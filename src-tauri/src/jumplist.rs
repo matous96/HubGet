@@ -1,5 +1,5 @@
 //! Rychlé akce na ikoně HubGetu v hlavním panelu a v nabídce Start (jump list, pravé
-//! tlačítko): Dostupné aktualizace, Aktualizovat vše, Přehled počítače. Každá akce je
+//! tlačítko): Dostupné aktualizace (s počtem), Aktualizovat vše, Nainstalované, Hledat a Přehled počítače. Každá akce je
 //! zástupce na HubGet s příkazem terminálu (`--cli updates` …) – spuštění projde stejnou
 //! cestou jako příkaz `hubget` (cli.rs): předá ho běžícímu HubGetu, nebo ho spustí.
 //! Názvy posílá frontend v jazyce aplikace (při startu a po změně jazyka).
@@ -12,12 +12,12 @@ use crate::process::background;
 #[serde(rename_all = "camelCase")]
 pub struct JumpTask {
     title: String,
-    /// Příkaz terminálu (cli.rs): updates | update | overview.
+    /// Příkaz terminálu (cli.rs): updates | update | installed | search | overview.
     command: String,
 }
 
 /// Povolené příkazy – zástupce nesmí spouštět nic jiného.
-const COMMANDS: &[&str] = &["updates", "update", "overview"];
+const COMMANDS: &[&str] = &["updates", "update", "installed", "search", "overview"];
 
 #[cfg(windows)]
 fn apply(tasks: &[JumpTask]) -> windows::core::Result<()> {

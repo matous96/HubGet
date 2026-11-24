@@ -29,6 +29,9 @@ import { problemShare, reliabilityWarning, useReliability } from "@/store/reliab
 import { useSelection } from "@/store/selection";
 import { useSettings } from "@/store/settings";
 import type { InstallOrigin } from "@/types";
+import { AfterBatchSelect, FailedRetryBanner } from "@/components/package/UpdateFixes";
+import { ScheduledInstallsBanner } from "@/components/package/ScheduleInstall";
+import { useUpdatesOverview } from "@/components/package/UpdatesOverviewDialog";
 
 type Filter = "all" | "updates" | "unused";
 
@@ -143,7 +146,9 @@ export function InstalledPage() {
               <RefreshCw className={cn("size-4", isFetching && "animate-spin")} />
               {t("installed.refresh")}
             </Button>
-            <Button onClick={updateAll} disabled={pendingUpdates === 0}>
+            {/* Po dokončení dávky uspat / vypnout počítač */}
+            <AfterBatchSelect />
+            <Button onClick={() => (useAutoUpdates.getState().overviewBeforeUpdateAll ? useUpdatesOverview.getState().show() : void updateAll())} disabled={pendingUpdates === 0}>
               {t("installed.updateAll")}
               {pendingUpdates > 0 && (
                 <span className="rounded-full bg-white/25 px-1.5 text-[11px] leading-5">{pendingUpdates}</span>
@@ -152,6 +157,11 @@ export function InstalledPage() {
           </>
         }
       />
+
+      {/* Poslední dávka měla chyby – zkusit je znovu s opravou */}
+      <FailedRetryBanner />
+      {/* Naplánované instalace (Nainstalovat později…) – kdy se spustí, zrušení */}
+      <ScheduledInstallsBanner />
 
       <div className="mb-5 flex flex-wrap items-center gap-3">
         {/* Filtr: Vše / Dostupné aktualizace */}

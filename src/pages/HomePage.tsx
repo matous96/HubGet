@@ -6,6 +6,11 @@ import { Link } from "react-router";
 import { CollectionModal } from "@/components/home/CollectionModal";
 import { AppOfTheDayCard, AppStoryCard, CollectionCard } from "@/components/home/TodayCards";
 import { ProfileCollections } from "@/components/home/ProfileCollections";
+import { ForYou } from "@/components/home/ForYou";
+import { MajorUpdates } from "@/components/home/MajorUpdates";
+import { RestoreFromDevice } from "@/components/home/RestoreFromDevice";
+import { RatePrompt } from "@/components/home/RatePrompt";
+import { TrialPrompt } from "@/components/home/TrialPrompt";
 import { SystemStatus } from "@/components/home/SystemStatus";
 import { UserModeToggle } from "@/components/home/UserModeToggle";
 import { ValuePillars } from "@/components/home/ValuePillars";
@@ -191,6 +196,16 @@ export function HomePage() {
           {/* Stav počítače: aktualizace, co spravuje HubGet, export / import, vyčištění */}
           <SystemStatus />
 
+          {/* Přeinstalované Windows: vrátit aplikace z dřívějšího záznamu tohoto počítače (Moje počítače) */}
+          <RestoreFromDevice />
+
+          {/* Nové hlavní verze nainstalovaných aplikací (jako Události v App Storu) */}
+          <MajorUpdates />
+
+          {/* Jak se vám líbí aplikace nainstalovaná před pár dny? (hodnocení jedním kliknutím) */}
+          <TrialPrompt />
+          <RatePrompt />
+
           {/* Režim Vývojář: nástroje pro vývojáře hned pod přehledem */}
           {devTools.length > 0 && (
             <div className="mb-8">
@@ -206,6 +221,9 @@ export function HomePage() {
 
           {/* Kolekce podle zaměření + vlastní sada sdílená odkazem */}
           <ProfileCollections />
+
+          {/* Doporučeno pro vás: „Protože máte …“ podle nainstalovaných aplikací (jen místně) */}
+          <ForYou />
 
           {/* Celoobrazovkový detail kolekce – otevírají ho karty kolekcí výše */}
           <CollectionModal />

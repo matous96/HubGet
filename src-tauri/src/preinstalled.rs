@@ -137,7 +137,7 @@ fn valid_package_text(text: &str) -> bool {
 /// (powershell.rs): ten předtím prochází nabídku Start přes Shell.Application a WinRT
 /// PackageManager v témže procesu pak vrací prázdný seznam balíčků. Odebrání navíc trvá
 /// i desítky sekund a sdílený PowerShell by mezitím blokoval výpis nainstalovaných.
-fn run_script(script: &str, timeout: Duration) -> Result<String, String> {
+pub(crate) fn run_script(script: &str, timeout: Duration) -> Result<String, String> {
     let script = format!("[Console]::OutputEncoding = New-Object System.Text.UTF8Encoding $false; $ProgressPreference = 'SilentlyContinue'; {script}");
     let encoded = BASE64.encode(script.encode_utf16().flat_map(u16::to_le_bytes).collect::<Vec<u8>>());
     let mut command = crate::process::hidden_command(&powershell_exe().to_string_lossy());

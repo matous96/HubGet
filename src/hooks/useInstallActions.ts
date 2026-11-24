@@ -4,10 +4,12 @@
  */
 import { resolveInstallOptions } from "@/lib/installArgs";
 import { canRepair } from "@/lib/repair";
+import { isWebOnly } from "@/lib/webOnly";
 import { getSource } from "@/services/managers";
 import { installFlags, packageIdFor, updateOptionsFor, useInstallOptions } from "@/store/installOptions";
 import { useJobs } from "@/store/jobs";
 import type { CatalogEntry, InstallOptions, SourceId } from "@/types";
+import { isUnmanagedOrigin } from "./useInstalledItems";
 import { useEffectiveSource, usePackageState } from "./usePackages";
 
 export function useInstallActions(entry: CatalogEntry, chosen?: SourceId) {
@@ -51,6 +53,17 @@ export function useInstallActions(entry: CatalogEntry, chosen?: SourceId) {
     repair: () => {
       const pkg = state.installed;
       if (pkg && canRepair(pkg)) enqueue({ appId: entry.id, appName: entry.name, source: pkg.source, packageId: pkg.packageId, kind: "repair" });
+    },
+    /**
+     * Uvolnit aplikaci (jako v iOS): odinstalovat, nastavení a data nechat – po Nainstalovat znovu
+     * se vrátí. Jen aplikace z katalogu, kterou jde znovu nainstalovat (ne hra z obchodu, program
+     * mimo správce nebo na disku, aplikace jen z webu výrobce).
+     */
+    canOffload:
+      !!state.installed && entry.sources.length > 0 && !isWebOnly(entry) && !isUnmanagedOrigin(state.installed.origin) && !state.installed.diskLocation,
+    offload: () => {
+      const pkg = state.installed;
+      if (pkg) enqueue({ appId: entry.id, appName: entry.name, source: pkg.source, packageId: pkg.packageId, kind: "uninstall", offload: true });
     },
     /** Stažení instalátoru bez instalace. */
     download: () => {

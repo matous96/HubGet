@@ -1,6 +1,8 @@
 import { ExternalLink, ShieldAlert, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useInstalledEntry } from "@/hooks/usePackages";
+import { isMajorUpdate } from "@/lib/majorUpdate";
 import { isSecurityNote } from "@/lib/securityUpdates";
 import { formatRelative } from "@/lib/utils";
 import { useSettings } from "@/store/settings";
@@ -14,6 +16,7 @@ export function WhatsNew({ entry }: { entry: CatalogEntry }) {
   const { t } = useTranslation();
   const language = useSettings((s) => s.language);
   const [expanded, setExpanded] = useState(false);
+  const installed = useInstalledEntry(entry.id);
   if (!entry.releaseNotes) return null;
   const long = entry.releaseNotes.length > 220;
 
@@ -28,6 +31,13 @@ export function WhatsNew({ entry }: { entry: CatalogEntry }) {
           {t("whatsNew.version", { version: entry.latestVersion })}
           {entry.releaseDate && ` · ${formatRelative(entry.releaseDate, language)}`}
         </span>
+        {/* Nainstalovaná aplikace dostane novou hlavní verzi (OBS 32 → 33) */}
+        {installed && isMajorUpdate(installed.installedVersion, entry.latestVersion) && (
+          <span className="inline-flex items-center gap-1 rounded-full bg-accent/12 px-2 py-0.5 text-xs font-semibold text-accent">
+            <Sparkles className="size-3.5" />
+            {t("majorUpdate.label")}
+          </span>
+        )}
         {/* Verze opravuje bezpečnostní chybu (CVE, „security fix“…) */}
         {isSecurityNote(entry.releaseNotes) && (
           <span className="inline-flex items-center gap-1 rounded-full bg-danger/12 px-2 py-0.5 text-xs font-semibold text-danger">

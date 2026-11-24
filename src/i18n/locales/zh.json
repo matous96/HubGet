@@ -109,7 +109,8 @@
     "about": "关于 HubGet",
     "overview": "电脑概览",
     "new": "目录新增",
-    "newPc": "新电脑"
+    "newPc": "新电脑",
+    "previous": "以前安装过"
   },
   "startup": {
     "title": "启动应用",
@@ -195,7 +196,7 @@
   },
   "privacy": {
     "title": "应用隐私",
-    "intro": "开发者 <b>{{publisher}}</b> 表示，该应用的隐私做法可能包括下述数据处理方式。有关详细信息，请参阅<policy>开发者的隐私政策</policy>。",
+    "intro": "使用厂商官方的策略和设置关闭已安装应用的遥测。随时可以恢复。",
     "introNoLink": "开发者 <b>{{publisher}}</b> 表示，该应用的隐私做法可能包括下述数据处理方式。",
     "notProvided": "开发者尚未提供此应用所处理数据的详细信息。",
     "policyLink": "开发者的隐私政策",
@@ -221,6 +222,21 @@
       "identifiers": "标识符",
       "usage": "使用数据",
       "diagnostics": "诊断"
+    },
+    "row": "{{name}}：不发送遥测",
+    "machine": "适用于这台电脑的所有用户——需要确认 UAC 提示。",
+    "failed": "无法更改隐私设置（{{error}}）。",
+    "hint": {
+      "firefox": "DisableTelemetry 策略——Firefox 不发送技术数据和使用数据。",
+      "thunderbird": "DisableTelemetry 策略——Thunderbird 不发送技术数据和使用数据。",
+      "chrome": "MetricsReportingEnabled 策略——Chrome 不发送使用统计和崩溃报告。",
+      "edge": "DiagnosticData 策略——Edge 不发送诊断数据。",
+      "brave": "MetricsReportingEnabled、BraveP3AEnabled 和 BraveStatsPingEnabled 策略——不发送统计或匿名测量数据。",
+      "vscode": "TelemetryLevel 策略——VS Code 不发送遥测（扩展可能有自己的遥测）。",
+      "visualStudio": "客户体验改善计划（SQM）已关闭。",
+      "office": "SendTelemetry 策略——Office 不发送客户端诊断数据。",
+      "dotnet": "DOTNET_CLI_TELEMETRY_OPTOUT 变量——dotnet 命令不发送遥测。",
+      "powershell": "POWERSHELL_TELEMETRY_OPTOUT 变量——PowerShell 7 启动时不发送遥测。"
     }
   },
   "arch": {
@@ -609,11 +625,13 @@
       "traced": "{{name}} 的安装监视：记录了 {{count}} 个新项目（文件夹、快捷方式、注册表）。卸载后会提示删除它们。",
       "skippedRunning": "{{name}} 正在运行——自动更新将等你关闭它后再进行。",
       "appClosed": "{{name}} 正在运行——已关闭（进程 {{processes}}），以便安装程序覆盖它。",
+      "otherAppsClosed": "其他程序占用了 {{name}} 的文件（{{processes}}）——已关闭，以便安装程序覆盖这些文件；正在重试操作。",
       "appClosing": "{{name}} 关闭时询问是否保存工作——正在等待用户关闭它。",
       "appCloseTimeout": "{{name}} 保持打开 15 分钟——操作已取消。",
       "needsAdmin": "{{name}} 需要管理员权限才能更新——将等待手动更新。",
       "settingsBackupFailed": "更新前无法备份 {{name}} 的设置：{{error}}",
-      "repairDone": "修复成功（{{seconds}} 秒）。"
+      "repairDone": "修复成功（{{seconds}} 秒）。",
+      "paused": "{{name}}：下载已暂停——已保留部分下载的安装程序，继续时会接着下载。"
     },
     "notice": {
       "prefetchFailed": "无法提前下载安装程序（{{detail}}）——将由 WinGet 下载。",
@@ -623,7 +641,10 @@
       "postCommandFailed": "安装后命令失败（{{detail}}）——安装本身已成功。",
       "needsAdmin": "需要管理员权限——后台自动更新不会打开 UAC 对话框。",
       "signedBy": "安装程序签名者：{{detail}}",
-      "unsigned": "安装程序没有数字签名。"
+      "unsigned": "安装程序没有数字签名。",
+      "finishingUpdate": "新版本（{{detail}}）正在等待应用关闭——HubGet 会关闭应用并立即完成更新，无需重启。",
+      "scanClean": "Microsoft Defender 未在安装程序中发现问题。",
+      "scanUnavailable": "无法使用 Microsoft Defender 扫描安装程序（{{detail}}）——可能启用了其他杀毒软件。"
     },
     "phase": {
       "queued": "正在排队…",
@@ -632,7 +653,8 @@
       "interactive": "正在等待你完成安装向导…",
       "installing": "正在运行安装程序…",
       "uninstalling": "正在卸载…",
-      "repairing": "正在修复安装…"
+      "repairing": "正在修复安装…",
+      "scanning": "Microsoft Defender 正在扫描安装程序…"
     }
   },
   "help": {
@@ -919,6 +941,8 @@
   },
   "package": {
     "install": "安装",
+    "reinstall": "重新安装",
+    "reinstallHint": "以前安装过——重新安装",
     "update": "更新",
     "uninstall": "卸载",
     "installed": "已安装",
@@ -926,6 +950,7 @@
     "openFolder": "打开文件夹",
     "webDownload": "从官网下载",
     "cancel": "取消",
+    "showProgress": "转到进度",
     "back": "返回",
     "publisher": "发布者",
     "latestVersion": "最新版本",
@@ -990,7 +1015,10 @@
     "cliMore": "更多命令和说明",
     "cliUnsupported": "{{manager}} 不支持此操作",
     "openSourceAlternatives": "{{name}} 的开源替代品",
-    "managedByStore": "此游戏由 {{store}} 管理——更新和文件验证在 {{store}} 中进行。"
+    "managedByStore": "此游戏由 {{store}} 管理——更新和文件验证在 {{store}} 中进行。",
+    "pause": "暂停下载",
+    "resume": "继续下载",
+    "paused": "已暂停"
   },
   "report": {
     "button": "报告问题",
@@ -1422,7 +1450,8 @@
     "estimate": "估计值——安装程序不报告进度",
     "remainingSeconds_other": "剩余 {{count}} 秒",
     "remainingMinutes_other": "剩余 {{count}} 分钟",
-    "repairing": "正在修复"
+    "repairing": "正在修复",
+    "scanning": "Defender 扫描"
   },
   "status": {
     "updates": "更新",
@@ -1616,7 +1645,9 @@
     "unsupported": "此包管理器不支持该操作",
     "sandbox": "在 Windows 沙盒中试用",
     "repair": "修复",
-    "repairHint": "从安装程序恢复应用损坏的文件——适用于应用无法启动或报错的情况。设置会保留。"
+    "repairHint": "从安装程序恢复应用损坏的文件——适用于应用无法启动或报错的情况。设置会保留。",
+    "offload": "卸载并保留数据",
+    "offloadHint": "卸载应用，但保留其设置和数据——重新安装后会恢复。"
   },
   "installOptions": {
     "title": "安装选项——{{name}}",
@@ -1895,6 +1926,7 @@
     "fallbackFailed": "无法安装 {{name}}：{{from}} 的安装程序不可用，通过 {{sources}} 的备用安装也失败了——{{error}}",
     "endedProcesses": "{{name}} 正在后台运行——HubGet 已将其关闭并继续",
     "appClosed": "{{name}} 正在运行——HubGet 已将其关闭并继续",
+    "otherAppsClosed": "{{name}}：HubGet 已关闭阻止安装程序的 {{processes}}，正在重试",
     "appClosing": "{{name}} 正在询问是否保存工作——请保存并关闭应用，HubGet 随后会继续",
     "appCloseTimeout": "{{name}} 仍处于打开状态——操作已取消",
     "repairDone": "{{name}} – 已修复（{{source}}）"
@@ -1924,6 +1956,7 @@
     "selfUpdating": "更新到 {{target}} 后，该应用自行回到了版本 {{version}}——它使用自己的更新程序。将不再提供包管理器更新（可在应用页面更改）。",
     "summary": "操作队列已完成——{{success}} 个成功，{{failed}} 个失败，{{cancelled}} 个已取消。",
     "appClosed": "该应用正在运行——已关闭（进程 {{processes}}）。",
+    "otherAppsClosed": "已关闭：{{processes}}——它们占用了该应用的文件，安装程序无法覆盖。正在重试。",
     "appClosing": "该应用正在询问是否保存工作——关闭后 HubGet 会继续。",
     "appCloseTimeout": "该应用保持打开 15 分钟——操作已取消。关闭应用后请重试。",
     "repairDone": "已修复（{{source}}）"
@@ -1988,7 +2021,8 @@
     "repairUserScope": "仅为你安装的应用无法以管理员权限修复——请在不使用管理员权限的情况下重试（{{code}}）。",
     "signerChanged": "新版本的安装程序与上次的签名者不同（{{detail}}）——HubGet 未运行它。详情见应用页面。",
     "signatureMissing": "以前的安装程序由“{{detail}}”签名，此安装程序没有数字签名——HubGet 未运行它。",
-    "signatureInvalid": "安装程序的数字签名与其内容不符——文件在签名后被修改。HubGet 未运行它。"
+    "signatureInvalid": "安装程序的数字签名与其内容不符——文件在签名后被修改。HubGet 未运行它。",
+    "threatFound": "Microsoft Defender 在安装程序中发现威胁（{{detail}}）——HubGet 未运行它。"
   },
   "managerError": {
     "failed": "{{name}} 以错误 {{code}} 结束",
@@ -2359,7 +2393,18 @@
     "seen": "上次在线：{{when}}",
     "apps_other": "{{count}} 个应用",
     "updates_other": "{{count}} 个更新",
-    "installHere": "安装到这里（{{count}}）"
+    "installHere": "安装到这里（{{count}}）",
+    "autoInstall": "{{name}}：正在自动安装——它已添加到 {{device}}。",
+    "autoInstallSetting": "自动安装其他电脑上的应用",
+    "autoInstallHint": "你在账户中另一台电脑上安装的应用，HubGet 也会在后台安装到这里。仅限开启后的新安装——不包括你在此处卸载的应用。",
+    "updateThere": "在那里更新",
+    "updateThereHint": "{{device}} 上运行 HubGet 后会立即更新所有应用。",
+    "updateRequested": "已发送——那台电脑运行 HubGet 后执行",
+    "remoteUpdate_other": "{{device}} 请求了更新——正在更新 {{count}} 个应用。",
+    "remoteUpdateNone": "{{device}} 请求了更新——这里的一切都已是最新。",
+    "remoteInstall_other": "{{device}} 发送了 {{count}} 个应用待安装：{{names}}。",
+    "remoteInstallPresent": "{{name}}：{{device}} 发送了安装请求，但这里已经安装。",
+    "remoteInstallUnavailable": "{{name}}：{{device}} 发送了安装请求，但这里没有已启用的来源可以安装它。"
   },
   "eol": {
     "title_other": "{{count}} 个程序已不再获得安全更新",
@@ -2440,7 +2485,9 @@
   },
   "jumpList": {
     "updates": "可用更新",
-    "updateAll": "全部更新"
+    "updateAll": "全部更新",
+    "updatesCount_other": "可用更新（{{count}}）",
+    "search": "搜索"
   },
   "sandbox": {
     "unavailable": "Windows 沙盒未启用。请在“控制面板 → 程序 → 启用或关闭 Windows 功能 → Windows 沙盒”中启用（仅限 Windows 专业版和企业版，之后需重启）。",
@@ -2785,5 +2832,201 @@
     "few": "少于 3",
     "days_other": "{{count}} 天内",
     "requests": "大家希望 HubGet 收录的应用——建议的应用"
+  },
+  "previous": {
+    "title": "以前安装过",
+    "subtitle": "你以前用过的应用——点云朵图标即可重新安装。",
+    "here": "此电脑（{{n}}）",
+    "devices": "其他电脑（{{n}}）",
+    "hidden": "已隐藏（{{n}}）",
+    "empty": "这里还没有内容。卸载应用后，可以在这里找到它。",
+    "hide": "隐藏",
+    "unhide": "显示",
+    "offloaded": "{{when}}已卸载并保留设置——重新安装后会恢复",
+    "offloadedNoBackup": "{{when}}已卸载——设置留在应用文件夹中",
+    "onDevices": "在 {{names}} 上",
+    "hint": {
+      "here": "曾在此电脑上安装、现已不在的应用。",
+      "devices": "你的其他电脑（我的电脑）上有、而此电脑上没有的应用。",
+      "hidden": "已隐藏的应用——点眼睛按钮可放回列表。"
+    }
+  },
+  "offload": {
+    "done": "已卸载 {{name}} 并保留设置。可在“以前安装过”中重新安装。",
+    "restored": "{{name}} 的设置已恢复，与卸载前相同。"
+  },
+  "majorUpdate": {
+    "title": "重大更新",
+    "label": "重大更新",
+    "badge": "重大",
+    "version": "新版本 {{version}}",
+    "noNotes": "新的主要版本 {{to}}（你当前为 {{from}}）——看看有什么新内容。",
+    "manual": "主版本仅手动更新",
+    "manualHint": "新的主版本（如 OBS 32 → 33）常会改变操作和设置——不会自动安装，等待你在“可用更新”中点击。",
+    "skippedAuto": "{{name}} {{version}} 是新的主版本——不会自动安装，等待手动更新。"
+  },
+  "ratePrompt": {
+    "title": "你觉得 {{name}} 怎么样？",
+    "never": "不再询问",
+    "later": "以后再说",
+    "setting": "邀请为新应用评分",
+    "settingHint": "安装几天后，主页会询问你对应用的看法——一键评分能帮助其他人。",
+    "text_other": "你已使用 {{count}} 天。你的评分能帮助其他人选择。",
+    "thanks": "感谢你的评分！",
+    "writeHint": "想为 {{name}} 写几句话吗？评论能更好地帮助其他人。"
+  },
+  "forYou": {
+    "because": "因为你装了 {{name}}"
+  },
+  "channels": {
+    "try": "试用预览版：",
+    "prerelease": "这是预览版（{{channel}}）——更早获得新功能，但可能有错误。它会与稳定版并存安装。",
+    "stable": "稳定版：{{name}}",
+    "name": {
+      "beta": "Beta",
+      "preview": "Preview",
+      "insiders": "Insiders",
+      "dev": "Dev",
+      "canary": "Canary",
+      "nightly": "Nightly",
+      "ptb": "PTB",
+      "alpha": "Alpha",
+      "rc": "RC",
+      "eap": "EAP"
+    }
+  },
+  "downloadLimit": {
+    "label": "限制下载速度",
+    "hint": "HubGet 下载的安装程序不会占满你的网络——适合慢速网络或视频通话时使用。",
+    "none": "不限制",
+    "kbps": "{{n}} KB/s",
+    "mbps": "{{n}} MB/s"
+  },
+  "funding": {
+    "button": "支持开发者",
+    "title": "支持 {{name}} 的开发者",
+    "hint": "链接来自该应用的 GitHub 仓库。HubGet 不从捐赠中抽取任何费用——款项直接归开发者。"
+  },
+  "restore": {
+    "title": "重装了 Windows？",
+    "text_other": "此电脑（{{name}}，上次在线 {{when}}）曾有 {{count}} 个应用，现在不在了。一键恢复？",
+    "action_other": "恢复 {{count}} 个应用"
+  },
+  "doctor": {
+    "button": "为什么失败？",
+    "title": "为什么 {{name}} 没有成功？",
+    "checking": "正在检查是什么阻止了操作…",
+    "fix": "修复并重试",
+    "defer": "下次登录时完成",
+    "deferHint": "下次登录时，占用文件的应用还未运行——更新会自动完成（HubGet 需要随 Windows 启动，否则在下次打开 HubGet 时完成）。",
+    "running": "{{name}} 正在运行",
+    "runningHint": "重试前会先关闭它——先正常关闭，以便提示保存工作。",
+    "holders": "应用的文件正被以下程序使用：{{names}}",
+    "holdersHint": "安装程序无法覆盖它们。重试会关闭它们，并防止它们在安装期间重新启动。以管理员身份运行的程序或服务请手动关闭，或重启电脑。",
+    "reboot": "Windows 正在等待重启",
+    "rebootHint": "重启后安装通常会成功——未完成的 Windows 更新可能会阻止安装程序。",
+    "admin": "此操作需要管理员权限",
+    "adminHint": "重试会直接以管理员身份运行——请确认 UAC 提示。",
+    "network": "无法下载安装程序",
+    "networkHint": "请检查网络连接（或 VPN / 代理）后重试。",
+    "disk": "磁盘空间不足",
+    "diskLink": "在“电脑概览”中释放空间",
+    "signature": "安装程序的签名不匹配",
+    "signatureHint": "出于安全考虑，HubGet 没有运行安装程序。详情及接受更改的选项见应用详情页。",
+    "manifest": "问题可能出在 winget 清单中",
+    "manifestHint": "winget 目录中的链接、校验和或安装程序代码不匹配。向维护者报告会有帮助——",
+    "manifestReport": "在 GitHub 上预填报告",
+    "nothing": "没有发现明显问题",
+    "nothingHint": "请重试——可能只是暂时性故障。"
+  },
+  "failedRetry": {
+    "text_other": "{{count}} 个操作失败（{{names}}）。",
+    "retry": "重试失败项"
+  },
+  "afterBatch": {
+    "label": "更新完成后",
+    "none": "完成后：无操作",
+    "sleep": "完成后：睡眠",
+    "shutdown": "完成后：关机",
+    "title": {
+      "sleep": "让电脑进入睡眠？",
+      "shutdown": "关闭电脑？"
+    },
+    "now": {
+      "sleep": "立即睡眠",
+      "shutdown": "立即关机"
+    },
+    "text": {
+      "sleep_other": "更新已完成。电脑将在 {{count}} 秒后进入睡眠。",
+      "shutdown_other": "更新已完成。电脑将在 {{count}} 秒后关机。"
+    }
+  },
+  "deferred": {
+    "running_other": "正在完成 {{count}} 个推迟的更新：{{names}}。"
+  },
+  "autoPause": {
+    "label": "暂停自动更新",
+    "hint": "几天内不自动安装任何内容——例如演示前或旅途中。检查和通知照常进行。",
+    "until": "已暂停至 {{until}}——之后自动更新会自行恢复。",
+    "resume": "恢复",
+    "days_other": "{{count}} 天",
+    "skipped": "自动更新已暂停至 {{until}}——不会安装任何内容。"
+  },
+  "prefetchUpdates": {
+    "label": "提前下载更新",
+    "hint": "在后台下载待处理的 winget 更新安装程序（按流量计费的连接除外）——之后“全部更新”几乎只需安装。"
+  },
+  "updatesOverview": {
+    "title_other": "更新 {{count}} 个应用",
+    "dontShow": "下次不再显示",
+    "start_other": "更新 {{count}} 个",
+    "size": "共需下载 {{size}}。",
+    "sizeAtLeast": "至少需下载 {{size}}（部分应用大小未知）。",
+    "sizeUnknown": "下载大小未知。",
+    "setting": "“全部更新”前显示概览",
+    "settingHint": "批量更新前显示要更新的内容、版本变化和下载量——可以取消勾选单个应用。"
+  },
+  "postCheck": {
+    "ok": "{{name}}：更新后检查正常。",
+    "missing": "{{name}}：更新后主程序缺失（{{file}}）。应用可能无法启动——可在应用详情中回退到上一版本。",
+    "invalid": "{{name}}：更新后主程序签名无效（{{file}}）。文件可能已损坏或被篡改——请考虑在应用详情中回退到上一版本。",
+    "unsigned": "{{name}}：主程序原本有签名，更新后却没有签名（{{file}}）。请考虑在应用详情中回退到上一版本。"
+  },
+  "sendToDevice": {
+    "menu": "在另一台电脑上安装…",
+    "title": "在另一台电脑上安装 {{name}}",
+    "intro": "那台电脑上以同一账户运行 HubGet 后会立即安装该应用。",
+    "present": "已安装",
+    "oldVersion": "需要更新的 HubGet",
+    "waiting": "已发送——等待 HubGet",
+    "send": "发送"
+  },
+  "schedule": {
+    "menu": "稍后安装…",
+    "menuCancel": "取消计划安装（{{when}}）",
+    "title": "何时安装 {{name}}？",
+    "night": "夜间（{{when}}）",
+    "hour": "一小时后",
+    "custom": "自定义时间",
+    "hint": "HubGet 必须在运行（隐藏在时钟旁即可）。在此之前电脑不会自动睡眠；如果电脑关机，将在下次启动 HubGet 时安装。",
+    "submit": "计划",
+    "done": "{{name}} 将于 {{when}} 安装。",
+    "running_other": "计划安装开始：{{names}}。",
+    "banner": "计划安装",
+    "cancel": "取消 {{name}} 的计划安装"
+  },
+  "trial": {
+    "menu": "试用一周",
+    "menuHint": "安装应用；如果一周内一次都没有打开，HubGet 会提议卸载。",
+    "kept": "{{name}}：试用周已结束——你在使用该应用，将保留。",
+    "notify_other": "试用周已结束：你从未打开过 {{names}}。保留还是卸载？（主页）",
+    "title": "你试用过 {{name}} 吗？",
+    "text_other": "安装后的 {{count}} 天里你一次都没有打开该应用。",
+    "keep": "保留",
+    "uninstall": "卸载"
+  },
+  "installerScan": {
+    "label": "使用 Microsoft Defender 扫描安装程序",
+    "hint": "HubGet 下载的安装程序在运行前由 Defender 扫描（本地、免费）。发现问题时不会开始安装。"
   }
 }

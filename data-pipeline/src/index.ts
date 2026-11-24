@@ -95,6 +95,8 @@ for (const [entry, repo] of repoOf) {
   // Opuštěné aplikace (HubGet: lib/abandoned.ts) – archivovaný repozitář, dlouho bez změn
   if (info.archived) entry.archived = true;
   if (info.pushedAt) entry.lastCommit = info.pushedAt;
+  // Podpořit vývojáře (FUNDING.yml) – HubGet z darů nic nebere, odkazy vedou přímo k vývojářům
+  if (info.funding?.length) entry.funding = info.funding;
 }
 log.info(
   `GitHub: hvězdičky u ${catalog.packages.filter((p) => p.githubStars !== undefined).length} aplikací z ${githubRepos.size} repozitářů, ` +

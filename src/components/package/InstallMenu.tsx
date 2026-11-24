@@ -28,6 +28,9 @@ import {
   SquareTerminal,
   Undo2,
   Wrench,
+  CloudUpload,
+  Send,
+  TimerOff,
   type LucideIcon,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
@@ -45,6 +48,10 @@ import { cn } from "@/lib/utils";
 import { isTauri } from "@/lib/tauri";
 import { isWebOnly, openDownloadPage } from "@/lib/webOnly";
 import { useCompare } from "@/store/compare";
+import { useScheduled } from "@/store/scheduled";
+import { useTrials } from "@/store/trials";
+import { formatScheduled, useScheduleUi } from "./ScheduleInstall";
+import { useOtherDeviceCount, useSendToDevice } from "./SendToDeviceDialog";
 import { useInstallUi } from "@/store/installUi";
 import { useRollbackUi } from "@/store/rollback";
 import { useSettings } from "@/store/settings";
@@ -97,11 +104,15 @@ export function InstallMenuItems({ entry, source, showDetails = true, onClose }:
   const rollback = useRollback(entry.id, actions.installed);
   const openRollback = useRollbackUi((s) => s.open);
   const compare = useCompareToggle(entry);
+  const language = useSettings((s) => s.language);
+  // Naplánovaná instalace této aplikace (Nainstalovat později…)
+  const scheduled = useScheduled((s) => s.items.find((i) => i.request.appId === entry.id));
+  const otherDevices = useOtherDeviceCount();
   // Balíček z repozitáře správce (ne program jen v registru, na disku nebo hra z herního obchodu)
   const repoPackage = !!actions.source && !/^(ARP|MSIX|DISK|EPIC)\\/i.test(actions.source.packageId);
   // Je nad Podrobnostmi aspoň jedna akce (jinak by nabídka začínala oddělovačem – hra ze Steamu)
   const hasActions =
-    notInstalled || status === "updatable" || actions.canRepair || pin.canPin || (!!rollback && !!actions.installed) || repoPackage;
+    notInstalled || status === "updatable" || actions.canRepair || actions.canOffload || pin.canPin || (!!rollback && !!actions.installed) || repoPackage;
 
   const run = (fn: () => void) => () => {
     onClose();
@@ -134,6 +145,10 @@ export function InstallMenuItems({ entry, source, showDetails = true, onClose }:
       {/* Oprava poškozené instalace (winget repair) – jen u nainstalované aplikace z wingetu / Aplikací ve Windows */}
       {!notInstalled && actions.canRepair && (
         <Item icon={Wrench} label={t("installMenu.repair")} hint={t("installMenu.repairHint")} disabled={!!job} onClick={run(actions.repair)} />
+      )}
+      {/* Uvolnit aplikaci: odinstalovat, nastavení nechat – vrátí se po Nainstalovat znovu (mráček) */}
+      {!notInstalled && actions.canOffload && (
+        <Item icon={CloudUpload} label={t("installMenu.offload")} hint={t("installMenu.offloadHint")} disabled={!!job} onClick={run(actions.offload)} />
       )}
       {/* Přeskočit nabízenou verzi / odložit / ignorovat aktualizace / zrušit zámek */}
       {pin.canPin && pin.offered && (
@@ -170,6 +185,36 @@ export function InstallMenuItems({ entry, source, showDetails = true, onClose }:
             disabled={busy}
             onClick={run(() => openOptions(entry, actions.source?.source))}
           />
+          {/* Nainstalovat později (v noci, za hodinu…) a Vyzkoušet na týden – jen balíček z repozitáře */}
+          {isTauri() && repoPackage && actions.source && (
+            <>
+              {scheduled ? (
+                <Item
+                  icon={TimerOff}
+                  label={t("schedule.menuCancel", { when: formatScheduled(scheduled.at, language) })}
+                  onClick={run(() => useScheduled.getState().cancel(entry.id))}
+                />
+              ) : (
+                <Item
+                  icon={AlarmClock}
+                  label={t("schedule.menu")}
+                  disabled={busy}
+                  onClick={run(() => useScheduleUi.getState().open({ entry, source: actions.source!.source, packageId: actions.source!.packageId }))}
+                />
+              )}
+              <Item
+                icon={FlaskConical}
+                label={t("trial.menu")}
+                hint={t("trial.menuHint")}
+                disabled={busy}
+                onClick={run(() => {
+                  const { source, packageId } = actions.source!;
+                  useTrials.getState().add(entry.id, { name: entry.name, source, packageId });
+                  actions.install();
+                })}
+              />
+            </>
+          )}
         </>
       )}
       {/* Ruční instalace, stažení instalátoru a Sandbox jen u balíčku z repozitáře správce – ne u programu
@@ -216,6 +261,14 @@ export function InstallMenuItems({ entry, source, showDetails = true, onClose }:
       {/* Vyzkoušet v izolovaném Windows Sandboxu – jen WinGet (instalátor stáhne winget) */}
       {isTauri() && repoPackage && actions.source?.source === "winget" && (
         <Item icon={FlaskConical} label={t("installMenu.sandbox")} onClick={run(() => void trySandbox(actions.source!.packageId, entry.name))} />
+      )}
+      {/* Nainstalovat na jiný počítač na účtu (Moje počítače) – provede se, až tam HubGet poběží */}
+      {isTauri() && repoPackage && actions.source && otherDevices > 0 && (
+        <Item
+          icon={Send}
+          label={t("sendToDevice.menu")}
+          onClick={run(() => useSendToDevice.getState().open({ entry, source: actions.source!.source, packageId: actions.source!.packageId }))}
+        />
       )}
 
       {(showDetails || compare.available) && hasActions && <Separator />}

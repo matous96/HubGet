@@ -87,6 +87,20 @@ export interface AutoUpdatesSettings {
   selfUpdatingWait: boolean;
   /** Anonymně přispívat do žebříčku instalací v HubGetu (store/installStats.ts). */
   communityInstalls: boolean;
+  /** Aplikace nainstalované na jiném počítači na účtu nainstalovat i tady (store/deviceInstalls.ts). */
+  installFromDevices: boolean;
+  /** Omezení rychlosti stahování instalátorů v kB/s (0 = bez omezení) – download.rs, `--limit-rate`. */
+  downloadLimit: number;
+  /** Automatické aktualizace pozastavené do (ms) – před prezentací, streamem…; null = běží. */
+  pausedUntil: number | null;
+  /** Novou hlavní verzi (OBS 32 → 33, lib/majorUpdate) automaticky neinstalovat – na kliknutí. */
+  majorManual: boolean;
+  /** Před „Aktualizovat vše“ ukázat přehled (velikost, novinky, výběr) – UpdatesOverviewDialog. */
+  overviewBeforeUpdateAll: boolean;
+  /** Čekající aktualizace stáhnout předem na pozadí (ne na měřeném připojení) – jobs.ts → prefetch. */
+  prefetchUpdates: boolean;
+  /** Instalátor stažený HubGetem před spuštěním prověřit Microsoft Defenderem (defender.rs). */
+  installerScan: boolean;
   /** Varovat, když se mezi nainstalovanou a novou verzí změní server instalátoru (winget); automaticky takovou aktualizaci neinstalovat. */
   warnHostChange: boolean;
   /** Na stránce aktualizací předem zaškrtnout všechny aktualizace. */
@@ -143,6 +157,13 @@ export const useAutoUpdates = create<AutoUpdatesState>()(
       stuckLimit: 3,
       selfUpdatingWait: true,
       communityInstalls: false,
+      installFromDevices: false,
+      downloadLimit: 0,
+      pausedUntil: null,
+      majorManual: true,
+      overviewBeforeUpdateAll: true,
+      prefetchUpdates: true,
+      installerScan: true,
       warnHostChange: true,
       preselectUpdates: false,
       checking: false,
