@@ -1,10 +1,10 @@
 {
   "version": "0.3",
-  "date": "2026-11-21",
-  "releases": 4,
+  "date": "2026-11-24",
+  "releases": 5,
   "cs": {
     "title": "Přehled počítače, hry ze všech obchodů a bezpečnostní aktualizace napřed",
-    "lead": "Verze 0.3.0 až 0.3.3 (19.–21. 11. 2026).",
+    "lead": "Verze 0.3.0 až 0.3.4 (19.–24. 11. 2026).",
     "highlights": [
       {
         "title": "Přehled počítače",
@@ -20,6 +20,16 @@
       }
     ],
     "new": [
+      "**Aktualizovat jde každá aplikace** (0.3.4) – programy a služby, které drží soubory aplikace (virtuální kamera, grafické doplňky, nástroje výrobce počítače), HubGet během aktualizace zavře a hlídá, aby se nespustily znovu.",
+      "**Proč aktualizace selhala?** (0.3.4) – průvodce najde příčinu a jedním kliknutím ji opraví; k tomu Zkusit neúspěšné znovu, Po dokončení uspat nebo vypnout a Dokončit při příštím přihlášení.",
+      "**Aktualizace pod kontrolou** (0.3.4) – pozastavení automatických aktualizací na 1–7 dní, velké verze jen ručně, přehled před Aktualizovat vše, stahování předem, kontrola po aktualizaci a limit rychlosti stahování.",
+      "**Moje počítače** (0.3.4) – Aktualizovat tam, Nainstalovat na jiný počítač a automatická instalace aplikací přidaných na ostatních počítačích; po přeinstalování Windows nabídka vrátit aplikace.",
+      "**Nainstalovat později** a **Vyzkoušet na týden** (0.3.4) – instalace v noci nebo ve zvolený čas; nespuštěnou aplikaci HubGet po týdnu nabídne odinstalovat.",
+      "**Soukromí aplikací** (0.3.4) – vypnutí telemetrie Firefoxu, Chromu, Edge, Brave, VS Code, Office, .NET a dalších jejich oficiálními zásadami.",
+      "**Kontrola instalátoru Defenderem** (0.3.4) – stažený instalátor před spuštěním prověří Microsoft Defender; když něco najde, instalace se nespustí.",
+      "**Jako v App Storu** (0.3.4) – průběh instalace zůstane vidět i při posunu detailu, stahování jde pozastavit a navázat, dřív nainstalované aplikace mají ikonu mráčku a aplikaci jde uvolnit (odinstalovat a nechat si nastavení).",
+      "**Doporučeno pro vás**, **významné aktualizace** a **výzva k hodnocení** na Domů (0.3.4).",
+      "**Předběžné verze** a **podpora vývojářů** (0.3.4) – Beta, Insiders či Nightly vedle stabilní verze a odkazy na GitHub Sponsors, Open Collective nebo Ko-fi u open-source aplikací.",
       "**Hry ze všech obchodů** (0.3.2) – kromě Steamu ukáže Knihovna i hry z Epic Games, EA app, GOG Galaxy, Ubisoft Connect a Battle.net s ikonou, velikostí a spuštěním přes jejich obchod.",
       "**Kontrola podpisu instalátoru** (0.3.2) – před instalací a aktualizací HubGet ověří digitální podpis staženého instalátoru; neplatný podpis nebo nový vydavatel instalaci zastaví a HubGet vysvětlí proč.",
       "**Opravit aplikaci** (0.3.2) – oprava přes winget v nabídce nainstalované aplikace, pokud ji instalátor podporuje.",
@@ -47,6 +57,7 @@
       "**Win+Shift+H** otevře HubGet odkudkoli s kurzorem ve vyhledávání a jednou týdně přijde **souhrn** aktualizací."
     ],
     "improved": [
+      "Rychlé akce na ikoně v hlavním panelu ukazují počet aktualizací a přibyly Nainstalované a Hledat; příkaz hubget search bez textu otevře hledání (0.3.4).",
       "Aplikace, které se aktualizují samy (Chrome, Firefox, Discord…), dostanou na vlastní aktualizaci 14 dní (bezpečnostní opravu 3 dny), než ji nabídne HubGet (0.3.2).",
       "Hledání rozumí i účelu – „střih videa“, „správce hesel“, „upravit pdf“ (0.3.2).",
       "Upozornění na opuštěné aplikace (archivovaný projekt nebo roky bez změn) a v Knihovně přehled Nedávno aktualizováno (0.3.2).",
@@ -63,6 +74,8 @@
       "U instalátoru v technických údajích je odkaz na kontrolu ve VirusTotalu."
     ],
     "fixed": [
+      "Aktualizace OBS selhávala, když její soubory držel nástroj výrobce počítače nebo služba virtuální kamery – teď je HubGet zavře a aktualizaci dokončí (0.3.4).",
+      "Aktualizace ChatGPT zůstala nedokončená, dokud aplikace běžela – teď ji HubGet dokončí hned (0.3.4).",
       "Aktualizace aplikací MSIX s vlastní službou Windows (nový ChatGPT s Codexem) končila chybou 0x80073D28 – teď se zopakuje s právy správce (0.3.3).",
       "Když soubory aplikace držel jiný program (virtuální kameru OBS třeba prohlížeč nebo videohovor), HubGet hlásil, že běží aplikace sama. Teď napíše, který program to je, a nabídne ho zavřít (0.3.3).",
       "V Nainstalovaných se aplikace ze Storu ukazovaly dvakrát.",
@@ -72,7 +85,7 @@
   },
   "en": {
     "title": "PC overview, games from every store and security updates first",
-    "lead": "Versions 0.3.0 to 0.3.3 (Nov 19–21, 2026).",
+    "lead": "Versions 0.3.0 to 0.3.4 (Nov 19–24, 2026).",
     "highlights": [
       {
         "title": "PC overview",
@@ -88,6 +101,16 @@
       }
     ],
     "new": [
+      "**Every app can be updated** (0.3.4) – programs and services holding the app’s files (virtual camera, graphics overlays, PC maker tools) are closed during the update and kept from starting again.",
+      "**Why did the update fail?** (0.3.4) – a guide finds the cause and fixes it in one click; plus Retry failed, Sleep or shut down when done and Finish at next sign-in.",
+      "**Updates under control** (0.3.4) – pause automatic updates for 1–7 days, major versions manually only, an overview before Update all, downloading ahead, a post-update check and a download speed limit.",
+      "**My computers** (0.3.4) – Update there, Install on another PC and automatic install of apps added on your other PCs; after reinstalling Windows, an offer to bring the apps back.",
+      "**Install later** and **Try for a week** (0.3.4) – install tonight or at a chosen time; if you never open the app, HubGet offers to uninstall it after a week.",
+      "**App privacy** (0.3.4) – turn off telemetry in Firefox, Chrome, Edge, Brave, VS Code, Office, .NET and more using their official policies.",
+      "**Defender installer scan** (0.3.4) – Microsoft Defender scans a downloaded installer before it runs; if it finds something, the install doesn’t start.",
+      "**Like the App Store** (0.3.4) – install progress stays visible while you scroll the details, downloads can be paused and resumed, previously installed apps get a cloud icon and an app can be offloaded (uninstalled while keeping its settings).",
+      "**Recommended for you**, **major updates** and a **rating prompt** on Home (0.3.4).",
+      "**Preview versions** and **support the developers** (0.3.4) – Beta, Insiders or Nightly next to the stable version and links to GitHub Sponsors, Open Collective or Ko-fi for open-source apps.",
       "**Games from every store** (0.3.2) – besides Steam, the Library now shows games from Epic Games, EA app, GOG Galaxy, Ubisoft Connect and Battle.net with icon, size and launching through their store.",
       "**Installer signature check** (0.3.2) – before installing or updating, HubGet verifies the digital signature of the downloaded installer; an invalid signature or a new publisher stops the installation and HubGet explains why.",
       "**Repair app** (0.3.2) – a repair through winget in the menu of an installed app, when the installer supports it.",
@@ -115,6 +138,7 @@
       "**Win+Shift+H** opens HubGet from anywhere with the cursor in search, and a weekly **summary** of updates."
     ],
     "improved": [
+      "Taskbar quick actions show the number of updates and gained Installed and Search; hubget search without text opens search (0.3.4).",
       "Apps that update themselves (Chrome, Firefox, Discord…) get 14 days to update on their own (3 days for a security fix) before HubGet offers the update (0.3.2).",
       "Search understands purpose too – “video editing”, “password manager”, “edit pdf” (0.3.2).",
       "Warnings about abandoned apps (archived project or years without changes) and Recently updated in the Library (0.3.2).",
@@ -131,6 +155,8 @@
       "The installer’s technical details include a link to check it on VirusTotal."
     ],
     "fixed": [
+      "OBS updates failed when a PC maker tool or the virtual camera service held its files – HubGet now closes them and finishes the update (0.3.4).",
+      "The ChatGPT update stayed unfinished while the app was running – HubGet now finishes it right away (0.3.4).",
       "Updates of MSIX apps with their own Windows service (the new ChatGPT with Codex) failed with error 0x80073D28 – they’re now retried with administrator rights (0.3.3).",
       "When another program held the app’s files (for example a browser or video call using the OBS virtual camera), HubGet said the app itself was running. Now it names the program and offers to close it (0.3.3).",
       "Microsoft Store apps appeared twice in Installed.",
