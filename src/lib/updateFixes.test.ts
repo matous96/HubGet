@@ -38,3 +38,13 @@ describe("dokončit při příštím přihlášení", () => {
     expect(request.options).toEqual({ scope: "machine", closeFileUsers: true, asAdmin: true });
   });
 });
+
+describe("kontrola instalátoru Defenderem", () => {
+  it("je výchozí vypnutá a nastavení z 0.3.4 (zapnuto) se převede na vypnuto", async () => {
+    const { migrateAutoUpdates, useAutoUpdates } = await import("@/store/autoUpdates");
+    expect(useAutoUpdates.getState().installerScan).toBe(false);
+    // Ostatní volby zůstanou; nové uložení (verze 1) se nemění – zapnutí v Nastavení platí
+    expect(migrateAutoUpdates({ installerScan: true, prefetchUpdates: false }, 0)).toEqual({ installerScan: false, prefetchUpdates: false });
+    expect(migrateAutoUpdates({ installerScan: true }, 1)).toEqual({ installerScan: true });
+  });
+});

@@ -3411,6 +3411,6 @@
   },
   "installerScan": {
     "label": "Prověřit instalátory Microsoft Defenderem",
-    "hint": "Instalátor, který HubGet stáhne, před spuštěním prověří Defender (v počítači, zdarma). Když něco najde, instalace se nespustí."
+    "hint": "Instalátor, který HubGet stáhne, před spuštěním celý prověří Defender (v počítači, zdarma); když něco najde, instalace se nespustí. U velkých instalátorů to trvá i několik minut – při spuštění instalátor Defender prověřuje i bez této volby."
   }
 }

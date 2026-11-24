@@ -194,8 +194,8 @@ s právy správce.
   odinstalovat.
 - 🕵️ **Soukromí aplikací** – vypnutí telemetrie Firefoxu, Chromu, Edge, VS Code, Office, .NET
   a dalších jejich oficiálními zásadami (Přehled počítače i detail aplikace).
-- 🛡️ **Kontrola instalátoru Defenderem** – stažený instalátor před spuštěním prověří Microsoft
-  Defender; když něco najde, instalace se nespustí.
+- 🛡️ **Kontrola instalátoru Defenderem** (volitelná) – stažený instalátor před spuštěním celý prověří
+  Microsoft Defender; když něco najde, instalace se nespustí.
 - ⌨️ **Win+Shift+H** otevře HubGet odkudkoli s kurzorem ve vyhledávání; jednou týdně
   souhrn, co se nainstalovalo a co čeká.
 - 📦 **Sady balíčků a profily** – sdílitelná sada aplikací pro nový počítač, export
@@ -1550,7 +1550,8 @@ z deps.dev (Google Open Source Insights, čísla pár dní stará), s proměnnou
   a `POWERSHELL_TELEMETRY_OPTOUT`. Uživatelské zapíše HubGet sám (proměnné rozešle `WM_SETTINGCHANGE`),
   zásady v HKLM přes PowerShell jako správce – povýšit jde jen skript přesně podle seznamu
   (`is_policy_command`). Vrácení smaže jen hodnoty HubGetu, ne celý klíč.
-- **Kontrola instalátoru Defenderem** (`src-tauri/src/defender.rs`, Nastavení → Aktualizace balíčků):
+- **Kontrola instalátoru Defenderem** (`src-tauri/src/defender.rs`, Nastavení → Aktualizace balíčků,
+  výchozí vypnuto – vlastní sken rozbalí celý archiv, 774MB MSIX trvá asi 2,5 min; jde zrušit):
   po stažení a ověření podpisu `MpCmdRun -Scan -ScanType 3 -File … -DisableRemediation` (bez práv
   správce); kód 2 = hrozba → chyba `threatFound` s názvem hrozby, jiný kód (jiný antivirus) jen
   zápis do protokolu. Průběh ukazuje fázi „Kontrola Defenderem“.

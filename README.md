@@ -168,7 +168,7 @@ retries it with administrator rights by itself.
 - 🧪 **Try for a week** – if you don’t open the app once within a week, HubGet offers to uninstall it.
 - 🕵️ **App privacy** – turn off telemetry in Firefox, Chrome, Edge, VS Code, Office, .NET and more
   using their official policies (PC overview and app details).
-- 🛡️ **Defender installer scan** – Microsoft Defender scans a downloaded installer before it runs;
+- 🛡️ **Defender installer scan** (optional) – Microsoft Defender fully scans a downloaded installer before it runs;
   if it finds something, the install doesn’t start.
 - 🌙 **A modern window** in the Windows 11 style, light and dark theme, seven languages (English, Czech, German, Spanish, French, Portuguese, Chinese);
   close the window and installs finish in the background.

@@ -3027,6 +3027,6 @@
   },
   "installerScan": {
     "label": "使用 Microsoft Defender 扫描安装程序",
-    "hint": "HubGet 下载的安装程序在运行前由 Defender 扫描（本地、免费）。发现问题时不会开始安装。"
+    "hint": "HubGet 下载的安装程序在运行前由 Defender 完整扫描（本地、免费）；发现问题时不会开始安装。大型安装程序可能需要几分钟——即使不开启此选项，Defender 也会在安装程序运行时检查它。"
   }
 }

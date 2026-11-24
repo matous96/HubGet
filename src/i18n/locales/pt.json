@@ -3264,6 +3264,6 @@
   },
   "installerScan": {
     "label": "Verificar instaladores com o Microsoft Defender",
-    "hint": "O Defender verifica os instaladores baixados pelo HubGet antes de executá-los (no PC, grátis). Se encontrar algo, a instalação não começa."
+    "hint": "O Defender verifica por completo os instaladores baixados pelo HubGet antes de executá-los (no PC, grátis); se encontrar algo, a instalação não começa. Instaladores grandes levam vários minutos – o Defender verifica o instalador ao executá-lo mesmo sem esta opção."
   }
 }

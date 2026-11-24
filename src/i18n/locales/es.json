@@ -3264,6 +3264,6 @@
   },
   "installerScan": {
     "label": "Analizar los instaladores con Microsoft Defender",
-    "hint": "Defender analiza los instaladores que descarga HubGet antes de ejecutarlos (en el PC, gratis). Si encuentra algo, la instalación no empieza."
+    "hint": "Defender analiza por completo los instaladores que descarga HubGet antes de ejecutarlos (en el PC, gratis); si encuentra algo, la instalación no empieza. Con instaladores grandes tarda varios minutos; Defender revisa el instalador al ejecutarse incluso sin esta opción."
   }
 }

@@ -99,7 +99,10 @@ export interface AutoUpdatesSettings {
   overviewBeforeUpdateAll: boolean;
   /** Čekající aktualizace stáhnout předem na pozadí (ne na měřeném připojení) – jobs.ts → prefetch. */
   prefetchUpdates: boolean;
-  /** Instalátor stažený HubGetem před spuštěním prověřit Microsoft Defenderem (defender.rs). */
+  /**
+   * Instalátor stažený HubGetem před spuštěním prověřit Microsoft Defenderem (defender.rs).
+   * Výchozí vypnuto – u velkých instalátorů sken trvá minuty.
+   */
   installerScan: boolean;
   /** Varovat, když se mezi nainstalovanou a novou verzí změní server instalátoru (winget); automaticky takovou aktualizaci neinstalovat. */
   warnHostChange: boolean;
@@ -163,7 +166,7 @@ export const useAutoUpdates = create<AutoUpdatesState>()(
       majorManual: true,
       overviewBeforeUpdateAll: true,
       prefetchUpdates: true,
-      installerScan: true,
+      installerScan: false,
       warnHostChange: true,
       preselectUpdates: false,
       checking: false,
@@ -185,9 +188,19 @@ export const useAutoUpdates = create<AutoUpdatesState>()(
     {
       name: "unibox-auto-updates",
       partialize: ({ checking: _checking, ...rest }) => rest,
+      version: 1,
+      migrate: (stored, version) => migrateAutoUpdates(stored, version) as AutoUpdatesState,
     },
   ),
 );
+
+/**
+ * Převod uloženého nastavení na novou verzi úložiště. 1: kontrola instalátorů Defenderem byla
+ * v 0.3.4 výchozí zapnutá – vypnout (sken velkého instalátoru trvá minuty), zapnout jde v Nastavení.
+ */
+export function migrateAutoUpdates(stored: unknown, version: number): unknown {
+  return version < 1 ? { ...(stored as object), installerScan: false } : stored;
+}
 
 /** Minimální stáří aktualizací pro správce (ve dnech). */
 export const minAgeFor = (settings: Pick<AutoUpdatesSettings, "minAgeDays" | "minAgeBySource">, source: SourceId) =>

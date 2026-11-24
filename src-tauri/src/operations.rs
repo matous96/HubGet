@@ -394,7 +394,7 @@ pub async fn execute(id: String, spec: Spec, channel: Channel<OpEvent>) -> Resul
                         //     Defender (jiný antivirus) jen zmíní průběh
                         if crate::defender::enabled() {
                             tracker.scanning();
-                            let verdict = crate::defender::scan(&job.target);
+                            let verdict = crate::defender::scan(&job.target, &token);
                             tracker.prefetched();
                             match verdict {
                                 crate::defender::Verdict::Clean => tracker.notice("scanClean", None),
@@ -409,6 +409,7 @@ pub async fn execute(id: String, spec: Spec, channel: Channel<OpEvent>) -> Resul
                                     });
                                 }
                                 crate::defender::Verdict::Unavailable(reason) => tracker.notice("scanUnavailable", Some(reason)),
+                                crate::defender::Verdict::Cancelled => return cancelled(&spec),
                             }
                         }
                     }

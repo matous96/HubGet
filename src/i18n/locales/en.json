@@ -3117,6 +3117,6 @@
   },
   "installerScan": {
     "label": "Scan installers with Microsoft Defender",
-    "hint": "Installers downloaded by HubGet are scanned by Defender before they run (locally, free). If it finds something, the install doesn’t start."
+    "hint": "Installers downloaded by HubGet are fully scanned by Defender before they run (locally, free); if it finds something, the install doesn’t start. Large installers can take several minutes – Defender checks the installer when it runs even without this option."
   }
 }

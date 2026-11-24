@@ -3117,6 +3117,6 @@
   },
   "installerScan": {
     "label": "Installer mit Microsoft Defender prüfen",
-    "hint": "Von HubGet heruntergeladene Installer prüft Defender vor dem Start (lokal, kostenlos). Findet er etwas, startet die Installation nicht."
+    "hint": "Von HubGet heruntergeladene Installer prüft Defender vor dem Start vollständig (lokal, kostenlos); findet er etwas, startet die Installation nicht. Große Installer brauchen dafür mehrere Minuten – beim Start prüft Defender den Installer auch ohne diese Option."
   }
 }
